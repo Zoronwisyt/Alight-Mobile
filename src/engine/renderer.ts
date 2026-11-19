@@ -1134,15 +1134,34 @@ export class AlightRenderer {
     let camState: { x: number; y: number; z: number; fov: number } | null = null;
     if (activeCam) {
       const { remappedNormT } = evalRemappedTime(activeCam, sceneTimeMs);
-      const cloc = evalAnimatable(activeCam.transform.location, remappedNormT, [project.width / 2, project.height / 2, 0]);
+      const ctf = this.resolveWorldTransform(activeCam, layersMap, sceneTimeMs, project.fps);
       const fov = activeCam.cameraData ? evalAnimatable(activeCam.cameraData.fov, remappedNormT, 60) : 60;
-      camState = { x: cloc[0] - project.width / 2, y: cloc[1] - project.height / 2, z: cloc[2] ?? 0, fov };
+      camState = { x: ctf.x - project.width / 2, y: ctf.y - project.height / 2, z: ctf.z, fov };
     }
 
-    for (const layer of layers) {
-      if (!layer.visible || layer.type === 'audio' || layer.type === 'null' || layer.type === 'camera') continue;
-      if (sceneTimeMs < layer.startTime || sceneTimeMs > layer.endTime) continue;
+    const activeLayers = layers.filter(
+      (layer) =>
+        layer.visible &&
+        layer.type !== 'audio' &&
+        layer.type !== 'null' &&
+        layer.type !== 'camera' &&
+        sceneTimeMs >= layer.startTime &&
+        sceneTimeMs <= layer.endTime
+    );
 
+    // Depth-sort layers by world Z (furthest negative Z first, closest positive Z on top) when any layer uses 3D Z space
+    let orderedLayers = activeLayers;
+    const zEntries = activeLayers.map((layer, idx) => ({
+      layer,
+      idx,
+      z: this.resolveWorldTransform(layer, layersMap, sceneTimeMs, project.fps).z,
+    }));
+    if (zEntries.some((e) => Math.abs(e.z) > 0.5)) {
+      zEntries.sort((a, b) => (Math.abs(a.z - b.z) > 0.5 ? a.z - b.z : a.idx - b.idx));
+      orderedLayers = zEntries.map((e) => e.layer);
+    }
+
+    for (const layer of orderedLayers) {
       // Echo Keyframes effect check
       const echoFx = layer.effects.find((e) => e.enabled && e.effectId === 'com.alightcreative.effects.repeat.echokf');
       if (echoFx) {
@@ -1179,17 +1198,23 @@ export class AlightRenderer {
     const isSelected = selectedIds.includes(layer.id);
     const tf = this.resolveWorldTransform(layer, layersMap, sceneTimeMs, project.fps, new Set<string>(), isSelected);
 
-    // Apply Camera 3D parallax / Z depth perspective if active
+    // Apply Alight Motion 3D Z-depth perspective (active whenever camera exists OR world Z != 0)
+    // Right-handed AM convention: -Z is further away (smaller), +Z is closer to viewer (larger).
     let wx = tf.x;
     let wy = tf.y;
     let wsx = tf.sx;
     let wsy = tf.sy;
-    if (camState) {
-      const focal = (project.width * 0.5) / Math.tan(((camState.fov || 60) * Math.PI) / 360);
-      const dz = Math.max(80, focal + tf.z - camState.z);
+    if (camState || Math.abs(tf.z) > 0.01) {
+      const fov = camState?.fov || 60;
+      const camX = camState?.x ?? 0;
+      const camY = camState?.y ?? 0;
+      const camZ = camState?.z ?? 0;
+      const focal = (project.height * 0.5) / Math.tan((fov * Math.PI) / 360);
+      const dz = focal - (tf.z - camZ);
+      if (dz <= 10) return; // behind camera near plane
       const pScale = focal / dz;
-      wx = project.width * 0.5 + (wx - camState.x - project.width * 0.5) * pScale;
-      wy = project.height * 0.5 + (wy - camState.y - project.height * 0.5) * pScale;
+      wx = project.width * 0.5 + (wx - camX - project.width * 0.5) * pScale;
+      wy = project.height * 0.5 + (wy - camY - project.height * 0.5) * pScale;
       wsx *= pScale;
       wsy *= pScale;
     }

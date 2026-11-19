@@ -546,6 +546,9 @@ function parseXmlLayer(
   const resolvedBlendMode: BlendModeId =
     isClippingMask && rawBlending !== 'exclude' ? 'mask' : rawBlending;
 
+  const parentId = el.getAttribute('parent') || null;
+  const defaultLoc: [number, number, number] = parentId ? [0, 0, 0] : [projW / 2, projH / 2, 0];
+
   return {
     id: el.getAttribute('id') || `layer_${Date.now()}_${idx}`,
     type,
@@ -555,11 +558,11 @@ function parseXmlLayer(
     endTime: parseFloat(el.getAttribute('endTime') || '3000'),
     visible: el.getAttribute('hidden') !== 'true' && el.getAttribute('visible') !== 'false',
     locked: false,
-    parentId: el.getAttribute('parent') || null,
+    parentId,
     blendMode: resolvedBlendMode,
     opacity: parsePropElement(tf?.querySelector(':scope > opacity') ?? null, parseNum, 1),
     transform: {
-      location: parsePropElement(tf?.querySelector(':scope > location') ?? null, parseVec3, [projW / 2, projH / 2, 0]),
+      location: parsePropElement(tf?.querySelector(':scope > location') ?? null, parseVec3, defaultLoc),
       rotation: parsePropElement(tf?.querySelector(':scope > rotation') ?? null, parseNum, 0),
       scale: parsePropElement(tf?.querySelector(':scope > scale') ?? null, parseVec2, [1, 1]),
       scaleLinked: true,
