@@ -8,6 +8,7 @@ interface SpinnerControlProps {
   max?: number;
   step?: number;
   multiplier?: number;
+  decimals?: number;
   unit?: string;
   hasKeyframe?: boolean;
   onToggleKeyframe?: () => void;
@@ -24,6 +25,7 @@ export const SpinnerControl: React.FC<SpinnerControlProps> = ({
   max = 10000,
   step = 1,
   multiplier = 1,
+  decimals,
   unit = '',
   hasKeyframe = false,
   onToggleKeyframe,
@@ -32,7 +34,8 @@ export const SpinnerControl: React.FC<SpinnerControlProps> = ({
   canOpenCurve = false,
   onChange,
 }) => {
-  const displayVal = Number((value * multiplier).toFixed(step < 0.05 ? 3 : step < 1 ? 2 : 1));
+  const fracDigits = decimals !== undefined ? decimals : step < 0.05 ? 3 : step < 1 ? 2 : 1;
+  const displayVal = Number((value * multiplier).toFixed(fracDigits));
   const range = max - min;
   const normPos = range > 0 ? Math.max(0, Math.min(1, (value - min) / range)) : 0.5;
 
@@ -46,7 +49,7 @@ export const SpinnerControl: React.FC<SpinnerControlProps> = ({
       const dx = ev.clientX - startX;
       let next = startVal + dx * sensitivity;
       next = Math.max(min, Math.min(max, next));
-      const invStep = 1 / Math.max(0.0001, step);
+      const invStep = 1 / Math.max(1e-6, step);
       next = Math.round(next * invStep) / invStep;
       onChange(next);
     };

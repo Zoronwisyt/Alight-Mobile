@@ -27,6 +27,7 @@ export const EditorScreen: React.FC = () => {
     layoutMode,
     selectedLayerIds,
     groupStack,
+    previewQuality,
     setCurrentTimeMs,
     setIsPlaying,
     togglePlay,
@@ -54,9 +55,6 @@ export const EditorScreen: React.FC = () => {
     return () => window.removeEventListener('resize', syncLayout);
   }, []);
 
-  const getPreviewScale = (width: number, height: number) =>
-    Math.max(width, height) > 1440 ? 0.5 : 0.75;
-
   // Initialize WebGL2 AlightRenderer
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -72,7 +70,7 @@ export const EditorScreen: React.FC = () => {
         const proj = store.currentProject;
         if (!proj || store.isPlaying) return;
         renderer.renderProject(proj, store.currentTimeMs, {
-          previewScale: getPreviewScale(proj.width, proj.height),
+          previewScale: store.previewQuality,
           selectedIds: store.selectedLayerIds,
           activeGroupStack: store.groupStack,
         });
@@ -93,17 +91,17 @@ export const EditorScreen: React.FC = () => {
     };
   }, []);
 
-  // Render single frame whenever project, playhead, or visibility changes while paused
+  // Render single frame whenever project, playhead, quality, or visibility changes while paused
   useEffect(() => {
     const renderer = rendererRef.current;
     if (!renderer || !currentProject || visibilityPaused || isPlaying || isExportingRef.current) return;
     renderer.syncVideosForPlayback(currentProject, currentTimeMs, false);
     renderer.renderProject(currentProject, currentTimeMs, {
-      previewScale: getPreviewScale(currentProject.width, currentProject.height),
+      previewScale: previewQuality,
       selectedIds: selectedLayerIds,
       activeGroupStack: groupStack,
     });
-  }, [currentProject, currentTimeMs, selectedLayerIds, groupStack, visibilityPaused, isPlaying]);
+  }, [currentProject, currentTimeMs, selectedLayerIds, groupStack, previewQuality, visibilityPaused, isPlaying]);
 
   // Playback rAF loop: renders directly to WebGL2 canvas + syncs HTMLVideo & Web Audio without React commit lag
   useEffect(() => {
@@ -142,7 +140,7 @@ export const EditorScreen: React.FC = () => {
           playheadMs = proj.durationMs;
           renderer.syncVideosForPlayback(proj, playheadMs, false);
           renderer.renderProject(proj, playheadMs, {
-            previewScale: getPreviewScale(proj.width, proj.height),
+            previewScale: store.previewQuality,
             selectedIds: store.selectedLayerIds,
             activeGroupStack: store.groupStack,
           });
@@ -154,7 +152,7 @@ export const EditorScreen: React.FC = () => {
 
       renderer.syncVideosForPlayback(proj, playheadMs, true);
       renderer.renderProject(proj, playheadMs, {
-        previewScale: getPreviewScale(proj.width, proj.height),
+        previewScale: store.previewQuality,
         selectedIds: store.selectedLayerIds,
         activeGroupStack: store.groupStack,
       });

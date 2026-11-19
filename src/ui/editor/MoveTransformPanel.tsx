@@ -1,10 +1,36 @@
 import React, { useState } from 'react';
+import { evalAnimatable } from '../../engine/animation';
 import { useEditorStore, type ActiveCurveTarget } from '../../store/useEditorStore';
+import type { Layer, Project } from '../../types/project';
 import { AmIcon } from '../components/AmIcon';
 import { SpinnerControl } from '../components/SpinnerControl';
 import { useSelectedLayer } from './useSelectedLayer';
 
 type Mode = 'location' | 'rotation' | 'scale' | 'skew';
+
+function getLayerBaseDimensions(layer: Layer, project: Project, normT: number): [number, number] {
+  if (layer.mediaData?.displayWidth && layer.mediaData?.displayHeight) {
+    return [layer.mediaData.displayWidth, layer.mediaData.displayHeight];
+  }
+  if (layer.mediaData?.naturalWidth && layer.mediaData?.naturalHeight) {
+    return [layer.mediaData.naturalWidth, layer.mediaData.naturalHeight];
+  }
+  if (layer.groupWidth && layer.groupHeight) {
+    return [layer.groupWidth, layer.groupHeight];
+  }
+  if (layer.type === 'shape' && layer.shapeParams) {
+    const sizeVal = layer.shapeParams.size ? evalAnimatable(layer.shapeParams.size, normT, null as unknown as number[]) : null;
+    if (Array.isArray(sizeVal) && Number.isFinite(sizeVal[0]) && Number.isFinite(sizeVal[1])) {
+      return [Math.max(1, Math.round(sizeVal[0] * 2)), Math.max(1, Math.round(sizeVal[1] * 2))];
+    }
+    const radVal = layer.shapeParams.radius ? evalAnimatable(layer.shapeParams.radius, normT, null as unknown as number) : null;
+    if (typeof radVal === 'number' && Number.isFinite(radVal)) {
+      const d = Math.max(1, Math.round(radVal * 2));
+      return [d, d];
+    }
+  }
+  return [project.width, project.height];
+}
 
 export const MoveTransformPanel: React.FC = () => {
   const { toggleKeyframeOnProp, stepKeyframe, setCurveTarget } = useEditorStore();
@@ -17,6 +43,9 @@ export const MoveTransformPanel: React.FC = () => {
   const loc = readAnim(layer.transform.location, [project.width / 2, project.height / 2, 0]);
   const rot = readAnim(layer.transform.rotation, 0);
   const scale = readAnim(layer.transform.scale, [1, 1]);
+  const [baseW, baseH] = getLayerBaseDimensions(layer, project, normT);
+  const resolvedW = Math.max(1, Math.round(baseW * scale[0]));
+  const resolvedH = Math.max(1, Math.round(baseH * scale[1]));
   const pivot = readAnim(layer.transform.pivot, [0, 0]);
   const skew = readAnim(layer.transform.skew, [0, 0]);
 
@@ -155,9 +184,9 @@ export const MoveTransformPanel: React.FC = () => {
             )}
             {mode === 'scale' && (
               <>
-                <div className="am-mt-coord-pill">
+                <div className="am-mt-coord-pill" title={`Resolution: ${resolvedW}×${resolvedH}px`}>
                   <span>W</span>
-                  <strong>{Math.round(scale[0] * 100)}%</strong>
+                  <strong>{resolvedW}px</strong>
                 </div>
                 <button
                   type="button"
@@ -171,9 +200,9 @@ export const MoveTransformPanel: React.FC = () => {
                 >
                   <AmIcon name={layer.transform.scaleLinked ? 'ic_size_link' : 'ic_size_unlink'} fallback="link" size={14} />
                 </button>
-                <div className="am-mt-coord-pill">
+                <div className="am-mt-coord-pill" title={`Resolution: ${resolvedW}×${resolvedH}px`}>
                   <span>H</span>
-                  <strong>{Math.round(scale[1] * 100)}%</strong>
+                  <strong>{resolvedH}px</strong>
                 </div>
               </>
             )}
@@ -330,13 +359,14 @@ export const MoveTransformPanel: React.FC = () => {
       {mode === 'scale' && (
         <>
           <SpinnerControl
-            label={layer.transform.scaleLinked ? 'Uniform Scale' : 'Scale X (Width)'}
+            label={layer.transform.scaleLinked ? `Scale Width (${resolvedW}×${resolvedH})` : 'Scale X (Width)'}
             value={scale[0]}
             min={0.01}
-            max={10}
-            step={0.01}
-            multiplier={100}
-            unit="%"
+            max={20}
+            step={1 / Math.max(1, baseW)}
+            multiplier={baseW}
+            decimals={0}
+            unit="px"
             onChange={(v) =>
               updateLayer((l) =>
                 setAnimValue(l.transform.scale, l.transform.scaleLinked ? [v, v] : [v, scale[1]])
@@ -348,10 +378,11 @@ export const MoveTransformPanel: React.FC = () => {
               label="Scale Y (Height)"
               value={scale[1]}
               min={0.01}
-              max={10}
-              step={0.01}
-              multiplier={100}
-              unit="%"
+              max={20}
+              step={1 / Math.max(1, baseH)}
+              multiplier={baseH}
+              decimals={0}
+              unit="px"
               onChange={(v) => updateLayer((l) => setAnimValue(l.transform.scale, [scale[0], v]))}
             />
           )}

@@ -2,9 +2,16 @@ import React, { useEffect, useRef, useState } from 'react';
 import { evalAnimatable, evalRemappedTime } from '../../engine/animation';
 import { getShapeById, parseDefaultParamValue } from '../../engine/catalog';
 import { evaluateShapeHandles } from '../../engine/scriptRuntime';
-import { useEditorStore } from '../../store/useEditorStore';
+import { useEditorStore, type PreviewQuality } from '../../store/useEditorStore';
 import { AmIcon } from '../components/AmIcon';
 import { LayerQuickActions } from './LayerQuickActions';
+
+const PREVIEW_QUALITY_OPTIONS: { q: PreviewQuality; label: string; short: string }[] = [
+  { q: 1, label: 'Full Quality (1/1)', short: 'Full' },
+  { q: 0.75, label: 'High Quality (3/4)', short: '3/4' },
+  { q: 0.5, label: 'Half Quality (1/2)', short: '1/2' },
+  { q: 0.25, label: 'Quarter Quality (1/4)', short: '1/4' },
+];
 
 interface PreviewCanvasProps {
   canvasRef: React.RefObject<HTMLCanvasElement | null>;
@@ -28,6 +35,8 @@ export const PreviewCanvas: React.FC<PreviewCanvasProps> = ({
     toggleGrid,
     snapEnabled,
     toggleSnap,
+    previewQuality,
+    setPreviewQuality,
     previewZoom,
     setPreviewZoom,
     previewPan,
@@ -42,6 +51,7 @@ export const PreviewCanvas: React.FC<PreviewCanvasProps> = ({
   const wrapRef = useRef<HTMLDivElement>(null);
   const [stageSize, setStageSize] = useState<{ w: number; h: number }>({ w: 360, h: 360 });
   const [snapGuide, setSnapGuide] = useState<{ x: boolean; y: boolean }>({ x: false, y: false });
+  const [qualityMenuOpen, setQualityMenuOpen] = useState(false);
   const touchDistRef = useRef<number | null>(null);
   const touchZoomStartRef = useRef<number>(1);
 
@@ -583,7 +593,53 @@ export const PreviewCanvas: React.FC<PreviewCanvasProps> = ({
             />
           </button>
 
-          {/* APK previewmode_canvas_zoom.xml (vertical + / 100% / - box) */}
+          {/* Preview Quality & Resolution Selector (Full 1.0x down to Quarter 0.25x) */}
+          <div className="am-quality-control">
+            <button
+              type="button"
+              className={`am-viewmode-btn am-quality-trigger ${previewQuality < 1 ? 'active' : ''}`}
+              onClick={() => setQualityMenuOpen((v) => !v)}
+              title="Preview Render Quality (Full to Quarter)"
+              aria-label="Preview Render Quality"
+            >
+              <span className="am-quality-short">
+                {PREVIEW_QUALITY_OPTIONS.find((o) => o.q === previewQuality)?.short ?? '3/4'}
+              </span>
+              <span className="am-quality-res">
+                {Math.max(16, Math.round(currentProject.width * previewQuality))}×
+                {Math.max(16, Math.round(currentProject.height * previewQuality))}
+              </span>
+            </button>
+
+            {qualityMenuOpen && (
+              <div className="am-quality-popover" role="menu" aria-label="Preview Quality Options">
+                <div className="am-quality-popover-title">Preview Quality</div>
+                {PREVIEW_QUALITY_OPTIONS.map((opt) => {
+                  const rw = Math.max(16, Math.round(currentProject.width * opt.q));
+                  const rh = Math.max(16, Math.round(currentProject.height * opt.q));
+                  const active = previewQuality === opt.q;
+                  return (
+                    <button
+                      key={opt.q}
+                      type="button"
+                      className={`am-quality-option ${active ? 'active' : ''}`}
+                      onClick={() => {
+                        setPreviewQuality(opt.q);
+                        setQualityMenuOpen(false);
+                      }}
+                    >
+                      <span>{opt.label}</span>
+                      <strong>
+                        {rw}×{rh}
+                      </strong>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
+          {/* APK previewmode_canvas_zoom.xml (+ / Resolution / - box) */}
           <div className="am-canvas-zoom-box">
             <button
               type="button"
@@ -600,9 +656,10 @@ export const PreviewCanvas: React.FC<PreviewCanvasProps> = ({
                 setPreviewZoom(1);
                 setPreviewPan([0, 0]);
               }}
-              title="Reset Stage Zoom"
+              title="Reset Stage Zoom (Current Preview Resolution)"
             >
-              {Math.round(previewZoom * 100)}%
+              {Math.max(16, Math.round(currentProject.width * previewQuality))}×
+              {Math.max(16, Math.round(currentProject.height * previewQuality))}
             </button>
             <button
               type="button"
@@ -615,6 +672,25 @@ export const PreviewCanvas: React.FC<PreviewCanvasProps> = ({
           </div>
         </div>
       )}
+
+      {/* Always-accessible compact Preview Quality pill (top-left of stage for mobile & desktop) */}
+      <button
+        type="button"
+        className="am-stage-quality-pill"
+        onPointerDown={(e) => e.stopPropagation()}
+        onClick={() => {
+          const order: PreviewQuality[] = [1, 0.75, 0.5, 0.25];
+          const idx = order.indexOf(previewQuality);
+          setPreviewQuality(order[(idx + 1) % order.length]);
+        }}
+        title="Tap to cycle Preview Quality (Full → 3/4 → 1/2 → 1/4)"
+      >
+        <span>{PREVIEW_QUALITY_OPTIONS.find((o) => o.q === previewQuality)?.short ?? '3/4'}</span>
+        <strong>
+          {Math.max(16, Math.round(currentProject.width * previewQuality))}×
+          {Math.max(16, Math.round(currentProject.height * previewQuality))}
+        </strong>
+      </button>
 
       <LayerQuickActions />
     </div>

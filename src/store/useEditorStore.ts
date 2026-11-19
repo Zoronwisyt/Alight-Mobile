@@ -22,6 +22,7 @@ import {
 
 export type AppScreen = 'home' | 'editor';
 export type HomeTab = 'home' | 'tutorials' | 'projects' | 'elements';
+export type PreviewQuality = 1 | 0.75 | 0.5 | 0.25;
 export type InspectorTab =
   | 'none'
   | 'menu'
@@ -77,6 +78,7 @@ interface EditorState {
   timelinePxPerSec: number;
   snapEnabled: boolean;
   gridVisible: boolean;
+  previewQuality: PreviewQuality;
   previewZoom: number;
   previewPan: [number, number];
   audioLevel: number; // 0..1 for VU meter
@@ -157,6 +159,7 @@ interface EditorState {
   setActiveEffectUid: (uid: string | null) => void;
   setCurveTarget: (t: ActiveCurveTarget | null) => void;
   setAudioLevel: (lvl: number) => void;
+  setPreviewQuality: (q: PreviewQuality) => void;
   setPreviewZoom: (z: number) => void;
   setPreviewPan: (pan: [number, number]) => void;
   toggleSnap: () => void;
@@ -257,6 +260,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   timelinePxPerSec: 120,
   snapEnabled: true,
   gridVisible: false,
+  previewQuality: 0.75,
   previewZoom: 1,
   previewPan: [0, 0],
   audioLevel: 0,
@@ -826,6 +830,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   setActiveEffectUid: (activeEffectUid) => set({ activeEffectUid }),
   setCurveTarget: (curveTarget) => set({ curveTarget }),
   setAudioLevel: (audioLevel) => set({ audioLevel }),
+  setPreviewQuality: (previewQuality) => set({ previewQuality }),
   setPreviewZoom: (previewZoom) => set({ previewZoom: Math.max(0.2, Math.min(5, previewZoom)) }),
   setPreviewPan: (previewPan) => set({ previewPan }),
   toggleSnap: () => set((s) => ({ snapEnabled: !s.snapEnabled })),

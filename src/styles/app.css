@@ -703,10 +703,138 @@ dialog.am-dialog::backdrop {
 }
 
 .am-zoom-pct-btn {
-  font-size: 10px;
+  font-size: 7.5px;
   font-weight: 700;
   color: #D8DCE8;
-  padding: 2px 0;
+  padding: 2px 1px;
+  line-height: 1.15;
+  text-align: center;
+  white-space: nowrap;
+  letter-spacing: -0.02em;
+}
+
+.am-quality-control {
+  position: relative;
+  width: 42px;
+}
+
+.am-quality-trigger {
+  width: 42px;
+  height: auto !important;
+  min-height: 36px;
+  flex-direction: column;
+  gap: 1px;
+  padding: 4px 2px;
+  background: #191B27;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.am-quality-trigger.active {
+  border-color: rgba(0, 255, 168, 0.38);
+}
+
+.am-quality-short {
+  font-size: 9px;
+  font-weight: 800;
+  color: #00FFA8;
+  line-height: 1.1;
+}
+
+.am-quality-res {
+  font-size: 7.5px;
+  font-weight: 600;
+  color: #D8DCE8;
+  line-height: 1.1;
+  white-space: nowrap;
+  letter-spacing: -0.02em;
+}
+
+.am-quality-popover {
+  position: absolute;
+  right: 50px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 215px;
+  background: #242636;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 8px;
+  padding: 6px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.72);
+  z-index: 65;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.am-quality-popover-title {
+  font-size: 10px;
+  font-weight: 700;
+  color: #8E95A8;
+  padding: 2px 6px 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.am-quality-option {
+  width: 100%;
+  padding: 7px 8px;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11px;
+  font-weight: 600;
+  color: #FFFFFF;
+}
+
+.am-quality-option strong {
+  font-size: 10px;
+  color: #9BA3B5;
+  font-weight: 700;
+}
+
+.am-quality-option:hover {
+  background: #333750;
+}
+
+.am-quality-option.active {
+  background: rgba(0, 255, 168, 0.16);
+  color: #00FFA8;
+}
+
+.am-quality-option.active strong {
+  color: #00FFA8;
+}
+
+.am-stage-quality-pill {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 15;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: rgba(25, 27, 39, 0.84);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(6px);
+  font-size: 10px;
+  color: #FFFFFF;
+}
+
+.am-stage-quality-pill span {
+  font-weight: 800;
+  color: #00FFA8;
+}
+
+.am-stage-quality-pill strong {
+  font-weight: 700;
+  color: #D8DCE8;
+}
+
+.am-stage-quality-pill:hover {
+  border-color: rgba(0, 255, 168, 0.45);
 }
 
 /* APK activity_edit_playbar.xml (46dp #191B27) */

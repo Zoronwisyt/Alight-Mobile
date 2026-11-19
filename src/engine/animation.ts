@@ -24,21 +24,21 @@ export function solveCubicBezier(u: number, x1: number, y1: number, x2: number, 
   let t = u;
   for (let i = 0; i < 8; i++) {
     const err = sampleX(t) - u;
-    if (Math.abs(err) < 1e-6) return sampleY(t);
+    if (t >= 0 && t <= 1 && Math.abs(err) < 1e-6) return sampleY(t);
     const dx = sampleDX(t);
     if (Math.abs(dx) < 1e-6) break;
     t -= err / dx;
+    if (t < 0 || t > 1) break;
   }
 
   let lo = 0;
   let hi = 1;
-  t = u;
-  for (let i = 0; i < 16; i++) {
+  for (let i = 0; i < 20; i++) {
+    t = 0.5 * (lo + hi);
     const x = sampleX(t);
     if (Math.abs(x - u) < 1e-6) break;
     if (u > x) lo = t;
     else hi = t;
-    t = 0.5 * (lo + hi);
   }
   return sampleY(t);
 }
@@ -205,23 +205,23 @@ export function integrateAnimatable(
 ): number {
   const t = clamp01(normT);
   if (t <= 0 || durSec <= 0) return 0;
+  const elapsedSec = durSec * t;
   if (!prop || !prop.keyframes || prop.keyframes.length <= 1) {
     const v = prop?.keyframes?.length === 1 ? Number(prop.keyframes[0].v) : Number(prop?.value ?? fallback);
-    return (Number.isFinite(v) ? v : fallback) * scaleFactor * t * durSec;
+    return (Number.isFinite(v) ? v : fallback) * scaleFactor * elapsedSec;
   }
-  const steps = 64;
-  const du = t / steps;
+  // Matches Alight Motion APK UserParameterKt->valueAtTimeAccum (120 steps/sec discrete accumulator)
+  const STEPS_PER_SEC = 120;
+  const totalSteps = Math.round(durSec * STEPS_PER_SEC);
+  const curSteps = Math.round(elapsedSec * STEPS_PER_SEC);
+  if (curSteps <= 0 || totalSteps <= 0) return 0;
   let sum = 0;
-  let vPrev = Number(evalAnimatable(prop, 0, fallback));
-  if (!Number.isFinite(vPrev)) vPrev = fallback;
-  for (let i = 1; i <= steps; i++) {
-    const u = i * du;
-    let vCurr = Number(evalAnimatable(prop, u, fallback));
-    if (!Number.isFinite(vCurr)) vCurr = fallback;
-    sum += 0.5 * (vPrev + vCurr);
-    vPrev = vCurr;
+  for (let i = 0; i < curSteps; i++) {
+    const u = i / totalSteps;
+    const v = Number(evalAnimatable(prop, u, fallback));
+    sum += ((Number.isFinite(v) ? v : fallback) * scaleFactor) / STEPS_PER_SEC;
   }
-  return sum * du * durSec * scaleFactor;
+  return sum;
 }
 
 export function evalAnimatable<T>(prop: Animatable<T> | undefined, normT: number, fallback?: T): T {
@@ -242,8 +242,8 @@ export function evalAnimatable<T>(prop: Animatable<T> | undefined, normT: number
       const span = k1.t - k0.t;
       if (span <= 1e-7) return k1.v;
       const rawU = (normT - k0.t) / span;
-      // Alight Motion places the outgoing easing on k1 or k0; presets use e="..." on k1!
-      const easing = k1.easing ?? k0.easing;
+      // APK KeyableKt->valueAtTime reads easing strictly from k1 (segment end keyframe)
+      const easing = k1.easing;
       const e = evalEasing(rawU, easing);
       return interpolateValue(k0.v, k1.v, e);
     }

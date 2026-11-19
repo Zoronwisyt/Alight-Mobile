@@ -1175,13 +1175,66 @@ export class AlightRenderer {
     const layerOpacity = clamp01(evalAnimatable(layer.opacity, remappedNormT, 1)) * tf.alphaMul * extraAlpha;
     if (layerOpacity <= 0.001) return;
 
-    // Allocate overdraw margin when layer runs shader effects (so off-screen shifted/rotated content survives for Tile & Warps)
+    // Pre-resolve logical dimensions and uploaded media so overdrawPad covers shifted/rotated corners
+    let logicalW = project.width;
+    let logicalH = project.height;
+    let uploadedMedia: { tex: WebGLTexture; w: number; h: number } | null = null;
+    if (layer.type === 'group') {
+      logicalW = layer.groupWidth || project.width;
+      logicalH = layer.groupHeight || project.height;
+    } else if (layer.type === 'image' || layer.type === 'video') {
+      const md = layer.mediaData;
+      if (md?.src) {
+        uploadedMedia = this.uploadImageOrVideo(
+          md.src,
+          localTimeMs,
+          md.trimStartMs ?? 0,
+          layer.type === 'video',
+          md.mediaId,
+          md.playbackSpeed ?? 1
+        );
+      }
+      const srcW = uploadedMedia?.w || md?.naturalWidth || 512;
+      const srcH = uploadedMedia?.h || md?.naturalHeight || 512;
+      logicalW = md?.displayWidth || srcW;
+      logicalH = md?.displayHeight || srcH;
+    }
+
+    let { screenToLayer, layerToScreen } = makeTransformMatrices(
+      renderW,
+      renderH,
+      wx * scale,
+      wy * scale,
+      logicalW * scale,
+      logicalH * scale,
+      tf.rotation,
+      wsx,
+      wsy,
+      tf.px * scale,
+      tf.py * scale,
+      tf.skewX,
+      tf.skewY
+    );
+
+    // Allocate dynamic overdraw margin when layer runs shader effects (so stacked oscillate + swing never clips before Tile & Warps)
     const activeShaderDefs = layer.effects
       .filter((e) => e.enabled)
       .map((e) => getEffectById(e.effectId))
       .filter((d): d is EffectDef => !!d && d.shaders.length > 0);
     const usesCompTex = activeShaderDefs.some((d) => d.params.some((p) => p.srcType === 'comp'));
-    const overdrawPad = activeShaderDefs.length > 0 && !usesCompTex ? 0.5 : 0.0;
+
+    let overdrawPad = 0.0;
+    if (activeShaderDefs.length > 0 && !usesCompTex) {
+      const ax = layerToScreen[0], bx = layerToScreen[1], oX = layerToScreen[3];
+      const ay = layerToScreen[4], by = layerToScreen[5], oY = layerToScreen[7];
+      const minCorner = Math.min(oX, oX + ax, oX + bx, oX + ax + bx, oY, oY + ay, oY + by, oY + ay + by);
+      const maxCorner = Math.max(oX, oX + ax, oX + bx, oX + ax + bx, oY, oY + ay, oY + by, oY + ay + by);
+      const neededPad = Math.max(0.5, -minCorner + 0.05, maxCorner - 1.0 + 0.05);
+      const maxTex = (this.gl.getParameter(this.gl.MAX_TEXTURE_SIZE) as number) || 4096;
+      const maxPadByGpu = Math.max(0.5, ((Math.min(8192, maxTex) / Math.max(1, renderW, renderH)) - 1.0) * 0.5);
+      overdrawPad = Math.min(1.25, maxPadByGpu, neededPad);
+    }
+
     const overdrawSpan = 1.0 + 2.0 * overdrawPad;
     const invOverdrawSpan = 1.0 / overdrawSpan;
     const fboW = Math.max(1, Math.round(renderW * overdrawSpan));
@@ -1204,13 +1257,10 @@ export class AlightRenderer {
     const contentFbo = this.acquireFbo(fboW, fboH);
     this.clearFbo(contentFbo, fboW, fboH, 0, 0, 0, 0);
 
-    let logicalW = 300;
-    let logicalH = 300;
-
     if (layer.type === 'group') {
       // Render group children in the nested embedScene's own coordinate space, then transform
-      const grpW = layer.groupWidth || project.width;
-      const grpH = layer.groupHeight || project.height;
+      const grpW = logicalW;
+      const grpH = logicalH;
       const grpRenderW = Math.max(16, Math.round(grpW * scale));
       const grpRenderH = Math.max(16, Math.round(grpH * scale));
       const grpFbo = this.acquireFbo(grpRenderW, grpRenderH);
@@ -1244,66 +1294,70 @@ export class AlightRenderer {
         overdrawSpan
       );
       this.releaseFbo(grpFbo);
-      logicalW = grpW;
-      logicalH = grpH;
     } else if (layer.type === 'image' || layer.type === 'video') {
-      const md = layer.mediaData;
-      if (md?.src) {
-        const uploaded = this.uploadImageOrVideo(
-          md.src,
-          localTimeMs,
-          md.trimStartMs ?? 0,
-          layer.type === 'video',
-          md.mediaId,
-          md.playbackSpeed ?? 1
-        );
-        if (uploaded) {
-          const srcW = uploaded.w || md.naturalWidth || 512;
-          const srcH = uploaded.h || md.naturalHeight || 512;
-          logicalW = md.displayWidth || srcW;
-          logicalH = md.displayHeight || srcH;
-          // Aspect-fill (cover) UV scale matching Alight Motion's <shape fillType="media">
-          const srcAspect = srcW / Math.max(1, srcH);
-          const boxAspect = logicalW / Math.max(1, logicalH);
-          let coverScaleX = 1;
-          let coverScaleY = 1;
-          if (Math.abs(srcAspect - boxAspect) > 0.002) {
-            if (srcAspect > boxAspect) {
-              coverScaleX = boxAspect / srcAspect;
-            } else {
-              coverScaleY = srcAspect / boxAspect;
-            }
+      if (uploadedMedia) {
+        const srcW = uploadedMedia.w || layer.mediaData?.naturalWidth || 512;
+        const srcH = uploadedMedia.h || layer.mediaData?.naturalHeight || 512;
+        // Aspect-fill (cover) UV scale matching Alight Motion's <shape fillType="media">
+        const srcAspect = srcW / Math.max(1, srcH);
+        const boxAspect = logicalW / Math.max(1, logicalH);
+        let coverScaleX = 1;
+        let coverScaleY = 1;
+        if (Math.abs(srcAspect - boxAspect) > 0.002) {
+          if (srcAspect > boxAspect) {
+            coverScaleX = boxAspect / srcAspect;
+          } else {
+            coverScaleY = srcAspect / boxAspect;
           }
-          this.blitTransformedFbo(
-            uploaded.tex,
-            contentFbo,
-            renderW,
-            renderH,
-            wx * scale,
-            wy * scale,
-            logicalW * scale,
-            logicalH * scale,
-            tf.rotation,
-            wsx,
-            wsy,
-            layer.type === 'video',
-            tf.px * scale,
-            tf.py * scale,
-            tf.skewX,
-            tf.skewY,
-            coverScaleX,
-            coverScaleY,
-            overdrawPad,
-            overdrawSpan
-          );
         }
+        this.blitTransformedFbo(
+          uploadedMedia.tex,
+          contentFbo,
+          renderW,
+          renderH,
+          wx * scale,
+          wy * scale,
+          logicalW * scale,
+          logicalH * scale,
+          tf.rotation,
+          wsx,
+          wsy,
+          layer.type === 'video',
+          tf.px * scale,
+          tf.py * scale,
+          tf.skewX,
+          tf.skewY,
+          coverScaleX,
+          coverScaleY,
+          overdrawPad,
+          overdrawSpan
+        );
       }
     } else {
       // Shape / Vector / Freehand / Text -> Canvas2D rasterization in world coordinates (with Repeat effects!)
       const repeatInstances = this.computeRepeatInstances(layer, remappedNormT);
       const dims = this.rasterizeLayerToCanvas2D(project, layer, remappedNormT, wx, wy, tf.rotation, wsx, wsy, tf.px, tf.py, tf.skewX, tf.skewY, scale, renderW, renderH, repeatInstances, overdrawPad, overdrawSpan);
-      logicalW = dims.w;
-      logicalH = dims.h;
+      if (dims.w !== logicalW || dims.h !== logicalH) {
+        logicalW = dims.w;
+        logicalH = dims.h;
+        const recomputed = makeTransformMatrices(
+          renderW,
+          renderH,
+          wx * scale,
+          wy * scale,
+          logicalW * scale,
+          logicalH * scale,
+          tf.rotation,
+          wsx,
+          wsy,
+          tf.px * scale,
+          tf.py * scale,
+          tf.skewX,
+          tf.skewY
+        );
+        screenToLayer = recomputed.screenToLayer;
+        layerToScreen = recomputed.layerToScreen;
+      }
 
       const gl = this.gl;
       gl.activeTexture(gl.TEXTURE0);
@@ -1345,22 +1399,6 @@ export class AlightRenderer {
       angularVelocity: vels.angularVelocity,
       scaleVelocity: vels.scaleVelocity,
     };
-
-    const { screenToLayer, layerToScreen } = makeTransformMatrices(
-      renderW,
-      renderH,
-      wx * scale,
-      wy * scale,
-      logicalW * scale,
-      logicalH * scale,
-      tf.rotation,
-      wsx,
-      wsy,
-      tf.px * scale,
-      tf.py * scale,
-      tf.skewX,
-      tf.skewY
-    );
 
     let scriptAlpha = 1;
 
@@ -1850,7 +1888,7 @@ export class AlightRenderer {
     if (u.acLayerPivot) gl.uniform2f(u.acLayerPivot, px, py);
     if (u.acLayerSize) gl.uniform2f(u.acLayerSize, lw, lh);
     if (u.acLayerSizeNorm) gl.uniform2f(u.acLayerSizeNorm, lw / project.width, lh / project.height);
-    if (u.acVelocity) gl.uniform2f(u.acVelocity, vels.velocity[0], vels.velocity[1]);
+    if (u.acVelocity) gl.uniform2f(u.acVelocity, vels.velocity[0], -vels.velocity[1]);
     if (u.acAngularVelocity) gl.uniform1f(u.acAngularVelocity, vels.angularVelocity);
     if (u.acScaleVelocity) gl.uniform1f(u.acScaleVelocity, vels.scaleVelocity);
     if (u.acTime) gl.uniform1f(u.acTime, localTimeMs / 1000);
