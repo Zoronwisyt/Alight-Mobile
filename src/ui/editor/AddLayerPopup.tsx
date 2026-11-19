@@ -372,9 +372,9 @@ export const AddLayerPopup: React.FC = () => {
           </div>
           <div className="am-pill-row">
             {[
-              ['Bump Surface A', '/am/resource/bumpmap_a.webp'],
-              ['Grunge Texture A', '/am/resource/grunge_a.webp'],
-              ['RGBA Noise Map', '/am/textures/rgbanoise.webp'],
+              ['Bump Surface A', `${import.meta.env.BASE_URL}am/resource/bumpmap_a.webp`],
+              ['Grunge Texture A', `${import.meta.env.BASE_URL}am/resource/grunge_a.webp`],
+              ['RGBA Noise Map', `${import.meta.env.BASE_URL}am/textures/rgbanoise.webp`],
             ].map(([lbl, src]) => (
               <button
                 key={src}

@@ -75,9 +75,9 @@ export const EffectBrowserDialog: React.FC = () => {
 
           <div style={{ display: 'flex', gap: 14, alignItems: 'center', background: 'var(--am-a1)', padding: 14, borderRadius: 14, border: '1px solid var(--am-border)' }}>
             <div className="am-effect-thumb-wrap" style={{ width: 84, height: 84, flexShrink: 0 }}>
-              {detailEffect.thumbBg && <img src={`/am/thumb/${detailEffect.thumbBg}`} alt="" />}
+              {detailEffect.thumbBg && <img src={`${import.meta.env.BASE_URL}am/thumb/${detailEffect.thumbBg}`} alt="" />}
               {detailEffect.thumb ? (
-                <img src={`/am/thumb/${detailEffect.thumb}`} alt={detailEffect.name} />
+                <img src={`${import.meta.env.BASE_URL}am/thumb/${detailEffect.thumb}`} alt={detailEffect.name} />
               ) : (
                 <AmIcon name="effects" fallback="effects" size={30} color="var(--am-accent)" />
               )}
@@ -165,9 +165,9 @@ export const EffectBrowserDialog: React.FC = () => {
                 onClick={() => setDetailEffect(eff)}
               >
                 <div className="am-effect-thumb-wrap">
-                  {eff.thumbBg && <img src={`/am/thumb/${eff.thumbBg}`} alt="" loading="lazy" />}
+                  {eff.thumbBg && <img src={`${import.meta.env.BASE_URL}am/thumb/${eff.thumbBg}`} alt="" loading="lazy" />}
                   {eff.thumb ? (
-                    <img src={`/am/thumb/${eff.thumb}`} alt={eff.name} loading="lazy" />
+                    <img src={`${import.meta.env.BASE_URL}am/thumb/${eff.thumb}`} alt={eff.name} loading="lazy" />
                   ) : (
                     <AmIcon name="effects" fallback="effects" size={26} color="var(--am-accent)" />
                   )}

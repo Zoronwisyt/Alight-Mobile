@@ -403,12 +403,13 @@ export class AlightRenderer {
   }
 
   private preloadBuiltinTextures() {
+    const base = import.meta.env.BASE_URL;
     const imgs = [
-      ['resource/bumpmap_a.webp', '/am/resource/bumpmap_a.webp'],
-      ['resource/bumpmap_b.webp', '/am/resource/bumpmap_b.webp'],
-      ['resource/grunge_a.webp', '/am/resource/grunge_a.webp'],
-      ['resource/grunge_b.webp', '/am/resource/grunge_b.webp'],
-      ['textures/rgbanoise.webp', '/am/textures/rgbanoise.webp'],
+      ['resource/bumpmap_a.webp', `${base}am/resource/bumpmap_a.webp`],
+      ['resource/bumpmap_b.webp', `${base}am/resource/bumpmap_b.webp`],
+      ['resource/grunge_a.webp', `${base}am/resource/grunge_a.webp`],
+      ['resource/grunge_b.webp', `${base}am/resource/grunge_b.webp`],
+      ['textures/rgbanoise.webp', `${base}am/textures/rgbanoise.webp`],
     ];
     for (const [key, url] of imgs) {
       const img = new Image();
