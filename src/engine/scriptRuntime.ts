@@ -163,7 +163,8 @@ export interface EffectScriptElement {
 type AnimateFn = (
   env: EffectScriptEnv,
   el: EffectScriptElement,
-  params: Record<string, any>
+  params: Record<string, any>,
+  prevParams?: Record<string, any>
 ) => EffectScriptElement | void;
 
 type ShapeScripts = {
@@ -174,29 +175,7 @@ type ShapeScripts = {
 const effectFnCache = new Map<string, AnimateFn | null>();
 const shapeFnCache = new Map<string, ShapeScripts>();
 
-export function runEffectScript(
-  effect: EffectDef,
-  env: EffectScriptEnv,
-  el: EffectScriptElement,
-  rawParams: Record<string, any>
-): EffectScriptElement {
-  if (!effect.script) return el;
-  let fn = effectFnCache.get(effect.id);
-  if (fn === undefined) {
-    try {
-      const factory = new Function(
-        'AM',
-        `${effect.script}\nreturn typeof animate === "function" ? animate : null;`
-      );
-      fn = (factory(AM_RUNTIME) as AnimateFn | null) ?? null;
-    } catch {
-      fn = null;
-    }
-    effectFnCache.set(effect.id, fn);
-  }
-  if (!fn) return el;
-
-  // Convert [x,y] point params to {x, y} objects for scripts that read p.param.x
+function wrapEffectParams(effect: EffectDef, rawParams: Record<string, any>): Record<string, any> {
   const pObj: Record<string, any> = {};
   for (const pd of effect.params) {
     if (!pd.id) continue;
@@ -209,11 +188,41 @@ export function runEffectScript(
       pObj[pd.id] = val;
     }
   }
+  return pObj;
+}
+
+export function runEffectScript(
+  effect: EffectDef,
+  env: EffectScriptEnv,
+  el: EffectScriptElement,
+  rawParams: Record<string, any>,
+  prevRawParams?: Record<string, any>
+): EffectScriptElement {
+  if (!effect.script) return el;
+  let fn = effectFnCache.get(effect.id);
+  if (fn === undefined) {
+    try {
+      const factory = new Function(
+        'AM',
+        `${effect.script}\nreturn typeof animate === "function" ? animate : null;`
+      );
+      fn = (factory(AM_RUNTIME) as AnimateFn | null) ?? null;
+    } catch (err) {
+      console.warn(`[scriptRuntime] compile failed for ${effect.id}:`, err);
+      fn = null;
+    }
+    effectFnCache.set(effect.id, fn);
+  }
+  if (!fn) return el;
+
+  const pObj = wrapEffectParams(effect, rawParams);
+  const pPrevObj = prevRawParams ? wrapEffectParams(effect, prevRawParams) : pObj;
 
   try {
-    const res = fn(env, el, pObj);
+    const res = fn(env, el, pObj, pPrevObj);
     return (res as EffectScriptElement) || el;
-  } catch {
+  } catch (err) {
+    console.warn(`[scriptRuntime] runtime error in ${effect.id}:`, err);
     return el;
   }
 }

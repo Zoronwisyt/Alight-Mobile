@@ -142,8 +142,11 @@ export interface TextData {
   content: string;
   fontFamily: string;
   fontSize: number; // px relative to 1080p project
+  fontWeight?: number | string;
+  italic?: boolean;
   color: string; // #AARRGGBB
   align: 'left' | 'center' | 'right';
+  verticalAlign?: 'top' | 'middle' | 'bottom';
   lineHeight: number;
   letterSpacing: number;
   wrapWidth: number;

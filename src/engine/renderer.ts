@@ -873,7 +873,23 @@ export class AlightRenderer {
                   settled = true;
                   v.removeEventListener('seeked', onSeeked);
                   v.removeEventListener('loadeddata', onSeeked);
-                  resolve();
+                  const rVfc = (v as HTMLVideoElement & { requestVideoFrameCallback?: (cb: () => void) => number }).requestVideoFrameCallback;
+                  if (typeof rVfc === 'function' && v.readyState >= 2) {
+                    let vfcDone = false;
+                    const done = () => {
+                      if (vfcDone) return;
+                      vfcDone = true;
+                      resolve();
+                    };
+                    try {
+                      rVfc.call(v, done);
+                      window.setTimeout(done, 80);
+                    } catch {
+                      resolve();
+                    }
+                  } else {
+                    resolve();
+                  }
                 };
                 const onSeeked = () => finish();
                 v.addEventListener('seeked', onSeeked, { once: true });
@@ -883,7 +899,7 @@ export class AlightRenderer {
                 } catch {
                   finish();
                 }
-                window.setTimeout(finish, 300);
+                window.setTimeout(finish, 1200);
               });
             }
             this.uploadVideoTex(entry);
@@ -1004,7 +1020,8 @@ export class AlightRenderer {
     layersMap: Map<string, Layer>,
     sceneTimeMs: number,
     fps: number,
-    visited = new Set<string>()
+    visited = new Set<string>(),
+    selected = false
   ): {
     x: number;
     y: number;
@@ -1023,7 +1040,7 @@ export class AlightRenderer {
     }
     visited.add(layer.id);
 
-    const { localTimeMs, remappedNormT } = evalRemappedTime(layer, sceneTimeMs);
+    const { remappedNormT } = evalRemappedTime(layer, sceneTimeMs);
     const loc = evalAnimatable(layer.transform.location, remappedNormT, [0, 0, 0]);
     let x = loc[0], y = loc[1], z = loc[2] ?? 0;
     let rotation = evalAnimatable(layer.transform.rotation, remappedNormT, 0);
@@ -1044,7 +1061,7 @@ export class AlightRenderer {
       fps,
       frame: Math.floor((sceneTimeMs / 1000) * fps),
       editMode: 'none',
-      selected: false,
+      selected,
       velocity: { x: vels.velocity[0], y: vels.velocity[1] },
       angularVelocity: vels.angularVelocity,
       scaleVelocity: vels.scaleVelocity,
@@ -1155,7 +1172,8 @@ export class AlightRenderer {
     extraAlpha = 1
   ): void {
     const { localTimeMs, remappedNormT } = evalRemappedTime(layer, sceneTimeMs);
-    const tf = this.resolveWorldTransform(layer, layersMap, sceneTimeMs, project.fps);
+    const isSelected = selectedIds.includes(layer.id);
+    const tf = this.resolveWorldTransform(layer, layersMap, sceneTimeMs, project.fps, new Set<string>(), isSelected);
 
     // Apply Camera 3D parallax / Z depth perspective if active
     let wx = tf.x;
@@ -1336,7 +1354,7 @@ export class AlightRenderer {
     } else {
       // Shape / Vector / Freehand / Text -> Canvas2D rasterization in world coordinates (with Repeat effects!)
       const repeatInstances = this.computeRepeatInstances(layer, remappedNormT);
-      const dims = this.rasterizeLayerToCanvas2D(project, layer, remappedNormT, wx, wy, tf.rotation, wsx, wsy, tf.px, tf.py, tf.skewX, tf.skewY, scale, renderW, renderH, repeatInstances, overdrawPad, overdrawSpan);
+      const dims = this.rasterizeLayerToCanvas2D(project, layer, remappedNormT, sceneTimeMs, wx, wy, tf.rotation, wsx, wsy, tf.px, tf.py, tf.skewX, tf.skewY, scale, renderW, renderH, repeatInstances, overdrawPad, overdrawSpan);
       if (dims.w !== logicalW || dims.h !== logicalH) {
         logicalW = dims.w;
         logicalH = dims.h;
@@ -1678,7 +1696,7 @@ export class AlightRenderer {
     }
 
     const passes = def.passes.length > 0 ? def.passes : [{}];
-    const iterCount = def.iterations ? Math.min(10, Math.max(1, Math.round(Number(params[def.iterations]) || 1))) : 1;
+    const iterCount = def.iterations ? Math.min(32, Math.max(1, Math.round(Number(params[def.iterations]) || 1))) : 1;
 
     let iterInput = inputSlot;
     let iterOutput: FboSlot | null = null;
@@ -1735,7 +1753,23 @@ export class AlightRenderer {
 
         gl.bindFramebuffer(gl.FRAMEBUFFER, targetSlot.fbo);
         gl.viewport(0, 0, targetSlot.width, targetSlot.height);
-        gl.disable(gl.BLEND);
+        const passBlend = pass.blend;
+        if (passBlend === 'overwrite') {
+          gl.disable(gl.BLEND);
+        } else if (passBlend === 'add') {
+          gl.enable(gl.BLEND);
+          gl.blendEquation(gl.FUNC_ADD);
+          gl.blendFunc(gl.ONE, gl.ONE);
+        } else if (passBlend === 'max') {
+          gl.enable(gl.BLEND);
+          gl.blendEquation(gl.MAX);
+          gl.blendFunc(gl.ONE, gl.ONE);
+        } else {
+          // Default pass blend: premultiplied over (writes cleanly onto cleared buffers and accumulates multi-pass targets)
+          gl.enable(gl.BLEND);
+          gl.blendEquation(gl.FUNC_ADD);
+          gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+        }
         gl.useProgram(prog.program);
 
         this.bindBuiltinUniforms(
@@ -1841,6 +1875,7 @@ export class AlightRenderer {
           gl.bindTexture(gl.TEXTURE_2D, null);
         }
         this.drawQuad(prog.program);
+        if (passBlend === 'max') gl.blendEquation(gl.FUNC_ADD);
         this.unbindTextureUnits(Math.max(texUnit, 2));
       }
 
@@ -2078,6 +2113,7 @@ export class AlightRenderer {
     project: Project,
     layer: Layer,
     normT: number,
+    sceneTimeMs: number,
     wx: number,
     wy: number,
     rotDeg: number,
@@ -2225,7 +2261,7 @@ export class AlightRenderer {
           }
         }
       } else if (layer.type === 'text' && layer.textData) {
-        this.drawTextLayer(ctx, layer, normT);
+        this.drawTextLayer(ctx, project, layer, normT, sceneTimeMs);
       }
 
       ctx.restore();
@@ -2242,11 +2278,14 @@ export class AlightRenderer {
     h: number,
     path2d?: Path2D
   ) {
+    const fillRule: CanvasFillRule = path2d ? 'evenodd' : 'nonzero';
+    ctx.miterLimit = 10;
+
     if (layer.fill.type === 'solid') {
       const [r, g, b, a] = parseColorArgb(evalAnimatable(layer.fill.color, normT, '#FF00FFA8'));
       ctx.fillStyle = `rgba(${Math.round(r * 255)}, ${Math.round(g * 255)}, ${Math.round(b * 255)}, ${a.toFixed(3)})`;
-      if (path2d) ctx.fill(path2d);
-      else ctx.fill();
+      if (path2d) ctx.fill(path2d, fillRule);
+      else ctx.fill(fillRule);
     } else if (layer.fill.type === 'gradient') {
       const [sx, sy] = layer.fill.gradientStart;
       const [ex, ey] = layer.fill.gradientEnd;
@@ -2265,8 +2304,8 @@ export class AlightRenderer {
         grad.addColorStop(clamp01(st.offset), `rgba(${Math.round(r * 255)}, ${Math.round(g * 255)}, ${Math.round(b * 255)}, ${a.toFixed(3)})`);
       }
       ctx.fillStyle = grad;
-      if (path2d) ctx.fill(path2d);
-      else ctx.fill();
+      if (path2d) ctx.fill(path2d, fillRule);
+      else ctx.fill(fillRule);
     }
 
     // Stroke (check Stroke Color + Drawing Progress effects!)
@@ -2300,26 +2339,52 @@ export class AlightRenderer {
     }
   }
 
-  private drawTextLayer(ctx: CanvasRenderingContext2D, layer: Layer, normT: number) {
+  private drawTextLayer(ctx: CanvasRenderingContext2D, project: Project, layer: Layer, normT: number, sceneTimeMs: number) {
     const td = layer.textData!;
     let content = td.content || '';
 
-    // Count Up / Down effect
-    const counterFx = layer.effects.find((e) => e.enabled && e.effectId === 'com.alightcreative.effects.counter');
-    if (counterFx) {
-      const numVal = Number(evalAnimatable(counterFx.params.value, normT, 0)) || 0;
-      const dec = Math.max(0, Math.min(6, Math.round(Number(evalAnimatable(counterFx.params.decimals, normT, 0)) || 0)));
-      content = numVal.toFixed(dec);
-    }
+    const durSec = Math.max(0.001, (layer.endTime - layer.startTime) / 1000);
+    const frameStepNorm = 1 / Math.max(1, project.fps * durSec);
+    const prevNormT = Math.max(0, normT - frameStepNorm);
+    const textEnv: EffectScriptEnv = {
+      time: normT,
+      absTime: sceneTimeMs / 1000,
+      duration: durSec,
+      inTime: layer.startTime / 1000,
+      fps: project.fps,
+      frame: Math.floor((sceneTimeMs / 1000) * project.fps),
+      editMode: 'none',
+      selected: false,
+      velocity: { x: 0, y: 0 },
+      angularVelocity: 0,
+      scaleVelocity: 0,
+    };
 
-    // Text Progress effect
-    const txtProgFx = layer.effects.find((e) => e.enabled && e.effectId === 'com.alightcreative.effects.textprogress');
-    if (txtProgFx) {
-      const start = clamp01(Number(evalAnimatable(txtProgFx.params.start, normT, 0)) || 0);
-      const end = clamp01(Number(evalAnimatable(txtProgFx.params.end, normT, 1)) || 1);
-      const i0 = Math.floor(start * content.length);
-      const i1 = Math.ceil(end * content.length);
-      content = content.slice(i0, i1);
+    // Drive text-mutating effects (counter, textprogress, textrand, timecode) via their APK scripts
+    for (const effInst of layer.effects) {
+      if (!effInst.enabled) continue;
+      if (effInst.effectId === 'com.alightcreative.effects.textspacing' || effInst.effectId === 'com.alightcreative.effects.texttransform') {
+        continue;
+      }
+      const def = getEffectById(effInst.effectId);
+      if (!def || def.autoTransform || def.shaders.length > 0 || !def.script) continue;
+      const paramsEval = this.evalEffectParams(def, effInst, normT, durSec);
+      const prevParamsEval = this.evalEffectParams(def, effInst, prevNormT, durSec);
+      const out = runEffectScript(
+        def,
+        textEnv,
+        {
+          alpha: 1,
+          shaderGroups: null,
+          text: content,
+          transform: { location: { x: 0, y: 0, z: 0 }, angle: 0, scale: { x: 1, y: 1 } },
+        },
+        paramsEval,
+        prevParamsEval
+      );
+      if (typeof out.text === 'string') {
+        content = out.text;
+      }
     }
 
     // Text Spacing effect
@@ -2331,24 +2396,58 @@ export class AlightRenderer {
     const ttFx = layer.effects.find((e) => e.enabled && e.effectId === 'com.alightcreative.effects.texttransform');
 
     const fontSize = Math.max(8, td.fontSize);
-    ctx.font = `700 ${fontSize}px "${td.fontFamily}", "Space Grotesk", "Roboto", sans-serif`;
+    const fontStyle = td.italic ? 'italic ' : '';
+    const fontWeight = td.fontWeight ?? 700;
+    ctx.font = `${fontStyle}${fontWeight} ${fontSize}px "${td.fontFamily}", "Space Grotesk", "Roboto", sans-serif`;
     ctx.textBaseline = 'middle';
     ctx.textAlign = 'center';
 
     const [r, g, b, a] = parseColorArgb(td.color || '#FFFFFFFF');
     const baseFill = `rgba(${Math.round(r * 255)}, ${Math.round(g * 255)}, ${Math.round(b * 255)}, ${a.toFixed(3)})`;
-    const lines = content.split('\n');
+    const letterSp = (td.letterSpacing || 0) + extraLetterSpace;
+    const measureRun = (txt: string) => {
+      let w = 0;
+      for (const ch of Array.from(txt)) w += ctx.measureText(ch).width + letterSp;
+      return w;
+    };
+
+    const wrapMax = td.wrapWidth > 40 ? td.wrapWidth : Infinity;
+    const lines: string[] = [];
+    for (const rawLine of content.split('\n')) {
+      if (!Number.isFinite(wrapMax) || measureRun(rawLine) <= wrapMax) {
+        lines.push(rawLine);
+        continue;
+      }
+      const words = rawLine.split(' ');
+      let cur = '';
+      for (const word of words) {
+        const candidate = cur ? `${cur} ${word}` : word;
+        if (measureRun(candidate) <= wrapMax) {
+          cur = candidate;
+        } else {
+          if (cur) lines.push(cur);
+          cur = word;
+        }
+      }
+      if (cur) lines.push(cur);
+    }
+
     const lineH = fontSize * (td.lineHeight || 1.2) * extraLineSpace;
     const totalH = (lines.length - 1) * lineH;
+    const yStart =
+      td.verticalAlign === 'top'
+        ? 0
+        : td.verticalAlign === 'bottom'
+          ? -totalH
+          : -totalH * 0.5;
 
     // Compute total character index for Text Transform
-    const allChars = content.replace(/\n/g, '').length;
+    const allChars = lines.join('').length;
     let charGlobalIdx = 0;
 
     lines.forEach((line, li) => {
-      const y = -totalH * 0.5 + li * lineH;
+      const y = yStart + li * lineH;
       const chars = Array.from(line);
-      const letterSp = (td.letterSpacing || 0) + extraLetterSpace;
       const widths = chars.map((ch) => ctx.measureText(ch).width + letterSp);
       const lineW = widths.reduce((acc, v) => acc + v, 0);
       let cursorX = td.align === 'left' ? -td.wrapWidth * 0.45 : td.align === 'right' ? td.wrapWidth * 0.45 - lineW : -lineW * 0.5;
