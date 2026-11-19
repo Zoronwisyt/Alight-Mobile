@@ -8,6 +8,21 @@ class AudioEngine {
   private buffers = new Map<string, AudioBuffer>();
   private activeSources: AudioBufferSourceNode[] = [];
   private loading = new Set<string>();
+  private playbackStartCtxTime = 0;
+  private playbackStartSceneMs = 0;
+  private playbackActive = false;
+
+  public hasAudio(project: Project): boolean {
+    const out: { layer: Layer; absStart: number; absEnd: number }[] = [];
+    this.collectAudioLayers(project.layers, 0, out);
+    return out.length > 0;
+  }
+
+  public getPlaybackPositionMs(): number | null {
+    if (!this.playbackActive || !this.ctx || this.ctx.state !== 'running') return null;
+    const elapsedSec = Math.max(0, this.ctx.currentTime - this.playbackStartCtxTime);
+    return this.playbackStartSceneMs + elapsedSec * 1000;
+  }
 
   public ensureContext(): AudioContext {
     if (!this.ctx) {
@@ -97,6 +112,9 @@ class AudioEngine {
   public startPlayback(project: Project, startMs: number): void {
     this.stopPlayback();
     const ctx = this.ensureContext();
+    this.playbackStartCtxTime = ctx.currentTime;
+    this.playbackStartSceneMs = startMs;
+    this.playbackActive = true;
     const audioLayers: { layer: Layer; absStart: number; absEnd: number }[] = [];
     this.collectAudioLayers(project.layers, 0, audioLayers);
 
@@ -133,6 +151,7 @@ class AudioEngine {
   }
 
   public stopPlayback(): void {
+    this.playbackActive = false;
     for (const s of this.activeSources) {
       try {
         s.stop();

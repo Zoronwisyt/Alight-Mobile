@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { ensureCatalogLoaded } from './engine/catalog';
+import { initFontRegistry } from './engine/fontRegistry';
+import { hydrateUserFonts } from './store/fontStore';
 import { useEditorStore } from './store/useEditorStore';
 import { EditorScreen } from './ui/editor/EditorScreen';
 import { HomeScreen } from './ui/HomeScreen';
@@ -11,7 +13,11 @@ export const App: React.FC = () => {
 
   useEffect(() => {
     let alive = true;
-    Promise.all([ensureCatalogLoaded(), initApp()]).then(() => {
+    Promise.all([
+      ensureCatalogLoaded(),
+      initApp(),
+      initFontRegistry().then(() => hydrateUserFonts()),
+    ]).then(() => {
       if (alive) setReady(true);
     });
     return () => {

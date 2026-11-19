@@ -255,6 +255,7 @@ export interface ImportReport {
   mediaFound: number;
   mediaMissing: number;
   textWrapDefaults: number;
+  fontDefaultsApplied?: number;
 }
 
 export interface Project {
@@ -271,6 +272,7 @@ export interface Project {
   modifiedTime: number;
   thumbnailDataUrl?: string;
   importReport?: ImportReport;
+  fontSubstitutions?: Record<string, string>;
 }
 
 export interface SavedElement {

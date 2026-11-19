@@ -1,79 +1,93 @@
 @font-face {
   font-family: 'Space Grotesk';
+  src: url('/am/fonts/spacegrotesk_light.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: block;
+}
+@font-face {
+  font-family: 'Space Grotesk';
   src: url('/am/fonts/spacegrotesk_regular.ttf') format('truetype');
   font-weight: 400;
   font-style: normal;
-  font-display: swap;
+  font-display: block;
 }
 @font-face {
   font-family: 'Space Grotesk';
   src: url('/am/fonts/spacegrotesk_medium.ttf') format('truetype');
   font-weight: 500;
   font-style: normal;
-  font-display: swap;
+  font-display: block;
 }
 @font-face {
   font-family: 'Space Grotesk';
   src: url('/am/fonts/spacegrotesk_semibold.ttf') format('truetype');
   font-weight: 600;
   font-style: normal;
-  font-display: swap;
+  font-display: block;
 }
 @font-face {
   font-family: 'Space Grotesk';
   src: url('/am/fonts/spacegrotesk_bold.ttf') format('truetype');
   font-weight: 700;
   font-style: normal;
-  font-display: swap;
+  font-display: block;
 }
 @font-face {
   font-family: 'Roboto';
   src: url('/am/fonts/roboto_regular.ttf') format('truetype');
   font-weight: 400;
   font-style: normal;
-  font-display: swap;
+  font-display: block;
 }
 @font-face {
   font-family: 'Roboto';
   src: url('/am/fonts/roboto_medium.ttf') format('truetype');
   font-weight: 500;
   font-style: normal;
-  font-display: swap;
+  font-display: block;
 }
 @font-face {
   font-family: 'Roboto';
   src: url('/am/fonts/roboto_bold.ttf') format('truetype');
   font-weight: 700;
   font-style: normal;
-  font-display: swap;
+  font-display: block;
+}
+@font-face {
+  font-family: 'Hind';
+  src: url('/am/fonts/hind_light.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: block;
 }
 @font-face {
   font-family: 'Hind';
   src: url('/am/fonts/hind_regular.ttf') format('truetype');
   font-weight: 400;
   font-style: normal;
-  font-display: swap;
+  font-display: block;
+}
+@font-face {
+  font-family: 'Hind';
+  src: url('/am/fonts/hind_medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: block;
 }
 @font-face {
   font-family: 'Hind';
   src: url('/am/fonts/hind_semibold.ttf') format('truetype');
   font-weight: 600;
   font-style: normal;
-  font-display: swap;
+  font-display: block;
 }
 @font-face {
-  font-family: 'Serif Pro';
-  src: url('/am/fonts/serifpro_regular.ttf') format('truetype');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'Serif Pro';
-  src: url('/am/fonts/serifpro_bold.ttf') format('truetype');
+  font-family: 'Hind';
+  src: url('/am/fonts/hind_bold.ttf') format('truetype');
   font-weight: 700;
   font-style: normal;
-  font-display: swap;
+  font-display: block;
 }
 
 :root,

@@ -1,8 +1,18 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { replaceMediaOnLayers } from '../../engine/mediaReplace';
+import type { AlightRenderer } from '../../engine/renderer';
 import { useEditorStore } from '../../store/useEditorStore';
 import type { Layer } from '../../types/project';
 import { AmIcon } from '../components/AmIcon';
+
+interface TimelineProps {
+  rendererRef?: React.RefObject<AlightRenderer | null>;
+  cacheVersion?: number;
+  missingFontLayerIds?: Set<string>;
+  onOpenMissingFonts?: () => void;
+  onClearCache?: () => void;
+  onRenderCacheNow?: () => void;
+}
 
 function collectLayerKeyframes(layer: Layer): number[] {
   const ts = new Set<number>();
@@ -47,7 +57,14 @@ function fmtCtsTime(ms: number, fps: number): string {
   return `${String(min).padStart(2, '0')}:${String(sec).padStart(2, '0')}.${String(frame).padStart(2, '0')}`;
 }
 
-export const Timeline: React.FC = () => {
+export const Timeline: React.FC<TimelineProps> = ({
+  rendererRef,
+  cacheVersion = 0,
+  missingFontLayerIds,
+  onOpenMissingFonts,
+  onClearCache,
+  onRenderCacheNow,
+}) => {
   const {
     currentProject,
     currentTimeMs,
@@ -55,6 +72,7 @@ export const Timeline: React.FC = () => {
     selectedLayerIds,
     groupStack,
     loop,
+    previewQuality,
     getActiveLayers,
     setCurrentTimeMs,
     setIsPlaying,
@@ -73,7 +91,33 @@ export const Timeline: React.FC = () => {
   const headersRef = useRef<HTMLDivElement>(null);
   const replaceInputRef = useRef<HTMLInputElement>(null);
   const [showOverflowMenu, setShowOverflowMenu] = useState(false);
+  const [showCacheMenu, setShowCacheMenu] = useState(false);
   const [trackViewportW, setTrackViewportW] = useState(600);
+
+  // Compute merged color runs for the AE-style preview RAM cache bar
+  const cacheRuns = useMemo(() => {
+    void cacheVersion;
+    const renderer = rendererRef?.current;
+    if (!renderer || !currentProject) return [] as { startPct: number; widthPct: number; state: number }[];
+    const totalFrames = Math.max(1, Math.ceil((currentProject.durationMs / 1000) * Math.max(1, currentProject.fps)));
+    const map = renderer.getCachedFrameMap(totalFrames, previewQuality);
+    const runs: { startPct: number; widthPct: number; state: number }[] = [];
+    let i = 0;
+    while (i < map.length) {
+      const st = map[i];
+      let j = i + 1;
+      while (j < map.length && map[j] === st) j++;
+      if (st > 0) {
+        runs.push({
+          startPct: (i / map.length) * 100,
+          widthPct: ((j - i) / map.length) * 100,
+          state: st,
+        });
+      }
+      i = j;
+    }
+    return runs;
+  }, [rendererRef, currentProject, previewQuality, cacheVersion]);
 
   // R-1: Restore persisted timeline height from localStorage
   useEffect(() => {
@@ -314,6 +358,40 @@ export const Timeline: React.FC = () => {
               willChange: 'transform',
             }}
           >
+            {/* AE-style Preview RAM Cache Bar (green=full, amber=adaptive, subtle red=uncached) */}
+            <div
+              onPointerDown={(e) => e.stopPropagation()}
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowCacheMenu((v) => !v);
+              }}
+              title="Preview RAM Cache Bar (click to clear or pre-render)"
+              style={{
+                position: 'absolute',
+                left: 0,
+                top: 0,
+                width: (currentProject.durationMs / 1000) * timelinePxPerSec,
+                height: 4,
+                background: 'rgba(255, 95, 115, 0.22)',
+                cursor: 'pointer',
+                zIndex: 5,
+              }}
+            >
+              {cacheRuns.map((run, idx) => (
+                <div
+                  key={idx}
+                  style={{
+                    position: 'absolute',
+                    left: `${run.startPct}%`,
+                    width: `${run.widthPct}%`,
+                    top: 0,
+                    height: '100%',
+                    background: run.state === 2 ? '#22D38B' : '#F5B742',
+                  }}
+                />
+              ))}
+            </div>
+
             {ticks.map((s) => {
               const left = s * timelinePxPerSec;
               const isMajor = Math.abs(s - Math.round(s)) < 0.01;
@@ -355,6 +433,48 @@ export const Timeline: React.FC = () => {
 
           {/* R-3: Fixed Centre Playhead Cap */}
           <div className="am-centre-playhead-cap" />
+
+          {showCacheMenu && (
+            <div
+              onPointerDown={(e) => e.stopPropagation()}
+              style={{
+                position: 'absolute',
+                top: 22,
+                right: 8,
+                zIndex: 40,
+                background: 'var(--am-surface-2, #1E2239)',
+                border: '1px solid var(--am-border)',
+                borderRadius: 8,
+                padding: 6,
+                display: 'flex',
+                gap: 6,
+                boxShadow: '0 8px 24px rgba(0,0,0,0.45)',
+              }}
+            >
+              <button
+                type="button"
+                className="am-btn am-btn-accent"
+                style={{ padding: '4px 8px', fontSize: 11 }}
+                onClick={() => {
+                  setShowCacheMenu(false);
+                  onRenderCacheNow?.();
+                }}
+              >
+                Render preview now
+              </button>
+              <button
+                type="button"
+                className="am-btn"
+                style={{ padding: '4px 8px', fontSize: 11 }}
+                onClick={() => {
+                  setShowCacheMenu(false);
+                  onClearCache?.();
+                }}
+              >
+                Clear cache
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
@@ -421,6 +541,31 @@ export const Timeline: React.FC = () => {
                     }}
                   >
                     ›
+                  </button>
+                )}
+
+                {/* M-2: Missing-font warning badge on text layers */}
+                {layer.type === 'text' && missingFontLayerIds?.has(layer.id) && (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onOpenMissingFonts?.();
+                    }}
+                    title={`Missing font "${layer.textData?.fontFamily}" — tap to resolve`}
+                    style={{
+                      background: 'rgba(255, 107, 129, 0.2)',
+                      border: '1px solid rgba(255, 107, 129, 0.6)',
+                      color: '#FF6B81',
+                      borderRadius: 4,
+                      fontSize: 10,
+                      fontWeight: 700,
+                      padding: '1px 4px',
+                      cursor: 'pointer',
+                      lineHeight: 1.1,
+                    }}
+                  >
+                    ⚠
                   </button>
                 )}
               </div>

@@ -1,0 +1,710 @@
+{
+  "families": [
+    {
+      "family": "Arimo",
+      "weights": [
+        400,
+        700
+      ],
+      "styles": [
+        "italic",
+        "normal"
+      ],
+      "thumbs": {
+        "700|italic": "Arimo Bold Italic.webp",
+        "700|normal": "Arimo Bold.webp",
+        "400|italic": "Arimo Regular Italic.webp",
+        "400|normal": "Arimo Regular.webp"
+      },
+      "google": true
+    },
+    {
+      "family": "Fira Sans",
+      "weights": [
+        100,
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "styles": [
+        "italic",
+        "normal"
+      ],
+      "thumbs": {
+        "900|italic": "Fira Sans Black Italic.webp",
+        "900|normal": "Fira Sans Black.webp",
+        "700|italic": "Fira Sans Bold Italic.webp",
+        "700|normal": "Fira Sans Bold.webp",
+        "800|italic": "Fira Sans Extra Bold Italic.webp",
+        "800|normal": "Fira Sans Extra Bold.webp",
+        "200|italic": "Fira Sans Extra Light Italic.webp",
+        "200|normal": "Fira Sans Extra Light.webp",
+        "300|italic": "Fira Sans Light Italic.webp",
+        "300|normal": "Fira Sans Light.webp",
+        "500|italic": "Fira Sans Medium Italic.webp",
+        "500|normal": "Fira Sans Medium.webp",
+        "400|italic": "Fira Sans Regular Italic.webp",
+        "400|normal": "Fira Sans Regular.webp",
+        "600|italic": "Fira Sans Semi Bold Italic.webp",
+        "600|normal": "Fira Sans Semi Bold.webp",
+        "100|italic": "Fira Sans Thin Italic.webp",
+        "100|normal": "Fira Sans Thin.webp"
+      },
+      "google": true
+    },
+    {
+      "family": "Hind",
+      "weights": [
+        300,
+        400,
+        500,
+        600,
+        700
+      ],
+      "styles": [
+        "normal"
+      ],
+      "thumbs": {},
+      "google": true
+    },
+    {
+      "family": "Lato",
+      "weights": [
+        100,
+        300,
+        400,
+        700,
+        900
+      ],
+      "styles": [
+        "italic",
+        "normal"
+      ],
+      "thumbs": {
+        "900|italic": "Lato Black Italic.webp",
+        "900|normal": "Lato Black.webp",
+        "700|italic": "Lato Bold Italic.webp",
+        "700|normal": "Lato Bold.webp",
+        "300|italic": "Lato Light Italic.webp",
+        "300|normal": "Lato Light.webp",
+        "400|italic": "Lato Regular Italic.webp",
+        "400|normal": "Lato Regular.webp",
+        "100|italic": "Lato Thin Italic.webp",
+        "100|normal": "Lato Thin.webp"
+      },
+      "google": true
+    },
+    {
+      "family": "Lora",
+      "weights": [
+        400,
+        700
+      ],
+      "styles": [
+        "italic",
+        "normal"
+      ],
+      "thumbs": {
+        "700|italic": "Lora Bold Italic.webp",
+        "700|normal": "Lora Bold.webp",
+        "400|italic": "Lora Regular Italic.webp",
+        "400|normal": "Lora Regular.webp"
+      },
+      "google": true
+    },
+    {
+      "family": "Merriweather",
+      "weights": [
+        300,
+        400,
+        700,
+        900
+      ],
+      "styles": [
+        "italic",
+        "normal"
+      ],
+      "thumbs": {
+        "900|italic": "Merriweather Black Italic.webp",
+        "900|normal": "Merriweather Black.webp",
+        "700|italic": "Merriweather Bold Italic.webp",
+        "700|normal": "Merriweather Bold.webp",
+        "300|italic": "Merriweather Light Italic.webp",
+        "300|normal": "Merriweather Light.webp",
+        "400|italic": "Merriweather Regular Italic.webp",
+        "400|normal": "Merriweather Regular.webp"
+      },
+      "google": true
+    },
+    {
+      "family": "Montserrat",
+      "weights": [
+        100,
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "styles": [
+        "italic",
+        "normal"
+      ],
+      "thumbs": {
+        "900|italic": "Montserrat Black Italic.webp",
+        "900|normal": "Montserrat Black.webp",
+        "700|italic": "Montserrat Bold Italic.webp",
+        "700|normal": "Montserrat Bold.webp",
+        "800|italic": "Montserrat Extra Bold Italic.webp",
+        "800|normal": "Montserrat Extra Bold.webp",
+        "200|italic": "Montserrat Extra Light Italic.webp",
+        "200|normal": "Montserrat Extra Light.webp",
+        "300|italic": "Montserrat Light Italic.webp",
+        "300|normal": "Montserrat Light.webp",
+        "500|italic": "Montserrat Medium Italic.webp",
+        "500|normal": "Montserrat Medium.webp",
+        "400|italic": "Montserrat Regular Italic.webp",
+        "400|normal": "Montserrat Regular.webp",
+        "600|italic": "Montserrat Semi Bold Italic.webp",
+        "600|normal": "Montserrat Semi Bold.webp",
+        "100|italic": "Montserrat Thin Italic.webp",
+        "100|normal": "Montserrat Thin.webp"
+      },
+      "google": true
+    },
+    {
+      "family": "Muli",
+      "weights": [
+        200,
+        300,
+        400,
+        600,
+        700,
+        800,
+        900
+      ],
+      "styles": [
+        "italic",
+        "normal"
+      ],
+      "thumbs": {
+        "900|italic": "Muli Black Italic.webp",
+        "900|normal": "Muli Black.webp",
+        "700|italic": "Muli Bold Italic.webp",
+        "700|normal": "Muli Bold.webp",
+        "800|italic": "Muli Extra Bold Italic.webp",
+        "800|normal": "Muli Extra Bold.webp",
+        "200|italic": "Muli Extra Light Italic.webp",
+        "200|normal": "Muli Extra Light.webp",
+        "300|italic": "Muli Light Italic.webp",
+        "300|normal": "Muli Light.webp",
+        "400|italic": "Muli Regular Italic.webp",
+        "400|normal": "Muli Regular.webp",
+        "600|italic": "Muli Semi Bold Italic.webp",
+        "600|normal": "Muli Semi Bold.webp"
+      },
+      "google": true
+    },
+    {
+      "family": "Nanum Gothic",
+      "weights": [
+        400,
+        700,
+        800
+      ],
+      "styles": [
+        "normal"
+      ],
+      "thumbs": {
+        "700|normal": "Nanum Gothic Bold.webp",
+        "800|normal": "Nanum Gothic Extra Bold.webp",
+        "400|normal": "Nanum Gothic Regular.webp"
+      },
+      "google": true
+    },
+    {
+      "family": "Noto Sans",
+      "weights": [
+        400,
+        700
+      ],
+      "styles": [
+        "italic",
+        "normal"
+      ],
+      "thumbs": {
+        "700|italic": "Noto Sans Bold Italic.webp",
+        "700|normal": "Noto Sans Bold.webp",
+        "400|italic": "Noto Sans Regular Italic.webp",
+        "400|normal": "Noto Sans Regular.webp"
+      },
+      "google": true
+    },
+    {
+      "family": "Nunito",
+      "weights": [
+        200,
+        300,
+        400,
+        600,
+        700,
+        800,
+        900
+      ],
+      "styles": [
+        "italic",
+        "normal"
+      ],
+      "thumbs": {
+        "900|italic": "Nunito Black Italic.webp",
+        "900|normal": "Nunito Black.webp",
+        "700|italic": "Nunito Bold Italic.webp",
+        "700|normal": "Nunito Bold.webp",
+        "800|italic": "Nunito Extra Bold Italic.webp",
+        "800|normal": "Nunito Extra Bold.webp",
+        "200|italic": "Nunito Extra Light Italic.webp",
+        "200|normal": "Nunito Extra Light.webp",
+        "300|italic": "Nunito Light Italic.webp",
+        "300|normal": "Nunito Light.webp",
+        "400|italic": "Nunito Regular Italic.webp",
+        "400|normal": "Nunito Regular.webp",
+        "600|italic": "Nunito Semi Bold Italic.webp",
+        "600|normal": "Nunito Semi Bold.webp"
+      },
+      "google": true
+    },
+    {
+      "family": "Open Sans",
+      "weights": [
+        300,
+        400,
+        600,
+        700,
+        800
+      ],
+      "styles": [
+        "italic",
+        "normal"
+      ],
+      "thumbs": {
+        "700|italic": "Open Sans Bold Italic.webp",
+        "700|normal": "Open Sans Bold.webp",
+        "800|italic": "Open Sans Extra Bold Italic.webp",
+        "800|normal": "Open Sans Extra Bold.webp",
+        "300|italic": "Open Sans Light Italic.webp",
+        "300|normal": "Open Sans Light.webp",
+        "400|italic": "Open Sans Regular Italic.webp",
+        "400|normal": "Open Sans Regular.webp",
+        "600|italic": "Open Sans Semi Bold Italic.webp",
+        "600|normal": "Open Sans Semi Bold.webp"
+      },
+      "google": true
+    },
+    {
+      "family": "Open Sans Condensed",
+      "weights": [
+        300,
+        700
+      ],
+      "styles": [
+        "italic",
+        "normal"
+      ],
+      "thumbs": {
+        "700|normal": "Open Sans Condensed Bold.webp",
+        "300|italic": "Open Sans Condensed Light Italic.webp",
+        "300|normal": "Open Sans Condensed Light.webp"
+      },
+      "google": true
+    },
+    {
+      "family": "Oswald",
+      "weights": [
+        200,
+        300,
+        400,
+        500,
+        600,
+        700
+      ],
+      "styles": [
+        "normal"
+      ],
+      "thumbs": {
+        "700|normal": "Oswald Bold.webp",
+        "200|normal": "Oswald Extra Light.webp",
+        "300|normal": "Oswald Light.webp",
+        "500|normal": "Oswald Medium.webp",
+        "400|normal": "Oswald Regular.webp",
+        "600|normal": "Oswald Semi Bold.webp"
+      },
+      "google": true
+    },
+    {
+      "family": "PT Sans",
+      "weights": [
+        400,
+        700
+      ],
+      "styles": [
+        "italic",
+        "normal"
+      ],
+      "thumbs": {
+        "700|italic": "PT Sans Bold Italic.webp",
+        "700|normal": "PT Sans Bold.webp",
+        "400|italic": "PT Sans Regular Italic.webp",
+        "400|normal": "PT Sans Regular.webp"
+      },
+      "google": true
+    },
+    {
+      "family": "PT Sans Narrow",
+      "weights": [
+        400,
+        700
+      ],
+      "styles": [
+        "normal"
+      ],
+      "thumbs": {
+        "700|normal": "PT Sans Narrow Bold.webp",
+        "400|normal": "PT Sans Narrow Regular.webp"
+      },
+      "google": true
+    },
+    {
+      "family": "PT Serif",
+      "weights": [
+        400,
+        700
+      ],
+      "styles": [
+        "italic",
+        "normal"
+      ],
+      "thumbs": {
+        "700|italic": "PT Serif Bold Italic.webp",
+        "700|normal": "PT Serif Bold.webp",
+        "400|italic": "PT Serif Regular Italic.webp",
+        "400|normal": "PT Serif Regular.webp"
+      },
+      "google": true
+    },
+    {
+      "family": "Playfair Display",
+      "weights": [
+        400,
+        700,
+        900
+      ],
+      "styles": [
+        "italic",
+        "normal"
+      ],
+      "thumbs": {
+        "900|italic": "Playfair Display Black Italic.webp",
+        "900|normal": "Playfair Display Black.webp",
+        "700|italic": "Playfair Display Bold Italic.webp",
+        "700|normal": "Playfair Display Bold.webp",
+        "400|italic": "Playfair Display Regular Italic.webp",
+        "400|normal": "Playfair Display Regular.webp"
+      },
+      "google": true
+    },
+    {
+      "family": "Poppins",
+      "weights": [
+        100,
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "styles": [
+        "italic",
+        "normal"
+      ],
+      "thumbs": {
+        "900|italic": "Poppins Black Italic.webp",
+        "900|normal": "Poppins Black.webp",
+        "700|italic": "Poppins Bold Italic.webp",
+        "700|normal": "Poppins Bold.webp",
+        "800|italic": "Poppins Extra Bold Italic.webp",
+        "800|normal": "Poppins Extra Bold.webp",
+        "200|italic": "Poppins Extra Light Italic.webp",
+        "200|normal": "Poppins Extra Light.webp",
+        "300|italic": "Poppins Light Italic.webp",
+        "300|normal": "Poppins Light.webp",
+        "500|italic": "Poppins Medium Italic.webp",
+        "500|normal": "Poppins Medium.webp",
+        "400|italic": "Poppins Regular Italic.webp",
+        "400|normal": "Poppins Regular.webp",
+        "600|italic": "Poppins Semi Bold Italic.webp",
+        "600|normal": "Poppins Semi Bold.webp",
+        "100|italic": "Poppins Thin Italic.webp",
+        "100|normal": "Poppins Thin.webp"
+      },
+      "google": true
+    },
+    {
+      "family": "Raleway",
+      "weights": [
+        100,
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "styles": [
+        "italic",
+        "normal"
+      ],
+      "thumbs": {
+        "900|italic": "Raleway Black Italic.webp",
+        "900|normal": "Raleway Black.webp",
+        "700|italic": "Raleway Bold Italic.webp",
+        "700|normal": "Raleway Bold.webp",
+        "800|italic": "Raleway Extra Bold Italic.webp",
+        "800|normal": "Raleway Extra Bold.webp",
+        "200|italic": "Raleway Extra Light Italic.webp",
+        "200|normal": "Raleway Extra Light.webp",
+        "300|italic": "Raleway Light Italic.webp",
+        "300|normal": "Raleway Light.webp",
+        "500|italic": "Raleway Medium Italic.webp",
+        "500|normal": "Raleway Medium.webp",
+        "400|italic": "Raleway Regular Italic.webp",
+        "400|normal": "Raleway Regular.webp",
+        "600|italic": "Raleway Semi Bold Italic.webp",
+        "600|normal": "Raleway Semi Bold.webp",
+        "100|italic": "Raleway Thin Italic.webp",
+        "100|normal": "Raleway Thin.webp"
+      },
+      "google": true
+    },
+    {
+      "family": "Roboto",
+      "weights": [
+        100,
+        300,
+        400,
+        500,
+        700,
+        900
+      ],
+      "styles": [
+        "italic",
+        "normal"
+      ],
+      "thumbs": {
+        "900|italic": "Roboto Black Italic.webp",
+        "900|normal": "Roboto Black.webp",
+        "700|italic": "Roboto Bold Italic.webp",
+        "700|normal": "Roboto Bold.webp",
+        "300|italic": "Roboto Light Italic.webp",
+        "300|normal": "Roboto Light.webp",
+        "500|italic": "Roboto Medium Italic.webp",
+        "500|normal": "Roboto Medium.webp",
+        "400|italic": "Roboto Regular Italic.webp",
+        "400|normal": "Roboto Regular.webp",
+        "100|italic": "Roboto Thin Italic.webp",
+        "100|normal": "Roboto Thin.webp"
+      },
+      "google": true
+    },
+    {
+      "family": "Roboto Condensed",
+      "weights": [
+        300,
+        400,
+        700
+      ],
+      "styles": [
+        "italic",
+        "normal"
+      ],
+      "thumbs": {
+        "700|italic": "Roboto Condensed Bold Italic.webp",
+        "700|normal": "Roboto Condensed Bold.webp",
+        "300|italic": "Roboto Condensed Light Italic.webp",
+        "300|normal": "Roboto Condensed Light.webp",
+        "400|italic": "Roboto Condensed Regular Italic.webp",
+        "400|normal": "Roboto Condensed Regular.webp"
+      },
+      "google": true
+    },
+    {
+      "family": "Roboto Mono",
+      "weights": [
+        100,
+        300,
+        400,
+        500,
+        700
+      ],
+      "styles": [
+        "italic",
+        "normal"
+      ],
+      "thumbs": {
+        "700|italic": "Roboto Mono Bold Italic.webp",
+        "700|normal": "Roboto Mono Bold.webp",
+        "300|italic": "Roboto Mono Light Italic.webp",
+        "300|normal": "Roboto Mono Light.webp",
+        "500|italic": "Roboto Mono Medium Italic.webp",
+        "500|normal": "Roboto Mono Medium.webp",
+        "400|italic": "Roboto Mono Regular Italic.webp",
+        "400|normal": "Roboto Mono Regular.webp",
+        "100|italic": "Roboto Mono Thin Italic.webp",
+        "100|normal": "Roboto Mono Thin.webp"
+      },
+      "google": true
+    },
+    {
+      "family": "Roboto Slab",
+      "weights": [
+        100,
+        300,
+        400,
+        700
+      ],
+      "styles": [
+        "normal"
+      ],
+      "thumbs": {
+        "700|normal": "Roboto Slab Bold.webp",
+        "300|normal": "Roboto Slab Light.webp",
+        "400|normal": "Roboto Slab Regular.webp",
+        "100|normal": "Roboto Slab Thin.webp"
+      },
+      "google": true
+    },
+    {
+      "family": "Slabo 27px",
+      "weights": [
+        400
+      ],
+      "styles": [
+        "normal"
+      ],
+      "thumbs": {
+        "400|normal": "Slabo 27px Regular.webp"
+      },
+      "google": true
+    },
+    {
+      "family": "Source Sans Pro",
+      "weights": [
+        200,
+        300,
+        400,
+        600,
+        700,
+        900
+      ],
+      "styles": [
+        "italic",
+        "normal"
+      ],
+      "thumbs": {
+        "900|italic": "Source Sans Pro Black Italic.webp",
+        "900|normal": "Source Sans Pro Black.webp",
+        "700|italic": "Source Sans Pro Bold Italic.webp",
+        "700|normal": "Source Sans Pro Bold.webp",
+        "200|italic": "Source Sans Pro Extra Light Italic.webp",
+        "200|normal": "Source Sans Pro Extra Light.webp",
+        "300|italic": "Source Sans Pro Light Italic.webp",
+        "300|normal": "Source Sans Pro Light.webp",
+        "400|italic": "Source Sans Pro Regular Italic.webp",
+        "400|normal": "Source Sans Pro Regular.webp",
+        "600|italic": "Source Sans Pro Semi Bold Italic.webp",
+        "600|normal": "Source Sans Pro Semi Bold.webp"
+      },
+      "google": true
+    },
+    {
+      "family": "Space Grotesk",
+      "weights": [
+        300,
+        400,
+        500,
+        600,
+        700
+      ],
+      "styles": [
+        "normal"
+      ],
+      "thumbs": {},
+      "google": true
+    },
+    {
+      "family": "Titillium Web",
+      "weights": [
+        200,
+        300,
+        400,
+        600,
+        700,
+        900
+      ],
+      "styles": [
+        "italic",
+        "normal"
+      ],
+      "thumbs": {
+        "900|normal": "Titillium Web Black.webp",
+        "700|italic": "Titillium Web Bold Italic.webp",
+        "700|normal": "Titillium Web Bold.webp",
+        "200|italic": "Titillium Web Extra Light Italic.webp",
+        "200|normal": "Titillium Web Extra Light.webp",
+        "300|italic": "Titillium Web Light Italic.webp",
+        "300|normal": "Titillium Web Light.webp",
+        "400|italic": "Titillium Web Regular Italic.webp",
+        "400|normal": "Titillium Web Regular.webp",
+        "600|italic": "Titillium Web Semi Bold Italic.webp",
+        "600|normal": "Titillium Web Semi Bold.webp"
+      },
+      "google": true
+    },
+    {
+      "family": "Ubuntu",
+      "weights": [
+        300,
+        400,
+        500,
+        700
+      ],
+      "styles": [
+        "italic",
+        "normal"
+      ],
+      "thumbs": {
+        "700|italic": "Ubuntu Bold Italic.webp",
+        "700|normal": "Ubuntu Bold.webp",
+        "300|italic": "Ubuntu Light Italic.webp",
+        "300|normal": "Ubuntu Light.webp",
+        "500|italic": "Ubuntu Medium Italic.webp",
+        "500|normal": "Ubuntu Medium.webp",
+        "400|italic": "Ubuntu Regular Italic.webp",
+        "400|normal": "Ubuntu Regular.webp"
+      },
+      "google": true
+    }
+  ]
+}

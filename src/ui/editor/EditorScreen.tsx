@@ -1,5 +1,10 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { audioEngine } from '../../engine/audioEngine';
+import {
+  collectMissingFonts,
+  onFontEpochChange,
+  type MissingFontEntry,
+} from '../../engine/fontRegistry';
 import { AlightRenderer } from '../../engine/renderer';
 import { useEditorStore } from '../../store/useEditorStore';
 import { AddLayerPopup } from './AddLayerPopup';
@@ -7,6 +12,7 @@ import { EditorActionBar } from './EditorActionBar';
 import { EffectBrowserDialog } from './EffectBrowserDialog';
 import { ExportDialog } from './ExportDialog';
 import { LayerInspector } from './LayerInspector';
+import { MissingFontsDialog } from './MissingFontsDialog';
 import { Playbar } from './Playbar';
 import { PreviewCanvas } from './PreviewCanvas';
 import { ProjectSettingsDialog } from './ProjectSettingsDialog';
@@ -16,6 +22,7 @@ import { Timeline } from './Timeline';
 declare global {
   interface Window {
     __verifyAllShaders?: () => ReturnType<AlightRenderer['verifyAllShaders']> | { error: string };
+    __rendererRef?: React.RefObject<AlightRenderer | null>;
   }
 }
 
@@ -45,6 +52,35 @@ export const EditorScreen: React.FC = () => {
   const mediaRedrawRafRef = useRef(0);
   const [visibilityPaused, setVisibilityPaused] = useState(false);
   const [viewModeOpen, setViewModeOpen] = useState(() => typeof window !== 'undefined' && window.innerWidth > 860);
+  const [cacheVersion, setCacheVersion] = useState(0);
+  const [missingFonts, setMissingFonts] = useState<MissingFontEntry[]>([]);
+  const [showMissingFontsModal, setShowMissingFontsModal] = useState(false);
+  const lastAutoPromptProjectIdRef = useRef<string | null>(null);
+  const lastModifiedTimeRef = useRef<number>(0);
+
+  const missingFontLayerIds = useMemo(() => {
+    const set = new Set<string>();
+    for (const m of missingFonts) {
+      for (const id of m.layerIds) set.add(id);
+    }
+    return set;
+  }, [missingFonts]);
+
+  const refreshMissingFonts = useCallback((autoOpenIfNew = false) => {
+    const proj = useEditorStore.getState().currentProject;
+    if (!proj) {
+      setMissingFonts([]);
+      return;
+    }
+    const found = collectMissingFonts(proj);
+    setMissingFonts(found);
+    if (found.length === 0) {
+      setShowMissingFontsModal(false);
+    } else if (autoOpenIfNew && lastAutoPromptProjectIdRef.current !== proj.id) {
+      lastAutoPromptProjectIdRef.current = proj.id;
+      setShowMissingFontsModal(true);
+    }
+  }, []);
 
   // Auto-select Mobile APK (classic) vs iPad Desktop (widescreen) on viewport resize
   useEffect(() => {
@@ -75,23 +111,53 @@ export const EditorScreen: React.FC = () => {
           previewScale: store.previewQuality,
           selectedIds: store.selectedLayerIds,
           activeGroupStack: store.groupStack,
+          useCache: true,
         });
       });
     };
+    let cacheNotifyTimer = 0;
+    renderer.onCacheChange = () => {
+      if (cacheNotifyTimer) return;
+      cacheNotifyTimer = window.setTimeout(() => {
+        cacheNotifyTimer = 0;
+        setCacheVersion((v) => v + 1);
+      }, 180);
+    };
     window.__verifyAllShaders = () => renderer.verifyAllShaders();
+    window.__rendererRef = rendererRef;
+
+    const unsubFont = onFontEpochChange(() => {
+      renderer.invalidatePreviewCache();
+      refreshMissingFonts(false);
+      renderer.onMediaReady?.();
+    });
 
     return () => {
+      unsubFont();
+      if (cacheNotifyTimer) clearTimeout(cacheNotifyTimer);
       if (mediaRedrawRafRef.current) {
         cancelAnimationFrame(mediaRedrawRafRef.current);
         mediaRedrawRafRef.current = 0;
       }
       renderer.onMediaReady = undefined;
+      renderer.onCacheChange = undefined;
       delete window.__verifyAllShaders;
+      delete window.__rendererRef;
       renderer.dispose();
       rendererRef.current = null;
       audioEngine.stopPlayback();
     };
-  }, []);
+  }, [refreshMissingFonts]);
+
+  // Detect missing fonts on project open / edit & invalidate L2 cache on project mutations
+  useEffect(() => {
+    if (!currentProject) return;
+    if (lastModifiedTimeRef.current !== currentProject.modifiedTime) {
+      lastModifiedTimeRef.current = currentProject.modifiedTime;
+      rendererRef.current?.invalidatePreviewCache();
+    }
+    refreshMissingFonts(true);
+  }, [currentProject, currentProject?.id, currentProject?.modifiedTime, refreshMissingFonts]);
 
   // Render single frame whenever project, playhead, quality, or visibility changes while paused
   useEffect(() => {
@@ -102,10 +168,63 @@ export const EditorScreen: React.FC = () => {
       previewScale: previewQuality,
       selectedIds: selectedLayerIds,
       activeGroupStack: groupStack,
+      useCache: true,
     });
   }, [currentProject, currentTimeMs, selectedLayerIds, groupStack, previewQuality, visibilityPaused, isPlaying]);
 
-  // Playback rAF loop: renders directly to WebGL2 canvas + syncs HTMLVideo & Web Audio without React commit lag
+  // Idle render-ahead (After Effects RAM Preview): walks outward from playhead on idle turns
+  useEffect(() => {
+    const renderer = rendererRef.current;
+    if (!renderer || !currentProject || isPlaying || visibilityPaused || isExportingRef.current) return;
+    const totalFrames = Math.max(1, Math.ceil((currentProject.durationMs / 1000) * Math.max(1, currentProject.fps)));
+    const centerFrame = Math.max(0, Math.round((currentTimeMs / 1000) * Math.max(1, currentProject.fps)));
+    // Build outward frame order from playhead
+    const order: number[] = [];
+    for (let d = 1; d < totalFrames; d++) {
+      if (centerFrame + d < totalFrames) order.push(centerFrame + d);
+      if (centerFrame - d >= 0) order.push(centerFrame - d);
+    }
+    let cursor = 0;
+    let cancelled = false;
+    let idleHandle = 0;
+    const win = window as Window & {
+      requestIdleCallback?: (cb: (d: { timeRemaining: () => number }) => void) => number;
+      cancelIdleCallback?: (id: number) => void;
+    };
+    const rIC = win.requestIdleCallback
+      ? (cb: (d: { timeRemaining: () => number }) => void) => win.requestIdleCallback!(cb)
+      : (cb: (d: { timeRemaining: () => number }) => void) =>
+          globalThis.setTimeout(() => cb({ timeRemaining: () => 8 }), 40) as unknown as number;
+    const cIC = win.cancelIdleCallback
+      ? (id: number) => win.cancelIdleCallback!(id)
+      : (id: number) => globalThis.clearTimeout(id);
+
+    const pump = (deadline: { timeRemaining: () => number }) => {
+      if (cancelled || isExportingRef.current) return;
+      const store = useEditorStore.getState();
+      if (store.isPlaying || !store.currentProject || store.currentProject.id !== currentProject.id) return;
+      const start = performance.now();
+      while (cursor < order.length && performance.now() - start < Math.min(8, Math.max(2, deadline.timeRemaining()))) {
+        const frameIdx = order[cursor++];
+        renderer.precacheFrame(currentProject, frameIdx, previewQuality);
+      }
+      if (cursor < order.length && !cancelled) {
+        idleHandle = rIC(pump);
+      }
+    };
+
+    const delayTimer = window.setTimeout(() => {
+      if (!cancelled) idleHandle = rIC(pump);
+    }, 350);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(delayTimer);
+      if (idleHandle) cIC(idleHandle);
+    };
+  }, [currentProject, currentTimeMs, previewQuality, isPlaying, visibilityPaused]);
+
+  // Playback rAF loop: audio-master clock (or fixed-step without audio) + L2 RAM cache hit path + throttled store sync
   useEffect(() => {
     const renderer = rendererRef.current;
     if (!isPlaying || !currentProject || visibilityPaused || !renderer) {
@@ -121,22 +240,46 @@ export const EditorScreen: React.FC = () => {
       useEditorStore.getState().setCurrentTimeMs(0);
     }
 
+    const hasAudioTrack = audioEngine.hasAudio(currentProject);
+    const frameMs = 1000 / Math.max(1, currentProject.fps);
     renderer.syncVideosForPlayback(currentProject, playheadMs, true);
     audioEngine.startPlayback(currentProject, playheadMs);
     let lastTs = performance.now();
+    let accumMs = 0;
+    let commitTick = 0;
     let rafId = 0;
 
     const tick = (now: number) => {
-      const dt = Math.min(100, Math.max(0, now - lastTs));
-      lastTs = now;
       const store = useEditorStore.getState();
       const proj = store.currentProject;
       if (!proj || !store.isPlaying || isExportingRef.current) return;
 
-      playheadMs += dt;
+      if (hasAudioTrack) {
+        const audioPos = audioEngine.getPlaybackPositionMs();
+        if (audioPos !== null) {
+          playheadMs = audioPos;
+        } else {
+          playheadMs += Math.min(frameMs * 2, Math.max(0, now - lastTs));
+        }
+        lastTs = now;
+      } else {
+        // Fixed-step accumulator: advances by exact frame steps without swallowing hitches silently
+        const rawDt = Math.max(0, now - lastTs);
+        lastTs = now;
+        accumMs += Math.min(rawDt, frameMs * 3);
+        const steps = Math.max(1, Math.floor(accumMs / frameMs));
+        if (accumMs >= frameMs) {
+          accumMs -= steps * frameMs;
+          playheadMs += steps * frameMs;
+        } else {
+          playheadMs += rawDt;
+        }
+      }
+
       if (playheadMs >= proj.durationMs) {
         if (store.loop) {
           playheadMs = 0;
+          accumMs = 0;
           audioEngine.startPlayback(proj, 0);
         } else {
           playheadMs = proj.durationMs;
@@ -145,6 +288,7 @@ export const EditorScreen: React.FC = () => {
             previewScale: store.previewQuality,
             selectedIds: store.selectedLayerIds,
             activeGroupStack: store.groupStack,
+            useCache: true,
           });
           store.setCurrentTimeMs(proj.durationMs);
           store.setIsPlaying(false);
@@ -157,11 +301,17 @@ export const EditorScreen: React.FC = () => {
         previewScale: store.previewQuality,
         selectedIds: store.selectedLayerIds,
         activeGroupStack: store.groupStack,
+        useCache: true,
       });
-      store.setCurrentTimeMs(playheadMs);
-      const lvl = audioEngine.sampleLevel();
-      if (lvl !== store.audioLevel) {
-        store.setAudioLevel(lvl);
+
+      // Throttle React store playhead commits to every 4th frame (~15 Hz) while playing
+      commitTick++;
+      if (commitTick % 4 === 0) {
+        store.setCurrentTimeMs(playheadMs);
+        const lvl = audioEngine.sampleLevel();
+        if (lvl !== store.audioLevel) {
+          store.setAudioLevel(lvl);
+        }
       }
       rafId = requestAnimationFrame(tick);
     };
@@ -344,6 +494,29 @@ export const EditorScreen: React.FC = () => {
 
   if (!currentProject) return null;
 
+  const handleClearCache = () => {
+    rendererRef.current?.clearPreviewCache();
+    useEditorStore.getState().showToast('Preview RAM cache cleared');
+  };
+
+  const handleRenderCacheNow = () => {
+    const renderer = rendererRef.current;
+    if (!renderer || !currentProject) return;
+    const totalFrames = Math.max(1, Math.ceil((currentProject.durationMs / 1000) * Math.max(1, currentProject.fps)));
+    let idx = 0;
+    useEditorStore.getState().showToast(`Pre-rendering ${totalFrames} preview frames…`);
+    const step = () => {
+      if (!rendererRef.current || useEditorStore.getState().isPlaying) return;
+      const start = performance.now();
+      while (idx < totalFrames && performance.now() - start < 12) {
+        rendererRef.current.precacheFrame(currentProject, idx++, previewQuality);
+      }
+      if (idx < totalFrames) requestAnimationFrame(step);
+      else useEditorStore.getState().showToast('Preview RAM cache ready');
+    };
+    requestAnimationFrame(step);
+  };
+
   return (
     <div className="am-editor">
       <EditorActionBar />
@@ -355,7 +528,14 @@ export const EditorScreen: React.FC = () => {
           viewModeOpen={viewModeOpen}
         />
         <Playbar viewModeOpen={viewModeOpen} onToggleViewMode={() => setViewModeOpen((v) => !v)} />
-        <Timeline />
+        <Timeline
+          rendererRef={rendererRef}
+          cacheVersion={cacheVersion}
+          missingFontLayerIds={missingFontLayerIds}
+          onOpenMissingFonts={() => setShowMissingFontsModal(true)}
+          onClearCache={handleClearCache}
+          onRenderCacheNow={handleRenderCacheNow}
+        />
         <LayerInspector />
       </div>
 
@@ -364,6 +544,17 @@ export const EditorScreen: React.FC = () => {
       <ExportDialog rendererRef={rendererRef} isExportingRef={isExportingRef} />
       <ProjectSettingsDialog />
       <ShortcutOverlay />
+      {showMissingFontsModal && missingFonts.length > 0 && (
+        <MissingFontsDialog
+          projectTitle={currentProject.title}
+          missing={missingFonts}
+          onResolved={() => {
+            rendererRef.current?.invalidatePreviewCache();
+            refreshMissingFonts(false);
+          }}
+          onClose={() => setShowMissingFontsModal(false)}
+        />
+      )}
       {toastMessage && (
         <div className="am-toast" role="status" aria-live="polite">
           {toastMessage}

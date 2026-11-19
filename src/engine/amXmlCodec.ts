@@ -10,6 +10,7 @@ import type {
 } from '../types/project';
 import { animatable, parseEasingString } from './animation';
 import { getEffectById, getShapeById, parseDefaultParamValue } from './catalog';
+import { formatAmFontToken, parseAmFontToken } from './fontNames';
 
 function escapeXml(str: string): string {
   return str
@@ -93,8 +94,13 @@ function layerToXml(layer: Layer, indent = '  '): string {
   parts.push(`${indent}  </transform>`);
 
   if (layer.type === 'text' && layer.textData) {
+    const amFont = formatAmFontToken(
+      layer.textData.fontFamily,
+      layer.textData.fontWeight ?? 400,
+      Boolean(layer.textData.italic)
+    );
     parts.push(
-      `${indent}  <content font="${escapeXml(layer.textData.fontFamily)}" size="${layer.textData.fontSize}" align="${layer.textData.align}" color="${escapeXml(layer.textData.color)}">${escapeXml(layer.textData.content)}</content>`
+      `${indent}  <content font="${escapeXml(amFont)}" size="${layer.textData.fontSize}" align="${layer.textData.align}" color="${escapeXml(layer.textData.color)}">${escapeXml(layer.textData.content)}</content>`
     );
   }
 
@@ -651,9 +657,12 @@ function parseXmlLayer(
         ? (() => {
             const rawWrap = parseFloat(contentEl?.getAttribute('wrapWidth') || el.getAttribute('wrapWidth') || '');
             const hasExplicitWrap = Number.isFinite(rawWrap) && rawWrap > 0;
+            const parsedFont = parseAmFontToken(contentEl?.getAttribute('font'));
             return {
               content: contentEl?.textContent || 'Text',
-              fontFamily: contentEl?.getAttribute('font') || 'SpaceGrotesk-Bold',
+              fontFamily: parsedFont.family,
+              fontWeight: parsedFont.weight,
+              italic: parsedFont.style === 'italic',
               fontSize: parseFloat(contentEl?.getAttribute('size') || '72') || 72,
               color: contentEl?.getAttribute('color') || '#FFFFFFFF',
               align: (contentEl?.getAttribute('align') as 'left' | 'center' | 'right') || 'center',

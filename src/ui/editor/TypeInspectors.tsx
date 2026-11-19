@@ -1,9 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { evalAnimatable } from '../../engine/animation';
 import { getShapeById, parseDefaultParamValue } from '../../engine/catalog';
+import { normalizeFontWeight, weightToLabel } from '../../engine/fontNames';
+import { resolveFontTriple } from '../../engine/fontRegistry';
 import { useEditorStore } from '../../store/useEditorStore';
 import { ColorPicker } from '../components/ColorPicker';
 import { SpinnerControl } from '../components/SpinnerControl';
+import { FontPickerModal } from './FontPickerModal';
 import { useSelectedLayer } from './useSelectedLayer';
 
 export const ShapeEditPanel: React.FC = () => {
@@ -110,9 +113,14 @@ export const ShapeEditPanel: React.FC = () => {
 };
 
 export const TextEditPanel: React.FC = () => {
+  const { currentProject } = useEditorStore();
   const { layer, updateLayer } = useSelectedLayer();
+  const [showFontPicker, setShowFontPicker] = useState(false);
   if (!layer || layer.type !== 'text' || !layer.textData) return null;
   const td = layer.textData;
+  const fontWeight = normalizeFontWeight(td.fontWeight);
+  const fontItalic = Boolean(td.italic);
+  const resolved = resolveFontTriple(td.fontFamily, fontWeight, fontItalic, currentProject?.fontSubstitutions);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -128,20 +136,58 @@ export const TextEditPanel: React.FC = () => {
       </div>
 
       <div className="am-field">
-        <label htmlFor="txt-font">Font Family (APK Bundled)</label>
-        <select
-          id="txt-font"
-          className="am-select"
-          value={td.fontFamily}
-          onChange={(e) => updateLayer((l) => { if (l.textData) l.textData.fontFamily = e.target.value; })}
+        <label>Font ({weightToLabel(fontWeight)}{fontItalic ? ' Italic' : ''})</label>
+        <button
+          type="button"
+          className="am-input"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            cursor: 'pointer',
+            textAlign: 'left',
+            padding: '8px 10px',
+            borderColor: resolved.status === 'missing' ? '#FF6B81' : undefined,
+          }}
+          onClick={() => setShowFontPicker(true)}
         >
-          <option value="Space Grotesk">Space Grotesk</option>
-          <option value="Roboto">Roboto</option>
-          <option value="Hind">Hind</option>
-          <option value="Serif Pro">Serif Pro</option>
-          <option value="monospace">Monospace</option>
-        </select>
+          <span
+            style={{
+              fontFamily: `"${resolved.family}", sans-serif`,
+              fontWeight: resolved.weight,
+              fontStyle: resolved.style,
+              fontSize: 14,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {td.fontFamily}
+          </span>
+          <span style={{ fontSize: 11, color: resolved.status === 'missing' ? '#FF6B81' : 'var(--am-accent)', flexShrink: 0, marginLeft: 8 }}>
+            {resolved.status === 'missing' ? '⚠ Missing · Browse ▾' : resolved.status === 'substituted' ? `→ ${resolved.family} ▾` : 'Browse ▾'}
+          </span>
+        </button>
       </div>
+
+      {showFontPicker && (
+        <FontPickerModal
+          currentFamily={td.fontFamily}
+          currentWeight={fontWeight}
+          currentItalic={fontItalic}
+          sampleText={td.content}
+          onSelect={(family, weight, italic) => {
+            updateLayer((l) => {
+              if (l.textData) {
+                l.textData.fontFamily = family;
+                l.textData.fontWeight = weight;
+                l.textData.italic = italic;
+              }
+            });
+          }}
+          onClose={() => setShowFontPicker(false)}
+        />
+      )}
 
       <SpinnerControl
         label="Font Size"

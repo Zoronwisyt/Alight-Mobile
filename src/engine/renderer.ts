@@ -18,7 +18,33 @@ import {
 import { getEffectById, getEffects, getShapeById, parseDefaultParamValue } from './catalog';
 import { evaluateShapePath, runEffectScript, type EffectScriptElement, type EffectScriptEnv } from './scriptRuntime';
 import { sanitizeGlslUniformName, ShaderRegistry } from './shaderCompiler';
+import { fontEpoch, resolveFontTriple } from './fontRegistry';
 import { loadMediaUrl } from '../store/storage';
+
+interface CachedFrame {
+  tex: WebGLTexture;
+  w: number;
+  h: number;
+  scale: number;
+  epoch: number;
+  lastUsed: number;
+  bytes: number;
+}
+
+interface TextLayoutMemo {
+  lines: { chars: string[]; widths: number[]; lineW: number }[];
+  allChars: number;
+}
+
+export interface PreviewCacheStats {
+  hits: number;
+  misses: number;
+  bytes: number;
+  budgetBytes: number;
+  evictions: number;
+  epoch: number;
+  cachedCount: number;
+}
 
 interface FboSlot {
   fbo: WebGLFramebuffer;
@@ -406,9 +432,38 @@ export class AlightRenderer {
   private isPlaybackActive = false;
   private disposed = false;
   public onMediaReady?: () => void;
+  public onCacheChange?: () => void;
+
+  // After Effects-style L2 WebGL2 RAM Preview Cache + Text Layout Memo
+  private frameCache = new Map<number, CachedFrame>();
+  private textLayoutCache = new Map<string, TextLayoutMemo>();
+  private cacheEpoch = 1;
+  private cacheBytes = 0;
+  private cacheBudgetBytes = 384 * 1024 * 1024;
+  private cacheTick = 0;
+  private cacheHits = 0;
+  private cacheMisses = 0;
+  private cacheEvictions = 0;
+  private lastCacheProjectId = '';
+  private lastCacheScale = -1;
+  private lastCacheFontEpoch = -1;
+  private onContextLostHandler: (e: Event) => void;
 
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
+    // Compute adaptive RAM cache budget based on device class / navigator.deviceMemory
+    const navMem = typeof navigator !== 'undefined' ? (navigator as unknown as { deviceMemory?: number }).deviceMemory : undefined;
+    const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
+    const classBudget = isMobile ? 192 * 1024 * 1024 : typeof window !== 'undefined' && window.innerWidth <= 1024 ? 384 * 1024 * 1024 : 1536 * 1024 * 1024;
+    this.cacheBudgetBytes = navMem
+      ? Math.min(classBudget, Math.max(128 * 1024 * 1024, Math.floor(0.12 * navMem * 1024 * 1024 * 1024)))
+      : classBudget;
+
+    this.onContextLostHandler = () => {
+      this.clearPreviewCache();
+      this.cacheEpoch++;
+    };
+    canvas.addEventListener('webglcontextlost', this.onContextLostHandler);
     const gl = canvas.getContext('webgl2', {
       alpha: true,
       premultipliedAlpha: true,
@@ -582,6 +637,10 @@ export class AlightRenderer {
     const v = entry.video;
     if (v.readyState < 2 || v.seeking || v.videoWidth === 0 || v.videoHeight === 0) {
       return false;
+    }
+    // Skip redundant upload when video frame time hasn't advanced (paused scrubs / stills)
+    if (entry.hasFrame && entry.w === v.videoWidth && entry.h === v.videoHeight && Math.abs(entry.lastUploadedTime - v.currentTime) < 0.0005) {
+      return true;
     }
     const gl = this.gl;
     gl.activeTexture(gl.TEXTURE0);
@@ -781,7 +840,7 @@ export class AlightRenderer {
               });
             }
           }
-        } else if (!v.seeking && Math.abs(v.currentTime - targetSec) > 0.28) {
+        } else if (!v.seeking && Math.abs(v.currentTime - targetSec) > 0.5) {
           try {
             v.currentTime = targetSec;
           } catch {
@@ -967,6 +1026,158 @@ export class AlightRenderer {
   /**
    * Renders full project at `sceneTimeMs` to the WebGL2 canvas.
    */
+  public invalidatePreviewCache(): void {
+    this.cacheEpoch++;
+    this.textLayoutCache.clear();
+    this.clearPreviewCache();
+    this.onCacheChange?.();
+  }
+
+  public clearPreviewCache(): void {
+    if (this.frameCache.size === 0) return;
+    const gl = this.gl;
+    for (const entry of this.frameCache.values()) {
+      gl.deleteTexture(entry.tex);
+    }
+    this.frameCache.clear();
+    this.cacheBytes = 0;
+    this.publishCacheStats();
+    this.onCacheChange?.();
+  }
+
+  public getPreviewCacheStats(): PreviewCacheStats {
+    return {
+      hits: this.cacheHits,
+      misses: this.cacheMisses,
+      bytes: this.cacheBytes,
+      budgetBytes: this.cacheBudgetBytes,
+      evictions: this.cacheEvictions,
+      epoch: this.cacheEpoch,
+      cachedCount: this.frameCache.size,
+    };
+  }
+
+  private publishCacheStats(): void {
+    if (typeof window !== 'undefined') {
+      (window as unknown as { __previewCacheStats?: PreviewCacheStats }).__previewCacheStats =
+        this.getPreviewCacheStats();
+    }
+  }
+
+  /** Returns per-frame cache state for the timeline cache bar: 0 = uncached, 1 = lower scale, 2 = full scale */
+  public getCachedFrameMap(totalFrames: number, targetScale: number): Uint8Array {
+    const out = new Uint8Array(Math.max(1, totalFrames));
+    for (const [frameIdx, entry] of this.frameCache.entries()) {
+      if (entry.epoch !== this.cacheEpoch) continue;
+      if (frameIdx >= 0 && frameIdx < out.length) {
+        out[frameIdx] = entry.scale >= targetScale - 0.02 ? 2 : 1;
+      }
+    }
+    return out;
+  }
+
+  private computeCacheScale(project: Project, previewScale: number): number {
+    const totalFrames = Math.max(1, Math.ceil((project.durationMs / 1000) * Math.max(1, project.fps)));
+    const fullBytes = Math.max(1, totalFrames * project.width * project.height * 4);
+    const adaptive = Math.sqrt((this.cacheBudgetBytes * 0.85) / fullBytes);
+    const capped = Math.min(previewScale, 1.0);
+    return Math.max(0.25, Math.min(capped, adaptive));
+  }
+
+  private evictPreviewCache(protectFrame: number): void {
+    const targetBytes = Math.floor(this.cacheBudgetBytes * 0.9);
+    if (this.cacheBytes <= targetBytes) return;
+    const entries = Array.from(this.frameCache.entries())
+      .filter(([idx]) => idx !== protectFrame)
+      .sort((a, b) => a[1].lastUsed - b[1].lastUsed);
+    const gl = this.gl;
+    for (const [idx, entry] of entries) {
+      if (this.cacheBytes <= targetBytes) break;
+      gl.deleteTexture(entry.tex);
+      this.frameCache.delete(idx);
+      this.cacheBytes -= entry.bytes;
+      this.cacheEvictions++;
+    }
+  }
+
+  private hasActiveSeekingVideo(): boolean {
+    for (const entry of this.mediaVideos.values()) {
+      if (entry.video.seeking) return true;
+    }
+    return false;
+  }
+
+  private storeFrameInCache(frameIdx: number, srcFbo: FboSlot, srcW: number, srcH: number, cacheScale: number): void {
+    const gl = this.gl;
+    const bytes = srcW * srcH * 4;
+    if (bytes > this.cacheBudgetBytes / 12) return; // hard per-frame cap
+
+    const prev = this.frameCache.get(frameIdx);
+    if (prev) {
+      gl.deleteTexture(prev.tex);
+      this.cacheBytes -= prev.bytes;
+    }
+
+    const tex = gl.createTexture()!;
+    gl.bindTexture(gl.TEXTURE_2D, tex);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, srcW, srcH, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+
+    // Copy rendered FBO into cached texture via gl.copyTexSubImage2D (GPU-to-GPU, zero CPU readback)
+    gl.bindFramebuffer(gl.FRAMEBUFFER, srcFbo.fbo);
+    gl.copyTexSubImage2D(gl.TEXTURE_2D, 0, 0, 0, 0, 0, srcW, srcH);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    gl.bindTexture(gl.TEXTURE_2D, null);
+
+    this.frameCache.set(frameIdx, {
+      tex,
+      w: srcW,
+      h: srcH,
+      scale: cacheScale,
+      epoch: this.cacheEpoch,
+      lastUsed: ++this.cacheTick,
+      bytes,
+    });
+    this.cacheBytes += bytes;
+    this.evictPreviewCache(frameIdx);
+    this.publishCacheStats();
+    this.onCacheChange?.();
+  }
+
+  /** Renders one frame offscreen directly into the L2 preview cache (for idle render-ahead) */
+  public precacheFrame(
+    project: Project,
+    frameIdx: number,
+    previewScale: number
+  ): boolean {
+    if (this.disposed || this.isPlaybackActive) return false;
+    const existing = this.frameCache.get(frameIdx);
+    if (existing && existing.epoch === this.cacheEpoch) return false;
+    if (this.cacheBytes >= this.cacheBudgetBytes * 0.88) return false;
+
+    const fps = Math.max(1, project.fps);
+    const sceneTimeMs = (frameIdx / fps) * 1000;
+    if (sceneTimeMs > project.durationMs) return false;
+
+    const cScale = this.computeCacheScale(project, previewScale);
+    const cw = Math.max(16, Math.round(project.width * cScale));
+    const ch = Math.max(16, Math.round(project.height * cScale));
+
+    const sceneFbo = this.acquireFbo(cw, ch);
+    const [br, bg, bb, ba] =
+      project.bgColor === 'transparent' ? [0, 0, 0, 0] : parseColorArgb(project.bgColor);
+    this.clearFbo(sceneFbo, cw, ch, br * ba, bg * ba, bb * ba, ba);
+    this.renderLayerList(project, project.layers, sceneTimeMs, sceneFbo, cw, ch, cScale, []);
+    if (!this.hasActiveSeekingVideo()) {
+      this.storeFrameInCache(frameIdx, sceneFbo, cw, ch, cScale);
+    }
+    this.releaseFbo(sceneFbo);
+    return true;
+  }
+
   public renderProject(
     project: Project,
     sceneTimeMs: number,
@@ -976,14 +1187,16 @@ export class AlightRenderer {
       renderHeight?: number;
       selectedIds?: string[];
       activeGroupStack?: string[];
+      useCache?: boolean;
     } = {}
   ): void {
     let renderW: number;
     let renderH: number;
     let scale: number;
-    if (options.renderWidth && options.renderHeight) {
-      renderW = Math.max(16, Math.round(options.renderWidth));
-      renderH = Math.max(16, Math.round(options.renderHeight));
+    const isExport = Boolean(options.renderWidth && options.renderHeight);
+    if (isExport) {
+      renderW = Math.max(16, Math.round(options.renderWidth!));
+      renderH = Math.max(16, Math.round(options.renderHeight!));
       scale = renderW / Math.max(1, project.width);
     } else {
       const q = options.previewScale ?? 1;
@@ -994,9 +1207,71 @@ export class AlightRenderer {
       renderW = Math.max(16, Math.round(project.width * scale));
       renderH = Math.max(16, Math.round(project.height * scale));
     }
+
+    // Never reallocate the drawing buffer mid-playback (prevents blank-frame flash on quality/DPR changes)
     if (this.canvas.width !== renderW || this.canvas.height !== renderH) {
-      this.canvas.width = renderW;
-      this.canvas.height = renderH;
+      if (!this.isPlaybackActive || this.canvas.width === 0 || this.canvas.height === 0 || isExport) {
+        this.canvas.width = renderW;
+        this.canvas.height = renderH;
+      } else {
+        renderW = this.canvas.width;
+        renderH = this.canvas.height;
+        scale = renderW / Math.max(1, project.width);
+      }
+    }
+
+    // Invalidate L2 cache if project, fontEpoch, or previewScale changed
+    const cacheEligible = Boolean(options.useCache) && !isExport;
+    if (cacheEligible) {
+      const qKey = Math.round((options.previewScale ?? 1) * 100);
+      if (
+        this.lastCacheProjectId !== project.id ||
+        this.lastCacheScale !== qKey ||
+        this.lastCacheFontEpoch !== fontEpoch.value
+      ) {
+        this.lastCacheProjectId = project.id;
+        this.lastCacheScale = qKey;
+        this.lastCacheFontEpoch = fontEpoch.value;
+        this.clearPreviewCache();
+        this.cacheEpoch++;
+      }
+
+      const fps = Math.max(1, project.fps);
+      const frameIdx = Math.max(0, Math.round((sceneTimeMs / 1000) * fps));
+      const cached = this.frameCache.get(frameIdx);
+      if (cached && cached.epoch === this.cacheEpoch) {
+        cached.lastUsed = ++this.cacheTick;
+        this.cacheHits++;
+        this.blitTexture(cached.tex, null, renderW, renderH, 1.0, false);
+        this.publishCacheStats();
+        return;
+      }
+      this.cacheMisses++;
+
+      const sceneFbo = this.acquireFbo(renderW, renderH);
+      const [br, bg, bb, ba] =
+        project.bgColor === 'transparent' ? [0, 0, 0, 0] : parseColorArgb(project.bgColor);
+      this.clearFbo(sceneFbo, renderW, renderH, br * ba, bg * ba, bb * ba, ba);
+      this.renderLayerList(project, project.layers, sceneTimeMs, sceneFbo, renderW, renderH, scale, options.selectedIds ?? []);
+      this.blitTexture(sceneFbo.tex, null, renderW, renderH, 1.0, false);
+
+      // Store in L2 cache (at adaptive cacheScale if needed) when no video is mid-seek
+      if (!this.hasActiveSeekingVideo()) {
+        const cScale = this.computeCacheScale(project, options.previewScale ?? 1);
+        const cw = Math.max(16, Math.round(project.width * cScale));
+        const ch = Math.max(16, Math.round(project.height * cScale));
+        if (cw === renderW && ch === renderH) {
+          this.storeFrameInCache(frameIdx, sceneFbo, renderW, renderH, scale);
+        } else {
+          const downFbo = this.acquireFbo(cw, ch);
+          this.blitTexture(sceneFbo.tex, downFbo, cw, ch, 1.0, false);
+          this.storeFrameInCache(frameIdx, downFbo, cw, ch, cScale);
+          this.releaseFbo(downFbo);
+        }
+      }
+      this.releaseFbo(sceneFbo);
+      this.publishCacheStats();
+      return;
     }
 
     const sceneFbo = this.acquireFbo(renderW, renderH);
@@ -2630,44 +2905,70 @@ export class AlightRenderer {
     const ttFx = layer.effects.find((e) => e.enabled && e.effectId === 'com.alightcreative.effects.texttransform');
 
     const fontSize = Math.max(8, td.fontSize);
-    const fontStyle = td.italic ? 'italic ' : '';
-    const fontWeight = td.fontWeight ?? 700;
-    ctx.font = `${fontStyle}${fontWeight} ${fontSize}px "${td.fontFamily}", "Space Grotesk", "Roboto", sans-serif`;
+    const resolvedFont = resolveFontTriple(
+      td.fontFamily,
+      td.fontWeight ?? 400,
+      Boolean(td.italic),
+      project.fontSubstitutions
+    );
+    const fontStyle = resolvedFont.style === 'italic' ? 'italic ' : '';
+    const fontWeight = resolvedFont.weight;
+    const fontStr = `${fontStyle}${fontWeight} ${fontSize}px "${resolvedFont.family}", "Roboto", "Space Grotesk", sans-serif`;
+    ctx.font = fontStr;
     ctx.textBaseline = 'middle';
     ctx.textAlign = 'center';
 
     const [r, g, b, a] = parseColorArgb(td.color || '#FFFFFFFF');
     const baseFill = `rgba(${Math.round(r * 255)}, ${Math.round(g * 255)}, ${Math.round(b * 255)}, ${a.toFixed(3)})`;
     const letterSp = (td.letterSpacing || 0) + extraLetterSpace;
-    const measureRun = (txt: string) => {
-      let w = 0;
-      for (const ch of Array.from(txt)) w += ctx.measureText(ch).width + letterSp;
-      return w;
-    };
-
     const wrapMax = td.wrapWidth > 40 ? td.wrapWidth : Infinity;
-    const lines: string[] = [];
-    for (const rawLine of content.split('\n')) {
-      if (!Number.isFinite(wrapMax) || measureRun(rawLine) <= wrapMax) {
-        lines.push(rawLine);
-        continue;
-      }
-      const words = rawLine.split(' ');
-      let cur = '';
-      for (const word of words) {
-        const candidate = cur ? `${cur} ${word}` : word;
-        if (measureRun(candidate) <= wrapMax) {
-          cur = candidate;
-        } else {
-          if (cur) lines.push(cur);
-          cur = word;
+
+    // Memoize wrapped lines & per-character widths (eliminates per-frame measureText storm)
+    const layoutKey = `${fontEpoch.value}|${fontStr}|${letterSp.toFixed(2)}|${Number.isFinite(wrapMax) ? Math.round(wrapMax) : 'inf'}|${content}`;
+    let layout = this.textLayoutCache.get(layoutKey);
+    if (!layout) {
+      const measureRun = (txt: string) => {
+        if (Math.abs(letterSp) < 0.01) return ctx.measureText(txt).width;
+        let w = 0;
+        for (const ch of Array.from(txt)) w += ctx.measureText(ch).width + letterSp;
+        return w;
+      };
+      const rawLines: string[] = [];
+      for (const rawLine of content.split('\n')) {
+        if (!Number.isFinite(wrapMax) || measureRun(rawLine) <= wrapMax) {
+          rawLines.push(rawLine);
+          continue;
         }
+        const words = rawLine.split(' ');
+        let cur = '';
+        for (const word of words) {
+          const candidate = cur ? `${cur} ${word}` : word;
+          if (measureRun(candidate) <= wrapMax) {
+            cur = candidate;
+          } else {
+            if (cur) rawLines.push(cur);
+            cur = word;
+          }
+        }
+        if (cur) rawLines.push(cur);
       }
-      if (cur) lines.push(cur);
+      const lineEntries = rawLines.map((line) => {
+        const chars = Array.from(line);
+        const widths = chars.map((ch) => ctx.measureText(ch).width + letterSp);
+        const lineW = widths.reduce((acc, v) => acc + v, 0);
+        return { chars, widths, lineW };
+      });
+      const allChars = lineEntries.reduce((acc, l) => acc + l.chars.length, 0);
+      layout = { lines: lineEntries, allChars };
+      if (this.textLayoutCache.size >= 256) {
+        const firstKey = this.textLayoutCache.keys().next().value;
+        if (firstKey !== undefined) this.textLayoutCache.delete(firstKey);
+      }
+      this.textLayoutCache.set(layoutKey, layout);
     }
 
     const lineH = fontSize * (td.lineHeight || 1.2) * extraLineSpace;
-    const totalH = (lines.length - 1) * lineH;
+    const totalH = (layout.lines.length - 1) * lineH;
     const yStart =
       td.verticalAlign === 'top'
         ? 0
@@ -2675,15 +2976,12 @@ export class AlightRenderer {
           ? -totalH
           : -totalH * 0.5;
 
-    // Compute total character index for Text Transform
-    const allChars = lines.join('').length;
+    const allChars = layout.allChars;
     let charGlobalIdx = 0;
 
-    lines.forEach((line, li) => {
+    layout.lines.forEach((lineObj, li) => {
       const y = yStart + li * lineH;
-      const chars = Array.from(line);
-      const widths = chars.map((ch) => ctx.measureText(ch).width + letterSp);
-      const lineW = widths.reduce((acc, v) => acc + v, 0);
+      const { chars, widths, lineW } = lineObj;
       let cursorX = td.align === 'left' ? -td.wrapWidth * 0.45 : td.align === 'right' ? td.wrapWidth * 0.45 - lineW : -lineW * 0.5;
 
       chars.forEach((ch, ci) => {
@@ -2783,6 +3081,9 @@ export class AlightRenderer {
 
   public dispose(): void {
     this.disposed = true;
+    this.canvas.removeEventListener('webglcontextlost', this.onContextLostHandler);
+    this.clearPreviewCache();
+    this.textLayoutCache.clear();
     this.pauseAllVideos();
     this.registry.dispose();
     const gl = this.gl;
