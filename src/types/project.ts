@@ -196,6 +196,7 @@ export interface AudioData {
 
 export interface CameraData {
   fov: Animatable<number>;
+  type?: 'perspective' | 'orthographic';
   active: boolean;
   fogEnabled: boolean;
   fogColor: string;

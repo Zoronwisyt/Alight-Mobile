@@ -98,6 +98,10 @@ export const AddLayerPopup: React.FC = () => {
   };
 
   const addObjectLayer = (kind: 'null' | 'camera') => {
+    const defaultCamZ =
+      kind === 'camera'
+        ? -(Math.max(currentProject.width, currentProject.height) / (2 * Math.tan((60 * Math.PI) / 360)))
+        : 0;
     addLayer(
       makeBaseLayer({
         id: `${kind}_${Date.now()}`,
@@ -107,7 +111,7 @@ export const AddLayerPopup: React.FC = () => {
         startTime: 0,
         endTime: currentProject.durationMs,
         transform: {
-          location: animatable([cx, cy, 0]),
+          location: animatable([cx, cy, defaultCamZ]),
           rotation: animatable(0),
           scale: animatable([1, 1]),
           scaleLinked: true,
@@ -118,6 +122,7 @@ export const AddLayerPopup: React.FC = () => {
           kind === 'camera'
             ? {
                 fov: animatable(60),
+                type: 'perspective',
                 active: true,
                 fogEnabled: false,
                 fogColor: '#FF0E1317',

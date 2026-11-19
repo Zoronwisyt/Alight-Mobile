@@ -98,6 +98,13 @@ function layerToXml(layer: Layer, indent = '  '): string {
     );
   }
 
+  if (layer.type === 'camera' && layer.cameraData) {
+    parts.push(`${indent}  ${emitAnimProp('fov', layer.cameraData.fov)}`);
+    if (layer.cameraData.type === 'orthographic') {
+      parts.push(`${indent}  <property name="cameraType" type="string" value="orthographic"/>`);
+    }
+  }
+
   for (const eff of layer.effects) {
     const hiddenAttr = !eff.enabled ? ' hidden="true"' : '';
     parts.push(`${indent}  <effect id="${escapeXml(eff.effectId)}" locallyApplied="${eff.locallyApplied ? 'true' : 'false'}" enabled="${eff.enabled ? 'true' : 'false'}"${hiddenAttr}>`);
@@ -547,7 +554,61 @@ function parseXmlLayer(
     isClippingMask && rawBlending !== 'exclude' ? 'mask' : rawBlending;
 
   const parentId = el.getAttribute('parent') || null;
-  const defaultLoc: [number, number, number] = parentId ? [0, 0, 0] : [projW / 2, projH / 2, 0];
+  let cameraData: Layer['cameraData'] = undefined;
+  let defaultCamZ = 0;
+  if (type === 'camera') {
+    const camProps = parseDirectProperties(el);
+    const fovEl = el.querySelector(':scope > fov');
+    const fovAnim: Animatable<number> = fovEl
+      ? parsePropElement(fovEl, parseNum, 60)
+      : camProps.fov ?? animatable(parseFloat(el.getAttribute('fov') || '60') || 60);
+    const rawCamType = (
+      el.getAttribute('cameraType') ||
+      el.getAttribute('type') ||
+      (typeof camProps.cameraType?.value === 'string' ? camProps.cameraType.value : '')
+    ).toLowerCase();
+    const camType: 'perspective' | 'orthographic' =
+      rawCamType === 'orthographic' ? 'orthographic' : 'perspective';
+    const fogEnabled =
+      el.getAttribute('fogEnabled') === 'true' || Boolean(camProps.fogEnabled?.value);
+    const fogColorEl = el.querySelector(':scope > fogColor');
+    const fogColor =
+      fogColorEl?.getAttribute('value') ||
+      (typeof camProps.fogColor?.value === 'string' ? camProps.fogColor.value : null) ||
+      el.getAttribute('fogColor') ||
+      '#FF0E1317';
+    const fogNear =
+      parseFloat(el.querySelector(':scope > fogNearZ')?.getAttribute('value') || '') ||
+      (typeof camProps.fogNearZ?.value === 'number' ? camProps.fogNearZ.value : 300);
+    const fogFar =
+      parseFloat(el.querySelector(':scope > fogFarZ')?.getAttribute('value') || '') ||
+      (typeof camProps.fogFarZ?.value === 'number' ? camProps.fogFarZ.value : 2000);
+    const focusDistEl = el.querySelector(':scope > focusDistance');
+    const focusDistance: Animatable<number> = focusDistEl
+      ? parsePropElement(focusDistEl, parseNum, 1000)
+      : camProps.focusDistance ?? animatable(1000);
+    const blurEl = el.querySelector(':scope > focusBlurStrength');
+    const blurStrength: Animatable<number> = blurEl
+      ? parsePropElement(blurEl, parseNum, 0)
+      : camProps.focusBlurStrength ?? animatable(0);
+    cameraData = {
+      fov: fovAnim,
+      type: camType,
+      active: true,
+      fogEnabled,
+      fogColor,
+      fogNear,
+      fogFar,
+      focusDistance,
+      blurStrength,
+    };
+    const initFov = fovAnim.value > 0 ? fovAnim.value : 60;
+    // Matches APK CameraElementKt.makeDefaultCamera: z = -calcCameraZoom(scene, fov)
+    defaultCamZ = -(Math.max(projW, projH) / (2 * Math.tan((initFov * Math.PI) / 360)));
+  }
+  const defaultLoc: [number, number, number] = parentId
+    ? [0, 0, 0]
+    : [projW / 2, projH / 2, defaultCamZ];
 
   return {
     id: el.getAttribute('id') || `layer_${Date.now()}_${idx}`,
@@ -604,6 +665,7 @@ function parseXmlLayer(
         : undefined,
     mediaData,
     audioData,
+    cameraData,
     groupLayers,
     groupWidth,
     groupHeight,

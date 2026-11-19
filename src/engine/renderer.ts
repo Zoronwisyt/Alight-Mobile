@@ -1117,6 +1117,12 @@ export class AlightRenderer {
     return { x, y, z, rotation, sx, sy, px: piv[0], py: piv[1], skewX: skew[0], skewY: skew[1], alphaMul };
   }
 
+  private calcCameraZoom(width: number, height: number, fovDeg: number): number {
+    // Matches APK CameraElementKt.calcCameraZoom(scene, fov): max(w, h) / (2 * tan(fov/2))
+    const safeFov = Math.max(1, Math.min(179, fovDeg || 60));
+    return Math.max(width, height) / (2 * Math.tan(((safeFov / 2) * Math.PI) / 180));
+  }
+
   private renderLayerList(
     project: Project,
     layers: Layer[],
@@ -1128,15 +1134,50 @@ export class AlightRenderer {
     selectedIds: string[]
   ): void {
     const layersMap = new Map(layers.map((l) => [l.id, l]));
-    const activeCam = project.cameraEnabled
-      ? layers.find((l) => l.type === 'camera' && l.visible && sceneTimeMs >= l.startTime && sceneTimeMs <= l.endTime)
-      : undefined;
-    let camState: { x: number; y: number; z: number; fov: number } | null = null;
+    // Matches APK CameraElementKt.getActiveCameraAtTime: last visible camera covering sceneTimeMs
+    let activeCam: Layer | undefined;
+    if (project.cameraEnabled) {
+      for (const l of layers) {
+        if (l.type === 'camera' && l.visible && sceneTimeMs >= l.startTime && sceneTimeMs <= l.endTime) {
+          activeCam = l;
+        }
+      }
+    }
+    type CamState = {
+      x: number;
+      y: number;
+      z: number;
+      rotation: number;
+      fov: number;
+      type: 'perspective' | 'orthographic';
+      isExplicit: boolean;
+    };
+    let camState: CamState;
     if (activeCam) {
       const { remappedNormT } = evalRemappedTime(activeCam, sceneTimeMs);
       const ctf = this.resolveWorldTransform(activeCam, layersMap, sceneTimeMs, project.fps);
       const fov = activeCam.cameraData ? evalAnimatable(activeCam.cameraData.fov, remappedNormT, 60) : 60;
-      camState = { x: ctf.x - project.width / 2, y: ctf.y - project.height / 2, z: ctf.z, fov };
+      camState = {
+        x: ctf.x,
+        y: ctf.y,
+        z: ctf.z,
+        rotation: ctf.rotation,
+        fov,
+        type: activeCam.cameraData?.type ?? 'perspective',
+        isExplicit: true,
+      };
+    } else {
+      // Matches APK CameraElementKt.makeDefaultCamera(scene): (w/2, h/2, -calcCameraZoom(scene, 60))
+      const defaultFocal = this.calcCameraZoom(project.width, project.height, 60);
+      camState = {
+        x: project.width * 0.5,
+        y: project.height * 0.5,
+        z: -defaultFocal,
+        rotation: 0,
+        fov: 60,
+        type: 'perspective',
+        isExplicit: false,
+      };
     }
 
     const activeLayers = layers.filter(
@@ -1149,7 +1190,9 @@ export class AlightRenderer {
         sceneTimeMs <= layer.endTime
     );
 
-    // Depth-sort layers by world Z (furthest negative Z first, closest positive Z on top) when any layer uses 3D Z space
+    // Depth-sort layers by world Z when any layer uses 3D Z space.
+    // Matches APK CameraElementKt: camZ defaults to -focal, dz = layerZ - camZ,
+    // so larger +Z is further away (drawn first) and smaller -Z is closer to camera (drawn on top).
     let orderedLayers = activeLayers;
     const zEntries = activeLayers.map((layer, idx) => ({
       layer,
@@ -1157,7 +1200,7 @@ export class AlightRenderer {
       z: this.resolveWorldTransform(layer, layersMap, sceneTimeMs, project.fps).z,
     }));
     if (zEntries.some((e) => Math.abs(e.z) > 0.5)) {
-      zEntries.sort((a, b) => (Math.abs(a.z - b.z) > 0.5 ? a.z - b.z : a.idx - b.idx));
+      zEntries.sort((a, b) => (Math.abs(a.z - b.z) > 0.5 ? b.z - a.z : a.idx - b.idx));
       orderedLayers = zEntries.map((e) => e.layer);
     }
 
@@ -1185,7 +1228,15 @@ export class AlightRenderer {
     project: Project,
     layer: Layer,
     layersMap: Map<string, Layer>,
-    camState: { x: number; y: number; z: number; fov: number } | null,
+    camState: {
+      x: number;
+      y: number;
+      z: number;
+      rotation: number;
+      fov: number;
+      type: 'perspective' | 'orthographic';
+      isExplicit: boolean;
+    },
     sceneTimeMs: number,
     sceneFbo: FboSlot,
     renderW: number,
@@ -1198,25 +1249,34 @@ export class AlightRenderer {
     const isSelected = selectedIds.includes(layer.id);
     const tf = this.resolveWorldTransform(layer, layersMap, sceneTimeMs, project.fps, new Set<string>(), isSelected);
 
-    // Apply Alight Motion 3D Z-depth perspective (active whenever camera exists OR world Z != 0)
-    // Right-handed AM convention: -Z is further away (smaller), +Z is closer to viewer (larger).
+    // Apply Alight Motion 5.0.280 CameraElementKt.bakeCameraInternal 3D projection:
+    // - Default camera sits at (w/2, h/2, -calcCameraZoom(scene, 60))
+    // - dz = layerZ - camZ; layers at or behind camera (layerZ <= camZ) are culled
+    // - pScale = focal / dz (or 1.0 for orthographic), where focal = max(w, h) / (2 * tan(fov/2))
     let wx = tf.x;
     let wy = tf.y;
     let wsx = tf.sx;
     let wsy = tf.sy;
-    if (camState || Math.abs(tf.z) > 0.01) {
-      const fov = camState?.fov || 60;
-      const camX = camState?.x ?? 0;
-      const camY = camState?.y ?? 0;
-      const camZ = camState?.z ?? 0;
-      const focal = (project.height * 0.5) / Math.tan((fov * Math.PI) / 360);
-      const dz = focal - (tf.z - camZ);
-      if (dz <= 10) return; // behind camera near plane
-      const pScale = focal / dz;
-      wx = project.width * 0.5 + (wx - camX - project.width * 0.5) * pScale;
-      wy = project.height * 0.5 + (wy - camY - project.height * 0.5) * pScale;
+    let wrot = tf.rotation;
+    if (camState.isExplicit || Math.abs(tf.z) > 0.01) {
+      const dz = tf.z - camState.z;
+      if (dz <= 0.001) return; // behind camera plane (exact APK layerZ <= camZ cull)
+      const focal = this.calcCameraZoom(project.width, project.height, camState.fov);
+      const pScale = camState.type === 'orthographic' ? 1.0 : focal / dz;
+      const cx = project.width * 0.5;
+      const cy = project.height * 0.5;
+      const dx = tf.x + tf.px - camState.x;
+      const dy = tf.y + tf.py - camState.y;
+      const rad = (-camState.rotation * Math.PI) / 180;
+      const cosR = Math.cos(rad);
+      const sinR = Math.sin(rad);
+      const rx = dx * cosR - dy * sinR;
+      const ry = dx * sinR + dy * cosR;
+      wx = cx + rx * pScale - tf.px;
+      wy = cy + ry * pScale - tf.py;
       wsx *= pScale;
       wsy *= pScale;
+      wrot = tf.rotation - camState.rotation;
     }
 
     const layerOpacity = clamp01(evalAnimatable(layer.opacity, remappedNormT, 1)) * tf.alphaMul * extraAlpha;
@@ -1254,7 +1314,7 @@ export class AlightRenderer {
       wy * scale,
       logicalW * scale,
       logicalH * scale,
-      tf.rotation,
+      wrot,
       wsx,
       wsy,
       tf.px * scale,
@@ -1327,7 +1387,7 @@ export class AlightRenderer {
         wy * scale,
         grpW * scale,
         grpH * scale,
-        tf.rotation,
+        wrot,
         wsx,
         wsy,
         false,
@@ -1366,7 +1426,7 @@ export class AlightRenderer {
           wy * scale,
           logicalW * scale,
           logicalH * scale,
-          tf.rotation,
+          wrot,
           wsx,
           wsy,
           layer.type === 'video',
@@ -1383,7 +1443,7 @@ export class AlightRenderer {
     } else {
       // Shape / Vector / Freehand / Text -> Canvas2D rasterization in world coordinates (with Repeat effects!)
       const repeatInstances = this.computeRepeatInstances(layer, remappedNormT);
-      const dims = this.rasterizeLayerToCanvas2D(project, layer, remappedNormT, sceneTimeMs, wx, wy, tf.rotation, wsx, wsy, tf.px, tf.py, tf.skewX, tf.skewY, scale, renderW, renderH, repeatInstances, overdrawPad, overdrawSpan);
+      const dims = this.rasterizeLayerToCanvas2D(project, layer, remappedNormT, sceneTimeMs, wx, wy, wrot, wsx, wsy, tf.px, tf.py, tf.skewX, tf.skewY, scale, renderW, renderH, repeatInstances, overdrawPad, overdrawSpan);
       if (dims.w !== logicalW || dims.h !== logicalH) {
         logicalW = dims.w;
         logicalH = dims.h;
@@ -1394,7 +1454,7 @@ export class AlightRenderer {
           wy * scale,
           logicalW * scale,
           logicalH * scale,
-          tf.rotation,
+          wrot,
           wsx,
           wsy,
           tf.px * scale,
@@ -1475,7 +1535,7 @@ export class AlightRenderer {
               alpha: scriptAlpha,
               shaderGroups: null,
               text: '',
-              transform: { location: { x: wx, y: wy, z: tf.z }, angle: tf.rotation, scale: { x: wsx, y: wsy } },
+              transform: { location: { x: wx, y: wy, z: tf.z }, angle: wrot, scale: { x: wsx, y: wsy } },
             },
             paramsEval
           );
@@ -1494,7 +1554,7 @@ export class AlightRenderer {
             alpha: scriptAlpha,
             shaderGroups: null,
             text: '',
-            transform: { location: { x: wx, y: wy, z: tf.z }, angle: tf.rotation, scale: { x: wsx, y: wsy } },
+            transform: { location: { x: wx, y: wy, z: tf.z }, angle: wrot, scale: { x: wsx, y: wsy } },
           },
           paramsEval
         );
