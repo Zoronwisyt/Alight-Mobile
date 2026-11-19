@@ -174,7 +174,37 @@ const parseVec3 = (s: string): [number, number, number] => {
   return [a[0] ?? 0, a[1] ?? 0, a[2] ?? 0];
 };
 
-function parseXmlLayer(el: Element, idx: number, projW: number, projH: number): Layer {
+export interface ImportedMediaAsset {
+  mediaId: string;
+  src: string;
+  mime: string;
+  name: string;
+  width?: number;
+  height?: number;
+  durationMs?: number;
+}
+
+export type AmPackageMediaMap = Map<string, ImportedMediaAsset>;
+
+function lookupMediaAsset(rawRef: string | null, mediaMap?: AmPackageMediaMap): ImportedMediaAsset | undefined {
+  if (!rawRef || !mediaMap) return undefined;
+  const cleaned = rawRef.replace(/^amproj:/i, '').trim();
+  const base = cleaned.split('/').pop() || cleaned;
+  return (
+    mediaMap.get(cleaned) ??
+    mediaMap.get(cleaned.toLowerCase()) ??
+    mediaMap.get(base) ??
+    mediaMap.get(base.toLowerCase())
+  );
+}
+
+function parseXmlLayer(
+  el: Element,
+  idx: number,
+  projW: number,
+  projH: number,
+  mediaMap?: AmPackageMediaMap
+): Layer {
   const tag = el.tagName.toLowerCase();
   const typeMap: Record<string, Layer['type']> = {
     shape: 'shape',
@@ -186,7 +216,7 @@ function parseXmlLayer(el: Element, idx: number, projW: number, projH: number): 
     camera: 'camera',
     embedscene: 'group',
   };
-  const type = typeMap[tag] ?? 'shape';
+  let type: Layer['type'] = typeMap[tag] ?? 'shape';
   const tf = el.querySelector(':scope > transform');
 
   const effects: LayerEffectInstance[] = [];
@@ -239,21 +269,65 @@ function parseXmlLayer(el: Element, idx: number, projW: number, projH: number): 
   const fillTypeAttr = el.getAttribute('fillType');
   const fillColorAttr = el.getAttribute('fillColor') || '#FF69FC97';
 
+  // Resolve bundled .amproj media references (fillVideo / fillImage / src / uri)
+  const fillVideoRef = el.getAttribute('fillVideo');
+  const fillImageRef = el.getAttribute('fillImage');
+  const directSrcRef = el.getAttribute('src') ?? el.getAttribute('uri');
+  const matchedVideo = lookupMediaAsset(fillVideoRef || (type === 'video' ? directSrcRef : null), mediaMap);
+  const matchedImage = lookupMediaAsset(fillImageRef || (type === 'image' ? directSrcRef : null), mediaMap);
+  const matchedAudio = lookupMediaAsset(type === 'audio' ? directSrcRef : null, mediaMap);
+
+  let mediaData: Layer['mediaData'];
+  let audioData: Layer['audioData'];
+
+  if (matchedVideo) {
+    type = 'video';
+    mediaData = {
+      mediaId: matchedVideo.mediaId,
+      src: matchedVideo.src,
+      naturalWidth: matchedVideo.width || projW,
+      naturalHeight: matchedVideo.height || projH,
+      durationMs: matchedVideo.durationMs || 4000,
+      trimStartMs: parseFloat(el.getAttribute('inTime') || '0') || 0,
+      playbackSpeed: 1,
+      volume: 1,
+      muted: false,
+    };
+  } else if (matchedImage) {
+    type = 'image';
+    mediaData = {
+      mediaId: matchedImage.mediaId,
+      src: matchedImage.src,
+      naturalWidth: matchedImage.width || projW,
+      naturalHeight: matchedImage.height || projH,
+    };
+  } else if (matchedAudio) {
+    type = 'audio';
+    audioData = {
+      mediaId: matchedAudio.mediaId,
+      src: matchedAudio.src,
+      name: matchedAudio.name,
+      durationMs: matchedAudio.durationMs || 4000,
+      volume: animatable(1),
+      muted: false,
+    };
+  }
+
   const nestedScene = el.querySelector(':scope > scene');
   const groupLayers = nestedScene
     ? Array.from(nestedScene.children)
         .filter((c) => ['shape', 'text', 'image', 'video', 'audio', 'nullobj', 'camera', 'embedscene'].includes(c.tagName.toLowerCase()))
-        .map((c, j) => parseXmlLayer(c, j, projW, projH))
+        .map((c, j) => parseXmlLayer(c, j, projW, projH, mediaMap))
     : undefined;
 
   return {
     id: el.getAttribute('id') || `layer_${Date.now()}_${idx}`,
     type,
-    label: el.getAttribute('label') || `${type[0].toUpperCase()}${type.slice(1)} ${idx + 1}`,
+    label: el.getAttribute('label') || matchedVideo?.name || matchedImage?.name || matchedAudio?.name || `${type[0].toUpperCase()}${type.slice(1)} ${idx + 1}`,
     colorIndex: idx % 8,
     startTime: parseFloat(el.getAttribute('startTime') || '0'),
     endTime: parseFloat(el.getAttribute('endTime') || '3000'),
-    visible: el.getAttribute('visible') !== 'false',
+    visible: el.getAttribute('hidden') !== 'true' && el.getAttribute('visible') !== 'false',
     locked: false,
     parentId: el.getAttribute('parent') || null,
     blendMode: (el.getAttribute('blending') as BlendModeId) || 'normal',
@@ -319,11 +393,13 @@ function parseXmlLayer(el: Element, idx: number, projW: number, projH: number): 
             wrapWidth: projW * 0.85,
           }
         : undefined,
+    mediaData,
+    audioData,
     groupLayers,
   };
 }
 
-export function importProjectFromAmXml(xmlText: string): Project {
+export function importProjectFromAmXml(xmlText: string, mediaMap?: AmPackageMediaMap): Project {
   const parser = new DOMParser();
   const doc = parser.parseFromString(xmlText, 'application/xml');
   const scene = doc.querySelector('scene');
@@ -337,7 +413,7 @@ export function importProjectFromAmXml(xmlText: string): Project {
   const bg = scene.getAttribute('bgcolor') || '#FF000000';
   const layers = Array.from(scene.children)
     .filter((c) => ['shape', 'text', 'image', 'video', 'audio', 'nullobj', 'camera', 'embedscene'].includes(c.tagName.toLowerCase()))
-    .map((c, i) => parseXmlLayer(c, i, width, height));
+    .map((c, i) => parseXmlLayer(c, i, width, height, mediaMap));
 
   const bookmarkSet = new Set<number>();
   for (const bmEl of Array.from(scene.querySelectorAll('bookmark, marker'))) {

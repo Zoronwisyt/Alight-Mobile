@@ -1,8 +1,10 @@
 import React, { useRef, useState } from 'react';
+import { importAlightMotionLink, importAmProjZip, parseAlightShareUrl } from '../engine/amLinkImporter';
 import { importProjectFromAmXml } from '../engine/amXmlCodec';
 import { getEffects } from '../engine/catalog';
 import { useEditorStore } from '../store/useEditorStore';
 import type { Project } from '../types/project';
+import { AmDialog } from './components/AmDialog';
 import { AmIcon } from './components/AmIcon';
 import { NewProjectDialog } from './NewProjectDialog';
 
@@ -26,6 +28,11 @@ export const HomeScreen: React.FC = () => {
 
   const [search, setSearch] = useState('');
   const [importError, setImportError] = useState<string | null>(null);
+  const [showLinkDialog, setShowLinkDialog] = useState(false);
+  const [linkUrl, setLinkUrl] = useState('');
+  const [linkStatus, setLinkStatus] = useState('');
+  const [linkBusy, setLinkBusy] = useState(false);
+  const [linkError, setLinkError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const effectsCount = getEffects().filter((e) => !e.internal).length;
@@ -39,8 +46,14 @@ export const HomeScreen: React.FC = () => {
     if (!file) return;
     setImportError(null);
     try {
+      const lower = file.name.toLowerCase();
+      if (lower.endsWith('.amproj') || lower.endsWith('.zip')) {
+        const res = await importAmProjZip(file);
+        for (const proj of res.projects) importProject(proj);
+        return;
+      }
       const text = await file.text();
-      if (file.name.toLowerCase().endsWith('.xml') || text.trimStart().startsWith('<')) {
+      if (lower.endsWith('.xml') || text.trimStart().startsWith('<')) {
         const proj = importProjectFromAmXml(text);
         importProject(proj);
       } else {
@@ -52,6 +65,28 @@ export const HomeScreen: React.FC = () => {
       }
     } catch (err) {
       setImportError(err instanceof Error ? err.message : 'Failed to import project file.');
+    }
+  };
+
+  const handleImportLink = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!linkUrl.trim()) return;
+    setLinkBusy(true);
+    setLinkError(null);
+    setLinkStatus('Starting import...');
+    try {
+      const res = await importAlightMotionLink(linkUrl, setLinkStatus);
+      for (const proj of res.projects) {
+        importProject(proj);
+      }
+      setShowLinkDialog(false);
+      setLinkUrl('');
+      setLinkStatus('');
+    } catch (err) {
+      setLinkError(err instanceof Error ? err.message : 'Failed to import Alight Motion link.');
+      setLinkStatus('');
+    } finally {
+      setLinkBusy(false);
     }
   };
 
@@ -92,17 +127,30 @@ export const HomeScreen: React.FC = () => {
           </div>
           <button
             type="button"
+            className="am-btn am-btn-primary"
+            style={{ padding: '6px 12px', fontSize: 12 }}
+            onClick={() => {
+              setLinkError(null);
+              setLinkStatus('');
+              setShowLinkDialog(true);
+            }}
+          >
+            <AmIcon name="ic_layer_parent" fallback="link" size={15} color="#091318" />
+            Import Link
+          </button>
+          <button
+            type="button"
             className="am-btn"
             style={{ padding: '6px 12px', fontSize: 12 }}
             onClick={() => fileInputRef.current?.click()}
           >
             <AmIcon name="ic_xml_upload" fallback="xml" size={16} />
-            Import XML / JSON
+            Import XML / .amproj
           </button>
           <input
             ref={fileInputRef}
             type="file"
-            accept=".xml,.json,.amweb.json"
+            accept=".xml,.json,.amweb.json,.amproj,.zip"
             style={{ display: 'none' }}
             onChange={handleImportFile}
           />
@@ -401,6 +449,76 @@ export const HomeScreen: React.FC = () => {
           </aside>
         </div>
       )}
+
+      <AmDialog
+        open={showLinkDialog}
+        onClose={() => !linkBusy && setShowLinkDialog(false)}
+        title="Import Alight Motion Link"
+      >
+        <form onSubmit={handleImportLink} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <div className="am-field" style={{ marginBottom: 0 }}>
+            <label htmlFor="am-link-input">Alight Motion Share Link</label>
+            <input
+              id="am-link-input"
+              name="amShareLink"
+              type="url"
+              className="am-input"
+              placeholder="https://alightcreative.com/am/share/u/.../p/..."
+              value={linkUrl}
+              onChange={(e) => setLinkUrl(e.target.value)}
+              disabled={linkBusy}
+              autoFocus
+            />
+          </div>
+
+          <div style={{ fontSize: 12, color: 'var(--am-text-muted)' }}>
+            Downloads the project XML, beat bookmarks, effects, and all bundled images, videos, and audio into your studio.
+          </div>
+
+          {linkStatus && (
+            <div style={{ fontSize: 12, color: 'var(--am-accent)', fontWeight: 600 }}>{linkStatus}</div>
+          )}
+
+          {linkError && (
+            <div style={{ padding: '8px 10px', borderRadius: 8, background: 'rgba(224,20,69,0.2)', border: '1px solid var(--am-danger)', fontSize: 12 }}>
+              <div>{linkError}</div>
+              {parseAlightShareUrl(linkUrl) && (
+                <div style={{ marginTop: 8, display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                  <a
+                    href={parseAlightShareUrl(linkUrl)!.zipUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="am-btn am-btn-primary"
+                    style={{ fontSize: 11, padding: '5px 10px' }}
+                  >
+                    Download projectfiles.zip
+                  </a>
+                  <button
+                    type="button"
+                    className="am-btn"
+                    style={{ fontSize: 11, padding: '5px 10px' }}
+                    onClick={() => {
+                      setShowLinkDialog(false);
+                      fileInputRef.current?.click();
+                    }}
+                  >
+                    Upload .zip / .amproj
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
+            <button type="button" className="am-btn" disabled={linkBusy} onClick={() => setShowLinkDialog(false)}>
+              Cancel
+            </button>
+            <button type="submit" className="am-btn am-btn-primary" disabled={linkBusy || !linkUrl.trim()}>
+              {linkBusy ? 'Importing...' : 'Import Package'}
+            </button>
+          </div>
+        </form>
+      </AmDialog>
 
       <NewProjectDialog />
     </div>
