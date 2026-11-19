@@ -429,23 +429,86 @@ dialog.am-dialog::backdrop {
   overflow: hidden;
 }
 
+/* APK activity_edit_navbar.xml (42dp #191B27) */
 .am-actionbar {
-  height: 44px;
-  min-height: 44px;
-  background: var(--am-a11);
-  border-bottom: 1px solid var(--am-border);
+  height: 42px;
+  min-height: 42px;
+  background: #191B27;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 10px;
-  gap: 8px;
+  padding: 0 4px;
+  gap: 6px;
+}
+
+/* APK activity_edit_selectbar.xml (42dp #00FFA8) */
+.am-actionbar.am-selectbar {
+  background: #00FFA8;
+  color: #091318;
+  padding: 0 6px;
+}
+
+.am-selectbar-count {
+  font-size: 13px;
+  font-weight: 700;
+  color: #091318;
+  padding-left: 8px;
+}
+
+.am-selectbar-btn {
+  width: 40px;
+  height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  color: #091318;
+}
+
+.am-selectbar-btn:hover {
+  background: rgba(0, 0, 0, 0.1);
 }
 
 .am-actionbar-group {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 2px;
   min-width: 0;
+}
+
+.am-nav-icon-btn {
+  width: 40px;
+  height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #FFFFFF;
+  flex-shrink: 0;
+}
+
+.am-nav-icon-btn:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.am-nav-time {
+  font-family: 'Roboto', monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: 12px;
+  font-weight: 600;
+  color: #9AA1AF;
+  padding: 0 6px;
+}
+
+.am-layout-chip {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: 5px;
+  background: #2B2E3C;
+  color: #00FFA8;
+  border: 1px solid rgba(0, 255, 168, 0.28);
+  margin: 0 2px;
 }
 
 .am-editor-body {
@@ -456,23 +519,27 @@ dialog.am-dialog::backdrop {
   display: flex;
   flex-direction: column;
   position: relative;
+  background: #191B27;
 }
 
+/* iPad / Desktop Studio Layout: Upper (Stage + Right Docked Element Editor) / Middle Playbar / Bottom Full-Width Timeline */
 .am-editor-body.widescreen {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 370px;
-  grid-template-rows: 1fr 44px 235px;
+  grid-template-columns: minmax(0, 1fr) 390px;
+  grid-template-rows: minmax(220px, 1fr) 46px 250px;
 }
 
+/* Exact Mobile APK Portrait Layout (activity_edit.xml): Stage -> Playbar (46dp) -> Timeline (280dp) with Element Panel overlaying timeline */
 .am-editor-body.classic {
   display: grid;
-  grid-template-columns: 1fr;
-  grid-template-rows: minmax(240px, 1fr) 44px minmax(195px, 34%);
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: minmax(200px, 1fr) 46px 270px;
 }
 
+/* APK @id/previewGuide (#141620) */
 .am-stage-wrap {
   position: relative;
-  background: var(--am-stage-bg);
+  background: #141620;
   overflow: hidden;
   display: flex;
   align-items: center;
@@ -492,60 +559,128 @@ dialog.am-dialog::backdrop {
 }
 
 .am-editor-body.widescreen .am-timeline-wrap {
-  grid-column: 1 / 2;
+  grid-column: 1 / 3;
   grid-row: 3 / 4;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
 }
 
 .am-editor-body.widescreen .am-inspector-dock {
   grid-column: 2 / 3;
-  grid-row: 1 / 4;
-  border-left: 1px solid var(--am-border-strong);
-  background: var(--am-a11);
+  grid-row: 1 / 3;
+  border-left: 1px solid rgba(255, 255, 255, 0.08);
+  background: #202332;
   display: flex;
   flex-direction: column;
   min-height: 0;
   overflow: hidden;
 }
 
-/* Classic mobile-style floating/overlay inspector */
+/* Mobile APK @id/elementFragmentHolder (#202332 bottom sheet over timeline) */
 .am-editor-body.classic .am-inspector-dock {
   position: absolute;
   left: 0;
   right: 0;
   bottom: 0;
-  height: 52%;
-  z-index: 25;
-  background: rgba(20, 22, 32, 0.96);
-  backdrop-filter: blur(14px);
-  border-top: 1px solid var(--am-border-strong);
-  border-radius: 16px 16px 0 0;
+  height: 270px;
+  z-index: 35;
+  background: #202332;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  box-shadow: 0 -8px 28px rgba(0, 0, 0, 0.65);
 }
 
+.am-inspector-empty {
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  text-align: center;
+}
+
+/* APK @id/viewmodeHolder (50dp #333750 right vertical rail on previewGuide) */
+.am-viewmode-holder {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 50px;
+  background: #333750;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 4px;
+  z-index: 16;
+  border-left: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.am-viewmode-btn {
+  width: 42px;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 5px;
+}
+
+.am-viewmode-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* APK previewmode_canvas_zoom.xml (vertical + / 100% / - box) */
+.am-canvas-zoom-box {
+  width: 42px;
+  background: #191B27;
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2px 0;
+  gap: 2px;
+}
+
+.am-zoom-step-btn {
+  width: 38px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #FFFFFF;
+}
+
+.am-zoom-pct-btn {
+  font-size: 10px;
+  font-weight: 700;
+  color: #D8DCE8;
+  padding: 2px 0;
+}
+
+/* APK activity_edit_playbar.xml (46dp #191B27) */
 .am-playbar {
-  height: 44px;
+  height: 46px;
+  min-height: 46px;
   min-width: 0;
-  overflow: hidden;
-  background: var(--am-a10);
-  border-top: 1px solid var(--am-border);
-  border-bottom: 1px solid var(--am-border);
+  overflow: visible;
+  background: #191B27;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   display: flex;
   flex-direction: column;
   position: relative;
+  z-index: 22;
 }
 
 .am-vu-meter {
   height: 2px;
   width: 100%;
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.05);
   overflow: hidden;
 }
 
 .am-vu-fill {
   height: 100%;
-  background: var(--am-accent-grad);
+  background: #00FFA8;
   transition: width 0.06s linear;
 }
 
@@ -554,26 +689,86 @@ dialog.am-dialog::backdrop {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 10px;
-  gap: 8px;
+  padding: 0 4px;
 }
 
-.am-timecode {
-  font-family: 'Roboto', monospace;
-  font-variant-numeric: tabular-nums;
+.am-playbar-section {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.am-playbar-center {
+  gap: 6px;
+}
+
+.am-playbar-btn {
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  color: #FFFFFF;
+}
+
+.am-playbar-btn:disabled {
+  opacity: 0.32;
+}
+
+.am-playbar-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.am-playbar-btn.active {
+  background: #2B2E3C;
+  color: #00FFA8;
+}
+
+.am-playbar-btn.am-play-trigger.playing {
+  color: #00FFA8;
+}
+
+/* APK Popup Menus */
+.am-popup-menu {
+  position: absolute;
+  background: #242636;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 8px;
+  padding: 5px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.72);
+  z-index: 60;
+  min-width: 185px;
+}
+
+.am-popup-item {
+  width: 100%;
+  text-align: left;
+  padding: 8px 10px;
   font-size: 12px;
   font-weight: 600;
-  color: var(--am-text-primary);
-  min-width: 120px;
+  color: #FFFFFF;
+  border-radius: 5px;
+  display: block;
 }
 
-.am-timecode span {
-  color: var(--am-text-muted);
+.am-popup-item:hover:not(:disabled) {
+  background: #333750;
 }
 
-/* Timeline */
+.am-popup-item:disabled {
+  opacity: 0.38;
+}
+
+.am-popup-sep {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.08);
+  margin: 4px 0;
+}
+
+/* APK @id/timeline (#0C0D13 A12 + 70dp timeline_header.xml + 28dp timeline_item.xml) */
 .am-timeline-wrap {
-  background: var(--am-a12);
+  background: #0C0D13;
   display: flex;
   flex-direction: column;
   min-height: 0;
@@ -582,14 +777,132 @@ dialog.am-dialog::backdrop {
   position: relative;
 }
 
+.am-timeline-top-row {
+  display: flex;
+  height: 36px;
+  min-height: 36px;
+  background: #141620;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+/* APK timeline_cts_bg_width (70dp) */
+.am-timeline-cts {
+  width: 70px;
+  min-width: 70px;
+  height: 100%;
+  background: #191B27;
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Roboto', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  color: #FFFFFF;
+  font-variant-numeric: tabular-nums;
+}
+
+.am-timeline-cts.loop-on {
+  color: #00FFA8;
+}
+
 .am-timeline-ruler {
-  height: 26px;
-  min-height: 26px;
-  background: var(--am-a11);
-  border-bottom: 1px solid var(--am-border);
+  flex: 1;
+  height: 100%;
+  background: #141620;
   position: relative;
   overflow: hidden;
   cursor: ew-resize;
+}
+
+.am-ruler-sec-label {
+  position: absolute;
+  left: 4px;
+  top: -12px;
+  font-size: 10px;
+  font-family: 'Roboto', monospace;
+  color: #828A93;
+  white-space: nowrap;
+}
+
+.am-ruler-bookmark {
+  position: absolute;
+  top: 2px;
+  width: 12px;
+  height: 12px;
+  background: #FFCD4B;
+  clip-path: polygon(50% 100%, 0 0, 100% 0);
+  cursor: pointer;
+  z-index: 6;
+}
+
+.am-ruler-playhead-cap {
+  position: absolute;
+  bottom: 0;
+  width: 14px;
+  height: 16px;
+  background: #00FFA8;
+  clip-path: polygon(0 0, 100% 0, 100% 55%, 50% 100%, 0 55%);
+  pointer-events: none;
+  z-index: 8;
+}
+
+.am-timeline-body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  position: relative;
+  overflow: hidden;
+}
+
+/* APK timeline_header.xml (70dp left column) */
+.am-timeline-headers {
+  width: 70px;
+  min-width: 70px;
+  background: #141620;
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+  padding: 6px 0 64px;
+  z-index: 12;
+}
+
+.am-track-header {
+  height: 32px;
+  margin-bottom: 3px;
+  background: #1E2239;
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.am-track-header.selected {
+  background: #2C3046;
+}
+
+.am-track-tag {
+  width: 8px;
+  height: 100%;
+  flex-shrink: 0;
+}
+
+.am-track-eye-btn {
+  width: 31px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.am-track-check-btn {
+  width: 31px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.am-track-check-btn.checked {
+  background: #00FFA8;
 }
 
 .am-timeline-tracks {
@@ -600,26 +913,27 @@ dialog.am-dialog::backdrop {
   padding: 6px 0 64px;
 }
 
+/* APK timeline_row_height (28dp-32dp) */
 .am-track-row {
-  height: 40px;
+  height: 32px;
   position: relative;
   display: flex;
   align-items: center;
-  margin-bottom: 4px;
+  margin-bottom: 3px;
 }
 
+/* APK timeline_item.xml (corner_rad = 1.5dp / 3px) */
 .am-track-bar {
   position: absolute;
-  height: 36px;
-  border-radius: 7px;
+  height: 30px;
+  border-radius: 3px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 8px;
   color: #091217;
-  font-size: 12px;
+  font-size: 11.5px;
   font-weight: 700;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35), 0 2px 6px rgba(0, 0, 0, 0.35);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35), 0 1px 4px rgba(0, 0, 0, 0.4);
   cursor: grab;
   overflow: hidden;
   min-width: 28px;
@@ -627,119 +941,449 @@ dialog.am-dialog::backdrop {
 
 .am-track-bar.selected {
   outline: 2px solid #FFFFFF;
-  box-shadow: 0 0 0 3px var(--am-accent-selection);
 }
 
+/* APK @dimen/timeline_element_trim_grip_size (24px-30px) */
 .am-trim-grip {
-  width: 8px;
+  width: 14px;
   height: 100%;
   cursor: col-resize;
-  background: rgba(0, 0, 0, 0.2);
+  background: rgba(0, 0, 0, 0.16);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
 }
 
+.am-track-bar.selected .am-trim-grip {
+  width: 24px;
+  background: rgba(0, 0, 0, 0.28);
+}
+
+.am-trim-grip-bar {
+  width: 2px;
+  height: 12px;
+  border-radius: 1px;
+  background: rgba(255, 255, 255, 0.65);
+}
+
+.am-track-label-wrap {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex: 1;
+  min-width: 0;
+  padding: 0 6px;
+  z-index: 2;
+}
+
+.am-track-mask-icon {
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.am-track-label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.am-track-fx-pill {
+  font-size: 9.5px;
+  padding: 1px 5px;
+  border-radius: 3px;
+  background: rgba(0, 0, 0, 0.26);
+  color: #FFFFFF;
+  flex-shrink: 0;
+}
+
+.am-track-z-btns {
+  margin-left: auto;
+  display: inline-flex;
+  gap: 2px;
+}
+
+.am-track-z-btns button {
+  color: #081318;
+  font-size: 10px;
+  padding: 0 3px;
+}
+
+.am-track-waveform {
+  position: absolute;
+  inset: 4px 24px;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+.am-track-kf-diamond {
+  position: absolute;
+  bottom: 2px;
+  width: 7px;
+  height: 7px;
+  background: #FFFFFF;
+  border: 1px solid #081318;
+  transform: translateX(-50%) rotate(45deg);
+  pointer-events: none;
+  z-index: 3;
+}
+
+/* APK playhead_width = 1.5dp */
 .am-playhead-line {
   position: absolute;
   top: 0;
   bottom: 0;
-  width: 2px;
+  width: 1.5px;
   background: #FFFFFF;
-  box-shadow: 0 0 8px rgba(255, 255, 255, 0.7);
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.7);
   pointer-events: none;
   z-index: 15;
 }
 
+/* APK @id/timelineOverflowButton (40x40dp bottom-left) */
+.am-timeline-overflow-btn {
+  position: absolute;
+  left: 6px;
+  bottom: 6px;
+  width: 40px;
+  height: 40px;
+  border-radius: 6px;
+  background: #191B27;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 25;
+}
+
+/* APK @id/buttonAdd (add_layer_button bottom-right) */
 .am-editor-fab {
-  position: fixed;
-  bottom: 18px;
-  right: 22px;
-  width: 52px;
-  height: 52px;
+  position: absolute;
+  bottom: 8px;
+  right: 10px;
+  width: 56px;
+  height: 56px;
   border-radius: 50%;
-  background: var(--am-accent-grad);
+  background: #00FFA8;
   color: #081318;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 8px 24px rgba(0, 255, 168, 0.42);
-  z-index: 30;
-}
-
-.am-editor-body.widescreen .am-editor-fab {
-  right: 392px;
+  box-shadow: 0 6px 20px rgba(0, 255, 168, 0.42);
+  z-index: 25;
 }
 
 /* Layer Quick Action Rail on preview edge */
 .am-quick-rail {
   position: absolute;
-  right: 10px;
+  left: 8px;
   top: 50%;
   transform: translateY(-50%);
-  background: rgba(16, 20, 26, 0.86);
-  border: 1px solid var(--am-border-strong);
-  border-radius: 12px;
-  padding: 5px;
+  background: rgba(25, 27, 39, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  padding: 4px;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 3px;
   z-index: 18;
-  backdrop-filter: blur(8px);
 }
 
-/* Inspector UI */
+/* APK fragment_element_actionbar.xml (#202332, 42dp) & fragment_setting_actionbar.xml (#292D40, 42dp) */
 .am-insp-head {
-  height: 44px;
-  min-height: 44px;
-  padding: 0 12px;
-  background: var(--am-a10);
-  border-bottom: 1px solid var(--am-border);
+  height: 42px;
+  min-height: 42px;
+  padding: 0 4px;
+  background: #202332;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
+  gap: 4px;
+}
+
+.am-insp-head.sub-bar {
+  background: #292D40;
+}
+
+.am-element-label-input {
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  color: #FFFFFF;
+  font-size: 14px;
+  font-weight: 700;
+  padding: 3px 6px;
+  min-width: 0;
+  flex: 1;
+}
+
+.am-element-label-input:focus {
+  border-color: #00FFA8;
+  background: #141620;
+  outline: none;
+}
+
+.am-setting-title {
+  font-weight: 700;
+  font-size: 14px;
+  color: #FFFFFF;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .am-insp-scroll {
   flex: 1;
   overflow-y: auto;
-  padding: 12px;
+  padding: 10px;
+  background: #202332;
+}
+
+/* APK fragment_element_edit.xml (#202332 body: 38dp top strip + 57dp tile grid) */
+.am-element-edit-root {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.am-element-strip-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 38px;
+}
+
+.am-strip-btn {
+  height: 38px;
+  min-width: 42px;
+  padding: 0 10px;
+  border-radius: 5px;
+  background: #2B2E3C;
+  color: #FFFFFF;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.am-strip-btn:hover {
+  background: #363A4D;
+}
+
+.am-strip-group {
+  display: flex;
+  flex: 1;
+  height: 38px;
+  border-radius: 5px;
+  overflow: hidden;
+  gap: 1px;
+}
+
+.am-strip-seg {
+  flex: 1;
+  height: 38px;
+  background: #2B2E3C;
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.am-strip-seg:hover {
+  background: #363A4D;
+}
+
+.am-apk-tile-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
+}
+
+.am-apk-tile {
+  height: 54px;
+  background: #2B2E3C;
+  border-radius: 5px;
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #FFFFFF;
+  text-align: left;
+}
+
+.am-apk-tile:hover {
+  background: #35394B;
 }
 
 .am-menu-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 8px;
+  gap: 6px;
 }
 
 .am-menu-tile {
-  background: var(--am-a1);
-  border: 1px solid var(--am-border);
-  border-radius: 12px;
-  padding: 14px 12px;
+  background: #2B2E3C;
+  border-radius: 5px;
+  padding: 12px;
   display: flex;
   align-items: center;
   gap: 10px;
-  font-size: 13px;
+  font-size: 12.5px;
   font-weight: 600;
   text-align: left;
-  transition: background 0.12s ease, border-color 0.12s ease;
 }
 
-.am-menu-tile:hover {
-  background: var(--am-a2);
-  border-color: rgba(0, 255, 168, 0.35);
+/* APK fragment_move_transform.xml (#262A3C shell) */
+.am-mt-apk-shell {
+  background: #262A3C;
+  border-radius: 6px;
+  padding: 8px;
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) 44px;
+  gap: 8px;
+  align-items: stretch;
+}
+
+.am-mt-left-rail {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.am-mt-kf-group {
+  background: #1E2239;
+  border-radius: 5px;
+  padding: 4px 2px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.am-mt-kf-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.am-mt-kf-arrows {
+  display: flex;
+  width: 100%;
+  justify-content: space-around;
+}
+
+.am-mt-kf-arrows button {
+  padding: 2px 4px;
+  color: #9AA1AF;
+}
+
+.am-mt-curve-btn {
+  width: 44px;
+  height: 40px;
+  border-radius: 5px;
+  background: #1E2239;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #FFFFFF;
+}
+
+.am-mt-curve-btn:disabled {
+  opacity: 0.35;
+}
+
+.am-mt-center-pad {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.am-mt-coord-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+/* APK locationX / locationY / locationZ (63x25dp #191C25) */
+.am-mt-coord-pill {
+  min-width: 63px;
+  height: 25px;
+  background: #191C25;
+  border-radius: 4px;
+  padding: 0 7px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 5px;
+  font-size: 11px;
+  font-family: 'Roboto', monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+.am-mt-coord-pill span {
+  color: #828A93;
+  font-weight: 700;
+}
+
+.am-mt-coord-pill strong {
+  color: #FFFFFF;
+}
+
+.am-mt-link-btn {
+  width: 25px;
+  height: 25px;
+  border-radius: 4px;
+  background: #2B2E3C;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.am-mt-link-btn.active {
+  color: #00FFA8;
+}
+
+.am-mt-right-rail {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.am-mt-mode-tab {
+  flex: 1;
+  min-height: 36px;
+  border-radius: 5px;
+  background: #1E2239;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.am-mt-mode-tab.active {
+  background: #333750;
+  border-left: 2px solid #00FFA8;
 }
 
 /* Spinner Ruler Widget */
 .am-spinner-box {
-  background: var(--am-a1);
-  border: 1px solid var(--am-border);
-  border-radius: 11px;
-  padding: 9px 11px;
-  margin-bottom: 10px;
+  background: #191C25;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 6px;
+  padding: 8px 10px;
+  margin-bottom: 8px;
 }
 
 .am-spinner-header {
@@ -764,9 +1408,9 @@ dialog.am-dialog::backdrop {
 
 .am-num-input {
   width: 78px;
-  background: var(--am-a11);
-  border: 1px solid var(--am-border);
-  border-radius: 6px;
+  background: #141620;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
   padding: 3px 6px;
   font-size: 12px;
   font-weight: 600;
@@ -776,14 +1420,14 @@ dialog.am-dialog::backdrop {
 
 .am-ruler-scrub {
   height: 26px;
-  border-radius: 7px;
+  border-radius: 5px;
   background: repeating-linear-gradient(
       90deg,
       rgba(255, 255, 255, 0.22) 0 1px,
       transparent 1px 10px
     ),
-    var(--am-a11);
-  border: 1px solid var(--am-border);
+    #141620;
+  border: 1px solid rgba(255, 255, 255, 0.08);
   position: relative;
   cursor: ew-resize;
   display: flex;
@@ -795,43 +1439,41 @@ dialog.am-dialog::backdrop {
 .am-ruler-indicator {
   width: 2px;
   height: 100%;
-  background: var(--am-accent);
-  box-shadow: 0 0 6px var(--am-accent);
+  background: #00FFA8;
+  box-shadow: 0 0 6px #00FFA8;
 }
 
 /* Effect Browser Thumb Cards */
 .am-effect-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(145px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(135px, 1fr));
   gap: 10px;
 }
 
 .am-effect-card {
-  background: var(--am-a1);
-  border: 1px solid var(--am-border);
-  border-radius: 12px;
+  background: #191C25;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
   padding: 10px;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 8px;
   text-align: center;
-  transition: transform 0.1s ease, border-color 0.12s ease;
 }
 
 .am-effect-card:hover {
-  transform: translateY(-2px);
-  border-color: var(--am-accent);
-  background: var(--am-a2);
+  border-color: #00FFA8;
+  background: #1E2239;
 }
 
 .am-effect-thumb-wrap {
-  width: 72px;
-  height: 72px;
-  border-radius: 12px;
+  width: 69px;
+  height: 69px;
+  border-radius: 10px;
   overflow: hidden;
   position: relative;
-  background: var(--am-a10);
+  background: #191B27;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -850,7 +1492,7 @@ dialog.am-dialog::backdrop {
   display: flex;
   flex-direction: column;
   gap: 5px;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 }
 
 .am-field label {
@@ -862,10 +1504,10 @@ dialog.am-dialog::backdrop {
 .am-input,
 .am-select {
   width: 100%;
-  padding: 8px 11px;
-  border-radius: 9px;
-  border: 1px solid var(--am-border-strong);
-  background: var(--am-a11);
+  padding: 7px 10px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: #141620;
   color: var(--am-text-primary);
   font-size: 13px;
 }
@@ -873,41 +1515,73 @@ dialog.am-dialog::backdrop {
 .am-pill-row {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 5px;
 }
 
 .am-pill {
-  padding: 6px 11px;
-  border-radius: 99px;
-  font-size: 12px;
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-size: 11.5px;
   font-weight: 600;
-  background: var(--am-a1);
-  border: 1px solid var(--am-border);
+  background: #191C25;
+  border: 1px solid rgba(255, 255, 255, 0.08);
   color: var(--am-text-secondary);
 }
 
 .am-pill.active {
   background: rgba(0, 255, 168, 0.16);
-  border-color: var(--am-accent);
-  color: var(--am-accent);
+  border-color: #00FFA8;
+  color: #00FFA8;
 }
 
 .am-trackpad {
   width: 100%;
-  height: 150px;
-  border-radius: 12px;
-  background: radial-gradient(circle at center, rgba(92, 229, 255, 0.08) 0%, transparent 70%),
-    linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
-    var(--am-a11);
-  background-size: 100% 100%, 24px 24px, 24px 24px, 100% 100%;
-  border: 1px solid var(--am-border-strong);
+  height: 118px;
+  border-radius: 6px;
+  background: linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    #1E2239;
+  background-size: 22px 22px, 22px 22px, 100% 100%;
+  border: 1px solid rgba(255, 255, 255, 0.1);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: move;
   touch-action: none;
   position: relative;
+}
+
+.am-pad-corner {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-color: rgba(255, 255, 255, 0.32);
+  border-style: solid;
+  pointer-events: none;
+}
+
+.am-pad-corner.nw {
+  top: 6px;
+  left: 6px;
+  border-width: 2px 0 0 2px;
+}
+
+.am-pad-corner.ne {
+  top: 6px;
+  right: 6px;
+  border-width: 2px 2px 0 0;
+}
+
+.am-pad-corner.sw {
+  bottom: 6px;
+  left: 6px;
+  border-width: 0 0 2px 2px;
+}
+
+.am-pad-corner.se {
+  bottom: 6px;
+  right: 6px;
+  border-width: 0 2px 2px 0;
 }
 
 .am-checker-bg {
@@ -920,49 +1594,26 @@ dialog.am-dialog::backdrop {
   background-position: 0 0, 0 9px, 9px -9px, -9px 0;
 }
 
-
 /* Mobile & Touch Responsive Layout */
-@media (max-width: 820px) {
-  .am-action-bar {
-    overflow-x: auto;
-    gap: 6px;
-    padding: 0 8px;
-    scrollbar-width: none;
-  }
-
-  .am-playbar {
-    height: auto;
-    min-height: 44px;
-  }
-
-  .am-playbar-row {
-    flex-wrap: wrap;
-    padding: 4px 8px;
-    gap: 4px;
-  }
-
-  .am-icon-btn {
-    min-width: 38px;
-    min-height: 38px;
-  }
-
-  .am-track-bar {
-    height: 42px;
-  }
-
-  .am-trim-grip {
-    width: 18px;
+@media (max-width: 860px) {
+  .am-editor-body.classic {
+    grid-template-rows: minmax(190px, 1fr) 46px 265px;
   }
 
   .am-editor-body.classic .am-inspector-dock {
-    height: 60%;
-    border-radius: 16px 16px 0 0;
+    height: 265px;
   }
 
-  .am-editor-fab {
-    width: 52px;
-    height: 52px;
-    right: 14px;
-    bottom: 14px;
+  .am-track-row,
+  .am-track-header {
+    height: 36px;
+  }
+
+  .am-track-bar {
+    height: 34px;
+  }
+
+  .am-track-bar.selected .am-trim-grip {
+    width: 28px;
   }
 }

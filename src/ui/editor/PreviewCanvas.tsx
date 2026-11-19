@@ -3,14 +3,20 @@ import { evalAnimatable, evalRemappedTime } from '../../engine/animation';
 import { getShapeById, parseDefaultParamValue } from '../../engine/catalog';
 import { evaluateShapeHandles } from '../../engine/scriptRuntime';
 import { useEditorStore } from '../../store/useEditorStore';
+import { AmIcon } from '../components/AmIcon';
 import { LayerQuickActions } from './LayerQuickActions';
 
 interface PreviewCanvasProps {
   canvasRef: React.RefObject<HTMLCanvasElement | null>;
   onVisibilityPauseChange: (paused: boolean) => void;
+  viewModeOpen: boolean;
 }
 
-export const PreviewCanvas: React.FC<PreviewCanvasProps> = ({ canvasRef, onVisibilityPauseChange }) => {
+export const PreviewCanvas: React.FC<PreviewCanvasProps> = ({
+  canvasRef,
+  onVisibilityPauseChange,
+  viewModeOpen,
+}) => {
   const {
     currentProject,
     currentTimeMs,
@@ -19,7 +25,9 @@ export const PreviewCanvas: React.FC<PreviewCanvasProps> = ({ canvasRef, onVisib
     getActiveLayers,
     inspectorTab,
     gridVisible,
+    toggleGrid,
     snapEnabled,
+    toggleSnap,
     previewZoom,
     setPreviewZoom,
     previewPan,
@@ -34,6 +42,8 @@ export const PreviewCanvas: React.FC<PreviewCanvasProps> = ({ canvasRef, onVisib
   const wrapRef = useRef<HTMLDivElement>(null);
   const [stageSize, setStageSize] = useState<{ w: number; h: number }>({ w: 360, h: 360 });
   const [snapGuide, setSnapGuide] = useState<{ x: boolean; y: boolean }>({ x: false, y: false });
+  const touchDistRef = useRef<number | null>(null);
+  const touchZoomStartRef = useRef<number>(1);
 
   // Modern Web Guidance: Pause background WebGL rendering when off-screen via contentvisibilityautostatechange
   useEffect(() => {
@@ -66,8 +76,9 @@ export const PreviewCanvas: React.FC<PreviewCanvasProps> = ({ canvasRef, onVisib
     if (!el || !currentProject) return;
     const compute = () => {
       const r = el.getBoundingClientRect();
-      const padW = Math.max(120, r.width - 72);
-      const padH = Math.max(120, r.height - 40);
+      const rightPad = viewModeOpen ? 68 : 28;
+      const padW = Math.max(110, r.width - rightPad);
+      const padH = Math.max(110, r.height - 24);
       const asp = currentProject.width / Math.max(1, currentProject.height);
       let w = padW;
       let h = w / asp;
@@ -81,7 +92,7 @@ export const PreviewCanvas: React.FC<PreviewCanvasProps> = ({ canvasRef, onVisib
     const ro = new ResizeObserver(compute);
     ro.observe(el);
     return () => ro.disconnect();
-  }, [currentProject?.width, currentProject?.height]);
+  }, [currentProject?.width, currentProject?.height, viewModeOpen]);
 
   if (!currentProject) return null;
 
@@ -98,10 +109,32 @@ export const PreviewCanvas: React.FC<PreviewCanvasProps> = ({ canvasRef, onVisib
     return [px, py];
   };
 
-  // Freehand Drawing Mode
+  // Two-finger touch pinch-to-zoom on mobile
+  const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
+    if (e.touches.length === 2) {
+      const dx = e.touches[0].clientX - e.touches[1].clientX;
+      const dy = e.touches[0].clientY - e.touches[1].clientY;
+      touchDistRef.current = Math.hypot(dx, dy);
+      touchZoomStartRef.current = previewZoom;
+    }
+  };
+
+  const handleTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
+    if (e.touches.length === 2 && touchDistRef.current && touchDistRef.current > 10) {
+      const dx = e.touches[0].clientX - e.touches[1].clientX;
+      const dy = e.touches[0].clientY - e.touches[1].clientY;
+      const dist = Math.hypot(dx, dy);
+      setPreviewZoom(touchZoomStartRef.current * (dist / touchDistRef.current));
+    }
+  };
+
+  const handleTouchEnd = () => {
+    touchDistRef.current = null;
+  };
+
+  // Freehand Drawing Mode & Pan
   const handleStagePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     if (e.button === 1 || e.altKey) {
-      // Middle-mouse / Alt pan
       const sx = e.clientX;
       const sy = e.clientY;
       const [opx, opy] = previewPan;
@@ -118,42 +151,48 @@ export const PreviewCanvas: React.FC<PreviewCanvasProps> = ({ canvasRef, onVisib
     if (inspectorTab === 'drawing' && singleLayer?.type === 'freehand') {
       const [px, py] = clientToProject(e.clientX, e.clientY);
       const { remappedNormT } = evalRemappedTime(singleLayer, currentTimeMs);
-      const loc = evalAnimatable(singleLayer.transform.location, remappedNormT, [currentProject.width / 2, currentProject.height / 2, 0]);
-      const pts: { x: number; y: number; pressure: number }[] = [{ x: px - loc[0], y: py - loc[1], pressure: e.pressure || 0.7 }];
+      const loc = evalAnimatable(singleLayer.transform.location, remappedNormT, [
+        currentProject.width / 2,
+        currentProject.height / 2,
+        0,
+      ]);
+      const pts: { x: number; y: number; pressure: number }[] = [
+        { x: Math.round(px - loc[0]), y: Math.round(py - loc[1]), pressure: e.pressure || 0.5 },
+      ];
       let strokeIdx = -1;
 
-      mutateProject((proj) => {
-        let list = proj.layers;
-        for (const gid of groupStack) {
-          const g = list.find((x) => x.id === gid);
-          if (g?.groupLayers) list = g.groupLayers;
-        }
-        const target = list.find((x) => x.id === singleLayer.id);
-        if (!target) return;
-        target.freehandStrokes = target.freehandStrokes ?? [];
-        target.freehandStrokes.push({
-          points: pts,
-          color: drawingBrushColor,
-          width: drawingBrushWidth,
-          opacity: drawingBrushOpacity,
-        });
-        strokeIdx = target.freehandStrokes.length - 1;
-      }, false);
-
-      const onMove = (ev: PointerEvent) => {
-        const [nx, ny] = clientToProject(ev.clientX, ev.clientY);
+      const pushPoints = (record: boolean) => {
         mutateProject((proj) => {
           let list = proj.layers;
           for (const gid of groupStack) {
-            const g = list.find((x) => x.id === gid);
+            const g = list.find((l) => l.id === gid);
             if (g?.groupLayers) list = g.groupLayers;
           }
-          const target = list.find((x) => x.id === singleLayer.id);
-          const st = target?.freehandStrokes?.[strokeIdx];
-          if (st) st.points.push({ x: nx - loc[0], y: ny - loc[1], pressure: ev.pressure || 0.7 });
-        }, false);
+          const target = list.find((l) => l.id === singleLayer.id);
+          if (!target) return;
+          target.freehandStrokes = target.freehandStrokes ?? [];
+          if (strokeIdx >= 0 && target.freehandStrokes[strokeIdx]) {
+            target.freehandStrokes[strokeIdx].points = [...pts];
+          } else {
+            strokeIdx = target.freehandStrokes.length;
+            target.freehandStrokes.push({
+              color: drawingBrushColor,
+              width: drawingBrushWidth,
+              opacity: drawingBrushOpacity,
+              points: [...pts],
+            });
+          }
+        }, record);
+      };
+
+      pushPoints(false);
+      const onMove = (ev: PointerEvent) => {
+        const [mx, my] = clientToProject(ev.clientX, ev.clientY);
+        pts.push({ x: Math.round(mx - loc[0]), y: Math.round(my - loc[1]), pressure: ev.pressure || 0.5 });
+        pushPoints(false);
       };
       const onUp = () => {
+        pushPoints(true);
         window.removeEventListener('pointermove', onMove);
         window.removeEventListener('pointerup', onUp);
       };
@@ -162,87 +201,104 @@ export const PreviewCanvas: React.FC<PreviewCanvasProps> = ({ canvasRef, onVisib
       return;
     }
 
-    // Hit-test visible layers top-down when clicking canvas
-    if (e.target === e.currentTarget || e.target === canvasRef.current) {
-      const [px, py] = clientToProject(e.clientX, e.clientY);
-      let hit: string | null = null;
-      for (let i = layers.length - 1; i >= 0; i--) {
-        const l = layers[i];
-        if (!l.visible || l.locked || l.type === 'audio' || currentTimeMs < l.startTime || currentTimeMs > l.endTime) continue;
-        const { remappedNormT } = evalRemappedTime(l, currentTimeMs);
-        const loc = evalAnimatable(l.transform.location, remappedNormT, [currentProject.width / 2, currentProject.height / 2, 0]);
-        if (Math.abs(px - loc[0]) < 240 && Math.abs(py - loc[1]) < 240) {
-          hit = l.id;
-          break;
-        }
+    // Hit-test layers top-to-bottom on stage click
+    const [px, py] = clientToProject(e.clientX, e.clientY);
+    for (let i = layers.length - 1; i >= 0; i--) {
+      const l = layers[i];
+      if (!l.visible || l.locked || l.type === 'audio' || l.type === 'camera') continue;
+      if (currentTimeMs < l.startTime || currentTimeMs > l.endTime) continue;
+      const { remappedNormT } = evalRemappedTime(l, currentTimeMs);
+      const loc = evalAnimatable(l.transform.location, remappedNormT, [currentProject.width / 2, currentProject.height / 2, 0]);
+      const sc = evalAnimatable(l.transform.scale, remappedNormT, [1, 1]);
+      const rad = 180 * Math.max(Math.abs(sc[0]), Math.abs(sc[1]), 0.35);
+      if (Math.abs(px - loc[0]) <= rad && Math.abs(py - loc[1]) <= rad) {
+        selectLayer(l.id, e.shiftKey || e.ctrlKey || e.metaKey);
+        return;
       }
-      if (hit) selectLayer(hit, e.shiftKey);
-      else selectLayer('');
     }
   };
 
-  // Drag selected layer position directly on canvas
-  const startLayerDrag = (e: React.PointerEvent, mode: 'move' | 'rotate' | 'scale') => {
+  // Drag selected layer gizmo (move / scale / rotate)
+  const startLayerDrag = (e: React.PointerEvent, mode: 'move' | 'scale' | 'rotate') => {
     e.stopPropagation();
     if (!singleLayer || singleLayer.locked) return;
     const { remappedNormT } = evalRemappedTime(singleLayer, currentTimeMs);
-    const startLoc = evalAnimatable(singleLayer.transform.location, remappedNormT, [currentProject.width / 2, currentProject.height / 2, 0]);
+    const startX = e.clientX;
+    const startY = e.clientY;
+    const startLoc = [...evalAnimatable(singleLayer.transform.location, remappedNormT, [currentProject.width / 2, currentProject.height / 2, 0])] as [number, number, number];
+    const startScale = [...evalAnimatable(singleLayer.transform.scale, remappedNormT, [1, 1])] as [number, number];
     const startRot = evalAnimatable(singleLayer.transform.rotation, remappedNormT, 0);
-    const startScale = evalAnimatable(singleLayer.transform.scale, remappedNormT, [1, 1]);
-    const sx = e.clientX;
-    const sy = e.clientY;
 
-    const applyDelta = (cx: number, cy: number, record: boolean) => {
-      const dx = (cx - sx) / (projScale * previewZoom);
-      const dy = (cy - sy) / (projScale * previewZoom);
+    const applyUpdate = (clientX: number, clientY: number, record: boolean) => {
+      const dx = (clientX - startX) / (projScale * previewZoom);
+      const dy = (clientY - startY) / (projScale * previewZoom);
+
       mutateProject((proj) => {
         let list = proj.layers;
         for (const gid of groupStack) {
-          const g = list.find((x) => x.id === gid);
+          const g = list.find((l) => l.id === gid);
           if (g?.groupLayers) list = g.groupLayers;
         }
-        const target = list.find((x) => x.id === singleLayer.id);
+        const target = list.find((l) => l.id === singleLayer.id);
         if (!target) return;
-        const { remappedNormT: nt } = evalRemappedTime(target, currentTimeMs);
-        const writeAnim = (prop: { value: any; keyframes: any[] }, val: any) => {
-          prop.value = val;
-          if (prop.keyframes.length > 0) {
-            const idx = prop.keyframes.findIndex((k) => Math.abs(k.t - nt) < 0.015);
-            if (idx !== -1) prop.keyframes[idx].v = val;
-            else {
-              prop.keyframes.push({ t: nt, v: val });
-              prop.keyframes.sort((a, b) => a.t - b.t);
-            }
-          }
-        };
 
         if (mode === 'move') {
-          let nx = startLoc[0] + dx;
-          let ny = startLoc[1] + dy;
-          let snappedX = false;
-          let snappedY = false;
+          let nx = Math.round(startLoc[0] + dx);
+          let ny = Math.round(startLoc[1] + dy);
+          let gx = false;
+          let gy = false;
           if (snapEnabled) {
-            if (Math.abs(nx - proj.width / 2) < 18) { nx = proj.width / 2; snappedX = true; }
-            if (Math.abs(ny - proj.height / 2) < 18) { ny = proj.height / 2; snappedY = true; }
+            if (Math.abs(nx - proj.width / 2) < 16) {
+              nx = proj.width / 2;
+              gx = true;
+            }
+            if (Math.abs(ny - proj.height / 2) < 16) {
+              ny = proj.height / 2;
+              gy = true;
+            }
           }
-          setSnapGuide({ x: snappedX, y: snappedY });
-          writeAnim(target.transform.location, [nx, ny, startLoc[2] ?? 0]);
-        } else if (mode === 'rotate') {
-          writeAnim(target.transform.rotation, Math.round((startRot + dx * 0.6) * 10) / 10);
+          setSnapGuide({ x: gx, y: gy });
+          const next = [nx, ny, startLoc[2]] as [number, number, number];
+          if (target.transform.location.keyframes.length > 0) {
+            const kf = target.transform.location.keyframes.find((k) => Math.abs(k.t - remappedNormT) < 0.015);
+            if (kf) kf.v = next;
+            else target.transform.location.keyframes.push({ t: remappedNormT, v: next });
+            target.transform.location.keyframes.sort((a, b) => a.t - b.t);
+          } else {
+            target.transform.location.value = next;
+          }
         } else if (mode === 'scale') {
-          const factor = Math.max(0.05, 1 + (dx - dy) * 0.004);
-          writeAnim(target.transform.scale, [
+          const factor = Math.max(0.05, 1 + (dx - dy) / 260);
+          const next: [number, number] = [
             Math.round(startScale[0] * factor * 100) / 100,
             Math.round(startScale[1] * factor * 100) / 100,
-          ]);
+          ];
+          if (target.transform.scale.keyframes.length > 0) {
+            const kf = target.transform.scale.keyframes.find((k) => Math.abs(k.t - remappedNormT) < 0.015);
+            if (kf) kf.v = next;
+            else target.transform.scale.keyframes.push({ t: remappedNormT, v: next });
+            target.transform.scale.keyframes.sort((a, b) => a.t - b.t);
+          } else {
+            target.transform.scale.value = next;
+          }
+        } else if (mode === 'rotate') {
+          const next = Math.round((startRot + dx * 0.45) * 10) / 10;
+          if (target.transform.rotation.keyframes.length > 0) {
+            const kf = target.transform.rotation.keyframes.find((k) => Math.abs(k.t - remappedNormT) < 0.015);
+            if (kf) kf.v = next;
+            else target.transform.rotation.keyframes.push({ t: remappedNormT, v: next });
+            target.transform.rotation.keyframes.sort((a, b) => a.t - b.t);
+          } else {
+            target.transform.rotation.value = next;
+          }
         }
       }, record);
     };
 
-    const onMove = (ev: PointerEvent) => applyDelta(ev.clientX, ev.clientY, false);
+    const onMove = (ev: PointerEvent) => applyUpdate(ev.clientX, ev.clientY, false);
     const onUp = (ev: PointerEvent) => {
-      applyDelta(ev.clientX, ev.clientY, true);
       setSnapGuide({ x: false, y: false });
+      applyUpdate(ev.clientX, ev.clientY, true);
       window.removeEventListener('pointermove', onMove);
       window.removeEventListener('pointerup', onUp);
     };
@@ -250,30 +306,40 @@ export const PreviewCanvas: React.FC<PreviewCanvasProps> = ({ canvasRef, onVisib
     window.addEventListener('pointerup', onUp);
   };
 
-  // Interactive Gizmo & Shape/Vector Handles
+  // Compute selected layer overlay gizmo coordinates
   let gizmo: {
     x: number;
     y: number;
     rot: number;
+    sx: number;
+    sy: number;
     shapeHandles: Record<string, [number, number]>;
   } | null = null;
 
-  if (singleLayer && currentTimeMs >= singleLayer.startTime && currentTimeMs <= singleLayer.endTime) {
+  if (singleLayer && singleLayer.visible && currentTimeMs >= singleLayer.startTime && currentTimeMs <= singleLayer.endTime) {
     const { remappedNormT } = evalRemappedTime(singleLayer, currentTimeMs);
     const loc = evalAnimatable(singleLayer.transform.location, remappedNormT, [currentProject.width / 2, currentProject.height / 2, 0]);
     const rot = evalAnimatable(singleLayer.transform.rotation, remappedNormT, 0);
+    const sc = evalAnimatable(singleLayer.transform.scale, remappedNormT, [1, 1]);
     let shapeHandles: Record<string, [number, number]> = {};
     if (singleLayer.type === 'shape' && singleLayer.shapeId && inspectorTab === 'editShape') {
-      const def = getShapeById(singleLayer.shapeId);
-      if (def) {
+      const sDef = getShapeById(singleLayer.shapeId);
+      if (sDef) {
         const sp: Record<string, any> = {};
-        for (const pd of def.params) {
+        for (const pd of sDef.params) {
           if (pd.id) sp[pd.id] = evalAnimatable(singleLayer.shapeParams?.[pd.id], remappedNormT, parseDefaultParamValue(pd));
         }
-        shapeHandles = evaluateShapeHandles(def, sp);
+        shapeHandles = evaluateShapeHandles(sDef, sp);
       }
     }
-    gizmo = { x: loc[0] * projScale, y: loc[1] * projScale, rot, shapeHandles };
+    gizmo = {
+      x: loc[0] * projScale,
+      y: loc[1] * projScale,
+      rot,
+      sx: sc[0],
+      sy: sc[1],
+      shapeHandles,
+    };
   }
 
   return (
@@ -281,34 +347,16 @@ export const PreviewCanvas: React.FC<PreviewCanvasProps> = ({ canvasRef, onVisib
       ref={wrapRef}
       className="am-stage-wrap"
       onPointerDown={handleStagePointerDown}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
       onWheel={(e) => {
-        if (e.ctrlKey) {
+        if (e.ctrlKey || e.metaKey) {
           e.preventDefault();
-          setPreviewZoom(previewZoom * (e.deltaY < 0 ? 1.1 : 0.9));
+          setPreviewZoom(previewZoom + (e.deltaY < 0 ? 0.12 : -0.12));
         }
       }}
     >
-      {/* Viewport Zoom Controls */}
-      <div style={{ position: 'absolute', left: 10, top: 10, zIndex: 16, display: 'flex', gap: 4 }}>
-        <button type="button" className="am-btn" style={{ padding: '4px 8px', fontSize: 11 }} onClick={() => setPreviewZoom(previewZoom * 0.85)}>
-          -
-        </button>
-        <button
-          type="button"
-          className="am-btn"
-          style={{ padding: '4px 8px', fontSize: 11 }}
-          onClick={() => {
-            setPreviewZoom(1);
-            setPreviewPan([0, 0]);
-          }}
-        >
-          {Math.round(previewZoom * 100)}%
-        </button>
-        <button type="button" className="am-btn" style={{ padding: '4px 8px', fontSize: 11 }} onClick={() => setPreviewZoom(previewZoom * 1.15)}>
-          +
-        </button>
-      </div>
-
       {/* Stage Frame */}
       <div
         className={currentProject.bgColor === 'transparent' ? 'am-checker-bg' : ''}
@@ -317,8 +365,8 @@ export const PreviewCanvas: React.FC<PreviewCanvasProps> = ({ canvasRef, onVisib
           height: stageSize.h,
           position: 'relative',
           transform: `translate(${previewPan[0]}px, ${previewPan[1]}px) scale(${previewZoom})`,
-          boxShadow: '0 12px 44px rgba(0,0,0,0.75)',
-          border: '1px solid var(--am-border-strong)',
+          boxShadow: '0 10px 36px rgba(0,0,0,0.75)',
+          border: '1px solid rgba(255,255,255,0.14)',
           overflow: 'visible',
         }}
       >
@@ -366,8 +414,8 @@ export const PreviewCanvas: React.FC<PreviewCanvasProps> = ({ canvasRef, onVisib
               width: 110,
               height: 110,
               transform: `translate(-50%, -50%) rotate(${gizmo.rot}deg)`,
-              border: '1.5px dashed rgba(0, 255, 168, 0.85)',
-              borderRadius: 6,
+              border: '2px solid #00FFA8',
+              borderRadius: 4,
               cursor: 'move',
               pointerEvents: 'auto',
             }}
@@ -381,9 +429,9 @@ export const PreviewCanvas: React.FC<PreviewCanvasProps> = ({ canvasRef, onVisib
                 width: 8,
                 height: 8,
                 borderRadius: '50%',
-                background: 'var(--am-accent)',
+                background: '#00FFA8',
                 transform: 'translate(-50%, -50%)',
-                border: '1px solid #000',
+                border: '1.5px solid #091318',
               }}
             />
             {/* Corner Scale Handle */}
@@ -396,9 +444,9 @@ export const PreviewCanvas: React.FC<PreviewCanvasProps> = ({ canvasRef, onVisib
                 bottom: -6,
                 width: 12,
                 height: 12,
-                borderRadius: 3,
+                borderRadius: 2,
                 background: '#FFFFFF',
-                border: '2px solid var(--am-accent)',
+                border: '2px solid #00FFA8',
                 cursor: 'nwse-resize',
               }}
             />
@@ -413,14 +461,14 @@ export const PreviewCanvas: React.FC<PreviewCanvasProps> = ({ canvasRef, onVisib
                 width: 12,
                 height: 12,
                 borderRadius: '50%',
-                background: 'var(--am-accent)',
+                background: '#00FFA8',
                 border: '2px solid #091318',
                 transform: 'translateX(-50%)',
                 cursor: 'grab',
               }}
             />
 
-            {/* Procedural Shape Handles (when in Edit Shape mode) */}
+            {/* Procedural Shape Handles */}
             {Object.entries(gizmo.shapeHandles).map(([hid, [hx, hy]]) => (
               <div
                 key={hid}
@@ -496,6 +544,77 @@ export const PreviewCanvas: React.FC<PreviewCanvasProps> = ({ canvasRef, onVisib
           </div>
         )}
       </div>
+
+      {/* APK @id/viewmodeHolder (50dp #333750 right vertical drawer from activity_edit.xml) */}
+      {viewModeOpen && (
+        <div
+          className="am-viewmode-holder"
+          onPointerDown={(e) => e.stopPropagation()}
+        >
+          <button
+            type="button"
+            className={`am-viewmode-btn ${gridVisible ? 'active' : ''}`}
+            onClick={toggleGrid}
+            title="Toggle Safe Area & Grid"
+          >
+            <AmIcon name="ic_preview_mode_grid_off" fallback="grid" size={20} color={gridVisible ? '#FFCD4B' : '#FFFFFF'} />
+          </button>
+
+          <button
+            type="button"
+            className={`am-viewmode-btn ${snapEnabled ? 'active' : ''}`}
+            onClick={toggleSnap}
+            title="Toggle Center Snapping"
+          >
+            <AmIcon name="snap" fallback="snap" size={18} color={snapEnabled ? '#FFCD4B' : '#FFFFFF'} />
+          </button>
+
+          <button
+            type="button"
+            className={`am-viewmode-btn ${currentProject.cameraEnabled ? 'active' : ''}`}
+            onClick={() => mutateProject((p) => { p.cameraEnabled = !p.cameraEnabled; })}
+            title="Toggle Active 3D Camera"
+          >
+            <AmIcon
+              name={currentProject.cameraEnabled ? 'ic_preview_mode_camera_on' : 'ic_preview_mode_camera_off'}
+              fallback="camera"
+              size={20}
+              color={currentProject.cameraEnabled ? '#FFCD4B' : '#FFFFFF'}
+            />
+          </button>
+
+          {/* APK previewmode_canvas_zoom.xml (vertical + / 100% / - box) */}
+          <div className="am-canvas-zoom-box">
+            <button
+              type="button"
+              className="am-zoom-step-btn"
+              onClick={() => setPreviewZoom(previewZoom * 1.15)}
+              title="Zoom In Stage"
+            >
+              <AmIcon name="ic_viewmode_zoom_in" fallback="plus" size={16} />
+            </button>
+            <button
+              type="button"
+              className="am-zoom-pct-btn"
+              onClick={() => {
+                setPreviewZoom(1);
+                setPreviewPan([0, 0]);
+              }}
+              title="Reset Stage Zoom"
+            >
+              {Math.round(previewZoom * 100)}%
+            </button>
+            <button
+              type="button"
+              className="am-zoom-step-btn"
+              onClick={() => setPreviewZoom(previewZoom / 1.15)}
+              title="Zoom Out Stage"
+            >
+              <AmIcon name="ic_viewmode_zoom_out" fallback="minus" size={16} />
+            </button>
+          </div>
+        </div>
+      )}
 
       <LayerQuickActions />
     </div>

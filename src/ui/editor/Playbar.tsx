@@ -1,36 +1,42 @@
-import React from 'react';
+import React, { useRef, useState } from 'react';
+import { replaceMediaOnLayers } from '../../engine/mediaReplace';
 import { useEditorStore } from '../../store/useEditorStore';
 import { AmIcon } from '../components/AmIcon';
 
-function fmtTimecode(ms: number, fps: number): string {
-  const safe = Math.max(0, ms);
-  const totalSec = Math.floor(safe / 1000);
-  const min = Math.floor(totalSec / 60);
-  const sec = totalSec % 60;
-  const frame = Math.floor(((safe % 1000) / 1000) * fps);
-  return `${String(min).padStart(2, '0')}:${String(sec).padStart(2, '0')}:${String(frame).padStart(2, '0')}`;
+interface PlaybarProps {
+  viewModeOpen: boolean;
+  onToggleViewMode: () => void;
 }
 
-export const Playbar: React.FC = () => {
+export const Playbar: React.FC<PlaybarProps> = ({ viewModeOpen, onToggleViewMode }) => {
   const {
     currentProject,
     currentTimeMs,
     isPlaying,
-    loop,
     audioLevel,
     selectedLayerIds,
-    timelinePxPerSec,
+    groupStack,
+    past,
+    future,
+    layerClipboard,
+    effectsClipboard,
+    undo,
+    redo,
     setCurrentTimeMs,
     togglePlay,
-    setLoop,
     setIsPlaying,
     toggleBookmarkAtPlayhead,
     jumpBookmark,
-    trimSelectedLeft,
-    splitSelectedAtPlayhead,
-    trimSelectedRight,
-    setTimelineZoom,
+    copySelectedLayers,
+    pasteLayers,
+    duplicateSelectedLayers,
+    copyLayerEffects,
+    pasteLayerEffects,
+    mutateProject,
   } = useEditorStore();
+
+  const [showCopyMenu, setShowCopyMenu] = useState(false);
+  const replaceInputRef = useRef<HTMLInputElement>(null);
 
   if (!currentProject) return null;
   const frameMs = 1000 / Math.max(1, currentProject.fps);
@@ -39,128 +45,209 @@ export const Playbar: React.FC = () => {
 
   return (
     <div className="am-playbar">
-      {/* LevelMeterView */}
+      {/* APK LevelMeterView (2dp) */}
       <div className="am-vu-meter" aria-hidden="true">
         <div className="am-vu-fill" style={{ width: `${Math.round(audioLevel * 100)}%` }} />
       </div>
 
+      {/* APK activity_edit_playbar.xml (46dp #191B27) */}
       <div className="am-playbar-row">
-        {/* Timecode */}
-        <div className="am-timecode">
-          {fmtTimecode(currentTimeMs, currentProject.fps)}{' '}
-          <span>/ {fmtTimecode(currentProject.durationMs, currentProject.fps)}</span>
-        </div>
-
-        {/* Transport Controls */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+        {/* Left: buttonUndo + buttonRedo */}
+        <div className="am-playbar-section">
           <button
             type="button"
-            className="am-icon-btn"
-            onClick={() => {
-              setIsPlaying(false);
-              setCurrentTimeMs(0);
-            }}
-            title="Jump to Start"
+            className="am-playbar-btn"
+            disabled={past.length === 0}
+            onClick={undo}
+            title="Undo (Ctrl+Z)"
           >
-            <AmIcon name="ic_start_time" fallback="back" size={17} />
+            <AmIcon name="ic_edit_undo" fallback="undo" size={20} />
           </button>
           <button
             type="button"
-            className="am-icon-btn"
+            className="am-playbar-btn"
+            disabled={future.length === 0}
+            onClick={redo}
+            title="Redo (Ctrl+Y)"
+          >
+            <AmIcon name="ic_edit_redo" fallback="redo" size={20} />
+          </button>
+        </div>
+
+        {/* Center: buttonSkipBack + buttonPlay + buttonSkipFwd */}
+        <div className="am-playbar-section am-playbar-center">
+          <button
+            type="button"
+            className="am-playbar-btn"
             onClick={() => {
               setIsPlaying(false);
               setCurrentTimeMs(currentTimeMs - frameMs);
             }}
             title="Previous Frame (ArrowLeft)"
           >
-            <AmIcon name="ic_edit_prevframe" fallback="back" size={18} />
+            <AmIcon name="ic_edit_prevframe" fallback="prevFrame" size={21} />
           </button>
+
           <button
             type="button"
-            className="am-icon-btn active"
-            style={{ width: 38, height: 34 }}
+            className={`am-playbar-btn am-play-trigger ${isPlaying ? 'playing' : ''}`}
             onClick={togglePlay}
             title="Play / Pause (Space)"
           >
-            <AmIcon
-              name={isPlaying ? 'ic_pause_white_24dp' : 'ic_play_arrow_white_24dp'}
-              fallback={isPlaying ? 'pause' : 'play'}
-              size={22}
-            />
+            <AmIcon name={isPlaying ? 'ac_ic_pause' : 'ac_ic_play'} fallback={isPlaying ? 'pause' : 'play'} size={24} />
           </button>
+
           <button
             type="button"
-            className="am-icon-btn"
+            className="am-playbar-btn"
             onClick={() => {
               setIsPlaying(false);
               setCurrentTimeMs(currentTimeMs + frameMs);
             }}
             title="Next Frame (ArrowRight)"
           >
-            <AmIcon name="ic_edit_nextframe" fallback="next" size={18} />
-          </button>
-          <button
-            type="button"
-            className="am-icon-btn"
-            onClick={() => {
-              setIsPlaying(false);
-              setCurrentTimeMs(currentProject.durationMs);
-            }}
-            title="Jump to End"
-          >
-            <AmIcon name="ic_exportpreview_next" fallback="next" size={17} />
-          </button>
-          <button
-            type="button"
-            className={`am-icon-btn ${loop ? 'active' : ''}`}
-            onClick={() => setLoop(!loop)}
-            title="Toggle Loop Playback"
-          >
-            <AmIcon name="ic_autoreplay_pause" fallback="reset" size={16} />
+            <AmIcon name="ic_edit_nextframe" fallback="nextFrame" size={21} />
           </button>
         </div>
 
-        {/* Bookmarks, Trim/Split, Zoom */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          <button type="button" className="am-icon-btn" onClick={() => jumpBookmark(-1)} title="Previous Bookmark">
-            <AmIcon name="ic_left_move" fallback="back" size={15} />
-          </button>
+        {/* Right: buttonCopyPasteOverflow + buttonBookmark + buttonPreviewMode */}
+        <div className="am-playbar-section" style={{ position: 'relative' }}>
+          <input
+            ref={replaceInputRef}
+            type="file"
+            accept="image/*,video/*"
+            multiple
+            style={{ display: 'none' }}
+            onChange={(e) => {
+              if (e.target.files && e.target.files.length > 0) {
+                replaceMediaOnLayers(e.target.files, selectedLayerIds, groupStack, mutateProject);
+              }
+              e.target.value = '';
+              setShowCopyMenu(false);
+            }}
+          />
+
           <button
             type="button"
-            className={`am-icon-btn ${hasBookmarkHere ? 'active' : ''}`}
+            className={`am-playbar-btn ${showCopyMenu ? 'active' : ''}`}
+            onClick={() => setShowCopyMenu((v) => !v)}
+            title="Copy / Paste / Duplicate Menu"
+          >
+            <AmIcon name="ic_layer_copy_paste_menu" fallback="copy" size={20} />
+          </button>
+
+          {showCopyMenu && (
+            <div className="am-popup-menu" style={{ right: 76, bottom: 48 }}>
+              <button
+                type="button"
+                className="am-popup-item"
+                disabled={!hasSel}
+                onClick={() => {
+                  copySelectedLayers();
+                  setShowCopyMenu(false);
+                }}
+              >
+                Copy {selectedLayerIds.length > 1 ? `${selectedLayerIds.length} Layers` : 'Layer'}
+              </button>
+              <button
+                type="button"
+                className="am-popup-item"
+                disabled={!layerClipboard}
+                onClick={() => {
+                  pasteLayers();
+                  setShowCopyMenu(false);
+                }}
+              >
+                Paste Layer(s)
+              </button>
+              <button
+                type="button"
+                className="am-popup-item"
+                disabled={!hasSel}
+                onClick={() => {
+                  duplicateSelectedLayers();
+                  setShowCopyMenu(false);
+                }}
+              >
+                Duplicate Layer(s)
+              </button>
+              <div className="am-popup-sep" />
+              <button
+                type="button"
+                className="am-popup-item"
+                disabled={!hasSel}
+                onClick={() => {
+                  copyLayerEffects();
+                  setShowCopyMenu(false);
+                }}
+              >
+                Copy Effects
+              </button>
+              <button
+                type="button"
+                className="am-popup-item"
+                disabled={!hasSel || !effectsClipboard}
+                onClick={() => {
+                  pasteLayerEffects();
+                  setShowCopyMenu(false);
+                }}
+              >
+                Paste Effects
+              </button>
+              <div className="am-popup-sep" />
+              <button
+                type="button"
+                className="am-popup-item"
+                disabled={!hasSel}
+                onClick={() => replaceInputRef.current?.click()}
+              >
+                Replace Media ({selectedLayerIds.length || 0})
+              </button>
+            </div>
+          )}
+
+          <button
+            type="button"
+            className="am-playbar-btn"
+            onClick={() => jumpBookmark(-1)}
+            title="Previous Bookmark"
+            style={{ width: 24 }}
+          >
+            <AmIcon name="ic_prev_element" fallback="back" size={14} />
+          </button>
+
+          <button
+            type="button"
+            className={`am-playbar-btn ${hasBookmarkHere ? 'bookmark-active' : ''}`}
             onClick={toggleBookmarkAtPlayhead}
             title="Add / Remove Beat Bookmark"
           >
-            <AmIcon name={hasBookmarkHere ? 'ic_bookmark_delete' : 'ic_bookmark_add'} fallback="bookmark" size={17} />
-          </button>
-          <button type="button" className="am-icon-btn" onClick={() => jumpBookmark(1)} title="Next Bookmark">
-            <AmIcon name="ic_right_move" fallback="next" size={15} />
-          </button>
-
-          <div style={{ width: 1, height: 18, background: 'var(--am-border)', margin: '0 4px' }} />
-
-          <button type="button" className="am-icon-btn" disabled={!hasSel} onClick={trimSelectedLeft} title="Trim Layer Left to Playhead">
-            <AmIcon name="ic_videotrim_grip_left" fallback="back" size={16} />
-          </button>
-          <button type="button" className="am-icon-btn" disabled={!hasSel} onClick={splitSelectedAtPlayhead} title="Split Layer at Playhead">
-            <AmIcon name="split" fallback="split" size={16} />
-          </button>
-          <button type="button" className="am-icon-btn" disabled={!hasSel} onClick={trimSelectedRight} title="Trim Layer Right to Playhead">
-            <AmIcon name="ic_videotrim_grip_right" fallback="next" size={16} />
+            <AmIcon
+              name={hasBookmarkHere ? 'ic_bookmark_remove' : 'ic_bookmark_add'}
+              fallback="bookmark"
+              size={20}
+              color={hasBookmarkHere ? '#FFCD4B' : undefined}
+            />
           </button>
 
-          <input
-            id="timeline-zoom-slider"
-            name="timelineZoom"
-            aria-label="Timeline Zoom"
-            type="range"
-            min={40}
-            max={360}
-            value={timelinePxPerSec}
-            onChange={(e) => setTimelineZoom(Number(e.target.value))}
-            title="Timeline Zoom"
-            style={{ width: 64, marginLeft: 6, accentColor: 'var(--am-accent)' }}
-          />
+          <button
+            type="button"
+            className="am-playbar-btn"
+            onClick={() => jumpBookmark(1)}
+            title="Next Bookmark"
+            style={{ width: 24 }}
+          >
+            <AmIcon name="ic_next_element" fallback="next" size={14} />
+          </button>
+
+          <button
+            type="button"
+            className={`am-playbar-btn ${viewModeOpen ? 'active' : ''}`}
+            onClick={onToggleViewMode}
+            title="Toggle Preview View Options Drawer"
+          >
+            <AmIcon name="ic_viewmode_panel_close" fallback="grid" size={20} />
+          </button>
         </div>
       </div>
     </div>

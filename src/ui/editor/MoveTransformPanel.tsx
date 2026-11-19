@@ -23,12 +23,14 @@ export const MoveTransformPanel: React.FC = () => {
   const activeTarget: ActiveCurveTarget =
     mode === 'location' && editPivot
       ? { label: 'Pivot', kind: 'transform', key: 'pivot' }
-      : { label: mode === 'location' ? 'Position' : mode === 'rotation' ? 'Rotation' : mode === 'scale' ? 'Scale' : 'Skew', kind: 'transform', key: mode };
+      : {
+          label: mode === 'location' ? 'Location' : mode === 'rotation' ? 'Rotation' : mode === 'scale' ? 'Scale' : 'Skew',
+          kind: 'transform',
+          key: mode,
+        };
 
-  const activeProp =
-    mode === 'location' && editPivot
-      ? layer.transform.pivot
-      : layer.transform[mode];
+  const activeProp = mode === 'location' && editPivot ? layer.transform.pivot : layer.transform[mode];
+  const kfActive = hasKfHere(activeProp);
 
   const handlePadDown = (e: React.PointerEvent<HTMLDivElement>) => {
     const startX = e.clientX;
@@ -79,152 +81,237 @@ export const MoveTransformPanel: React.FC = () => {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-      {/* Keyframe & Curve Top Strip */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'var(--am-a1)', padding: '6px 10px', borderRadius: 10, border: '1px solid var(--am-border)' }}>
-        <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--am-accent)' }}>{activeTarget.label}</span>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-          <button type="button" className="am-icon-btn" onClick={() => stepKeyframe(activeTarget, -1)} title="Previous Keyframe">
-            <AmIcon name="ic_prev_element" fallback="back" size={15} />
-          </button>
+      {/* APK fragment_move_transform.xml (#262A3C layout: Left Keyframe/Curve Rail + Center ControlPad + Right 4-Mode Tabs) */}
+      <div className="am-mt-apk-shell">
+        {/* Left Keyframe + Easing Curve Column */}
+        <div className="am-mt-left-rail">
+          <div className="am-mt-kf-group">
+            <button
+              type="button"
+              className={`am-mt-kf-btn ${kfActive ? 'active' : ''}`}
+              onClick={() => toggleKeyframeOnProp(activeTarget, normT)}
+              title="Add / Remove Keyframe"
+            >
+              <AmIcon name={kfActive ? 'ic_keyframe_sign' : 'ic_keyframe_add_hollow'} fallback="plus" size={20} color={kfActive ? '#00FFA8' : '#FFFFFF'} />
+            </button>
+            <div className="am-mt-kf-arrows">
+              <button type="button" onClick={() => stepKeyframe(activeTarget, -1)} title="Previous Keyframe">
+                <AmIcon name="ic_prev_element" fallback="back" size={12} />
+              </button>
+              <button type="button" onClick={() => stepKeyframe(activeTarget, 1)} title="Next Keyframe">
+                <AmIcon name="ic_next_element" fallback="next" size={12} />
+              </button>
+            </div>
+          </div>
+
           <button
             type="button"
-            className={`am-icon-btn ${hasKfHere(activeProp) ? 'active' : ''}`}
-            onClick={() => toggleKeyframeOnProp(activeTarget, normT)}
-            title="Add / Remove Keyframe"
-          >
-            <AmIcon name={hasKfHere(activeProp) ? 'ic_keyframe_sign' : 'ic_keyframe_add_hollow'} fallback="plus" size={18} />
-          </button>
-          <button type="button" className="am-icon-btn" onClick={() => stepKeyframe(activeTarget, 1)} title="Next Keyframe">
-            <AmIcon name="ic_next_element" fallback="next" size={15} />
-          </button>
-          <button
-            type="button"
-            className="am-icon-btn"
+            className="am-mt-curve-btn"
             disabled={activeProp.keyframes.length < 2}
             onClick={() => setCurveTarget(activeTarget)}
             title="Edit Easing Curve"
           >
-            <AmIcon name="ic_animate_curve" fallback="curve" size={17} />
+            <AmIcon name="ic_animate_curve" fallback="curve" size={19} />
           </button>
         </div>
-      </div>
 
-      {/* Mode Selector + Trackpad */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 78px', gap: 8 }}>
-        <div className="am-trackpad" onPointerDown={handlePadDown}>
-          <div style={{ textAlign: 'center', pointerEvents: 'none' }}>
-            <div style={{ fontSize: 11, color: 'var(--am-text-muted)', marginBottom: 4 }}>
-              SWIPE HERE TO ADJUST
-            </div>
-            <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--am-accent)' }}>
-              {mode === 'location' && !editPivot && `X: ${Math.round(loc[0])}  Y: ${Math.round(loc[1])}  Z: ${Math.round(loc[2] ?? 0)}`}
-              {mode === 'location' && editPivot && `Pivot X: ${Math.round(pivot[0])}  Y: ${Math.round(pivot[1])}`}
-              {mode === 'rotation' && `${rot.toFixed(1)}°`}
-              {mode === 'scale' && `${Math.round(scale[0] * 100)}% × ${Math.round(scale[1] * 100)}%`}
-              {mode === 'skew' && `X: ${skew[0].toFixed(1)}°  Y: ${skew[1].toFixed(1)}°`}
+        {/* Center APK ControlPad / RotateView / ValueSpinner */}
+        <div className="am-mt-center-pad">
+          {/* Top Coordinate Readout Boxes (locationX, locationY, locationZ 63x25dp #191C25) */}
+          <div className="am-mt-coord-row">
+            {mode === 'location' && !editPivot && (
+              <>
+                <div className="am-mt-coord-pill">
+                  <span>X</span>
+                  <strong>{Math.round(loc[0])}</strong>
+                </div>
+                <div className="am-mt-coord-pill">
+                  <span>Y</span>
+                  <strong>{Math.round(loc[1])}</strong>
+                </div>
+                <div className="am-mt-coord-pill">
+                  <span>Z</span>
+                  <strong>{Math.round(loc[2] ?? 0)}</strong>
+                </div>
+              </>
+            )}
+            {mode === 'location' && editPivot && (
+              <>
+                <div className="am-mt-coord-pill">
+                  <span>PX</span>
+                  <strong>{Math.round(pivot[0])}</strong>
+                </div>
+                <div className="am-mt-coord-pill">
+                  <span>PY</span>
+                  <strong>{Math.round(pivot[1])}</strong>
+                </div>
+              </>
+            )}
+            {mode === 'rotation' && (
+              <div className="am-mt-coord-pill wide">
+                <span>Angle</span>
+                <strong>{rot.toFixed(1)}°</strong>
+              </div>
+            )}
+            {mode === 'scale' && (
+              <>
+                <div className="am-mt-coord-pill">
+                  <span>W</span>
+                  <strong>{Math.round(scale[0] * 100)}%</strong>
+                </div>
+                <button
+                  type="button"
+                  className={`am-mt-link-btn ${layer.transform.scaleLinked ? 'active' : ''}`}
+                  onClick={() =>
+                    updateLayer((l) => {
+                      l.transform.scaleLinked = !l.transform.scaleLinked;
+                    })
+                  }
+                  title="Link X & Y Scale"
+                >
+                  <AmIcon name={layer.transform.scaleLinked ? 'ic_size_link' : 'ic_size_unlink'} fallback="link" size={14} />
+                </button>
+                <div className="am-mt-coord-pill">
+                  <span>H</span>
+                  <strong>{Math.round(scale[1] * 100)}%</strong>
+                </div>
+              </>
+            )}
+            {mode === 'skew' && (
+              <>
+                <div className="am-mt-coord-pill">
+                  <span>X</span>
+                  <strong>{skew[0].toFixed(1)}°</strong>
+                </div>
+                <div className="am-mt-coord-pill">
+                  <span>Y</span>
+                  <strong>{skew[1].toFixed(1)}°</strong>
+                </div>
+              </>
+            )}
+          </div>
+
+          {/* Interactive Touch ControlPad (#1E2239) */}
+          <div className="am-trackpad" onPointerDown={handlePadDown}>
+            <span className="am-pad-corner nw" />
+            <span className="am-pad-corner ne" />
+            <span className="am-pad-corner sw" />
+            <span className="am-pad-corner se" />
+            <div style={{ textAlign: 'center', pointerEvents: 'none' }}>
+              <div style={{ fontSize: 11, color: 'var(--am-text-secondary)', fontWeight: 600 }}>
+                {mode === 'location'
+                  ? editPivot
+                    ? 'Swipe here to move pivot'
+                    : 'Swipe here to move layer'
+                  : mode === 'rotation'
+                    ? 'Drag horizontally to rotate'
+                    : mode === 'scale'
+                      ? 'Drag to scale layer'
+                      : 'Drag to skew layer'}
+              </div>
             </div>
           </div>
+
+          {mode === 'location' && (
+            <div style={{ display: 'flex', gap: 6, justifyContent: 'center' }}>
+              <button type="button" className={`am-pill ${!editPivot ? 'active' : ''}`} onClick={() => setEditPivot(false)}>
+                Location
+              </button>
+              <button type="button" className={`am-pill ${editPivot ? 'active' : ''}`} onClick={() => setEditPivot(true)}>
+                Pivot
+              </button>
+              <button
+                type="button"
+                className="am-pill"
+                onClick={() =>
+                  updateLayer((l) => {
+                    if (editPivot) setAnimValue(l.transform.pivot, [0, 0]);
+                    else setAnimValue(l.transform.location, [project.width / 2, project.height / 2, 0]);
+                  })
+                }
+              >
+                Center
+              </button>
+            </div>
+          )}
         </div>
 
-        {/* 4-Mode Vertical Rail */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+        {/* Right 4-Mode Vertical Tab Rail (Move / Rotate / Scale / Skew) */}
+        <div className="am-mt-right-rail">
           {(
             [
-              ['location', 'Move'],
-              ['rotation', 'Rotate'],
-              ['scale', 'Scale'],
-              ['skew', 'Skew'],
-            ] as [Mode, string][]
-          ).map(([m, lbl]) => (
+              ['location', 'ac_ic_movetransform', 'Move'],
+              ['rotation', 'ic_rotate', 'Rotate'],
+              ['scale', 'ic_scale', 'Scale'],
+              ['skew', 'ic_skew', 'Skew'],
+            ] as [Mode, string, string][]
+          ).map(([m, icon, lbl]) => (
             <button
               key={m}
               type="button"
-              className={`am-pill ${mode === m ? 'active' : ''}`}
-              style={{ width: '100%', padding: '7px 4px', textAlign: 'center', fontSize: 11 }}
+              className={`am-mt-mode-tab ${mode === m ? 'active' : ''}`}
               onClick={() => setMode(m)}
+              title={lbl}
             >
-              {lbl}
+              <AmIcon name={icon} fallback="sliders" size={18} color={mode === m ? '#00FFA8' : '#9AA1AF'} />
             </button>
           ))}
         </div>
       </div>
 
       {/* Exact Numeric Spinners */}
-      {mode === 'location' && (
+      {mode === 'location' && !editPivot && (
         <>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <button type="button" className={`am-pill ${!editPivot ? 'active' : ''}`} onClick={() => setEditPivot(false)}>
-              Position
-            </button>
-            <button type="button" className={`am-pill ${editPivot ? 'active' : ''}`} onClick={() => setEditPivot(true)}>
-              Edit Pivot Anchor
-            </button>
-            <button
-              type="button"
-              className="am-pill"
-              onClick={() =>
-                updateLayer((l) => {
-                  if (editPivot) setAnimValue(l.transform.pivot, [0, 0]);
-                  else setAnimValue(l.transform.location, [project.width / 2, project.height / 2, 0]);
-                })
-              }
-            >
-              Center
-            </button>
-          </div>
+          <SpinnerControl
+            label="X Position"
+            value={loc[0]}
+            min={-4000}
+            max={4000}
+            step={1}
+            unit="px"
+            onChange={(v) => updateLayer((l) => setAnimValue(l.transform.location, [v, loc[1], loc[2] ?? 0]))}
+          />
+          <SpinnerControl
+            label="Y Position"
+            value={loc[1]}
+            min={-4000}
+            max={4000}
+            step={1}
+            unit="px"
+            onChange={(v) => updateLayer((l) => setAnimValue(l.transform.location, [loc[0], v, loc[2] ?? 0]))}
+          />
+          <SpinnerControl
+            label="Z Depth (Camera Parallax)"
+            value={loc[2] ?? 0}
+            min={-3000}
+            max={3000}
+            step={1}
+            unit="px"
+            onChange={(v) => updateLayer((l) => setAnimValue(l.transform.location, [loc[0], loc[1], v]))}
+          />
+        </>
+      )}
 
-          {!editPivot ? (
-            <>
-              <SpinnerControl
-                label="X Position"
-                value={loc[0]}
-                min={-4000}
-                max={4000}
-                step={1}
-                unit="px"
-                onChange={(v) => updateLayer((l) => setAnimValue(l.transform.location, [v, loc[1], loc[2] ?? 0]))}
-              />
-              <SpinnerControl
-                label="Y Position"
-                value={loc[1]}
-                min={-4000}
-                max={4000}
-                step={1}
-                unit="px"
-                onChange={(v) => updateLayer((l) => setAnimValue(l.transform.location, [loc[0], v, loc[2] ?? 0]))}
-              />
-              <SpinnerControl
-                label="Z Depth (Camera Parallax)"
-                value={loc[2] ?? 0}
-                min={-3000}
-                max={3000}
-                step={1}
-                unit="px"
-                onChange={(v) => updateLayer((l) => setAnimValue(l.transform.location, [loc[0], loc[1], v]))}
-              />
-            </>
-          ) : (
-            <>
-              <SpinnerControl
-                label="Pivot X"
-                value={pivot[0]}
-                min={-2000}
-                max={2000}
-                step={1}
-                unit="px"
-                onChange={(v) => updateLayer((l) => setAnimValue(l.transform.pivot, [v, pivot[1]]))}
-              />
-              <SpinnerControl
-                label="Pivot Y"
-                value={pivot[1]}
-                min={-2000}
-                max={2000}
-                step={1}
-                unit="px"
-                onChange={(v) => updateLayer((l) => setAnimValue(l.transform.pivot, [pivot[0], v]))}
-              />
-            </>
-          )}
+      {mode === 'location' && editPivot && (
+        <>
+          <SpinnerControl
+            label="Pivot X"
+            value={pivot[0]}
+            min={-2000}
+            max={2000}
+            step={1}
+            unit="px"
+            onChange={(v) => updateLayer((l) => setAnimValue(l.transform.pivot, [v, pivot[1]]))}
+          />
+          <SpinnerControl
+            label="Pivot Y"
+            value={pivot[1]}
+            min={-2000}
+            max={2000}
+            step={1}
+            unit="px"
+            onChange={(v) => updateLayer((l) => setAnimValue(l.transform.pivot, [pivot[0], v]))}
+          />
         </>
       )}
 
@@ -232,8 +319,8 @@ export const MoveTransformPanel: React.FC = () => {
         <SpinnerControl
           label="Rotation Angle"
           value={rot}
-          min={-3600}
-          max={3600}
+          min={-1440}
+          max={1440}
           step={0.5}
           unit="°"
           onChange={(v) => updateLayer((l) => setAnimValue(l.transform.rotation, v))}
@@ -242,16 +329,8 @@ export const MoveTransformPanel: React.FC = () => {
 
       {mode === 'scale' && (
         <>
-          <button
-            type="button"
-            className={`am-pill ${layer.transform.scaleLinked ? 'active' : ''}`}
-            style={{ alignSelf: 'flex-start' }}
-            onClick={() => updateLayer((l) => { l.transform.scaleLinked = !l.transform.scaleLinked; })}
-          >
-            {layer.transform.scaleLinked ? '🔗 Uniform Scale Locked' : '🔓 Independent X / Y'}
-          </button>
           <SpinnerControl
-            label="Scale X"
+            label={layer.transform.scaleLinked ? 'Uniform Scale' : 'Scale X (Width)'}
             value={scale[0]}
             min={0.01}
             max={10}
@@ -259,12 +338,14 @@ export const MoveTransformPanel: React.FC = () => {
             multiplier={100}
             unit="%"
             onChange={(v) =>
-              updateLayer((l) => setAnimValue(l.transform.scale, [v, l.transform.scaleLinked ? v : scale[1]]))
+              updateLayer((l) =>
+                setAnimValue(l.transform.scale, l.transform.scaleLinked ? [v, v] : [v, scale[1]])
+              )
             }
           />
           {!layer.transform.scaleLinked && (
             <SpinnerControl
-              label="Scale Y"
+              label="Scale Y (Height)"
               value={scale[1]}
               min={0.01}
               max={10}

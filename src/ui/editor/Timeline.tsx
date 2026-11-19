@@ -1,4 +1,5 @@
 import React, { useRef, useState } from 'react';
+import { replaceMediaOnLayers } from '../../engine/mediaReplace';
 import { useEditorStore } from '../../store/useEditorStore';
 import type { Layer } from '../../types/project';
 import { AmIcon } from '../components/AmIcon';
@@ -37,6 +38,15 @@ const LAYER_GRADIENTS = [
   'var(--am-el-7)',
 ];
 
+function fmtCtsTime(ms: number, fps: number): string {
+  const safe = Math.max(0, ms);
+  const totalSec = Math.floor(safe / 1000);
+  const min = Math.floor(totalSec / 60);
+  const sec = totalSec % 60;
+  const frame = Math.floor(((safe % 1000) / 1000) * fps);
+  return `${String(min).padStart(2, '0')}:${String(sec).padStart(2, '0')}.${String(frame).padStart(2, '0')}`;
+}
+
 export const Timeline: React.FC = () => {
   const {
     currentProject,
@@ -44,19 +54,24 @@ export const Timeline: React.FC = () => {
     timelinePxPerSec,
     selectedLayerIds,
     groupStack,
+    loop,
     getActiveLayers,
     setCurrentTimeMs,
     setIsPlaying,
+    setLoop,
     selectLayer,
     toggleLayerVisible,
     reorderLayer,
+    setTimelineZoom,
     mutateProject,
     setModal,
   } = useEditorStore();
 
   const scrollerRef = useRef<HTMLDivElement>(null);
   const rulerRef = useRef<HTMLDivElement>(null);
-  const [multiSelectMode, setMultiSelectMode] = useState(false);
+  const headersRef = useRef<HTMLDivElement>(null);
+  const replaceInputRef = useRef<HTMLInputElement>(null);
+  const [showOverflowMenu, setShowOverflowMenu] = useState(false);
 
   if (!currentProject) return null;
   const layers = getActiveLayers();
@@ -126,7 +141,16 @@ export const Timeline: React.FC = () => {
     window.addEventListener('pointerup', onUp);
   };
 
-  // Generate ruler ticks every 0.5s or 1s
+  const selectAllLayers = () => {
+    if (layers.length === 0) return;
+    selectLayer(layers[0].id, false);
+    for (let i = 1; i < layers.length; i++) {
+      selectLayer(layers[i].id, true);
+    }
+    setShowOverflowMenu(false);
+  };
+
+  // Generate ruler ticks every 0.5s or 1s (timeline_tick_sec = 18dp, timeline_tick_halfsec = 12dp)
   const tickStepSec = timelinePxPerSec >= 100 ? 0.5 : 1.0;
   const ticks: number[] = [];
   for (let s = 0; s <= totalSec; s += tickStepSec) {
@@ -138,236 +162,327 @@ export const Timeline: React.FC = () => {
 
   return (
     <div className="am-timeline-wrap">
-      {/* Scrubbable Time Ruler */}
-      <div
-        ref={rulerRef}
-        className="am-timeline-ruler"
-        onPointerDown={handleRulerDown}
-        onScroll={(e) => {
-          if (scrollerRef.current) scrollerRef.current.scrollLeft = e.currentTarget.scrollLeft;
+      <input
+        ref={replaceInputRef}
+        type="file"
+        accept="image/*,video/*"
+        multiple
+        style={{ display: 'none' }}
+        onChange={(e) => {
+          if (e.target.files && e.target.files.length > 0 && selectedLayerIds.length > 0) {
+            replaceMediaOnLayers(e.target.files, selectedLayerIds, groupStack, mutateProject);
+          }
+          e.target.value = '';
+          setShowOverflowMenu(false);
         }}
-      >
-        <div style={{ width: trackWidth, height: '100%', position: 'relative' }}>
-          {ticks.map((s) => {
-            const left = s * timelinePxPerSec;
-            const isMajor = Math.abs(s - Math.round(s)) < 0.01;
-            return (
+      />
+
+      {/* Top Row: 70dp CTS Timecode Box + Scrubbable Time Ruler */}
+      <div className="am-timeline-top-row">
+        {/* APK timeline_cts_bg_width (70dp) */}
+        <button
+          type="button"
+          className={`am-timeline-cts ${loop ? 'loop-on' : ''}`}
+          onClick={() => setLoop(!loop)}
+          title="Current Time (tap to toggle loop playback)"
+        >
+          <span>{fmtCtsTime(currentTimeMs, currentProject.fps)}</span>
+        </button>
+
+        <div
+          ref={rulerRef}
+          className="am-timeline-ruler"
+          onPointerDown={handleRulerDown}
+          onScroll={(e) => {
+            if (scrollerRef.current) scrollerRef.current.scrollLeft = e.currentTarget.scrollLeft;
+          }}
+        >
+          <div style={{ width: trackWidth, height: '100%', position: 'relative' }}>
+            {ticks.map((s) => {
+              const left = s * timelinePxPerSec;
+              const isMajor = Math.abs(s - Math.round(s)) < 0.01;
+              return (
+                <div
+                  key={s}
+                  style={{
+                    position: 'absolute',
+                    left,
+                    bottom: 0,
+                    height: isMajor ? 18 : 10,
+                    borderLeft: `1px solid ${isMajor ? 'rgba(255,255,255,0.42)' : 'rgba(255,255,255,0.16)'}`,
+                  }}
+                >
+                  {isMajor && (
+                    <span className="am-ruler-sec-label">
+                      {String(Math.floor(s / 60)).padStart(2, '0')}:{String(Math.round(s % 60)).padStart(2, '0')}
+                    </span>
+                  )}
+                </div>
+              );
+            })}
+
+            {/* Beat Bookmarks */}
+            {currentProject.bookmarks.map((bm) => (
               <div
-                key={s}
-                style={{
-                  position: 'absolute',
-                  left,
-                  bottom: 0,
-                  height: isMajor ? 14 : 7,
-                  borderLeft: `1px solid ${isMajor ? 'rgba(255,255,255,0.42)' : 'rgba(255,255,255,0.18)'}`,
+                key={bm}
+                className="am-ruler-bookmark"
+                style={{ left: (bm / 1000) * timelinePxPerSec - 6 }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsPlaying(false);
+                  setCurrentTimeMs(bm);
                 }}
-              >
-                {isMajor && (
-                  <span style={{ position: 'absolute', left: 3, top: -8, fontSize: 10, color: 'var(--am-text-muted)' }}>
-                    {s}s
-                  </span>
-                )}
-              </div>
-            );
-          })}
+                title={`Beat Bookmark (${(bm / 1000).toFixed(2)}s)`}
+              />
+            ))}
 
-          {/* Beat Bookmarks */}
-          {currentProject.bookmarks.map((bm) => (
+            {/* Playhead Handle */}
             <div
-              key={bm}
-              style={{
-                position: 'absolute',
-                left: (bm / 1000) * timelinePxPerSec - 5,
-                top: 2,
-                width: 10,
-                height: 10,
-                background: 'var(--am-gold)',
-                clipPath: 'polygon(50% 100%, 0 0, 100% 0)',
-              }}
+              className="am-ruler-playhead-cap"
+              style={{ left: playheadX - 7 }}
             />
-          ))}
-
-          {/* Playhead Handle */}
-          <div
-            style={{
-              position: 'absolute',
-              left: playheadX - 6,
-              bottom: 0,
-              width: 12,
-              height: 14,
-              background: 'var(--am-accent)',
-              clipPath: 'polygon(0 0, 100% 0, 100% 55%, 50% 100%, 0 55%)',
-            }}
-          />
+          </div>
         </div>
       </div>
 
-      {/* Scrollable Layer Tracks */}
-      <div
-        ref={scrollerRef}
-        className="am-timeline-tracks am-scroll"
-        onScroll={(e) => {
-          if (rulerRef.current) rulerRef.current.scrollLeft = e.currentTarget.scrollLeft;
-        }}
-        onClick={(e) => {
-          if (e.target === e.currentTarget) selectLayer('');
-        }}
-      >
-        <div style={{ width: trackWidth, minHeight: '100%', position: 'relative', paddingLeft: 4 }}>
-          {layers.length === 0 && (
-            <div style={{ padding: 24, color: 'var(--am-text-muted)', fontSize: 13 }}>
-              Tap the glowing <strong>+</strong> button to add Shapes, Text, Media, Audio, Camera, or Vector Drawings.
-            </div>
-          )}
-
-          {displayIndices.map((idx, visualPos) => {
+      {/* Main Body: 70dp Left Layer Headers (timeline_header.xml) + Scrollable Track Lanes (timeline_item.xml) */}
+      <div className="am-timeline-body">
+        {/* APK timeline_header.xml (70dp column: trackTag 10dp + layerVisibilityToggle + layerSelectionCheckmark) */}
+        <div ref={headersRef} className="am-timeline-headers">
+          {displayIndices.map((idx) => {
             const layer = layers[idx];
             const isSelected = selectedLayerIds.includes(layer.id);
-            const left = (layer.startTime / 1000) * timelinePxPerSec;
-            const width = Math.max(32, ((layer.endTime - layer.startTime) / 1000) * timelinePxPerSec);
-            const durMs = Math.max(1, layer.endTime - layer.startTime);
-            const kfs = collectLayerKeyframes(layer);
-
+            const tagBg = LAYER_GRADIENTS[layer.colorIndex % LAYER_GRADIENTS.length];
             return (
-              <div key={layer.id} className="am-track-row">
-                {/* Layer Track Bar */}
-                <div
-                  className={`am-track-bar ${isSelected ? 'selected' : ''}`}
-                  style={{
-                    left,
-                    width,
-                    background: LAYER_GRADIENTS[layer.colorIndex % LAYER_GRADIENTS.length],
-                    opacity: layer.visible ? 1 : 0.42,
-                  }}
+              <div
+                key={layer.id}
+                className={`am-track-header ${isSelected ? 'selected' : ''}`}
+              >
+                <div className="am-track-tag" style={{ background: tagBg }} />
+
+                <button
+                  type="button"
+                  className="am-track-eye-btn"
                   onClick={(e) => {
                     e.stopPropagation();
-                    selectLayer(layer.id, multiSelectMode || e.shiftKey || e.ctrlKey || e.metaKey);
+                    toggleLayerVisible(layer.id);
                   }}
-                  onPointerDown={(e) => handleTrackMove(e, idx, 'move')}
+                  title={layer.visible ? 'Hide Layer' : 'Show Layer'}
                 >
-                  <div
-                    className="am-trim-grip"
-                    onPointerDown={(e) => handleTrackMove(e, idx, 'left')}
-                    title="Drag to Trim Start"
+                  <AmIcon
+                    name={layer.visible ? 'ic_visibility' : 'ic_visibility_off'}
+                    fallback={layer.visible ? 'eye' : 'eyeOff'}
+                    size={15}
+                    color={layer.visible ? '#D8DCE8' : '#656B7C'}
                   />
+                </button>
 
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, flex: 1, minWidth: 0, padding: '0 6px' }}>
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        toggleLayerVisible(layer.id);
-                      }}
-                      style={{ color: '#081318', display: 'flex', alignItems: 'center' }}
-                      title={layer.visible ? 'Hide Layer' : 'Show Layer'}
-                    >
-                      <AmIcon name={layer.visible ? 'ic_visibility' : 'ic_visibility_off'} fallback={layer.visible ? 'eye' : 'eyeOff'} size={14} />
-                    </button>
-
-                    <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                      {layer.label}
-                    </span>
-
-                    {layer.effects.length > 0 && (
-                      <span style={{ fontSize: 10, padding: '1px 5px', borderRadius: 99, background: 'rgba(0,0,0,0.22)', color: '#fff' }}>
-                        {layer.effects.length} fx
-                      </span>
-                    )}
-
-                    {/* Z-order move up/down buttons when selected */}
-                    {isSelected && (
-                      <span style={{ marginLeft: 'auto', display: 'inline-flex', gap: 2 }}>
-                        <button
-                          type="button"
-                          disabled={visualPos === 0}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            reorderLayer(idx, idx + 1);
-                          }}
-                          style={{ color: '#081318', fontSize: 11, padding: '0 3px' }}
-                          title="Move Layer Up"
-                        >
-                          ▲
-                        </button>
-                        <button
-                          type="button"
-                          disabled={visualPos === displayIndices.length - 1}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            reorderLayer(idx, idx - 1);
-                          }}
-                          style={{ color: '#081318', fontSize: 11, padding: '0 3px' }}
-                          title="Move Layer Down"
-                        >
-                          ▼
-                        </button>
-                      </span>
-                    )}
-                  </div>
-
-                  {/* Audio Waveform Preview */}
-                  {layer.type === 'audio' && layer.audioData?.waveform && (
-                    <div style={{ position: 'absolute', inset: '4px 12px', display: 'flex', alignItems: 'center', gap: 2, opacity: 0.35, pointerEvents: 'none' }}>
-                      {layer.audioData.waveform.slice(0, 48).map((v, wi) => (
-                        <div key={wi} style={{ flex: 1, height: `${Math.max(15, v * 100)}%`, background: '#081318', borderRadius: 1 }} />
-                      ))}
-                    </div>
-                  )}
-
-                  {/* Keyframe Diamonds on Track */}
-                  {kfs.map((kt, ki) => (
-                    <div
-                      key={ki}
-                      style={{
-                        position: 'absolute',
-                        left: `${Math.max(2, Math.min(98, kt * 100))}%`,
-                        bottom: 3,
-                        width: 7,
-                        height: 7,
-                        background: '#FFFFFF',
-                        border: '1px solid #081318',
-                        transform: 'translateX(-50%) rotate(45deg)',
-                        pointerEvents: 'none',
-                      }}
-                    />
-                  ))}
-
-                  <div
-                    className="am-trim-grip"
-                    onPointerDown={(e) => handleTrackMove(e, idx, 'right')}
-                    title="Drag to Trim End"
+                {/* Tapping checkmark toggles layer in multi-selection (exact APK timeline_header behavior) */}
+                <button
+                  type="button"
+                  className={`am-track-check-btn ${isSelected ? 'checked' : ''}`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    selectLayer(layer.id, true);
+                  }}
+                  title="Tap to Multi-Select Layer"
+                >
+                  <AmIcon
+                    name="ic_selected_layer_checkmark"
+                    fallback="check"
+                    size={14}
+                    color={isSelected ? '#091318' : 'rgba(255,255,255,0.28)'}
                   />
-                </div>
+                </button>
               </div>
             );
           })}
+        </div>
 
-          {/* Vertical Playhead Line */}
-          <div className="am-playhead-line" style={{ left: playheadX }} />
+        {/* Scrollable Layer Tracks */}
+        <div
+          ref={scrollerRef}
+          className="am-timeline-tracks am-scroll"
+          onScroll={(e) => {
+            if (rulerRef.current) rulerRef.current.scrollLeft = e.currentTarget.scrollLeft;
+            if (headersRef.current) headersRef.current.scrollTop = e.currentTarget.scrollTop;
+          }}
+          onClick={(e) => {
+            if (e.target === e.currentTarget) selectLayer('');
+          }}
+        >
+          <div style={{ width: trackWidth, minHeight: '100%', position: 'relative' }}>
+            {layers.length === 0 && (
+              <div style={{ padding: 24, color: 'var(--am-text-muted)', fontSize: 13 }}>
+                Tap the mint <strong>+</strong> button to add Shapes, Text, Media, Audio, Camera, or Vector Drawings.
+              </div>
+            )}
+
+            {displayIndices.map((idx, visualPos) => {
+              const layer = layers[idx];
+              const isSelected = selectedLayerIds.includes(layer.id);
+              const left = (layer.startTime / 1000) * timelinePxPerSec;
+              const width = Math.max(32, ((layer.endTime - layer.startTime) / 1000) * timelinePxPerSec);
+              const kfs = collectLayerKeyframes(layer);
+
+              return (
+                <div key={layer.id} className="am-track-row">
+                  {/* APK timeline_item.xml */}
+                  <div
+                    className={`am-track-bar ${isSelected ? 'selected' : ''}`}
+                    style={{
+                      left,
+                      width,
+                      background: LAYER_GRADIENTS[layer.colorIndex % LAYER_GRADIENTS.length],
+                      opacity: layer.visible ? 1 : 0.42,
+                    }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      selectLayer(layer.id, e.shiftKey || e.ctrlKey || e.metaKey);
+                    }}
+                    onPointerDown={(e) => handleTrackMove(e, idx, 'move')}
+                  >
+                    {/* APK @id/trimGripLeft (30dp when selected) */}
+                    <div
+                      className="am-trim-grip left"
+                      onPointerDown={(e) => handleTrackMove(e, idx, 'left')}
+                      title="Drag to Trim Start"
+                    >
+                      <span className="am-trim-grip-bar" />
+                    </div>
+
+                    <div className="am-track-label-wrap">
+                      {(layer.blendMode === 'mask' || layer.blendMode === 'exclude') && (
+                        <span className="am-track-mask-icon">↙︎</span>
+                      )}
+                      <span className="am-track-label">{layer.label}</span>
+
+                      {layer.effects.length > 0 && (
+                        <span className="am-track-fx-pill">{layer.effects.length} fx</span>
+                      )}
+
+                      {isSelected && (
+                        <span className="am-track-z-btns">
+                          <button
+                            type="button"
+                            disabled={visualPos === 0}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              reorderLayer(idx, idx + 1);
+                            }}
+                            title="Move Layer Up"
+                          >
+                            ▲
+                          </button>
+                          <button
+                            type="button"
+                            disabled={visualPos === displayIndices.length - 1}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              reorderLayer(idx, idx - 1);
+                            }}
+                            title="Move Layer Down"
+                          >
+                            ▼
+                          </button>
+                        </span>
+                      )}
+                    </div>
+
+                    {/* AudioThumbnailView */}
+                    {layer.type === 'audio' && layer.audioData?.waveform && (
+                      <div className="am-track-waveform">
+                        {layer.audioData.waveform.slice(0, 48).map((v, wi) => (
+                          <div key={wi} style={{ flex: 1, height: `${Math.max(15, v * 100)}%`, background: '#081318', borderRadius: 1 }} />
+                        ))}
+                      </div>
+                    )}
+
+                    {/* KeyframeView Diamonds */}
+                    {kfs.map((kt, ki) => (
+                      <div
+                        key={ki}
+                        className="am-track-kf-diamond"
+                        style={{ left: `${Math.max(2, Math.min(98, kt * 100))}%` }}
+                      />
+                    ))}
+
+                    {/* APK @id/trimGripRight */}
+                    <div
+                      className="am-trim-grip right"
+                      onPointerDown={(e) => handleTrackMove(e, idx, 'right')}
+                      title="Drag to Trim End"
+                    >
+                      <span className="am-trim-grip-bar" />
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+
+            {/* Vertical Playhead Line (1.5dp) */}
+            <div className="am-playhead-line" style={{ left: playheadX }} />
+          </div>
         </div>
       </div>
 
-      {/* Mobile-friendly Multi-Select Toggle */}
+      {/* APK @id/timelineOverflowButton (40x40dp bottom-left) */}
       <button
         type="button"
-        className={`am-btn ${multiSelectMode ? 'am-btn-primary' : ''}`}
-        onClick={() => setMultiSelectMode((v) => !v)}
-        title="Toggle Multi-Select Mode (tap multiple layers)"
-        style={{
-          position: 'absolute',
-          left: 10,
-          bottom: 12,
-          zIndex: 18,
-          padding: '6px 10px',
-          fontSize: 11,
-          borderRadius: 99,
-          boxShadow: '0 4px 12px rgba(0,0,0,0.45)',
-        }}
+        className="am-timeline-overflow-btn"
+        onClick={() => setShowOverflowMenu((v) => !v)}
+        title="Timeline Options & Multi-Select"
       >
-        {multiSelectMode ? `Multi (${selectedLayerIds.length})` : 'Multi'}
+        <AmIcon name="ic_more_vert_white_24dp" fallback="more" size={18} />
       </button>
 
-      {/* Floating Mint + Add Layer Button */}
+      {showOverflowMenu && (
+        <div className="am-popup-menu" style={{ left: 10, bottom: 50, width: 220 }}>
+          <button type="button" className="am-popup-item" onClick={selectAllLayers}>
+            Select All Layers ({layers.length})
+          </button>
+          <button
+            type="button"
+            className="am-popup-item"
+            disabled={selectedLayerIds.length === 0}
+            onClick={() => {
+              selectLayer('');
+              setShowOverflowMenu(false);
+            }}
+          >
+            Deselect All
+          </button>
+          <button
+            type="button"
+            className="am-popup-item"
+            disabled={selectedLayerIds.length === 0}
+            onClick={() => replaceInputRef.current?.click()}
+          >
+            Replace Selected Media ({selectedLayerIds.length})
+          </button>
+          <div className="am-popup-sep" />
+          <div style={{ padding: '6px 10px' }}>
+            <label
+              htmlFor="tl-zoom-slider"
+              style={{ display: 'block', fontSize: 11, color: 'var(--am-text-secondary)', marginBottom: 4 }}
+            >
+              Timeline Zoom ({timelinePxPerSec}px/s)
+            </label>
+            <input
+              id="tl-zoom-slider"
+              name="timelineZoom"
+              type="range"
+              min={40}
+              max={360}
+              value={timelinePxPerSec}
+              onChange={(e) => setTimelineZoom(Number(e.target.value))}
+              style={{ width: '100%', accentColor: 'var(--am-accent)' }}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* APK @id/buttonAdd (add_layer_button bottom-right) */}
       <button
         type="button"
         className="am-editor-fab"
@@ -375,7 +490,7 @@ export const Timeline: React.FC = () => {
         aria-label="Add Layer"
         title="Add Layer (Shape, Text, Media, Audio, Drawing, Camera)"
       >
-        <AmIcon name="ic_add_project_plus" fallback="plus" size={24} />
+        <AmIcon name="ic_add_project_plus" fallback="plus" size={26} />
       </button>
     </div>
   );

@@ -41,6 +41,18 @@ export const EditorScreen: React.FC = () => {
   const isExportingRef = useRef(false);
   const mediaRedrawRafRef = useRef(0);
   const [visibilityPaused, setVisibilityPaused] = useState(false);
+  const [viewModeOpen, setViewModeOpen] = useState(() => typeof window !== 'undefined' && window.innerWidth > 860);
+
+  // Auto-select Mobile APK (classic) vs iPad Desktop (widescreen) on viewport resize
+  useEffect(() => {
+    const syncLayout = () => {
+      const mobile = window.innerWidth <= 860;
+      useEditorStore.getState().setLayoutMode(mobile ? 'classic' : 'widescreen');
+    };
+    syncLayout();
+    window.addEventListener('resize', syncLayout);
+    return () => window.removeEventListener('resize', syncLayout);
+  }, []);
 
   const getPreviewScale = (width: number, height: number) =>
     Math.max(width, height) > 1440 ? 0.5 : 0.75;
@@ -205,8 +217,12 @@ export const EditorScreen: React.FC = () => {
       <EditorActionBar />
 
       <div className={`am-editor-body ${layoutMode}`}>
-        <PreviewCanvas canvasRef={canvasRef} onVisibilityPauseChange={setVisibilityPaused} />
-        <Playbar />
+        <PreviewCanvas
+          canvasRef={canvasRef}
+          onVisibilityPauseChange={setVisibilityPaused}
+          viewModeOpen={viewModeOpen}
+        />
+        <Playbar viewModeOpen={viewModeOpen} onToggleViewMode={() => setViewModeOpen((v) => !v)} />
         <Timeline />
         <LayerInspector />
       </div>
