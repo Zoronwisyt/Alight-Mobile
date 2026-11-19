@@ -226,6 +226,19 @@ export interface Layer {
   groupMaskMode?: 'none' | 'mask' | 'exclude';
 }
 
+export interface ImportReport {
+  width: number;
+  height: number;
+  sizeSource: 'exportWidth/exportHeight' | 'width/height' | 'aspect';
+  roundedToEven: boolean;
+  fps: number;
+  durationMs: number;
+  layerCount: number;
+  mediaFound: number;
+  mediaMissing: number;
+  textWrapDefaults: number;
+}
+
 export interface Project {
   id: string;
   title: string;
@@ -239,6 +252,7 @@ export interface Project {
   cameraEnabled: boolean;
   modifiedTime: number;
   thumbnailDataUrl?: string;
+  importReport?: ImportReport;
 }
 
 export interface SavedElement {
@@ -335,6 +349,19 @@ export interface EffectDef {
   iterations?: string | null;
   shaders: EffectShaderDef[];
   script?: string | null;
+  isCustom?: boolean;
+}
+
+export interface CustomEffectRecord {
+  uid: string;
+  id: string;
+  name: string;
+  xml: string;
+  source: 'paste' | 'file';
+  created: number;
+  hash: string;
+  enabled: boolean;
+  def: EffectDef;
 }
 
 export interface EffectPreset {

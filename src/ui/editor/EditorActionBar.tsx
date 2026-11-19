@@ -27,6 +27,7 @@ export const EditorActionBar: React.FC = () => {
     layoutMode,
     setLayoutMode,
     setModal,
+    setShowShortcutOverlay,
   } = useEditorStore();
 
   const replaceMultiRef = useRef<HTMLInputElement>(null);
@@ -160,6 +161,15 @@ export const EditorActionBar: React.FC = () => {
         <span className="am-nav-time" title="Playhead / Duration">
           {fmtTimecodeShort(currentTimeMs, currentProject.fps)}
         </span>
+
+        <button
+          type="button"
+          className="am-layout-chip"
+          onClick={() => setShowShortcutOverlay(true)}
+          title="Keyboard Shortcuts & Density (?)"
+        >
+          ?
+        </button>
 
         <button
           type="button"

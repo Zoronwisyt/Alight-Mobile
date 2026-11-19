@@ -85,8 +85,15 @@ export const EffectsPanel: React.FC = () => {
                   <div style={{ fontSize: 13, fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                     {formatEffectDisplayName(def, eff.effectId)}
                   </div>
-                  <div style={{ fontSize: 11, color: def?.deprecated ? 'var(--am-gold)' : 'var(--am-text-muted)' }}>
-                    {def?.deprecated ? 'Compatibility · ' : ''}{def?.category || 'effect'} · Tap to edit parameters
+                  <div
+                    style={{
+                      fontSize: 11,
+                      color: !def ? 'var(--am-danger)' : def.isCustom ? 'var(--am-accent)' : def.deprecated ? 'var(--am-gold)' : 'var(--am-text-muted)',
+                    }}
+                  >
+                    {!def
+                      ? 'Missing effect (re-import XML or remove)'
+                      : `${def.isCustom ? 'Custom · ' : def.deprecated ? 'Compatibility · ' : ''}${def.category || 'effect'} · Tap to edit parameters`}
                   </div>
                 </button>
 

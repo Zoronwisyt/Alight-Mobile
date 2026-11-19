@@ -134,6 +134,49 @@
 
   --scrollbar-thumb: #3F4361;
   --scrollbar-track: #141620;
+
+  /* Track B: Native motion system */
+  --am-dur-instant: 90ms;
+  --am-dur-fast: 160ms;
+  --am-dur-base: 220ms;
+  --am-dur-slow: 320ms;
+  --am-ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --am-ease-exit: cubic-bezier(0.4, 0, 1, 1);
+  --am-ease-sheet: cubic-bezier(0.05, 0.7, 0.1, 1);
+
+  /* Track C: Desktop density & UI scale tokens */
+  --am-ui-scale: 1;
+  --am-row-h: calc(34px * var(--am-ui-scale));
+  --am-gutter: calc(12px * var(--am-ui-scale));
+  --am-pad: calc(10px * var(--am-ui-scale));
+  --am-font-ui: calc(13px * var(--am-ui-scale));
+  --am-icon: calc(18px * var(--am-ui-scale));
+  --am-radius: 8px;
+}
+
+[data-density='compact'] {
+  --am-row-h: calc(28px * var(--am-ui-scale));
+  --am-gutter: calc(8px * var(--am-ui-scale));
+  --am-pad: calc(6px * var(--am-ui-scale));
+  --am-font-ui: calc(12px * var(--am-ui-scale));
+  --am-icon: calc(16px * var(--am-ui-scale));
+}
+
+[data-density='comfortable'] {
+  --am-row-h: calc(40px * var(--am-ui-scale));
+  --am-gutter: calc(16px * var(--am-ui-scale));
+  --am-pad: calc(14px * var(--am-ui-scale));
+  --am-font-ui: calc(14px * var(--am-ui-scale));
+  --am-icon: calc(20px * var(--am-ui-scale));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --am-dur-instant: 90ms;
+    --am-dur-fast: 90ms;
+    --am-dur-base: 90ms;
+    --am-dur-slow: 90ms;
+  }
 }
 
 [data-theme='desat'] {

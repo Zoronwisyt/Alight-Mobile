@@ -570,16 +570,20 @@ function parseXmlLayer(
     freehandStrokes,
     textData:
       type === 'text'
-        ? {
-            content: contentEl?.textContent || 'Text',
-            fontFamily: contentEl?.getAttribute('font') || 'SpaceGrotesk-Bold',
-            fontSize: parseFloat(contentEl?.getAttribute('size') || '72') || 72,
-            color: contentEl?.getAttribute('color') || '#FFFFFFFF',
-            align: (contentEl?.getAttribute('align') as 'left' | 'center' | 'right') || 'center',
-            lineHeight: 1.2,
-            letterSpacing: 0,
-            wrapWidth: projW * 0.85,
-          }
+        ? (() => {
+            const rawWrap = parseFloat(contentEl?.getAttribute('wrapWidth') || el.getAttribute('wrapWidth') || '');
+            const hasExplicitWrap = Number.isFinite(rawWrap) && rawWrap > 0;
+            return {
+              content: contentEl?.textContent || 'Text',
+              fontFamily: contentEl?.getAttribute('font') || 'SpaceGrotesk-Bold',
+              fontSize: parseFloat(contentEl?.getAttribute('size') || '72') || 72,
+              color: contentEl?.getAttribute('color') || '#FFFFFFFF',
+              align: (contentEl?.getAttribute('align') as 'left' | 'center' | 'right') || 'center',
+              lineHeight: 1.2,
+              letterSpacing: 0,
+              wrapWidth: hasExplicitWrap ? rawWrap : projW * 0.85,
+            };
+          })()
         : undefined,
     mediaData,
     audioData,
@@ -589,6 +593,71 @@ function parseXmlLayer(
   };
 }
 
+function resolveImportSceneSize(scene: Element): {
+  width: number;
+  height: number;
+  sizeSource: 'exportWidth/exportHeight' | 'width/height' | 'aspect';
+  roundedToEven: boolean;
+} {
+  const parsePosInt = (attr: string | null) => {
+    if (!attr) return 0;
+    const n = parseInt(attr, 10);
+    return Number.isFinite(n) && n > 0 ? n : 0;
+  };
+
+  let rawW = 0;
+  let rawH = 0;
+  let sizeSource: 'exportWidth/exportHeight' | 'width/height' | 'aspect' = 'width/height';
+
+  const expW = parsePosInt(scene.getAttribute('exportWidth'));
+  const expH = parsePosInt(scene.getAttribute('exportHeight'));
+  const attrW = parsePosInt(scene.getAttribute('width'));
+  const attrH = parsePosInt(scene.getAttribute('height'));
+
+  if (expW > 0 && expH > 0) {
+    rawW = expW;
+    rawH = expH;
+    sizeSource = 'exportWidth/exportHeight';
+  } else if (attrW > 0 && attrH > 0) {
+    rawW = attrW;
+    rawH = attrH;
+    sizeSource = 'width/height';
+  } else {
+    const aspectStr = (scene.getAttribute('aspect') || '').trim();
+    const m = aspectStr.match(/^(\d+(?:\.\d+)?)\s*[:/]\s*(\d+(?:\.\d+)?)$/);
+    if (m) {
+      const aw = parseFloat(m[1]);
+      const ah = parseFloat(m[2]);
+      if (aw > 0 && ah > 0) {
+        const base = 1080;
+        if (aw >= ah) {
+          rawH = base;
+          rawW = Math.round((base * aw) / ah);
+        } else {
+          rawW = base;
+          rawH = Math.round((base * ah) / aw);
+        }
+        sizeSource = 'aspect';
+      }
+    }
+  }
+
+  if (rawW <= 0 || rawH <= 0) {
+    throw new Error('Project size not declared in XML (missing exportWidth/exportHeight, width/height, or aspect).');
+  }
+  if (rawW < 16 || rawW > 8192 || rawH < 16 || rawH > 8192) {
+    throw new Error(`Project size ${rawW}×${rawH} is outside allowed bounds (16..8192).`);
+  }
+  const ratio = rawW / rawH;
+  if (ratio < 1 / 8 || ratio > 8) {
+    throw new Error(`Project aspect ratio ${rawW}:${rawH} is outside allowed bounds (1:8..8:1).`);
+  }
+
+  const width = rawW % 2 === 0 ? rawW : rawW + 1;
+  const height = rawH % 2 === 0 ? rawH : rawH + 1;
+  return { width, height, sizeSource, roundedToEven: width !== rawW || height !== rawH };
+}
+
 export function importProjectFromAmXml(xmlText: string, mediaMap?: AmPackageMediaMap): Project {
   const parser = new DOMParser();
   const doc = parser.parseFromString(xmlText, 'application/xml');
@@ -596,14 +665,29 @@ export function importProjectFromAmXml(xmlText: string, mediaMap?: AmPackageMedi
   if (!scene) {
     throw new Error('Invalid Alight Motion XML: missing <scene> root.');
   }
-  const width = parseInt(scene.getAttribute('width') || '1080', 10) || 1080;
-  const height = parseInt(scene.getAttribute('height') || '1080', 10) || 1080;
+  const { width, height, sizeSource, roundedToEven } = resolveImportSceneSize(scene);
   const fps = parseInt(scene.getAttribute('fps') || '30', 10) || 30;
   const durationMs = parseInt(scene.getAttribute('totalTime') || '5000', 10) || 5000;
   const bg = scene.getAttribute('bgcolor') || '#FF000000';
-  const layers = Array.from(scene.children)
-    .filter((c) => LAYER_TAGS.has(c.tagName.toLowerCase()))
-    .map((c, i) => parseXmlLayer(c, i, width, height, mediaMap));
+  const layerEls = Array.from(scene.children).filter((c) => LAYER_TAGS.has(c.tagName.toLowerCase()));
+  const layers = layerEls.map((c, i) => parseXmlLayer(c, i, width, height, mediaMap));
+
+  // Build import report metrics (no silent decisions)
+  let mediaFound = 0;
+  let mediaMissing = 0;
+  let textWrapDefaults = 0;
+  const scanReport = (list: Layer[]) => {
+    for (const l of list) {
+      if (l.type === 'image' || l.type === 'video') {
+        if (l.mediaData?.src) mediaFound++;
+        else mediaMissing++;
+      } else if (l.type === 'text' && l.textData && Math.abs(l.textData.wrapWidth - width * 0.85) < 1) {
+        textWrapDefaults++;
+      }
+      if (l.groupLayers?.length) scanReport(l.groupLayers);
+    }
+  };
+  scanReport(layers);
 
   const bookmarkSet = new Set<number>();
   for (const bmEl of Array.from(scene.querySelectorAll('bookmark, marker'))) {
@@ -628,6 +712,18 @@ export function importProjectFromAmXml(xmlText: string, mediaMap?: AmPackageMedi
     bgColor: bg === '#00000000' ? 'transparent' : bg,
     layers,
     bookmarks,
+    importReport: {
+      width,
+      height,
+      sizeSource,
+      roundedToEven,
+      fps,
+      durationMs: Math.max(1000, durationMs),
+      layerCount: layers.length,
+      mediaFound,
+      mediaMissing,
+      textWrapDefaults,
+    },
     cameraEnabled: layers.some((l) => l.type === 'camera'),
     modifiedTime: Date.now(),
   };

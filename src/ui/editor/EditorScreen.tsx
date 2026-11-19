@@ -10,6 +10,7 @@ import { LayerInspector } from './LayerInspector';
 import { Playbar } from './Playbar';
 import { PreviewCanvas } from './PreviewCanvas';
 import { ProjectSettingsDialog } from './ProjectSettingsDialog';
+import { ShortcutOverlay } from './ShortcutOverlay';
 import { Timeline } from './Timeline';
 
 declare global {
@@ -28,6 +29,7 @@ export const EditorScreen: React.FC = () => {
     selectedLayerIds,
     groupStack,
     previewQuality,
+    toastMessage,
     setCurrentTimeMs,
     setIsPlaying,
     togglePlay,
@@ -174,39 +176,160 @@ export const EditorScreen: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isPlaying, visibilityPaused, currentProject?.id]);
 
-  // Keyboard shortcuts
+  // Track C: Capture-phase global keyboard handler (suspends in inputs and open dialogs except Escape)
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
-      const tag = (e.target as HTMLElement)?.tagName;
-      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+      const target = e.target as HTMLElement | null;
+      const tag = target?.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || target?.isContentEditable) {
+        return;
+      }
 
-      if (e.code === 'Space') {
+      const store = useEditorStore.getState();
+      const proj = store.currentProject;
+      if (!proj) return;
+
+      const modalOpen =
+        store.showNewProjectDialog ||
+        store.showAddLayerPopup ||
+        store.showEffectBrowser ||
+        store.showExportDialog ||
+        store.showProjectSettings ||
+        store.showDrawer ||
+        store.showShortcutOverlay;
+
+      if (e.key === 'Escape') {
+        if (store.showShortcutOverlay) store.setShowShortcutOverlay(false);
+        else if (store.showEffectBrowser) store.setModal('showEffectBrowser', false);
+        else if (store.showAddLayerPopup) store.setModal('showAddLayerPopup', false);
+        else if (store.showExportDialog) store.setModal('showExportDialog', false);
+        else if (store.showProjectSettings) store.setModal('showProjectSettings', false);
+        else if (store.inspectorTab !== 'none') store.setInspectorTab('none');
+        return;
+      }
+      if (modalOpen) return;
+
+      const mod = e.ctrlKey || e.metaKey;
+      const key = e.key.toLowerCase();
+      const fps = proj.fps || 30;
+      const frameMs = 1000 / fps;
+
+      if (e.key === '?') {
         e.preventDefault();
-        togglePlay();
-      } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
+        store.setShowShortcutOverlay(true);
+      } else if (e.code === 'Space') {
         e.preventDefault();
-        if (e.shiftKey) redo();
-        else undo();
-      } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'y') {
+        store.togglePlay();
+      } else if (mod && key === 'z') {
         e.preventDefault();
-        redo();
+        if (e.shiftKey) {
+          store.redo();
+          store.showToast('Redo');
+        } else {
+          store.undo();
+          store.showToast('Undo');
+        }
+      } else if (mod && key === 'y') {
+        e.preventDefault();
+        store.redo();
+        store.showToast('Redo');
+      } else if (mod && key === 'd') {
+        e.preventDefault();
+        store.duplicateSelectedLayers();
+        store.showToast('Duplicated layer');
+      } else if (mod && key === 'c') {
+        e.preventDefault();
+        store.copySelectedLayers();
+        store.showToast('Copied layer');
+      } else if (mod && key === 'v') {
+        e.preventDefault();
+        store.pasteLayers();
+        store.showToast('Pasted layer');
+      } else if (mod && key === 'g') {
+        e.preventDefault();
+        if (e.shiftKey) store.ungroupSelectedLayer();
+        else store.groupSelectedLayers('none');
+      } else if (mod && e.shiftKey && key === 'e') {
+        e.preventDefault();
+        store.setModal('showExportDialog', true);
+      } else if (mod && key === 'e') {
+        e.preventDefault();
+        if (store.selectedLayerIds.length === 1) store.setModal('showEffectBrowser', true);
+      } else if (!mod && key === 'e') {
+        if (store.selectedLayerIds.length === 1) {
+          e.preventDefault();
+          store.setInspectorTab(store.inspectorTab === 'effects' ? 'menu' : 'effects');
+        }
+      } else if (!mod && key === 'g') {
+        e.preventDefault();
+        store.toggleGrid();
+      } else if (!mod && key === 'f') {
+        e.preventDefault();
+        store.setPreviewZoom(1);
+        store.setPreviewPan([0, 0]);
+      } else if (!mod && key === '0') {
+        e.preventDefault();
+        store.setPreviewZoom(1);
+        store.setPreviewPan([0, 0]);
+      } else if (!mod && (e.key === '+' || e.key === '=')) {
+        e.preventDefault();
+        store.setPreviewZoom(store.previewZoom * 1.15);
+      } else if (!mod && e.key === '-') {
+        e.preventDefault();
+        store.setPreviewZoom(store.previewZoom / 1.15);
+      } else if (!mod && e.key === ',') {
+        e.preventDefault();
+        store.setIsPlaying(false);
+        store.setCurrentTimeMs(store.currentTimeMs - frameMs * (e.shiftKey ? 10 : 1));
+      } else if (!mod && e.key === '.') {
+        e.preventDefault();
+        store.setIsPlaying(false);
+        store.setCurrentTimeMs(store.currentTimeMs + frameMs * (e.shiftKey ? 10 : 1));
+      } else if (!mod && e.key === 'Home') {
+        e.preventDefault();
+        store.setIsPlaying(false);
+        store.setCurrentTimeMs(0);
+      } else if (!mod && e.key === 'End') {
+        e.preventDefault();
+        store.setIsPlaying(false);
+        store.setCurrentTimeMs(proj.durationMs);
+      } else if (!mod && key === 'i') {
+        e.preventDefault();
+        store.trimSelectedLeft();
+      } else if (!mod && key === 'o') {
+        e.preventDefault();
+        store.trimSelectedRight();
       } else if (e.key === 'Delete' || e.key === 'Backspace') {
-        deleteSelectedLayers();
-      } else if (e.key === 'ArrowLeft') {
+        if (store.selectedLayerIds.length > 0) {
+          e.preventDefault();
+          store.deleteSelectedLayers();
+          store.showToast('Deleted layer');
+        }
+      } else if (e.key === 'ArrowLeft' || e.key === 'ArrowRight' || e.key === 'ArrowUp' || e.key === 'ArrowDown') {
         e.preventDefault();
-        const fps = currentProject?.fps || 30;
-        setIsPlaying(false);
-        setCurrentTimeMs(useEditorStore.getState().currentTimeMs - 1000 / fps);
-      } else if (e.key === 'ArrowRight') {
-        e.preventDefault();
-        const fps = currentProject?.fps || 30;
-        setIsPlaying(false);
-        setCurrentTimeMs(useEditorStore.getState().currentTimeMs + 1000 / fps);
+        if (store.selectedLayerIds.length === 1 && (e.key === 'ArrowUp' || e.key === 'ArrowDown' || e.shiftKey)) {
+          const step = e.shiftKey ? 10 : 1;
+          const dx = e.key === 'ArrowLeft' ? -step : e.key === 'ArrowRight' ? step : 0;
+          const dy = e.key === 'ArrowUp' ? -step : e.key === 'ArrowDown' ? step : 0;
+          const selId = store.selectedLayerIds[0];
+          store.mutateProject((p) => {
+            const targetLayer = p.layers.find((l) => l.id === selId);
+            if (!targetLayer) return;
+            const loc = targetLayer.transform.location.value;
+            targetLayer.transform.location.value = [loc[0] + dx, loc[1] + dy, loc[2] ?? 0];
+          });
+        } else if (e.key === 'ArrowLeft') {
+          store.setIsPlaying(false);
+          store.setCurrentTimeMs(store.currentTimeMs - frameMs);
+        } else if (e.key === 'ArrowRight') {
+          store.setIsPlaying(false);
+          store.setCurrentTimeMs(store.currentTimeMs + frameMs);
+        }
       }
     };
-    window.addEventListener('keydown', onKeyDown);
-    return () => window.removeEventListener('keydown', onKeyDown);
-  }, [togglePlay, undo, redo, deleteSelectedLayers, setIsPlaying, setCurrentTimeMs, currentProject?.fps]);
+    window.addEventListener('keydown', onKeyDown, true);
+    return () => window.removeEventListener('keydown', onKeyDown, true);
+  }, [togglePlay, undo, redo, deleteSelectedLayers, setIsPlaying, setCurrentTimeMs]);
 
   if (!currentProject) return null;
 
@@ -229,6 +352,12 @@ export const EditorScreen: React.FC = () => {
       <EffectBrowserDialog />
       <ExportDialog rendererRef={rendererRef} isExportingRef={isExportingRef} />
       <ProjectSettingsDialog />
+      <ShortcutOverlay />
+      {toastMessage && (
+        <div className="am-toast" role="status" aria-live="polite">
+          {toastMessage}
+        </div>
+      )}
     </div>
   );
 };

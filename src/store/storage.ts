@@ -1,10 +1,11 @@
-import type { Project, SavedElement } from '../types/project';
+import type { CustomEffectRecord, Project, SavedElement } from '../types/project';
 
 const DB_NAME = 'alight_motion_web_db';
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 const STORE_PROJECTS = 'projects';
 const STORE_ELEMENTS = 'elements';
 const STORE_MEDIA = 'media';
+const STORE_CUSTOM_EFFECTS = 'customEffects';
 
 function openDb(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
@@ -19,6 +20,9 @@ function openDb(): Promise<IDBDatabase> {
       }
       if (!db.objectStoreNames.contains(STORE_MEDIA)) {
         db.createObjectStore(STORE_MEDIA, { keyPath: 'id' });
+      }
+      if (!db.objectStoreNames.contains(STORE_CUSTOM_EFFECTS)) {
+        db.createObjectStore(STORE_CUSTOM_EFFECTS, { keyPath: 'uid' });
       }
     };
     req.onsuccess = () => resolve(req.result);
@@ -120,13 +124,52 @@ export async function loadMediaUrl(id: string): Promise<string | null> {
   return record?.blob ? URL.createObjectURL(record.blob) : null;
 }
 
+export async function loadAllCustomEffects(): Promise<CustomEffectRecord[]> {
+  try {
+    const db = await openDb();
+    return await new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE_CUSTOM_EFFECTS, 'readonly');
+      const req = tx.objectStore(STORE_CUSTOM_EFFECTS).getAll();
+      req.onsuccess = () => {
+        const list = (req.result as CustomEffectRecord[]) || [];
+        list.sort((a, b) => (b.created ?? 0) - (a.created ?? 0));
+        resolve(list);
+      };
+      req.onerror = () => reject(req.error);
+    });
+  } catch {
+    return [];
+  }
+}
+
+export async function saveCustomEffectToDb(rec: CustomEffectRecord): Promise<void> {
+  const db = await openDb();
+  await new Promise<void>((resolve, reject) => {
+    const tx = db.transaction(STORE_CUSTOM_EFFECTS, 'readwrite');
+    tx.objectStore(STORE_CUSTOM_EFFECTS).put(rec);
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  });
+}
+
+export async function deleteCustomEffectFromDb(uid: string): Promise<void> {
+  const db = await openDb();
+  await new Promise<void>((resolve, reject) => {
+    const tx = db.transaction(STORE_CUSTOM_EFFECTS, 'readwrite');
+    tx.objectStore(STORE_CUSTOM_EFFECTS).delete(uid);
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  });
+}
+
 export async function clearAllStorage(): Promise<void> {
   const db = await openDb();
   await new Promise<void>((resolve, reject) => {
-    const tx = db.transaction([STORE_PROJECTS, STORE_ELEMENTS, STORE_MEDIA], 'readwrite');
+    const tx = db.transaction([STORE_PROJECTS, STORE_ELEMENTS, STORE_MEDIA, STORE_CUSTOM_EFFECTS], 'readwrite');
     tx.objectStore(STORE_PROJECTS).clear();
     tx.objectStore(STORE_ELEMENTS).clear();
     tx.objectStore(STORE_MEDIA).clear();
+    tx.objectStore(STORE_CUSTOM_EFFECTS).clear();
     tx.oncomplete = () => resolve();
     tx.onerror = () => reject(tx.error);
   });

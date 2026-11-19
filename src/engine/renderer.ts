@@ -986,7 +986,11 @@ export class AlightRenderer {
       renderH = Math.max(16, Math.round(options.renderHeight));
       scale = renderW / Math.max(1, project.width);
     } else {
-      scale = options.previewScale ?? 1;
+      const q = options.previewScale ?? 1;
+      const dpr = typeof window !== 'undefined' ? Math.min(window.devicePixelRatio || 1, 2) : 1;
+      const maxDim = Math.max(project.width, project.height);
+      const effectiveScale = Math.min(q * dpr, 4096 / Math.max(1, maxDim));
+      scale = effectiveScale;
       renderW = Math.max(16, Math.round(project.width * scale));
       renderH = Math.max(16, Math.round(project.height * scale));
     }
@@ -1916,7 +1920,7 @@ export class AlightRenderer {
 
     if (u.acProjectSize) gl.uniform2f(u.acProjectSize, project.width, project.height);
     if (u.acScreenSize) gl.uniform2f(u.acScreenSize, project.width, project.height);
-    if (u.acPreviewSize) gl.uniform2f(u.acPreviewSize, renderW, renderH);
+    if (u.acPreviewSize) gl.uniform2f(u.acPreviewSize, project.width, project.height);
     if (u.acLayerScale) gl.uniform2f(u.acLayerScale, wsx, wsy);
     if (u.acLayerCenter) gl.uniform2f(u.acLayerCenter, wx, wy);
     if (u.acLayerCenterNorm) gl.uniform2f(u.acLayerCenterNorm, wx / project.width, 1.0 - wy / project.height);

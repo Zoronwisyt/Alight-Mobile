@@ -9,11 +9,31 @@ import type {
 import { animatable, parseEasingString } from './animation';
 
 let cachedEffects: EffectDef[] | null = null;
+let cachedBuiltInEffects: EffectDef[] | null = null;
+let cachedCustomEffects: EffectDef[] = [];
 let cachedEffectMap: Map<string, EffectDef> | null = null;
 let cachedPresets: Record<string, EffectPreset[]> | null = null;
 let cachedShapes: ShapeDef[] | null = null;
 let cachedShapeMap: Map<string, ShapeDef> | null = null;
 let loadPromise: Promise<void> | null = null;
+
+function rebuildEffectMap() {
+  if (!cachedBuiltInEffects) return;
+  const builtInIds = new Set(cachedBuiltInEffects.map((e) => e.id));
+  const safeCustom = cachedCustomEffects.filter((e) => !builtInIds.has(e.id));
+  cachedEffects = [...cachedBuiltInEffects, ...safeCustom];
+  cachedEffectMap = new Map();
+  for (const e of cachedEffects) cachedEffectMap.set(e.id, e);
+}
+
+export function setCustomEffects(defs: EffectDef[]): void {
+  cachedCustomEffects = defs;
+  rebuildEffectMap();
+}
+
+export function getBuiltInEffectIds(): Set<string> {
+  return new Set((cachedBuiltInEffects ?? []).map((e) => e.id));
+}
 
 export async function ensureCatalogLoaded(): Promise<void> {
   if (cachedEffects && cachedPresets && cachedShapes) return;
@@ -25,12 +45,11 @@ export async function ensureCatalogLoaded(): Promise<void> {
         fetch(`${base}am/presets.json`),
         fetch(`${base}am/shapes.json`),
       ]);
-      cachedEffects = (await effRes.json()) as EffectDef[];
+      cachedBuiltInEffects = (await effRes.json()) as EffectDef[];
       cachedPresets = (await preRes.json()) as Record<string, EffectPreset[]>;
       cachedShapes = (await shpRes.json()) as ShapeDef[];
 
-      cachedEffectMap = new Map();
-      for (const e of cachedEffects) cachedEffectMap.set(e.id, e);
+      rebuildEffectMap();
 
       cachedShapeMap = new Map();
       for (const s of cachedShapes) cachedShapeMap.set(s.id, s);

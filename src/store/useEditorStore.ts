@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import type {
   Animatable,
   BlendModeId,
+  CustomEffectRecord,
   EasingSpec,
   Layer,
   LayerEffectInstance,
@@ -9,13 +10,17 @@ import type {
   SavedElement,
 } from '../types/project';
 import { animatable, evalAnimatable } from '../engine/animation';
+import { setCustomEffects } from '../engine/catalog';
 import { createDefaultDemoProjects, makeBaseLayer } from './demoProjects';
 import {
   clearAllStorage,
+  deleteCustomEffectFromDb,
   deleteElementFromDb,
   deleteProjectFromDb,
+  loadAllCustomEffects,
   loadAllElements,
   loadAllProjects,
+  saveCustomEffectToDb,
   saveElementToDb,
   saveProjectToDb,
 } from './storage';
@@ -53,8 +58,13 @@ interface EditorState {
   homeTab: HomeTab;
   theme: 'navy' | 'desat';
   layoutMode: 'classic' | 'widescreen';
+  density: 'compact' | 'comfortable';
+  uiScale: number;
+  toastMessage: string | null;
+  showShortcutOverlay: boolean;
   projects: Project[];
   elements: SavedElement[];
+  customEffects: CustomEffectRecord[];
   activeProjectId: string | null;
   currentProject: Project | null;
 
@@ -106,6 +116,13 @@ interface EditorState {
   setHomeTab: (tab: HomeTab) => void;
   setTheme: (t: 'navy' | 'desat') => void;
   setLayoutMode: (m: 'classic' | 'widescreen') => void;
+  setDensity: (d: 'compact' | 'comfortable') => void;
+  setUiScale: (s: number) => void;
+  showToast: (msg: string) => void;
+  setShowShortcutOverlay: (open: boolean) => void;
+  addCustomEffect: (rec: CustomEffectRecord, replaceUid?: string) => Promise<void>;
+  deleteCustomEffect: (uid: string) => Promise<void>;
+  toggleCustomEffect: (uid: string) => Promise<void>;
   openProject: (id: string) => void;
   createProject: (opts: { title: string; width: number; height: number; fps: number; bgColor: string; durationMs?: number }) => void;
   importProject: (project: Project) => void;
@@ -238,13 +255,48 @@ function scheduleSave(proj: Project) {
   }, 350);
 }
 
+let toastTimer: number | null = null;
+
+function applyDensityTokens(density: 'compact' | 'comfortable', uiScale: number) {
+  if (typeof document === 'undefined') return;
+  document.documentElement.setAttribute('data-density', density);
+  document.documentElement.style.setProperty('--am-ui-scale', String(uiScale));
+}
+
+function defaultDensityForViewport(): { density: 'compact' | 'comfortable'; uiScale: number } {
+  if (typeof window === 'undefined') return { density: 'compact', uiScale: 1 };
+  try {
+    const saved = localStorage.getItem('am.layout.v1');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if ((parsed.density === 'compact' || parsed.density === 'comfortable') && typeof parsed.uiScale === 'number') {
+        return { density: parsed.density, uiScale: Math.max(0.8, Math.min(1.25, parsed.uiScale)) };
+      }
+    }
+  } catch {
+    // ignore
+  }
+  const w = window.innerWidth;
+  if (w < 768) return { density: 'comfortable', uiScale: 1 };
+  if (w < 1280) return { density: 'compact', uiScale: 1 };
+  if (w < 1920) return { density: 'compact', uiScale: 1.1 };
+  return { density: 'compact', uiScale: 1.15 };
+}
+
+const initialLayout = defaultDensityForViewport();
+
 export const useEditorStore = create<EditorState>((set, get) => ({
   screen: 'home',
   homeTab: 'home',
   theme: 'navy',
   layoutMode: typeof window !== 'undefined' && window.innerWidth >= 1024 ? 'widescreen' : 'classic',
+  density: initialLayout.density,
+  uiScale: initialLayout.uiScale,
+  toastMessage: null,
+  showShortcutOverlay: false,
   projects: [],
   elements: [],
+  customEffects: [],
   activeProjectId: null,
   currentProject: null,
   groupStack: [],
@@ -278,13 +330,17 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   drawingBrushOpacity: 1,
 
   initApp: async () => {
+    const s = get();
+    applyDensityTokens(s.density, s.uiScale);
     let projects = await loadAllProjects();
     if (projects.length === 0) {
       projects = createDefaultDemoProjects();
       for (const p of projects) await saveProjectToDb(p);
     }
     const elements = await loadAllElements();
-    set({ projects, elements });
+    const customEffects = await loadAllCustomEffects();
+    setCustomEffects(customEffects.filter((c) => c.enabled).map((c) => c.def));
+    set({ projects, elements, customEffects });
   },
 
   setHomeTab: (homeTab) => set({ homeTab }),
@@ -295,6 +351,60 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     set({ theme });
   },
   setLayoutMode: (layoutMode) => set({ layoutMode }),
+  setDensity: (density) => {
+    const uiScale = get().uiScale;
+    applyDensityTokens(density, uiScale);
+    try {
+      localStorage.setItem('am.layout.v1', JSON.stringify({ density, uiScale }));
+    } catch {
+      // ignore
+    }
+    set({ density });
+  },
+  setUiScale: (rawScale) => {
+    const uiScale = Math.max(0.8, Math.min(1.25, Math.round(rawScale * 100) / 100));
+    const density = get().density;
+    applyDensityTokens(density, uiScale);
+    try {
+      localStorage.setItem('am.layout.v1', JSON.stringify({ density, uiScale }));
+    } catch {
+      // ignore
+    }
+    set({ uiScale });
+  },
+  showToast: (msg) => {
+    if (toastTimer) window.clearTimeout(toastTimer);
+    set({ toastMessage: msg });
+    toastTimer = window.setTimeout(() => {
+      set({ toastMessage: null });
+      toastTimer = null;
+    }, 1800);
+  },
+  setShowShortcutOverlay: (showShortcutOverlay) => set({ showShortcutOverlay }),
+  addCustomEffect: async (rec, replaceUid) => {
+    if (replaceUid) {
+      await deleteCustomEffectFromDb(replaceUid);
+    }
+    await saveCustomEffectToDb(rec);
+    const next = [rec, ...get().customEffects.filter((c) => c.uid !== replaceUid && c.uid !== rec.uid)];
+    setCustomEffects(next.filter((c) => c.enabled).map((c) => c.def));
+    set({ customEffects: next });
+    get().showToast(`Imported custom effect: ${rec.name}`);
+  },
+  deleteCustomEffect: async (uid) => {
+    await deleteCustomEffectFromDb(uid);
+    const next = get().customEffects.filter((c) => c.uid !== uid);
+    setCustomEffects(next.filter((c) => c.enabled).map((c) => c.def));
+    set({ customEffects: next });
+    get().showToast('Removed custom effect');
+  },
+  toggleCustomEffect: async (uid) => {
+    const next = get().customEffects.map((c) => (c.uid === uid ? { ...c, enabled: !c.enabled } : c));
+    const target = next.find((c) => c.uid === uid);
+    if (target) await saveCustomEffectToDb(target);
+    setCustomEffects(next.filter((c) => c.enabled).map((c) => c.def));
+    set({ customEffects: next });
+  },
 
   openProject: (id) => {
     const p = get().projects.find((x) => x.id === id);
@@ -350,6 +460,17 @@ export const useEditorStore = create<EditorState>((set, get) => ({
 
   importProject: (proj) => {
     saveProjectToDb(proj).catch(() => {});
+    const rep = proj.importReport;
+    if (rep) {
+      const notes = [
+        `${rep.width}×${rep.height} (${rep.sizeSource})`,
+        `${rep.fps}fps`,
+        `${rep.layerCount} layers`,
+        rep.mediaMissing > 0 ? `${rep.mediaMissing} missing media` : null,
+        rep.roundedToEven ? 'even-rounded' : null,
+      ].filter(Boolean);
+      get().showToast(`Imported: ${notes.join(' · ')}`);
+    }
     set((s) => ({
       projects: [proj, ...s.projects],
       screen: 'editor',
