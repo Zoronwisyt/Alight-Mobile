@@ -326,6 +326,8 @@ export interface EffectDef {
   overdraw: boolean;
   maxOverdraw: number;
   autoTransform: boolean;
+  compat?: string | null;
+  afxver?: string | null;
   affinity: string;
   type: string;
   params: EffectParamDef[];

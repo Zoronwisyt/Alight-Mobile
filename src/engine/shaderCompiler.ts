@@ -122,6 +122,12 @@ function paramUniformDecl(p: EffectParamDef): string {
 }
 
 export function buildVertexSource(effect: EffectDef, customVert?: EffectShaderDef | null): string {
+  if (effect.compat && effect.compat !== 'acScreenNorm-y') {
+    console.warn(`[shaderCompiler] Unknown compat mode "${effect.compat}" on ${effect.id}`);
+  }
+  // Note: compat="acScreenNorm-y" (colorbalance, mattefringe, ominoglass, chromaticzoomblur)
+  // already matches our bottom-up WebGL2 acScreenNorm / acVtoRSpace / acLayerToScreen pairing;
+  // flipping acScreenNorm.y alone would invert texture2DCv() sampling upside-down.
   const paramIds = new Set(effect.params.map((p) => p.id).filter(Boolean) as string[]);
   const texIds = effect.params.filter((p) => p.tag === 'texture' && p.id).map((p) => p.id!);
   const paramUniforms = effect.params.map(paramUniformDecl).filter(Boolean).join('\n');

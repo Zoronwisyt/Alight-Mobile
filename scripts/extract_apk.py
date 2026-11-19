@@ -481,6 +481,8 @@ def extract_effects(arsc_strings: dict[str, str], thumb_files: set[str]) -> list
                 "overdraw": attrs.get("overdraw") == "true",
                 "maxOverdraw": float(attrs.get("max-overdraw") or attrs.get("maxOverdraw") or 0),
                 "autoTransform": attrs.get("auto-transform") == "true",
+                "compat": attrs.get("compat") or None,
+                "afxver": attrs.get("afxver") or None,
                 "affinity": attrs.get("affinity", ""),
                 "type": attrs.get("type", ""),
                 "params": params,
