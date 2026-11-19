@@ -154,6 +154,8 @@ export interface MediaData {
   src: string;
   naturalWidth: number;
   naturalHeight: number;
+  displayWidth?: number;
+  displayHeight?: number;
   durationMs?: number;
   trimStartMs?: number;
   playbackSpeed?: number;
@@ -205,6 +207,7 @@ export interface Layer {
   // Type-specific payloads
   shapeId?: string;
   shapeParams?: Record<string, Animatable<any>>;
+  svgPathD?: string;
   vectorPath?: {
     points: VectorPoint[];
     closed: boolean;
@@ -215,6 +218,8 @@ export interface Layer {
   audioData?: AudioData;
   cameraData?: CameraData;
   groupLayers?: Layer[];
+  groupWidth?: number;
+  groupHeight?: number;
   groupMaskMode?: 'none' | 'mask' | 'exclude';
 }
 

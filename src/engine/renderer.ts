@@ -12,6 +12,7 @@ import {
   evalAnimatable,
   evalLayerVelocities,
   evalRemappedTime,
+  integrateAnimatable,
   parseColorArgb,
 } from './animation';
 import { getEffectById, getEffects, getShapeById, parseDefaultParamValue } from './catalog';
@@ -203,6 +204,70 @@ function makeTransformMatrices(
   return { screenToLayer, layerToScreen };
 }
 
+function quatToMat4(q: [number, number, number, number], invert = false): Float32Array {
+  let x = Number(q[0]) || 0;
+  let y = Number(q[1]) || 0;
+  let z = Number(q[2]) || 0;
+  let w = Number(q[3]);
+  if (!Number.isFinite(w)) w = 1;
+  const len = Math.hypot(x, y, z, w);
+  if (len > 1e-8) {
+    x /= len;
+    y /= len;
+    z /= len;
+    w /= len;
+  } else {
+    x = 0; y = 0; z = 0; w = 1;
+  }
+
+  // Row-vector rotation matrix matching Alight Motion's `vec4(p, 1.0) * orient`
+  const xx = x * x, yy = y * y, zz = z * z;
+  const xy = x * y, xz = x * z, yz = y * z;
+  const wx = w * x, wy = w * y, wz = w * z;
+
+  const m00 = 1 - 2 * (yy + zz);
+  const m01 = 2 * (xy - wz);
+  const m02 = 2 * (xz + wy);
+
+  const m10 = 2 * (xy + wz);
+  const m11 = 1 - 2 * (xx + zz);
+  const m12 = 2 * (yz - wx);
+
+  const m20 = 2 * (xz - wy);
+  const m21 = 2 * (yz + wx);
+  const m22 = 1 - 2 * (xx + yy);
+
+  if (invert) {
+    return new Float32Array([
+      m00, m10, m20, 0,
+      m01, m11, m21, 0,
+      m02, m12, m22, 0,
+      0,   0,   0,   1,
+    ]);
+  }
+  return new Float32Array([
+    m00, m01, m02, 0,
+    m10, m11, m12, 0,
+    m20, m21, m22, 0,
+    0,   0,   0,   1,
+  ]);
+}
+
+function measureSvgPathBounds(d: string): { w: number; h: number } {
+  const nums = d.match(/-?\d*\.?\d+(?:e[-+]?\d+)?/gi);
+  let maxX = 120;
+  let maxY = 120;
+  if (nums) {
+    for (let i = 0; i + 1 < nums.length; i += 2) {
+      const x = Math.abs(parseFloat(nums[i]));
+      const y = Math.abs(parseFloat(nums[i + 1]));
+      if (Number.isFinite(x)) maxX = Math.max(maxX, x * 2);
+      if (Number.isFinite(y)) maxY = Math.max(maxY, y * 2);
+    }
+  }
+  return { w: Math.min(4096, Math.max(64, maxX)), h: Math.min(4096, Math.max(64, maxY)) };
+}
+
 function orientEulerToMat4(eulerDeg: [number, number, number], invert = false): Float32Array {
   const rx = (eulerDeg[0] * Math.PI) / 180;
   const ry = (eulerDeg[1] * Math.PI) / 180;
@@ -334,6 +399,7 @@ export class AlightRenderer {
   private resourceTextures = new Map<string, { tex: WebGLTexture; w: number; h: number }>();
   private mediaImages = new Map<string, ImageMediaEntry>();
   private mediaVideos = new Map<string, VideoMediaEntry>();
+  private svgPathCache = new Map<string, { path: Path2D; w: number; h: number }>();
   private tempUploadTex: WebGLTexture;
   private dummyBlackTex: WebGLTexture;
   private isPlaybackActive = false;
@@ -958,7 +1024,7 @@ export class AlightRenderer {
     const vels = evalLayerVelocities(layer, sceneTimeMs, fps);
     const durSec = Math.max(0.001, (layer.endTime - layer.startTime) / 1000);
     const env: EffectScriptEnv = {
-      time: Math.max(0, localTimeMs) / 1000,
+      time: remappedNormT,
       absTime: sceneTimeMs / 1000,
       duration: durSec,
       inTime: layer.startTime / 1000,
@@ -975,11 +1041,7 @@ export class AlightRenderer {
       if (!effInst.enabled) continue;
       const def = getEffectById(effInst.effectId);
       if (!def || !def.script || !def.autoTransform) continue;
-      const paramsEval: Record<string, any> = {};
-      for (const pd of def.params) {
-        if (!pd.id) continue;
-        paramsEval[pd.id] = evalAnimatable(effInst.params[pd.id], remappedNormT, parseDefaultParamValue(pd));
-      }
+      const paramsEval = this.evalEffectParams(def, effInst, remappedNormT, durSec);
       const el: EffectScriptElement = {
         alpha: alphaMul,
         shaderGroups: null,
@@ -1108,17 +1170,40 @@ export class AlightRenderer {
     let logicalH = 300;
 
     if (layer.type === 'group') {
-      // Render group children into a dedicated group FBO centered at proj center, then transform
-      const grpFbo = this.acquireFbo(renderW, renderH);
-      this.clearFbo(grpFbo, renderW, renderH, 0, 0, 0, 0);
+      // Render group children in the nested embedScene's own coordinate space, then transform
+      const grpW = layer.groupWidth || project.width;
+      const grpH = layer.groupHeight || project.height;
+      const grpRenderW = Math.max(16, Math.round(grpW * scale));
+      const grpRenderH = Math.max(16, Math.round(grpH * scale));
+      const grpFbo = this.acquireFbo(grpRenderW, grpRenderH);
+      this.clearFbo(grpFbo, grpRenderW, grpRenderH, 0, 0, 0, 0);
       if (layer.groupLayers && layer.groupLayers.length > 0) {
-        this.renderLayerList(project, layer.groupLayers, localTimeMs, grpFbo, renderW, renderH, scale, []);
+        const subProj = grpW === project.width && grpH === project.height
+          ? project
+          : { ...project, width: grpW, height: grpH };
+        this.renderLayerList(subProj, layer.groupLayers, localTimeMs, grpFbo, grpRenderW, grpRenderH, scale, []);
       }
-      // Blit group FBO into contentFbo (transformed using simple affine shader or 2D draw)
-      this.blitTransformedFbo(grpFbo.tex, contentFbo, renderW, renderH, wx * scale, wy * scale, project.width * scale, project.height * scale, tf.rotation, wsx, wsy);
+      this.blitTransformedFbo(
+        grpFbo.tex,
+        contentFbo,
+        renderW,
+        renderH,
+        wx * scale,
+        wy * scale,
+        grpW * scale,
+        grpH * scale,
+        tf.rotation,
+        wsx,
+        wsy,
+        false,
+        tf.px * scale,
+        tf.py * scale,
+        tf.skewX,
+        tf.skewY
+      );
       this.releaseFbo(grpFbo);
-      logicalW = project.width;
-      logicalH = project.height;
+      logicalW = grpW;
+      logicalH = grpH;
     } else if (layer.type === 'image' || layer.type === 'video') {
       const md = layer.mediaData;
       if (md?.src) {
@@ -1131,8 +1216,22 @@ export class AlightRenderer {
           md.playbackSpeed ?? 1
         );
         if (uploaded) {
-          logicalW = uploaded.w || md.naturalWidth || 512;
-          logicalH = uploaded.h || md.naturalHeight || 512;
+          const srcW = uploaded.w || md.naturalWidth || 512;
+          const srcH = uploaded.h || md.naturalHeight || 512;
+          logicalW = md.displayWidth || srcW;
+          logicalH = md.displayHeight || srcH;
+          // Aspect-fill (cover) UV scale matching Alight Motion's <shape fillType="media">
+          const srcAspect = srcW / Math.max(1, srcH);
+          const boxAspect = logicalW / Math.max(1, logicalH);
+          let coverScaleX = 1;
+          let coverScaleY = 1;
+          if (Math.abs(srcAspect - boxAspect) > 0.002) {
+            if (srcAspect > boxAspect) {
+              coverScaleX = boxAspect / srcAspect;
+            } else {
+              coverScaleY = srcAspect / boxAspect;
+            }
+          }
           this.blitTransformedFbo(
             uploaded.tex,
             contentFbo,
@@ -1145,7 +1244,13 @@ export class AlightRenderer {
             tf.rotation,
             wsx,
             wsy,
-            layer.type === 'video'
+            layer.type === 'video',
+            tf.px * scale,
+            tf.py * scale,
+            tf.skewX,
+            tf.skewY,
+            coverScaleX,
+            coverScaleY
           );
         }
       }
@@ -1167,10 +1272,17 @@ export class AlightRenderer {
 
     // Step 2: Run GPU Shader / Script Effect Stack
     let currentSlot = contentFbo;
-    const vels = evalLayerVelocities(layer, sceneTimeMs, project.fps);
+    const dtMs = 1000 / Math.max(1, project.fps);
+    const tfPrev = this.resolveWorldTransform(layer, layersMap, sceneTimeMs - dtMs * 0.5, project.fps);
+    const tfNext = this.resolveWorldTransform(layer, layersMap, sceneTimeMs + dtMs * 0.5, project.fps);
+    const vels = {
+      velocity: [tfNext.x - tfPrev.x, tfNext.y - tfPrev.y] as [number, number],
+      angularVelocity: tfNext.rotation - tfPrev.rotation,
+      scaleVelocity: Math.hypot((tfNext.sx - tfPrev.sx) * logicalW, (tfNext.sy - tfPrev.sy) * logicalH),
+    };
     const durSec = Math.max(0.001, (layer.endTime - layer.startTime) / 1000);
     const envBase: EffectScriptEnv = {
-      time: Math.max(0, localTimeMs) / 1000,
+      time: remappedNormT,
       absTime: sceneTimeMs / 1000,
       duration: durSec,
       inTime: layer.startTime / 1000,
@@ -1207,7 +1319,7 @@ export class AlightRenderer {
       if (!def || def.autoTransform || def.shaders.length === 0) {
         // Check non-autoTransform script-only opacity effects (like fade)
         if (def?.script && def.shaders.length === 0) {
-          const paramsEval = this.evalEffectParams(def, effInst, remappedNormT);
+          const paramsEval = this.evalEffectParams(def, effInst, remappedNormT, durSec);
           const out = runEffectScript(
             def,
             envBase,
@@ -1224,7 +1336,7 @@ export class AlightRenderer {
         continue;
       }
 
-      const paramsEval = this.evalEffectParams(def, effInst, remappedNormT);
+      const paramsEval = this.evalEffectParams(def, effInst, remappedNormT, durSec);
       let groupsToRun: (string | null)[] = [null];
       if (def.script) {
         const out = runEffectScript(
@@ -1373,14 +1485,21 @@ export class AlightRenderer {
     this.releaseFbo(currentSlot);
   }
 
-  private evalEffectParams(def: EffectDef, inst: LayerEffectInstance, normT: number): Record<string, any> {
+  private evalEffectParams(def: EffectDef, inst: LayerEffectInstance, normT: number, durSec = 1): Record<string, any> {
     const out: Record<string, any> = {};
     for (const pd of def.params) {
       if (!pd.id) continue;
       if (pd.tag === 'float' && pd.value !== undefined) {
         out[pd.id] = parseFloat(pd.value) || 0;
       } else if (pd.tag !== 'texture' && pd.tag !== 'section' && pd.tag !== 'tip') {
-        out[pd.id] = evalAnimatable(inst.params[pd.id], normT, parseDefaultParamValue(pd));
+        const defVal = parseDefaultParamValue(pd);
+        if (pd.type === 'hz') {
+          out[pd.id] = integrateAnimatable(inst.params[pd.id], normT, durSec, Number(defVal) || 0, 1);
+        } else if (pd.type === 'rpm') {
+          out[pd.id] = integrateAnimatable(inst.params[pd.id], normT, durSec, Number(defVal) || 0, 6);
+        } else {
+          out[pd.id] = evalAnimatable(inst.params[pd.id], normT, defVal);
+        }
       }
     }
     return out;
@@ -1562,8 +1681,14 @@ export class AlightRenderer {
               const [r, g, b, a] = parseColorArgb(String(val || '#FFFFFFFF'));
               gl.uniform4f(loc, r, g, b, a);
             } else if (pd.tag === 'orient') {
-              const v = Array.isArray(val) ? (val as [number, number, number]) : ([0, 0, 0] as [number, number, number]);
-              gl.uniformMatrix4fv(loc, false, orientEulerToMat4(v, pd.invert === 'true'));
+              const inv = pd.invert === 'true';
+              if (Array.isArray(val) && val.length === 4) {
+                gl.uniformMatrix4fv(loc, false, quatToMat4(val as [number, number, number, number], inv));
+              } else if (Array.isArray(val) && val.length === 3) {
+                gl.uniformMatrix4fv(loc, false, orientEulerToMat4(val as [number, number, number], inv));
+              } else {
+                gl.uniformMatrix4fv(loc, false, quatToMat4([0, 0, 0, 1], inv));
+              }
             } else if (pd.tag === 'selector') {
               gl.uniform1i(loc, Math.round(Number(val) || 0));
             } else if (pd.tag === 'switch') {
@@ -1614,7 +1739,7 @@ export class AlightRenderer {
     const id3 = new Float32Array([1, 0, 0, 0, 1, 0, 0, 0, 1]);
 
     if (u.acProjectSize) gl.uniform2f(u.acProjectSize, project.width, project.height);
-    if (u.acScreenSize) gl.uniform2f(u.acScreenSize, renderW, renderH);
+    if (u.acScreenSize) gl.uniform2f(u.acScreenSize, project.width, project.height);
     if (u.acPreviewSize) gl.uniform2f(u.acPreviewSize, renderW, renderH);
     if (u.acLayerScale) gl.uniform2f(u.acLayerScale, wsx, wsy);
     if (u.acLayerCenter) gl.uniform2f(u.acLayerCenter, wx, wy);
@@ -1650,10 +1775,14 @@ export class AlightRenderer {
     rotDeg: number,
     sx: number,
     sy: number,
-    flipY = false
+    flipY = false,
+    pivotX = 0,
+    pivotY = 0,
+    skewX = 0,
+    skewY = 0,
+    coverScaleX = 1,
+    coverScaleY = 1
   ) {
-    // Draw transformed image texture via Canvas2D helper or quad shader:
-    // Using a cached transform-blit GLSL shader avoids reading back textures from GPU!
     const key = '__internal_tf_blit';
     let prog = (this as any)._tfBlitProg as ReturnType<ShaderRegistry['compileRaw']> | undefined;
     if (!prog) {
@@ -1675,19 +1804,21 @@ export class AlightRenderer {
         uniform sampler2D uTex;
         uniform mat4 uScreenToLayer;
         uniform int uFlipY;
+        uniform vec2 uCoverScale;
         void main() {
           vec2 luv = (vec4(vUv, 0.0, 1.0) * uScreenToLayer).xy;
           if (luv.x < 0.0 || luv.x > 1.0 || luv.y < 0.0 || luv.y > 1.0) {
             fragColor = vec4(0.0);
           } else {
-            vec2 sampleUv = uFlipY == 1 ? vec2(luv.x, 1.0 - luv.y) : luv;
+            vec2 cuv = (luv - 0.5) * uCoverScale + 0.5;
+            vec2 sampleUv = uFlipY == 1 ? vec2(cuv.x, 1.0 - cuv.y) : cuv;
             fragColor = texture(uTex, sampleUv);
           }
         }`
       );
       (this as any)._tfBlitProg = prog;
     }
-    const { screenToLayer } = makeTransformMatrices(renderW, renderH, cx, cy, w, h, rotDeg, sx, sy, 0, 0, 0, 0);
+    const { screenToLayer } = makeTransformMatrices(renderW, renderH, cx, cy, w, h, rotDeg, sx, sy, pivotX, pivotY, skewX, skewY);
     const gl = this.gl;
     gl.bindFramebuffer(gl.FRAMEBUFFER, dst.fbo);
     gl.viewport(0, 0, renderW, renderH);
@@ -1698,6 +1829,7 @@ export class AlightRenderer {
     gl.uniform1i(prog.uniforms.uTex, 0);
     gl.uniformMatrix4fv(prog.uniforms.uScreenToLayer, false, screenToLayer);
     if (prog.uniforms.uFlipY) gl.uniform1i(prog.uniforms.uFlipY, flipY ? 1 : 0);
+    if (prog.uniforms.uCoverScale) gl.uniform2f(prog.uniforms.uCoverScale, coverScaleX, coverScaleY);
     this.drawQuad(prog.program);
     this.unbindTextureUnits(2);
   }
@@ -1824,10 +1956,21 @@ export class AlightRenderer {
 
     // Precompute shape path or bounds
     let shapePts: any[] | null = null;
+    let svgPathEntry: { path: Path2D; w: number; h: number } | null = null;
     let logicalW = 300;
     let logicalH = 300;
 
-    if (layer.type === 'shape' && layer.shapeId) {
+    if (layer.type === 'shape' && layer.svgPathD) {
+      let cached = this.svgPathCache.get(layer.svgPathD);
+      if (!cached) {
+        const b = measureSvgPathBounds(layer.svgPathD);
+        cached = { path: new Path2D(layer.svgPathD), w: b.w, h: b.h };
+        this.svgPathCache.set(layer.svgPathD, cached);
+      }
+      svgPathEntry = cached;
+      logicalW = cached.w;
+      logicalH = cached.h;
+    } else if (layer.type === 'shape' && layer.shapeId) {
       const shapeDef: ShapeDef | undefined = getShapeById(layer.shapeId);
       if (shapeDef) {
         const sp: Record<string, any> = {};
@@ -1840,6 +1983,18 @@ export class AlightRenderer {
         logicalW = b.w;
         logicalH = b.h;
       }
+    } else if (layer.type === 'freehand' && layer.freehandStrokes) {
+      let maxX = 120;
+      let maxY = 120;
+      for (const st of layer.freehandStrokes) {
+        const pad = st.width * 0.5;
+        for (const pt of st.points) {
+          maxX = Math.max(maxX, (Math.abs(pt.x) + pad) * 2);
+          maxY = Math.max(maxY, (Math.abs(pt.y) + pad) * 2);
+        }
+      }
+      logicalW = Math.min(4096, Math.max(64, maxX));
+      logicalH = Math.min(4096, Math.max(64, maxY));
     } else if (layer.type === 'text' && layer.textData) {
       logicalW = Math.max(200, layer.textData.wrapWidth || 800);
       logicalH = Math.max(120, layer.textData.fontSize * 3);
@@ -1872,7 +2027,9 @@ export class AlightRenderer {
         ctx.shadowOffsetY = evalAnimatable(layer.shadow.offsetY, normT, 8) * scale;
       }
 
-      if (layer.type === 'shape' && shapePts) {
+      if (layer.type === 'shape' && svgPathEntry) {
+        this.fillAndStrokeCurrentPath(ctx, layer, normT, logicalW, logicalH, svgPathEntry.path);
+      } else if (layer.type === 'shape' && shapePts) {
         buildCanvasPath(ctx, shapePts);
         this.fillAndStrokeCurrentPath(ctx, layer, normT, logicalW, logicalH);
       } else if (layer.type === 'vector' && layer.vectorPath) {
@@ -1929,12 +2086,14 @@ export class AlightRenderer {
     layer: Layer,
     normT: number,
     w: number,
-    h: number
+    h: number,
+    path2d?: Path2D
   ) {
     if (layer.fill.type === 'solid') {
       const [r, g, b, a] = parseColorArgb(evalAnimatable(layer.fill.color, normT, '#FF00FFA8'));
       ctx.fillStyle = `rgba(${Math.round(r * 255)}, ${Math.round(g * 255)}, ${Math.round(b * 255)}, ${a.toFixed(3)})`;
-      ctx.fill();
+      if (path2d) ctx.fill(path2d);
+      else ctx.fill();
     } else if (layer.fill.type === 'gradient') {
       const [sx, sy] = layer.fill.gradientStart;
       const [ex, ey] = layer.fill.gradientEnd;
@@ -1953,7 +2112,8 @@ export class AlightRenderer {
         grad.addColorStop(clamp01(st.offset), `rgba(${Math.round(r * 255)}, ${Math.round(g * 255)}, ${Math.round(b * 255)}, ${a.toFixed(3)})`);
       }
       ctx.fillStyle = grad;
-      ctx.fill();
+      if (path2d) ctx.fill(path2d);
+      else ctx.fill();
     }
 
     // Stroke (check Stroke Color + Drawing Progress effects!)
@@ -1981,7 +2141,8 @@ export class AlightRenderer {
       } else {
         ctx.setLineDash([]);
       }
-      ctx.stroke();
+      if (path2d) ctx.stroke(path2d);
+      else ctx.stroke();
       ctx.setLineDash([]);
     }
   }

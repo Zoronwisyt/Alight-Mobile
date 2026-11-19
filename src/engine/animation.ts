@@ -118,11 +118,65 @@ export function argbHexToCss(hex: string): string {
   return `rgba(${Math.round(r * 255)}, ${Math.round(g * 255)}, ${Math.round(b * 255)}, ${a.toFixed(3)})`;
 }
 
+export function slerpQuat(
+  a: [number, number, number, number],
+  b: [number, number, number, number],
+  t: number
+): [number, number, number, number] {
+  let ax = a[0], ay = a[1], az = a[2], aw = a[3];
+  let bx = b[0], by = b[1], bz = b[2], bw = b[3];
+
+  const aLen = Math.hypot(ax, ay, az, aw);
+  if (aLen > 1e-8) { ax /= aLen; ay /= aLen; az /= aLen; aw /= aLen; }
+  const bLen = Math.hypot(bx, by, bz, bw);
+  if (bLen > 1e-8) { bx /= bLen; by /= bLen; bz /= bLen; bw /= bLen; }
+
+  let dot = ax * bx + ay * by + az * bz + aw * bw;
+  if (dot < 0) {
+    dot = -dot;
+    bx = -bx; by = -by; bz = -bz; bw = -bw;
+  }
+
+  let rx: number, ry: number, rz: number, rw: number;
+  if (dot > 0.9995) {
+    rx = ax + (bx - ax) * t;
+    ry = ay + (by - ay) * t;
+    rz = az + (bz - az) * t;
+    rw = aw + (bw - aw) * t;
+  } else {
+    const theta0 = Math.acos(Math.min(1, Math.max(-1, dot)));
+    const sinTheta0 = Math.sin(theta0);
+    const theta = theta0 * t;
+    const sinTheta = Math.sin(theta);
+    const s0 = Math.cos(theta) - (dot * sinTheta) / sinTheta0;
+    const s1 = sinTheta / sinTheta0;
+    rx = s0 * ax + s1 * bx;
+    ry = s0 * ay + s1 * by;
+    rz = s0 * az + s1 * bz;
+    rw = s0 * aw + s1 * bw;
+  }
+
+  const rLen = Math.hypot(rx, ry, rz, rw) || 1;
+  return [rx / rLen, ry / rLen, rz / rLen, rw / rLen];
+}
+
 export function interpolateValue<T>(a: T, b: T, alpha: number): T {
   if (typeof a === 'number' && typeof b === 'number') {
     return (a + (b - a) * alpha) as unknown as T;
   }
   if (Array.isArray(a) && Array.isArray(b)) {
+    if (
+      a.length === 4 &&
+      b.length === 4 &&
+      typeof a[0] === 'number' &&
+      typeof b[0] === 'number'
+    ) {
+      return slerpQuat(
+        a as unknown as [number, number, number, number],
+        b as unknown as [number, number, number, number],
+        alpha
+      ) as unknown as T;
+    }
     return a.map((v, i) => (typeof v === 'number' && typeof b[i] === 'number' ? v + (b[i] - v) * alpha : v)) as unknown as T;
   }
   if (typeof a === 'string' && typeof b === 'string' && a.startsWith('#') && b.startsWith('#')) {
@@ -136,6 +190,34 @@ export function interpolateValue<T>(a: T, b: T, alpha: number): T {
     ) as unknown as T;
   }
   return (alpha < 0.5 ? a : b);
+}
+
+/**
+ * Integrates a rate parameter (e.g. type="hz" cycles/sec or type="rpm" * 6 deg/sec)
+ * over [0, normT * durSec] to match Alight Motion's native integrated frequency/RPM channels.
+ */
+export function integrateAnimatable(
+  prop: Animatable<number> | undefined,
+  normT: number,
+  durSec: number,
+  fallback = 0,
+  scaleFactor = 1
+): number {
+  const t = clamp01(normT);
+  if (t <= 0 || durSec <= 0) return 0;
+  if (!prop || !prop.keyframes || prop.keyframes.length <= 1) {
+    const v = prop?.keyframes?.length === 1 ? Number(prop.keyframes[0].v) : Number(prop?.value ?? fallback);
+    return (Number.isFinite(v) ? v : fallback) * scaleFactor * t * durSec;
+  }
+  const steps = 32;
+  const du = t / steps;
+  let sum = 0;
+  for (let i = 0; i < steps; i++) {
+    const u = (i + 0.5) * du;
+    const v = Number(evalAnimatable(prop, u, fallback));
+    sum += Number.isFinite(v) ? v : fallback;
+  }
+  return sum * du * durSec * scaleFactor;
 }
 
 export function evalAnimatable<T>(prop: Animatable<T> | undefined, normT: number, fallback?: T): T {

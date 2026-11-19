@@ -1,5 +1,11 @@
 import React, { useRef, useState } from 'react';
-import { importAlightMotionLink, importAmProjZip, parseAlightShareUrl } from '../engine/amLinkImporter';
+import {
+  getCustomProxyUrl,
+  importAlightMotionLink,
+  importAmProjZip,
+  parseAlightShareUrl,
+  setCustomProxyUrl,
+} from '../engine/amLinkImporter';
 import { importProjectFromAmXml } from '../engine/amXmlCodec';
 import { getEffects } from '../engine/catalog';
 import { useEditorStore } from '../store/useEditorStore';
@@ -33,6 +39,8 @@ export const HomeScreen: React.FC = () => {
   const [linkStatus, setLinkStatus] = useState('');
   const [linkBusy, setLinkBusy] = useState(false);
   const [linkError, setLinkError] = useState<string | null>(null);
+  const [proxyUrl, setProxyUrl] = useState(() => getCustomProxyUrl());
+  const [showProxySettings, setShowProxySettings] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const effectsCount = getEffects().filter((e) => !e.internal).length;
@@ -108,27 +116,25 @@ export const HomeScreen: React.FC = () => {
           <span className="am-brand-ver">5.0.280 WEB</span>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <div style={{ position: 'relative' }}>
+        <div className="am-home-header-actions">
+          <div className="am-home-search-wrap">
             <input
               id="home-project-search"
               name="projectSearch"
               aria-label="Search projects"
               type="search"
-              className="am-input"
+              className="am-input am-home-search-input"
               placeholder="Search projects..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              style={{ width: 200, padding: '6px 10px 6px 30px', fontSize: 12 }}
             />
-            <span style={{ position: 'absolute', left: 9, top: '50%', transform: 'translateY(-50%)', opacity: 0.6 }}>
+            <span className="am-home-search-icon">
               <AmIcon name="ic_effectbrowser_search" fallback="search" size={14} />
             </span>
           </div>
           <button
             type="button"
-            className="am-btn am-btn-primary"
-            style={{ padding: '6px 12px', fontSize: 12 }}
+            className="am-btn am-btn-primary am-header-action-btn"
             onClick={() => {
               setLinkError(null);
               setLinkStatus('');
@@ -140,8 +146,7 @@ export const HomeScreen: React.FC = () => {
           </button>
           <button
             type="button"
-            className="am-btn"
-            style={{ padding: '6px 12px', fontSize: 12 }}
+            className="am-btn am-header-action-btn"
             onClick={() => fileInputRef.current?.click()}
           >
             <AmIcon name="ic_xml_upload" fallback="xml" size={16} />
@@ -159,6 +164,66 @@ export const HomeScreen: React.FC = () => {
 
       {/* Main Content */}
       <main className="am-home-main am-scroll">
+        {/* Mobile Portrait Vertical Feature Stack (all tools accessible without rotating phone) */}
+        <section className="am-mobile-home-tools" aria-label="Quick Studio Actions">
+          <div className="am-home-search-wrap am-mobile-search-wrap">
+            <input
+              id="mobile-home-project-search"
+              name="mobileProjectSearch"
+              aria-label="Search projects"
+              type="search"
+              className="am-input am-home-search-input"
+              placeholder="Search projects..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+            <span className="am-home-search-icon">
+              <AmIcon name="ic_effectbrowser_search" fallback="search" size={14} />
+            </span>
+          </div>
+
+          <div className="am-mobile-action-stack">
+            <button
+              type="button"
+              className="am-btn am-btn-primary am-mobile-action-btn"
+              onClick={() => setModal('showNewProjectDialog', true)}
+            >
+              <AmIcon name="ic_add_project_plus" fallback="plus" size={16} color="#091318" />
+              New Project
+            </button>
+            <button
+              type="button"
+              className="am-btn am-btn-primary am-mobile-action-btn"
+              onClick={() => {
+                setLinkError(null);
+                setLinkStatus('');
+                setShowLinkDialog(true);
+              }}
+            >
+              <AmIcon name="ic_layer_parent" fallback="link" size={15} color="#091318" />
+              Import Alight Link
+            </button>
+            <button
+              type="button"
+              className="am-btn am-mobile-action-btn"
+              onClick={() => fileInputRef.current?.click()}
+            >
+              <AmIcon name="ic_xml_upload" fallback="xml" size={16} />
+              Import XML / .amproj / .zip
+            </button>
+            {projects[0] && (
+              <button
+                type="button"
+                className="am-btn am-mobile-action-btn"
+                onClick={() => openProject(projects[0].id)}
+              >
+                <AmIcon name="ic_play_onthumbnail" fallback="play" size={16} color="var(--am-accent)" />
+                Open Latest ({projects[0].title})
+              </button>
+            )}
+          </div>
+        </section>
+
         {importError && (
           <div style={{ padding: '10px 14px', borderRadius: 10, background: 'rgba(224,20,69,0.2)', border: '1px solid var(--am-danger)', marginBottom: 14, fontSize: 13 }}>
             {importError}
@@ -172,21 +237,33 @@ export const HomeScreen: React.FC = () => {
                 <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--am-accent)', letterSpacing: '0.08em' }}>
                   APK 5.0.280 WEBGL2 ENGINE
                 </div>
-                <h1 style={{ margin: '6px 0', fontSize: 24 }}>Alight Motion Web Studio</h1>
+                <h1 className="am-hero-title">Alight Motion Web Studio</h1>
                 <p style={{ margin: 0, color: 'var(--am-text-secondary)', fontSize: 13, maxWidth: 580 }}>
                   Full WebGL2 GLSL shader pipeline with {effectsCount || 280}+ effects, 20 procedural shapes,
                   26 GLSL blend modes, cubic-bezier easing curves, multi-track keyframing, camera parallax,
                   and XML/Video/GIF/PNG export.
                 </p>
               </div>
-              <div style={{ display: 'flex', gap: 10 }}>
+              <div className="am-hero-cta-row">
                 <button
                   type="button"
                   className="am-btn am-btn-primary"
                   onClick={() => setModal('showNewProjectDialog', true)}
                 >
-                  <AmIcon name="ic_add_project_plus" fallback="plus" size={16} />
+                  <AmIcon name="ic_add_project_plus" fallback="plus" size={16} color="#091318" />
                   New Project
+                </button>
+                <button
+                  type="button"
+                  className="am-btn"
+                  onClick={() => {
+                    setLinkError(null);
+                    setLinkStatus('');
+                    setShowLinkDialog(true);
+                  }}
+                >
+                  <AmIcon name="ic_layer_parent" fallback="link" size={15} />
+                  Import Link
                 </button>
                 {projects[0] && (
                   <button
@@ -461,9 +538,9 @@ export const HomeScreen: React.FC = () => {
             <input
               id="am-link-input"
               name="amShareLink"
-              type="url"
+              type="text"
               className="am-input"
-              placeholder="https://alightcreative.com/am/share/u/.../p/..."
+              placeholder="https://alightcreative.com/am/share/u/.../p/... or https://alight.link/..."
               value={linkUrl}
               onChange={(e) => setLinkUrl(e.target.value)}
               disabled={linkBusy}
@@ -473,6 +550,39 @@ export const HomeScreen: React.FC = () => {
 
           <div style={{ fontSize: 12, color: 'var(--am-text-muted)' }}>
             Downloads the project XML, beat bookmarks, effects, and all bundled images, videos, and audio into your studio.
+          </div>
+
+          <div>
+            <button
+              type="button"
+              className="am-btn"
+              style={{ fontSize: 11, padding: '4px 9px' }}
+              onClick={() => setShowProxySettings((v) => !v)}
+            >
+              {showProxySettings ? 'Hide Proxy Settings' : 'CORS Proxy Settings (Optional)'}
+              {proxyUrl ? ' · Active' : ''}
+            </button>
+            {showProxySettings && (
+              <div className="am-field" style={{ marginTop: 8, marginBottom: 0 }}>
+                <label htmlFor="am-proxy-input">Custom CORS Proxy URL (Cloudflare Worker / Vercel)</label>
+                <input
+                  id="am-proxy-input"
+                  name="amProxyUrl"
+                  type="url"
+                  className="am-input"
+                  placeholder="https://am-proxy.yourname.workers.dev"
+                  value={proxyUrl}
+                  onChange={(e) => {
+                    setProxyUrl(e.target.value);
+                    setCustomProxyUrl(e.target.value);
+                  }}
+                  disabled={linkBusy}
+                />
+                <span style={{ fontSize: 11, color: 'var(--am-text-muted)' }}>
+                  Deploy workers/am-proxy.js on Cloudflare Workers (free) or host on Vercel (api/am-proxy.js) for 1-click zero-download imports on any phone or PC.
+                </span>
+              </div>
+            )}
           </div>
 
           {linkStatus && (

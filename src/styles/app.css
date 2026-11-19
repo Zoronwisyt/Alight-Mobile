@@ -189,6 +189,7 @@ dialog.am-dialog::backdrop {
   height: 100%;
   background: var(--am-bg-gradient);
   position: relative;
+  overflow-x: hidden;
 }
 
 .am-home-header {
@@ -197,10 +198,62 @@ dialog.am-dialog::backdrop {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 12px;
   background: rgba(14, 19, 23, 0.55);
   border-bottom: 1px solid var(--am-border);
   backdrop-filter: blur(12px);
   z-index: 10;
+  flex-shrink: 0;
+}
+
+.am-home-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.am-home-search-wrap {
+  position: relative;
+  width: 200px;
+}
+
+.am-home-search-input {
+  width: 100%;
+  padding: 6px 10px 6px 30px;
+  font-size: 12px;
+}
+
+.am-home-search-icon {
+  position: absolute;
+  left: 9px;
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: 0.6;
+  pointer-events: none;
+  display: inline-flex;
+  align-items: center;
+}
+
+.am-header-action-btn {
+  padding: 6px 12px;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.am-mobile-home-tools {
+  display: none;
+}
+
+.am-hero-title {
+  margin: 6px 0;
+  font-size: 24px;
+}
+
+.am-hero-cta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
 .am-brand {
@@ -1596,6 +1649,121 @@ dialog.am-dialog::backdrop {
 
 /* Mobile & Touch Responsive Layout */
 @media (max-width: 860px) {
+  .am-home-header {
+    height: 52px;
+    padding: 0 12px;
+  }
+
+  .am-home-header-actions {
+    display: none;
+  }
+
+  .am-brand {
+    gap: 8px;
+    min-width: 0;
+  }
+
+  .am-brand-badge {
+    width: 30px;
+    height: 30px;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+
+  .am-brand-title {
+    font-size: 15px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .am-brand-ver {
+    font-size: 10px;
+    padding: 2px 6px;
+    white-space: nowrap;
+  }
+
+  .am-home-main {
+    padding: 12px 12px 92px;
+  }
+
+  .am-mobile-home-tools {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 14px;
+    padding: 12px;
+    border-radius: 14px;
+    background: rgba(25, 28, 37, 0.85);
+    border: 1px solid var(--am-border);
+  }
+
+  .am-mobile-search-wrap {
+    width: 100%;
+  }
+
+  .am-mobile-search-wrap .am-home-search-input {
+    padding: 9px 12px 9px 32px;
+    font-size: 13px;
+  }
+
+  .am-mobile-action-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .am-mobile-action-btn {
+    width: 100%;
+    justify-content: flex-start;
+    padding: 10px 14px;
+    font-size: 13px;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .am-hero-banner {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 16px;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .am-hero-title {
+    font-size: 20px;
+  }
+
+  .am-hero-cta-row {
+    display: none;
+  }
+
+  .am-project-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .am-bottom-nav {
+    justify-content: space-around;
+    gap: 2px;
+    padding: 0 4px;
+  }
+
+  .am-nav-tab {
+    padding: 6px 6px;
+    font-size: 10px;
+    min-width: 54px;
+  }
+
+  .am-fab-create {
+    width: 50px;
+    height: 50px;
+    transform: translateY(-10px);
+    flex-shrink: 0;
+  }
+
   .am-editor-body.classic {
     grid-template-rows: minmax(190px, 1fr) 46px 265px;
   }

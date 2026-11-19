@@ -7,12 +7,49 @@ export interface ParsedShareLink {
   uid: string;
   pid: string;
   zipUrl: string;
+  objectBase?: string;
 }
 
 export interface LinkImportResult {
   projects: Project[];
   mediaCount: number;
   zipUrl?: string;
+}
+
+const CUSTOM_PROXY_STORAGE_KEY = 'am_custom_proxy_url';
+
+export function getCustomProxyUrl(): string {
+  if (typeof window === 'undefined') return '';
+  try {
+    const qs = new URLSearchParams(window.location.search).get('proxy');
+    if (qs && /^https?:\/\//i.test(qs.trim())) {
+      window.localStorage.setItem(CUSTOM_PROXY_STORAGE_KEY, qs.trim());
+      return qs.trim();
+    }
+    return window.localStorage.getItem(CUSTOM_PROXY_STORAGE_KEY) || '';
+  } catch {
+    return '';
+  }
+}
+
+export function setCustomProxyUrl(url: string): void {
+  if (typeof window === 'undefined') return;
+  try {
+    const clean = url.trim().replace(/\/+$/, '');
+    if (clean) window.localStorage.setItem(CUSTOM_PROXY_STORAGE_KEY, clean);
+    else window.localStorage.removeItem(CUSTOM_PROXY_STORAGE_KEY);
+  } catch {
+    // ignore storage quota errors
+  }
+}
+
+function formatProxyUrl(baseProxy: string, targetUrl: string): string {
+  const trimmed = baseProxy.trim();
+  if (trimmed.includes('{url}')) {
+    return trimmed.replace('{url}', encodeURIComponent(targetUrl));
+  }
+  const sep = trimmed.includes('?') ? '&' : '?';
+  return `${trimmed}${sep}url=${encodeURIComponent(targetUrl)}`;
 }
 
 const EXT_TO_MIME: Record<string, string> = {
@@ -33,15 +70,57 @@ const EXT_TO_MIME: Record<string, string> = {
   opus: 'audio/opus',
 };
 
+function buildFirebaseObjectUrl(objectPath: string, token?: string): string {
+  const encoded = encodeURIComponent(objectPath);
+  return `https://firebasestorage.googleapis.com/v0/b/alight-creative.appspot.com/o/${encoded}?alt=media${
+    token ? `&token=${encodeURIComponent(token)}` : ''
+  }`;
+}
+
 export function parseAlightShareUrl(rawInput: string): ParsedShareLink | null {
   const text = rawInput.trim();
-  const match = text.match(/\/am\/share\/u\/([^/?#]+)\/p\/([^/?#]+)/i);
-  if (!match) return null;
-  const uid = match[1];
-  const pid = match[2];
-  const objectPath = encodeURIComponent(`share/u/${uid}/p/${pid}/projectfiles.zip`);
-  const zipUrl = `https://firebasestorage.googleapis.com/v0/b/alight-creative.appspot.com/o/${objectPath}?alt=media`;
-  return { uid, pid, zipUrl };
+  if (!text) return null;
+
+  // 1) Standard Alight Motion share link: https://alightcreative.com/am/share/u/{uid}/p/{pid}
+  const match = text.match(/\/am\/share\/u\/([^/?#\s"'<>]+)\/p\/([^/?#\s"'<>]+)/i);
+  if (match) {
+    const uid = decodeURIComponent(match[1]);
+    const pid = decodeURIComponent(match[2]);
+    const objectBase = `share/u/${uid}/p/${pid}`;
+    return {
+      uid,
+      pid,
+      objectBase,
+      zipUrl: buildFirebaseObjectUrl(`${objectBase}/projectfiles.zip`),
+    };
+  }
+
+  // 2) Direct Firebase Storage URL (URL-encoded share%2Fu%2F...%2Fp%2F...)
+  const fbMatch = text.match(/share(?:%2F|\/)u(?:%2F|\/)([^/?&#%\s]+)(?:%2F|\/)p(?:%2F|\/)([^/?&#%\s]+)/i);
+  if (fbMatch) {
+    const uid = decodeURIComponent(fbMatch[1]);
+    const pid = decodeURIComponent(fbMatch[2]);
+    const objectBase = `share/u/${uid}/p/${pid}`;
+    const urlInText = text.match(/https?:\/\/[^\s"'<>]+/i)?.[0];
+    return {
+      uid,
+      pid,
+      objectBase,
+      zipUrl: urlInText || buildFirebaseObjectUrl(`${objectBase}/projectfiles.zip`),
+    };
+  }
+
+  // 3) Direct .zip / .amproj / .xml URL
+  const directMatch = text.match(/https?:\/\/[^\s"'<>]+\.(?:zip|amproj|xml)(?:\?[^\s"'<>]*)?/i);
+  if (directMatch) {
+    return {
+      uid: 'direct',
+      pid: 'package',
+      zipUrl: directMatch[0],
+    };
+  }
+
+  return null;
 }
 
 function guessMime(filename: string): string {
@@ -96,6 +175,23 @@ export async function importAmProjZip(
   zipData: ArrayBuffer | Blob,
   onStatus?: (msg: string) => void
 ): Promise<LinkImportResult> {
+  // Check if payload is a raw Alight Motion XML instead of ZIP
+  const headBytes =
+    zipData instanceof Blob
+      ? new Uint8Array(await zipData.slice(0, 64).arrayBuffer())
+      : new Uint8Array(zipData, 0, Math.min(64, zipData.byteLength));
+  const isZip = headBytes.length >= 2 && headBytes[0] === 0x50 && headBytes[1] === 0x4b;
+  if (!isZip) {
+    const rawText =
+      zipData instanceof Blob
+        ? await zipData.text()
+        : new TextDecoder('utf-8').decode(zipData);
+    if (rawText.trimStart().startsWith('<')) {
+      onStatus?.('Parsing Alight Motion XML...');
+      return { projects: [importProjectFromAmXml(rawText)], mediaCount: 0 };
+    }
+  }
+
   onStatus?.('Unpacking Alight Motion package...');
   const zip = await JSZip.loadAsync(zipData);
 
@@ -148,41 +244,150 @@ export async function importAmProjZip(
   return { projects, mediaCount: mediaFiles.length };
 }
 
-async function fetchWithCorsFallbacks(url: string, onStatus?: (msg: string) => void): Promise<ArrayBuffer> {
-  const isLocal =
-    typeof window !== 'undefined' &&
-    (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
-
-  const endpoints: { label: string; fetchUrl: string }[] = [];
-  if (isLocal) {
-    endpoints.push({ label: 'local proxy', fetchUrl: `/api/am-proxy?url=${encodeURIComponent(url)}` });
+async function fetchWithTimeout(url: string, timeoutMs: number): Promise<Response> {
+  const ctrl = new AbortController();
+  const timer = window.setTimeout(() => ctrl.abort(), timeoutMs);
+  try {
+    return await fetch(url, { signal: ctrl.signal });
+  } finally {
+    window.clearTimeout(timer);
   }
-  endpoints.push({ label: 'direct', fetchUrl: url });
-  endpoints.push({ label: 'corsproxy.io', fetchUrl: `https://corsproxy.io/?url=${encodeURIComponent(url)}` });
-  endpoints.push({ label: 'codetabs', fetchUrl: `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}` });
-  endpoints.push({ label: 'allorigins', fetchUrl: `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}` });
+}
+
+/**
+ * Probes Firebase Storage metadata directly (Firebase metadata endpoint serves Access-Control-Allow-Origin: *)
+ * to discover downloadTokens, exact file size, and alternate filenames (projectfiles.zip / project.amproj / project.xml).
+ */
+async function resolveFirebasePackageUrl(
+  parsed: ParsedShareLink,
+  onStatus?: (msg: string) => void
+): Promise<{ downloadUrl: string; sizeBytes?: number }> {
+  if (!parsed.objectBase) {
+    return { downloadUrl: parsed.zipUrl };
+  }
+  const candidates = ['projectfiles.zip', 'project.amproj', 'project.xml'];
+  for (const file of candidates) {
+    const objPath = `${parsed.objectBase}/${file}`;
+    const metaUrl = `https://firebasestorage.googleapis.com/v0/b/alight-creative.appspot.com/o/${encodeURIComponent(objPath)}`;
+    try {
+      const res = await fetchWithTimeout(metaUrl, 5000);
+      if (!res.ok) continue;
+      const meta = (await res.json()) as { downloadTokens?: string; size?: string };
+      const token = meta.downloadTokens?.split(',')[0]?.trim();
+      const sizeBytes = meta.size ? parseInt(meta.size, 10) : undefined;
+      if (sizeBytes && Number.isFinite(sizeBytes)) {
+        onStatus?.(`Found ${file} (${(sizeBytes / (1024 * 1024)).toFixed(1)} MB)...`);
+      }
+      return {
+        downloadUrl: buildFirebaseObjectUrl(objPath, token),
+        sizeBytes,
+      };
+    } catch {
+      // ignore metadata probe errors and fall back to default zipUrl
+    }
+  }
+  return { downloadUrl: parsed.zipUrl };
+}
+
+function buildProxyEndpoints(targetUrl: string): { label: string; fetchUrl: string; timeoutMs: number }[] {
+  const endpoints: { label: string; fetchUrl: string; timeoutMs: number }[] = [];
+  const customProxy = getCustomProxyUrl();
+  if (customProxy) {
+    endpoints.push({ label: 'custom proxy', fetchUrl: formatProxyUrl(customProxy, targetUrl), timeoutMs: 45000 });
+  }
+
+  const host = typeof window !== 'undefined' ? window.location.hostname : '';
+  const isStaticGhPages = host.endsWith('.github.io');
+  if (typeof window !== 'undefined' && !isStaticGhPages && window.location.protocol.startsWith('http')) {
+    endpoints.push({
+      label: 'studio proxy',
+      fetchUrl: `/api/am-proxy?url=${encodeURIComponent(targetUrl)}`,
+      timeoutMs: 45000,
+    });
+  }
+
+  endpoints.push({ label: 'direct', fetchUrl: targetUrl, timeoutMs: 12000 });
+  endpoints.push({
+    label: 'codetabs',
+    fetchUrl: `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(targetUrl)}`,
+    timeoutMs: 18000,
+  });
+  endpoints.push({
+    label: 'allorigins',
+    fetchUrl: `https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}`,
+    timeoutMs: 18000,
+  });
+  return endpoints;
+}
+
+function isValidPackagePayload(buf: ArrayBuffer): boolean {
+  if (buf.byteLength < 22) return false;
+  const hdr = new Uint8Array(buf, 0, Math.min(64, buf.byteLength));
+  // ZIP ("PK")
+  if (hdr[0] === 0x50 && hdr[1] === 0x4b) return true;
+  // XML ("<?xml" or "<scene")
+  const headText = new TextDecoder('utf-8').decode(hdr).trimStart();
+  if (headText.startsWith('<?xml') || headText.startsWith('<scene')) return true;
+  return false;
+}
+
+async function fetchWithCorsFallbacks(
+  url: string,
+  sizeBytes?: number,
+  onStatus?: (msg: string) => void
+): Promise<ArrayBuffer> {
+  const endpoints = buildProxyEndpoints(url);
+  const sizeLabel = sizeBytes ? ` (${(sizeBytes / (1024 * 1024)).toFixed(1)} MB)` : '';
 
   let lastErr = '';
   for (const ep of endpoints) {
     try {
-      onStatus?.(`Downloading package via ${ep.label}...`);
-      const res = await fetch(ep.fetchUrl);
+      onStatus?.(`Downloading package${sizeLabel} via ${ep.label}...`);
+      const res = await fetchWithTimeout(ep.fetchUrl, ep.timeoutMs);
       if (!res.ok) {
         lastErr = `${ep.label}: HTTP ${res.status}`;
         continue;
       }
       const buf = await res.arrayBuffer();
-      // Verify ZIP magic bytes ("PK")
-      const hdr = new Uint8Array(buf, 0, Math.min(4, buf.byteLength));
-      if (buf.byteLength > 22 && hdr[0] === 0x50 && hdr[1] === 0x4b) {
+      if (isValidPackagePayload(buf)) {
         return buf;
       }
-      lastErr = `${ep.label}: non-ZIP response (${buf.byteLength} bytes)`;
+      lastErr = `${ep.label}: non-package response (${buf.byteLength} bytes)`;
     } catch (err) {
       lastErr = `${ep.label}: ${err instanceof Error ? err.message : 'network/CORS blocked'}`;
     }
   }
-  throw new Error(`Could not download package directly (${lastErr}). Use the direct download link below and drop the .zip/.amproj file.`);
+  throw new Error(
+    `Automatic download blocked by Firebase CORS on static hosting (${lastErr}). Set a free Cloudflare Worker proxy URL below for 1-click imports, or tap "Download projectfiles.zip" and select it.`
+  );
+}
+
+async function resolveShortAlightLink(
+  rawUrl: string,
+  onStatus?: (msg: string) => void
+): Promise<ParsedShareLink | null> {
+  const urlMatch = rawUrl.match(/https?:\/\/[^\s"'<>]+/i);
+  const target = (urlMatch ? urlMatch[0] : rawUrl).trim();
+  const endpoints = buildProxyEndpoints(target);
+
+  for (const ep of endpoints) {
+    if (ep.label === 'direct') continue; // alight.link has no CORS headers
+    try {
+      onStatus?.(`Resolving short link via ${ep.label}...`);
+      const res = await fetchWithTimeout(ep.fetchUrl, 10000);
+      const finalHeader = res.headers.get('X-Final-URL') || '';
+      const fromHeader = parseAlightShareUrl(finalHeader) ?? parseAlightShareUrl(res.url);
+      if (fromHeader) return fromHeader;
+      if (res.ok) {
+        const html = await res.text();
+        const fromHtml = parseAlightShareUrl(html);
+        if (fromHtml) return fromHtml;
+      }
+    } catch {
+      // try next resolver
+    }
+  }
+  return null;
 }
 
 export async function importAlightMotionLink(
@@ -191,27 +396,20 @@ export async function importAlightMotionLink(
 ): Promise<LinkImportResult> {
   let parsed = parseAlightShareUrl(rawUrl);
 
-  // Support short alight.link URLs by resolving redirect HTML/Location
+  // Support short alight.link / alight.page.link URLs by resolving redirects & HTML
   if (!parsed && /alight(?:\.page)?\.link\//i.test(rawUrl)) {
-    const isLocal =
-      typeof window !== 'undefined' &&
-      (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
-    const resolveUrl = isLocal
-      ? `/api/am-proxy?url=${encodeURIComponent(rawUrl.trim())}`
-      : `https://api.allorigins.win/raw?url=${encodeURIComponent(rawUrl.trim())}`;
-    onStatus?.('Resolving short Alight Motion link...');
-    const res = await fetch(resolveUrl);
-    if (res.ok) {
-      const html = await res.text();
-      parsed = parseAlightShareUrl(res.url) ?? parseAlightShareUrl(html);
-    }
+    parsed = await resolveShortAlightLink(rawUrl, onStatus);
   }
 
   if (!parsed) {
-    throw new Error('Unrecognized Alight Motion link. Paste a link like https://alightcreative.com/am/share/u/.../p/...');
+    throw new Error(
+      'Unrecognized Alight Motion link. Paste a link like https://alightcreative.com/am/share/u/.../p/... or https://alight.link/...'
+    );
   }
 
-  const zipBuf = await fetchWithCorsFallbacks(parsed.zipUrl, onStatus);
+  onStatus?.('Checking Alight Motion cloud package...');
+  const { downloadUrl, sizeBytes } = await resolveFirebasePackageUrl(parsed, onStatus);
+  const zipBuf = await fetchWithCorsFallbacks(downloadUrl, sizeBytes, onStatus);
   const res = await importAmProjZip(zipBuf, onStatus);
-  return { ...res, zipUrl: parsed.zipUrl };
+  return { ...res, zipUrl: downloadUrl };
 }

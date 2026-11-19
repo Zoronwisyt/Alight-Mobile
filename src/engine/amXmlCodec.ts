@@ -2,13 +2,14 @@ import type {
   Animatable,
   BlendModeId,
   EasingSpec,
+  FreehandStroke,
   Keyframe,
   Layer,
   LayerEffectInstance,
   Project,
 } from '../types/project';
 import { animatable, parseEasingString } from './animation';
-import { getEffectById } from './catalog';
+import { getEffectById, getShapeById, parseDefaultParamValue } from './catalog';
 
 function escapeXml(str: string): string {
   return str
@@ -96,7 +97,9 @@ function layerToXml(layer: Layer, indent = '  '): string {
       const ptype = Array.isArray(pval.value)
         ? pval.value.length === 2
           ? 'vec2'
-          : 'vec3'
+          : pval.value.length === 4
+            ? 'quat'
+            : 'vec3'
         : typeof pval.value === 'boolean'
           ? 'bool'
           : typeof pval.value === 'string' && pval.value.startsWith('#')
@@ -116,7 +119,9 @@ function layerToXml(layer: Layer, indent = '  '): string {
   }
 
   if (layer.type === 'group' && layer.groupLayers) {
-    parts.push(`${indent}  <scene width="1080" height="1080" fps="30" totalTime="${Math.round(layer.endTime - layer.startTime)}">`);
+    const gw = Math.round(layer.groupWidth || 1080);
+    const gh = Math.round(layer.groupHeight || 1080);
+    parts.push(`${indent}  <scene width="${gw}" height="${gh}" fps="30" totalTime="${Math.round(layer.endTime - layer.startTime)}">`);
     for (const sub of layer.groupLayers) {
       parts.push(layerToXml(sub, indent + '    '));
     }
@@ -164,6 +169,18 @@ function parsePropElement<T>(
   return animatable(val != null ? parseFn(val) : fallback);
 }
 
+const LAYER_TAGS = new Set([
+  'shape',
+  'text',
+  'image',
+  'video',
+  'audio',
+  'nullobj',
+  'camera',
+  'embedscene',
+  'drawing',
+]);
+
 const parseNum = (s: string) => parseFloat(s) || 0;
 const parseVec2 = (s: string): [number, number] => {
   const a = s.split(',').map((x) => parseFloat(x.trim()) || 0);
@@ -173,6 +190,63 @@ const parseVec3 = (s: string): [number, number, number] => {
   const a = s.split(',').map((x) => parseFloat(x.trim()) || 0);
   return [a[0] ?? 0, a[1] ?? 0, a[2] ?? 0];
 };
+const parseQuat = (s: string): [number, number, number, number] => {
+  const a = s.split(',').map((x) => parseFloat(x.trim()));
+  if (a.length >= 4 && a.every((n) => Number.isFinite(n))) {
+    return [a[0], a[1], a[2], a[3]];
+  }
+  return [0, 0, 0, 1];
+};
+
+function parseDrawingStrokes(el: Element): FreehandStroke[] {
+  const strokes: FreehandStroke[] = [];
+  for (const stEl of Array.from(el.querySelectorAll(':scope > stroke'))) {
+    const rawPts = stEl.getAttribute('points') || '';
+    const points: { x: number; y: number; pressure: number }[] = [];
+    for (const seg of rawPts.split(';')) {
+      const trimmed = seg.trim();
+      if (!trimmed) continue;
+      const parts = trimmed.split(',').map((n) => parseFloat(n.trim()));
+      if (parts.length >= 2 && Number.isFinite(parts[0]) && Number.isFinite(parts[1])) {
+        points.push({
+          x: parts[0],
+          y: parts[1],
+          pressure: Number.isFinite(parts[2]) ? parts[2] : 1,
+        });
+      }
+    }
+    if (points.length >= 2) {
+      strokes.push({
+        points,
+        color: stEl.getAttribute('color') || '#FFFFFFFF',
+        width: parseFloat(stEl.getAttribute('width') || '16') || 16,
+        opacity: parseFloat(stEl.getAttribute('opacity') || '1') ?? 1,
+      });
+    }
+  }
+  return strokes;
+}
+
+function parseDirectProperties(el: Element): Record<string, Animatable<any>> {
+  const out: Record<string, Animatable<any>> = {};
+  for (const propEl of Array.from(el.querySelectorAll(':scope > property'))) {
+    const pname = propEl.getAttribute('name');
+    const ptype = propEl.getAttribute('type') || 'float';
+    if (!pname) continue;
+    const parser = (raw: string) => {
+      if (ptype === 'vec2') return parseVec2(raw);
+      if (ptype === 'vec3') return parseVec3(raw);
+      if (ptype === 'quat') return parseQuat(raw);
+      if (ptype === 'int') return parseInt(raw, 10) || 0;
+      if (ptype === 'bool') return raw === 'true' || raw === '1';
+      if (ptype === 'color') return raw;
+      return parseFloat(raw) || 0;
+    };
+    const fallback = ptype === 'quat' ? [0, 0, 0, 1] : parser('0');
+    out[pname] = parsePropElement(propEl, parser, fallback);
+  }
+  return out;
+}
 
 export interface ImportedMediaAsset {
   mediaId: string;
@@ -215,6 +289,7 @@ function parseXmlLayer(
     nullobj: 'null',
     camera: 'camera',
     embedscene: 'group',
+    drawing: 'freehand',
   };
   let type: Layer['type'] = typeMap[tag] ?? 'shape';
   const tf = el.querySelector(':scope > transform');
@@ -227,11 +302,14 @@ function parseXmlLayer(
     const params: Record<string, Animatable<any>> = {};
     if (def) {
       for (const pd of def.params) {
-        if (pd.id && pd.default !== undefined) {
+        if (!pd.id) continue;
+        if (pd.tag === 'orient') {
+          params[pd.id] = animatable([0, 0, 0, 1]);
+        } else if (pd.default !== undefined) {
           params[pd.id] = animatable(
             pd.tag === 'point'
               ? parseVec2(pd.default)
-              : pd.tag === 'xyz' || pd.tag === 'hue-disc' || pd.tag === 'orient'
+              : pd.tag === 'xyz' || pd.tag === 'hue-disc'
                 ? parseVec3(pd.default)
                 : pd.tag === 'switch'
                   ? pd.default === 'true'
@@ -242,19 +320,9 @@ function parseXmlLayer(
         }
       }
     }
-    for (const propEl of Array.from(effEl.querySelectorAll(':scope > property'))) {
-      const pname = propEl.getAttribute('name');
-      const ptype = propEl.getAttribute('type') || 'float';
-      if (!pname) continue;
-      const parser = (raw: string) => {
-        if (ptype === 'vec2') return parseVec2(raw);
-        if (ptype === 'vec3') return parseVec3(raw);
-        if (ptype === 'int') return parseInt(raw, 10) || 0;
-        if (ptype === 'bool') return raw === 'true' || raw === '1';
-        if (ptype === 'color') return raw;
-        return parseFloat(raw) || 0;
-      };
-      params[pname] = parsePropElement(propEl, parser, parser('0'));
+    const effProps = parseDirectProperties(effEl);
+    for (const [pname, pval] of Object.entries(effProps)) {
+      params[pname] = pval;
     }
     effects.push({
       uid: `eff_${Math.random().toString(36).slice(2, 10)}`,
@@ -267,7 +335,139 @@ function parseXmlLayer(
 
   const contentEl = el.querySelector(':scope > content');
   const fillTypeAttr = el.getAttribute('fillType');
-  const fillColorAttr = el.getAttribute('fillColor') || '#FF69FC97';
+  const fillColorEl = el.querySelector(':scope > fillColor');
+  const fillColorFallback = el.getAttribute('fillColor') || '#FF69FC97';
+  const fillColorAnim = fillColorEl
+    ? parsePropElement(fillColorEl, (s) => s || fillColorFallback, fillColorFallback)
+    : animatable(fillColorFallback);
+
+  // Parse <gradient type="linear|radial|sweep" startColor="..." endColor="..." start="x,y" end="x,y"/>
+  const gradEl = el.querySelector(':scope > gradient');
+  let gradientType: 'linear' | 'radial' | 'sweep' = 'linear';
+  let gradientStops = [
+    { offset: 0, color: '#FF69FC97' },
+    { offset: 1, color: '#FF5CE5FF' },
+  ];
+  let gradientStart: [number, number] = [-0.5, -0.5];
+  let gradientEnd: [number, number] = [0.5, 0.5];
+  if (gradEl) {
+    const gt = (gradEl.getAttribute('type') || 'linear').toLowerCase();
+    gradientType = gt === 'radial' ? 'radial' : gt === 'sweep' ? 'sweep' : 'linear';
+    const sc = gradEl.getAttribute('startColor') || '#FF000000';
+    const ec = gradEl.getAttribute('endColor') || '#FFFFFFFF';
+    const mc = gradEl.getAttribute('midColor');
+    gradientStops = mc
+      ? [
+          { offset: 0, color: sc },
+          { offset: 0.5, color: mc },
+          { offset: 1, color: ec },
+        ]
+      : [
+          { offset: 0, color: sc },
+          { offset: 1, color: ec },
+        ];
+    const sRaw = gradEl.getAttribute('start');
+    const eRaw = gradEl.getAttribute('end');
+    if (sRaw) {
+      const [sx, sy] = parseVec2(sRaw);
+      gradientStart = [sx * 2 - 1, sy * 2 - 1];
+    }
+    if (eRaw) {
+      const [ex, ey] = parseVec2(eRaw);
+      gradientEnd = [ex * 2 - 1, ey * 2 - 1];
+    }
+  }
+
+  // Parse <shape s=".rect|.roundrect|...">, direct <property> children, and <path d="..."/>
+  const rawShapeAttr = el.getAttribute('s');
+  const resolvedShapeId = rawShapeAttr
+    ? rawShapeAttr.startsWith('.')
+      ? `com.alightcreative.shapes.${rawShapeAttr.slice(1)}`
+      : rawShapeAttr
+    : 'com.alightcreative.shapes.rect';
+  const directProps = parseDirectProperties(el);
+  const pathEl = el.querySelector(':scope > path');
+  const svgPathD = pathEl?.getAttribute('d') || undefined;
+
+  let shapeParams: Record<string, Animatable<any>> | undefined;
+  if (tag === 'shape') {
+    shapeParams = {};
+    const sDef = getShapeById(resolvedShapeId);
+    if (sDef) {
+      for (const pd of sDef.params) {
+        if (pd.id) {
+          shapeParams[pd.id] = animatable(parseDefaultParamValue(pd));
+        }
+      }
+    } else {
+      shapeParams.size = animatable([100, 100] as [number, number]);
+    }
+    for (const [k, v] of Object.entries(directProps)) {
+      shapeParams[k] = v;
+    }
+  }
+
+  // Parse <stroke> on shapes (distinct from <drawing><stroke points="..."/>)
+  const freehandStrokes = tag === 'drawing' ? parseDrawingStrokes(el) : undefined;
+  let stroke: Layer['stroke'] = {
+    enabled: false,
+    color: animatable('#FFFFFFFF'),
+    width: animatable(4),
+    position: 'center',
+    cap: 'round',
+    join: 'round',
+    dash: false,
+    dashLength: 16,
+    dashGap: 10,
+    dashOffset: 0,
+  };
+  if (tag === 'shape') {
+    const stEl = el.querySelector(':scope > stroke');
+    if (stEl && stEl.getAttribute('enabled') !== 'false') {
+      const stColorEl = stEl.querySelector(':scope > color');
+      const stSizeEl = stEl.querySelector(':scope > size');
+      const endType = (stEl.getAttribute('endType') || 'centered').toLowerCase();
+      stroke = {
+        ...stroke,
+        enabled: true,
+        color: stColorEl
+          ? parsePropElement(stColorEl, (s) => s || '#FFFFFFFF', '#FFFFFFFF')
+          : animatable(stEl.getAttribute('color') || '#FFFFFFFF'),
+        width: stSizeEl
+          ? parsePropElement(stSizeEl, parseNum, 4)
+          : animatable(parseFloat(stEl.getAttribute('size') || '4') || 4),
+        position: endType === 'inside' ? 'inside' : endType === 'outside' ? 'outside' : 'center',
+      };
+    }
+  }
+
+  // Parse <shadow enabled="true|false" ...>
+  let shadow: Layer['shadow'] = {
+    enabled: false,
+    color: animatable('#88000000'),
+    alpha: animatable(0.6),
+    size: animatable(12),
+    offsetX: animatable(6),
+    offsetY: animatable(6),
+  };
+  const shEl = el.querySelector(':scope > shadow');
+  if (shEl) {
+    const shColorEl = shEl.querySelector(':scope > color');
+    const shSizeEl = shEl.querySelector(':scope > size');
+    const shOffEl = shEl.querySelector(':scope > offset');
+    const shAlphaEl = shEl.querySelector(':scope > alpha');
+    const offVec = shOffEl ? parseVec2(shOffEl.getAttribute('value') || '0,0') : [0, 0];
+    shadow = {
+      enabled: shEl.getAttribute('enabled') === 'true',
+      color: shColorEl
+        ? parsePropElement(shColorEl, (s) => s || '#88000000', '#88000000')
+        : animatable('#88000000'),
+      alpha: shAlphaEl ? parsePropElement(shAlphaEl, parseNum, 1) : animatable(1),
+      size: shSizeEl ? parsePropElement(shSizeEl, parseNum, 12) : animatable(12),
+      offsetX: animatable(offVec[0]),
+      offsetY: animatable(offVec[1]),
+    };
+  }
 
   // Resolve bundled .amproj media references (fillVideo / fillImage / src / uri)
   const fillVideoRef = el.getAttribute('fillVideo');
@@ -277,6 +477,11 @@ function parseXmlLayer(
   const matchedImage = lookupMediaAsset(fillImageRef || (type === 'image' ? directSrcRef : null), mediaMap);
   const matchedAudio = lookupMediaAsset(type === 'audio' ? directSrcRef : null, mediaMap);
 
+  // Extract shape half-extent size for media-filled shapes (<shape fillType="media"><property name="size" value="sx,sy"/>)
+  const shapeSizeVal = directProps.size?.value;
+  const displayWidth = Array.isArray(shapeSizeVal) && shapeSizeVal[0] > 0 ? shapeSizeVal[0] * 2 : undefined;
+  const displayHeight = Array.isArray(shapeSizeVal) && shapeSizeVal[1] > 0 ? shapeSizeVal[1] * 2 : undefined;
+
   let mediaData: Layer['mediaData'];
   let audioData: Layer['audioData'];
 
@@ -285,8 +490,10 @@ function parseXmlLayer(
     mediaData = {
       mediaId: matchedVideo.mediaId,
       src: matchedVideo.src,
-      naturalWidth: matchedVideo.width || projW,
-      naturalHeight: matchedVideo.height || projH,
+      naturalWidth: matchedVideo.width || displayWidth || projW,
+      naturalHeight: matchedVideo.height || displayHeight || projH,
+      displayWidth,
+      displayHeight,
       durationMs: matchedVideo.durationMs || 4000,
       trimStartMs: parseFloat(el.getAttribute('inTime') || '0') || 0,
       playbackSpeed: 1,
@@ -298,8 +505,10 @@ function parseXmlLayer(
     mediaData = {
       mediaId: matchedImage.mediaId,
       src: matchedImage.src,
-      naturalWidth: matchedImage.width || projW,
-      naturalHeight: matchedImage.height || projH,
+      naturalWidth: matchedImage.width || displayWidth || projW,
+      naturalHeight: matchedImage.height || displayHeight || projH,
+      displayWidth,
+      displayHeight,
     };
   } else if (matchedAudio) {
     type = 'audio';
@@ -314,10 +523,12 @@ function parseXmlLayer(
   }
 
   const nestedScene = el.querySelector(':scope > scene');
+  const groupWidth = nestedScene ? parseInt(nestedScene.getAttribute('width') || '', 10) || projW : undefined;
+  const groupHeight = nestedScene ? parseInt(nestedScene.getAttribute('height') || '', 10) || projH : undefined;
   const groupLayers = nestedScene
     ? Array.from(nestedScene.children)
-        .filter((c) => ['shape', 'text', 'image', 'video', 'audio', 'nullobj', 'camera', 'embedscene'].includes(c.tagName.toLowerCase()))
-        .map((c, j) => parseXmlLayer(c, j, projW, projH, mediaMap))
+        .filter((c) => LAYER_TAGS.has(c.tagName.toLowerCase()))
+        .map((c, j) => parseXmlLayer(c, j, groupWidth!, groupHeight!, mediaMap))
     : undefined;
 
   return {
@@ -341,45 +552,21 @@ function parseXmlLayer(
       skew: animatable([0, 0]),
     },
     fill: {
-      type: fillTypeAttr === 'none' ? 'none' : fillTypeAttr === 'gradient' ? 'gradient' : 'solid',
-      color: animatable(fillColorAttr),
-      gradientType: 'linear',
-      gradientStops: [
-        { offset: 0, color: '#FF69FC97' },
-        { offset: 1, color: '#FF5CE5FF' },
-      ],
-      gradientStart: [-0.5, -0.5],
-      gradientEnd: [0.5, 0.5],
+      type: fillTypeAttr === 'none' ? 'none' : fillTypeAttr === 'gradient' ? 'gradient' : fillTypeAttr === 'media' ? 'media' : 'solid',
+      color: fillColorAnim,
+      gradientType,
+      gradientStops,
+      gradientStart,
+      gradientEnd,
     },
-    stroke: {
-      enabled: false,
-      color: animatable('#FFFFFFFF'),
-      width: animatable(4),
-      position: 'center',
-      cap: 'round',
-      join: 'round',
-      dash: false,
-      dashLength: 16,
-      dashGap: 10,
-      dashOffset: 0,
-    },
-    shadow: {
-      enabled: false,
-      color: animatable('#88000000'),
-      alpha: animatable(0.6),
-      size: animatable(12),
-      offsetX: animatable(6),
-      offsetY: animatable(6),
-    },
+    stroke,
+    shadow,
     effects,
     speed: animatable(1),
-    shapeId: type === 'shape' ? 'com.alightcreative.shapes.rect' : undefined,
-    shapeParams:
-      type === 'shape'
-        ? {
-            size: animatable([150, 150] as [number, number]),
-          }
-        : undefined,
+    shapeId: type === 'shape' ? resolvedShapeId : undefined,
+    shapeParams: type === 'shape' ? shapeParams : undefined,
+    svgPathD: type === 'shape' ? svgPathD : undefined,
+    freehandStrokes,
     textData:
       type === 'text'
         ? {
@@ -396,6 +583,8 @@ function parseXmlLayer(
     mediaData,
     audioData,
     groupLayers,
+    groupWidth,
+    groupHeight,
   };
 }
 
@@ -412,7 +601,7 @@ export function importProjectFromAmXml(xmlText: string, mediaMap?: AmPackageMedi
   const durationMs = parseInt(scene.getAttribute('totalTime') || '5000', 10) || 5000;
   const bg = scene.getAttribute('bgcolor') || '#FF000000';
   const layers = Array.from(scene.children)
-    .filter((c) => ['shape', 'text', 'image', 'video', 'audio', 'nullobj', 'camera', 'embedscene'].includes(c.tagName.toLowerCase()))
+    .filter((c) => LAYER_TAGS.has(c.tagName.toLowerCase()))
     .map((c, i) => parseXmlLayer(c, i, width, height, mediaMap));
 
   const bookmarkSet = new Set<number>();
