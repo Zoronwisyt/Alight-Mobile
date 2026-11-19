@@ -129,9 +129,11 @@ async function renderProjectAudioMix(project: Project, durationSec: number): Pro
       gain.connect(offline.destination);
 
       const startSec = Math.max(0, absStart / 1000);
-      const playDur = Math.max(0.02, Math.min(durationSec - startSec, (absEnd - absStart) / 1000, buf.duration));
+      const trimSec = Math.max(0, (layer.audioData.trimStartMs ?? 0) / 1000);
+      const safeTrim = buf.duration > 0 ? Math.min(trimSec, Math.max(0, buf.duration - 0.02)) : 0;
+      const playDur = Math.max(0.02, Math.min(durationSec - startSec, (absEnd - absStart) / 1000, Math.max(0.02, buf.duration - safeTrim)));
       if (playDur > 0.02 && startSec < durationSec) {
-        src.start(startSec, 0, playDur);
+        src.start(startSec, safeTrim, playDur);
         attached++;
       }
     } catch {

@@ -429,7 +429,7 @@ function parseXmlLayer(
     dashGap: 10,
     dashOffset: 0,
   };
-  if (tag === 'shape') {
+  if (tag !== 'drawing') {
     const stEl = el.querySelector(':scope > stroke');
     if (stEl && stEl.getAttribute('enabled') !== 'false') {
       const stColorEl = stEl.querySelector(':scope > color');
@@ -449,7 +449,7 @@ function parseXmlLayer(
     }
   }
 
-  // Parse <shadow enabled="true|false" ...>
+  // Parse <shadow> — in AM XML, enabled shadows omit `enabled`, disabled ones explicitly write `enabled="false"`
   let shadow: Layer['shadow'] = {
     enabled: false,
     color: animatable('#88000000'),
@@ -466,12 +466,12 @@ function parseXmlLayer(
     const shAlphaEl = shEl.querySelector(':scope > alpha');
     const offVec = shOffEl ? parseVec2(shOffEl.getAttribute('value') || '0,0') : [0, 0];
     shadow = {
-      enabled: shEl.getAttribute('enabled') === 'true',
+      enabled: shEl.getAttribute('enabled') !== 'false',
       color: shColorEl
-        ? parsePropElement(shColorEl, (s) => s || '#88000000', '#88000000')
-        : animatable('#88000000'),
-      alpha: shAlphaEl ? parsePropElement(shAlphaEl, parseNum, 1) : animatable(1),
-      size: shSizeEl ? parsePropElement(shSizeEl, parseNum, 12) : animatable(12),
+        ? parsePropElement(shColorEl, (s) => s || '#FF000000', '#FF000000')
+        : animatable('#FF000000'),
+      alpha: shAlphaEl ? parsePropElement(shAlphaEl, parseNum, 0.75) : animatable(0.75),
+      size: shSizeEl ? parsePropElement(shSizeEl, parseNum, 20) : animatable(20),
       offsetX: animatable(offVec[0]),
       offsetY: animatable(offVec[1]),
     };
@@ -525,6 +525,7 @@ function parseXmlLayer(
       src: matchedAudio.src,
       name: matchedAudio.name,
       durationMs: matchedAudio.durationMs || 4000,
+      trimStartMs: parseFloat(el.getAttribute('inTime') || '0') || 0,
       volume: animatable(1),
       muted: false,
     };
@@ -627,14 +628,16 @@ function resolveImportSceneSize(scene: Element): {
   const attrW = parsePosInt(scene.getAttribute('width'));
   const attrH = parsePosInt(scene.getAttribute('height'));
 
-  if (expW > 0 && expH > 0) {
-    rawW = expW;
-    rawH = expH;
-    sizeSource = 'exportWidth/exportHeight';
-  } else if (attrW > 0 && attrH > 0) {
+  if (attrW > 0 && attrH > 0) {
+    // Scene width/height is the true project canvas (e.g. 1080x1350 4:5);
+    // exportWidth/exportHeight often holds a stale 1920x1080 16:9 export preset.
     rawW = attrW;
     rawH = attrH;
     sizeSource = 'width/height';
+  } else if (expW > 0 && expH > 0) {
+    rawW = expW;
+    rawH = expH;
+    sizeSource = 'exportWidth/exportHeight';
   } else {
     const aspectStr = (scene.getAttribute('aspect') || '').trim();
     const m = aspectStr.match(/^(\d+(?:\.\d+)?)\s*[:/]\s*(\d+(?:\.\d+)?)$/);

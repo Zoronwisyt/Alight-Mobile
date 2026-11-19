@@ -1392,6 +1392,18 @@ export class AlightRenderer {
 
     // Step 2: Run GPU Shader / Script Effect Stack
     let currentSlot = contentFbo;
+
+    // Apply Border & Shadow pass for GPU-blitted layers (group / embedScene, image, video)
+    if (
+      (layer.type === 'group' || layer.type === 'image' || layer.type === 'video') &&
+      (layer.shadow.enabled || layer.stroke.enabled)
+    ) {
+      const styled = this.applyBorderAndShadowPass(currentSlot, layer, remappedNormT, scale);
+      if (styled !== currentSlot) {
+        this.releaseFbo(currentSlot);
+        currentSlot = styled;
+      }
+    }
     const frameDtMs = 1000 / Math.max(1, project.fps);
     const isFirstFrame = sceneTimeMs - layer.startTime < frameDtMs * 0.6;
     const tfPrev = isFirstFrame
@@ -2017,6 +2029,139 @@ export class AlightRenderer {
     if (prog.uniforms.uOverdraw) gl.uniform2f(prog.uniforms.uOverdraw, overdrawSpan, -overdrawPad);
     this.drawQuad(prog.program);
     this.unbindTextureUnits(2);
+  }
+
+  private applyBorderAndShadowPass(
+    src: FboSlot,
+    layer: Layer,
+    normT: number,
+    scale: number
+  ): FboSlot {
+    const key = '__internal_border_shadow_v1';
+    let prog = (this as any)._borderShadowProg as ReturnType<ShaderRegistry['compileRaw']> | undefined;
+    if (!prog) {
+      prog = this.registry.compileRaw(
+        key,
+        `#version 300 es
+        precision highp float;
+        layout(location = 0) in vec4 ac_internal_position;
+        layout(location = 1) in vec2 ac_internal_texcoord;
+        out vec2 vUv;
+        void main() {
+          gl_Position = ac_internal_position;
+          vUv = ac_internal_texcoord;
+        }`,
+        `#version 300 es
+        precision highp float;
+        in vec2 vUv;
+        out vec4 fragColor;
+        uniform sampler2D uTex;
+        uniform vec2 uTexSize;
+        uniform int uShadowOn;
+        uniform vec4 uShadowColor;
+        uniform float uShadowSize;
+        uniform vec2 uShadowOffset;
+        uniform int uStrokeOn;
+        uniform vec4 uStrokeColor;
+        uniform float uStrokeWidth;
+        uniform int uStrokePos; // 0=center, 1=inside, 2=outside
+
+        const float PI2 = 6.2831853;
+
+        void main() {
+          vec4 base = texture(uTex, vUv);
+          vec2 texel = 1.0 / max(uTexSize, vec2(1.0));
+          vec4 fg = base;
+
+          if (uStrokeOn == 1 && uStrokeWidth > 0.25) {
+            float rad = uStrokePos == 0 ? uStrokeWidth * 0.5 : uStrokeWidth;
+            float maxA = base.a;
+            float minA = base.a;
+            for (int i = 0; i < 16; i++) {
+              float ang = float(i) * (PI2 / 16.0);
+              vec2 off = vec2(cos(ang), sin(ang)) * rad * texel;
+              float a = texture(uTex, clamp(vUv + off, 0.0, 1.0)).a;
+              maxA = max(maxA, a);
+              minA = min(minA, a);
+            }
+            float edge = 0.0;
+            if (uStrokePos == 1) {
+              edge = clamp(base.a - minA, 0.0, 1.0);
+            } else if (uStrokePos == 2) {
+              edge = clamp(maxA - base.a, 0.0, 1.0);
+            } else {
+              edge = clamp(maxA - minA, 0.0, 1.0);
+            }
+            vec4 stCol = vec4(uStrokeColor.rgb * uStrokeColor.a, uStrokeColor.a) * edge;
+            if (uStrokePos == 2) {
+              fg = base + stCol * (1.0 - base.a);
+            } else {
+              fg = stCol + base * (1.0 - stCol.a);
+            }
+          }
+
+          if (uShadowOn == 1 && uShadowColor.a > 0.001) {
+            vec2 shUv = vUv - vec2(uShadowOffset.x, -uShadowOffset.y) * texel;
+            float shRad = max(1.0, uShadowSize);
+            float sumA = texture(uTex, clamp(shUv, 0.0, 1.0)).a * 0.2;
+            float wSum = 0.2;
+            for (int ring = 1; ring <= 2; ring++) {
+              float rScale = float(ring) * 0.5 * shRad;
+              float w = ring == 1 ? 0.5 : 0.3;
+              for (int i = 0; i < 12; i++) {
+                float ang = float(i) * (PI2 / 12.0) + float(ring) * 0.26;
+                vec2 off = vec2(cos(ang), sin(ang)) * rScale * texel;
+                vec2 su = shUv + off;
+                float a = (su.x < 0.0 || su.x > 1.0 || su.y < 0.0 || su.y > 1.0) ? 0.0 : texture(uTex, su).a;
+                sumA += a * (w / 12.0);
+                wSum += w / 12.0;
+              }
+            }
+            float shA = clamp(sumA / max(wSum, 0.001), 0.0, 1.0) * uShadowColor.a;
+            vec4 shCol = vec4(uShadowColor.rgb * shA, shA);
+            fragColor = fg + shCol * (1.0 - fg.a);
+          } else {
+            fragColor = fg;
+          }
+        }`
+      );
+      (this as any)._borderShadowProg = prog;
+    }
+
+    const dst = this.acquireFbo(src.width, src.height);
+    const gl = this.gl;
+    gl.bindFramebuffer(gl.FRAMEBUFFER, dst.fbo);
+    gl.viewport(0, 0, dst.width, dst.height);
+    gl.disable(gl.BLEND);
+    gl.useProgram(prog.program);
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, src.tex);
+    gl.uniform1i(prog.uniforms.uTex, 0);
+    if (prog.uniforms.uTexSize) gl.uniform2f(prog.uniforms.uTexSize, src.width, src.height);
+
+    const shOn = layer.shadow.enabled ? 1 : 0;
+    const [sr, sg, sb, sa] = parseColorArgb(evalAnimatable(layer.shadow.color, normT, '#FF000000'));
+    const shAlpha = clamp01(evalAnimatable(layer.shadow.alpha, normT, 0.75)) * sa;
+    const shSize = Math.max(0, evalAnimatable(layer.shadow.size, normT, 20)) * scale;
+    const shOx = evalAnimatable(layer.shadow.offsetX, normT, 0) * scale;
+    const shOy = evalAnimatable(layer.shadow.offsetY, normT, 0) * scale;
+    if (prog.uniforms.uShadowOn) gl.uniform1i(prog.uniforms.uShadowOn, shOn);
+    if (prog.uniforms.uShadowColor) gl.uniform4f(prog.uniforms.uShadowColor, sr, sg, sb, shAlpha);
+    if (prog.uniforms.uShadowSize) gl.uniform1f(prog.uniforms.uShadowSize, shSize);
+    if (prog.uniforms.uShadowOffset) gl.uniform2f(prog.uniforms.uShadowOffset, shOx, shOy);
+
+    const stOn = layer.stroke.enabled ? 1 : 0;
+    const [br, bg, bb, ba] = parseColorArgb(evalAnimatable(layer.stroke.color, normT, '#FFFFFFFF'));
+    const stW = Math.max(0, evalAnimatable(layer.stroke.width, normT, 4)) * scale;
+    const stPos = layer.stroke.position === 'inside' ? 1 : layer.stroke.position === 'outside' ? 2 : 0;
+    if (prog.uniforms.uStrokeOn) gl.uniform1i(prog.uniforms.uStrokeOn, stOn);
+    if (prog.uniforms.uStrokeColor) gl.uniform4f(prog.uniforms.uStrokeColor, br, bg, bb, ba);
+    if (prog.uniforms.uStrokeWidth) gl.uniform1f(prog.uniforms.uStrokeWidth, stW);
+    if (prog.uniforms.uStrokePos) gl.uniform1i(prog.uniforms.uStrokePos, stPos);
+
+    this.drawQuad(prog.program);
+    this.unbindTextureUnits(2);
+    return dst;
   }
 
   private computeRepeatInstances(

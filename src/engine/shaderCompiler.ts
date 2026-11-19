@@ -86,9 +86,11 @@ function transpileShaderCode(
     }
   }
 
-  // 4) Prevent 0/0 NaN in warp shaders on ANGLE/D3D11 (pinchbulge*, circularripple*)
+  // 4) Prevent 0/0 NaN in warp & 3D box raytrace shaders on ANGLE/D3D11 (pinchbulge*, circularripple*, flip3)
   code = code.replace(/\bfloat\s+dist\s*=\s*length\s*\(([^)]+)\)\s*;/g, 'float dist = max(length($1), 0.00001);');
   code = code.replace(/\bnormalize\s*\(\s*st\s*\)/g, '(length(st) > 0.00001 ? normalize(st) : vec2(0.0))');
+  code = code.replace(/\bvec3\s+m\s*=\s*1\.0\s*\/\s*rdd\s*;/g, 'vec3 m = 1.0 / mix(rdd, vec3(1e-5), lessThan(abs(rdd), vec3(1e-5)));');
+  code = code.replace(/max\(0\.00001,thickness\/10\.0\)\s*:\s*0\.00001/g, 'max(0.0005, thickness/10.0) : 0.0005');
 
   return code;
 }

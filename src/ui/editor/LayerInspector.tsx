@@ -396,7 +396,7 @@ export const LayerInspector: React.FC = () => {
                 </button>
               )}
 
-              {(layer.type === 'shape' || layer.type === 'text' || layer.type === 'vector') && (
+              {layer.type !== 'audio' && layer.type !== 'camera' && layer.type !== 'null' && (
                 <button type="button" className="am-apk-tile" onClick={() => setInspectorTab('borderShadow')}>
                   <AmIcon name="ic_border" fallback="box" size={20} />
                   <span>Border &amp; Shadow</span>

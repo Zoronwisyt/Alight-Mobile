@@ -83,21 +83,31 @@ class AudioEngine {
     return peaks;
   }
 
-  public startPlayback(project: Project, startMs: number): void {
-    this.stopPlayback();
-    const ctx = this.ensureContext();
-    const audioLayers = project.layers.filter(
-      (l) => l.type === 'audio' && l.visible && l.audioData && !l.audioData.muted
-    );
-
-    for (const l of audioLayers) {
-      this.startLayerAudio(l, startMs, ctx);
+  private collectAudioLayers(layers: Layer[], offsetMs: number, out: { layer: Layer; absStart: number; absEnd: number }[]) {
+    for (const l of layers) {
+      if (!l.visible) continue;
+      if (l.type === 'group' && l.groupLayers?.length) {
+        this.collectAudioLayers(l.groupLayers, offsetMs + l.startTime, out);
+      } else if (l.type === 'audio' && l.audioData && !l.audioData.muted) {
+        out.push({ layer: l, absStart: offsetMs + l.startTime, absEnd: offsetMs + l.endTime });
+      }
     }
   }
 
-  private async startLayerAudio(layer: Layer, sceneMs: number, ctx: AudioContext) {
+  public startPlayback(project: Project, startMs: number): void {
+    this.stopPlayback();
+    const ctx = this.ensureContext();
+    const audioLayers: { layer: Layer; absStart: number; absEnd: number }[] = [];
+    this.collectAudioLayers(project.layers, 0, audioLayers);
+
+    for (const item of audioLayers) {
+      this.startLayerAudio(item.layer, item.absStart, item.absEnd, startMs, ctx);
+    }
+  }
+
+  private async startLayerAudio(layer: Layer, absStart: number, absEnd: number, sceneMs: number, ctx: AudioContext) {
     if (!layer.audioData) return;
-    if (sceneMs > layer.endTime) return;
+    if (sceneMs > absEnd) return;
     try {
       const buf = await this.loadAudioBuffer(layer.audioData.src, layer.audioData.synthPattern);
       const src = ctx.createBufferSource();
@@ -109,10 +119,13 @@ class AudioEngine {
       src.connect(gain);
       gain.connect(this.analyser!);
 
-      const delaySec = Math.max(0, (layer.startTime - sceneMs) / 1000);
-      const offsetSec = Math.max(0, (sceneMs - layer.startTime) / 1000) % buf.duration;
-      const playDur = Math.max(0.05, (layer.endTime - Math.max(sceneMs, layer.startTime)) / 1000);
-      src.start(ctx.currentTime + delaySec, offsetSec, Math.min(playDur, buf.duration - offsetSec));
+      const trimSec = Math.max(0, (layer.audioData.trimStartMs ?? 0) / 1000);
+      const delaySec = Math.max(0, (absStart - sceneMs) / 1000);
+      const elapsedSec = Math.max(0, (sceneMs - absStart) / 1000);
+      const rawOffset = trimSec + elapsedSec;
+      const offsetSec = buf.duration > 0 ? Math.min(rawOffset, Math.max(0, buf.duration - 0.02)) : 0;
+      const playDur = Math.max(0.05, (absEnd - Math.max(sceneMs, absStart)) / 1000);
+      src.start(ctx.currentTime + delaySec, offsetSec, Math.min(playDur, Math.max(0.02, buf.duration - offsetSec)));
       this.activeSources.push(src);
     } catch {
       // ignore fetch/decode failure

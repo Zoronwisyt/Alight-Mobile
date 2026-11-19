@@ -187,6 +187,7 @@ export interface AudioData {
   src: string;
   name: string;
   durationMs: number;
+  trimStartMs?: number;
   volume: Animatable<number>;
   muted: boolean;
   waveform?: number[];
