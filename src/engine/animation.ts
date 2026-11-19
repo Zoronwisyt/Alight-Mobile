@@ -209,13 +209,17 @@ export function integrateAnimatable(
     const v = prop?.keyframes?.length === 1 ? Number(prop.keyframes[0].v) : Number(prop?.value ?? fallback);
     return (Number.isFinite(v) ? v : fallback) * scaleFactor * t * durSec;
   }
-  const steps = 32;
+  const steps = 64;
   const du = t / steps;
   let sum = 0;
-  for (let i = 0; i < steps; i++) {
-    const u = (i + 0.5) * du;
-    const v = Number(evalAnimatable(prop, u, fallback));
-    sum += Number.isFinite(v) ? v : fallback;
+  let vPrev = Number(evalAnimatable(prop, 0, fallback));
+  if (!Number.isFinite(vPrev)) vPrev = fallback;
+  for (let i = 1; i <= steps; i++) {
+    const u = i * du;
+    let vCurr = Number(evalAnimatable(prop, u, fallback));
+    if (!Number.isFinite(vCurr)) vCurr = fallback;
+    sum += 0.5 * (vPrev + vCurr);
+    vPrev = vCurr;
   }
   return sum * du * durSec * scaleFactor;
 }

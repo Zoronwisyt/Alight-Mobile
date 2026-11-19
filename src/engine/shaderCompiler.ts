@@ -86,6 +86,10 @@ function transpileShaderCode(
     }
   }
 
+  // 4) Prevent 0/0 NaN in warp shaders on ANGLE/D3D11 (pinchbulge*, circularripple*)
+  code = code.replace(/\bfloat\s+dist\s*=\s*length\s*\(([^)]+)\)\s*;/g, 'float dist = max(length($1), 0.00001);');
+  code = code.replace(/\bnormalize\s*\(\s*st\s*\)/g, '(length(st) > 0.00001 ? normalize(st) : vec2(0.0))');
+
   return code;
 }
 
@@ -227,7 +231,7 @@ vec4 texture2DCv(sampler2D ac_tex, vec2 position) {
 }
 
 vec2 getTexSize(vec2 size) {
-    vec2 rSpace = (vec4(size.xy, 0.0, 1.0) * acVtoRSpace).xy;
+    vec2 rSpace = (vec4(size.xy, 0.0, 0.0) * acVtoRSpace).xy;
     return rSpace;
 }
 

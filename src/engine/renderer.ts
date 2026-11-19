@@ -66,8 +66,9 @@ in vec2 vUv;
 out vec4 fragColor;
 uniform sampler2D uTex;
 uniform float uAlpha;
+uniform vec2 uUvXform;
 void main() {
-  fragColor = texture(uTex, vUv) * uAlpha;
+  fragColor = texture(uTex, vUv * uUvXform.x + uUvXform.y) * uAlpha;
 }`;
 
 const MASK_FRAG = `#version 300 es
@@ -542,7 +543,16 @@ export class AlightRenderer {
     gl.drawArrays(gl.TRIANGLES, 0, 6);
   }
 
-  private blitTexture(tex: WebGLTexture, dst: FboSlot | null, w: number, h: number, alpha = 1, blend = false) {
+  private blitTexture(
+    tex: WebGLTexture,
+    dst: FboSlot | null,
+    w: number,
+    h: number,
+    alpha = 1,
+    blend = false,
+    uvScale = 1,
+    uvOffset = 0
+  ) {
     if (dst && tex === dst.tex) return;
     const gl = this.gl;
     gl.bindFramebuffer(gl.FRAMEBUFFER, dst ? dst.fbo : null);
@@ -558,6 +568,9 @@ export class AlightRenderer {
     gl.bindTexture(gl.TEXTURE_2D, tex);
     gl.uniform1i(this.blitProg.uniforms.uTex, 0);
     gl.uniform1f(this.blitProg.uniforms.uAlpha, alpha);
+    if (this.blitProg.uniforms.uUvXform) {
+      gl.uniform2f(this.blitProg.uniforms.uUvXform, uvScale, uvOffset);
+    }
     gl.bindVertexArray(this.quadVao);
     gl.drawArrays(gl.TRIANGLES, 0, 6);
     this.unbindTextureUnits(2);
@@ -1162,9 +1175,34 @@ export class AlightRenderer {
     const layerOpacity = clamp01(evalAnimatable(layer.opacity, remappedNormT, 1)) * tf.alphaMul * extraAlpha;
     if (layerOpacity <= 0.001) return;
 
-    // Step 1: Rasterize layer base content into an FBO at screen size
-    const contentFbo = this.acquireFbo(renderW, renderH);
-    this.clearFbo(contentFbo, renderW, renderH, 0, 0, 0, 0);
+    // Allocate overdraw margin when layer runs shader effects (so off-screen shifted/rotated content survives for Tile & Warps)
+    const activeShaderDefs = layer.effects
+      .filter((e) => e.enabled)
+      .map((e) => getEffectById(e.effectId))
+      .filter((d): d is EffectDef => !!d && d.shaders.length > 0);
+    const usesCompTex = activeShaderDefs.some((d) => d.params.some((p) => p.srcType === 'comp'));
+    const overdrawPad = activeShaderDefs.length > 0 && !usesCompTex ? 0.5 : 0.0;
+    const overdrawSpan = 1.0 + 2.0 * overdrawPad;
+    const invOverdrawSpan = 1.0 / overdrawSpan;
+    const fboW = Math.max(1, Math.round(renderW * overdrawSpan));
+    const fboH = Math.max(1, Math.round(renderH * overdrawSpan));
+
+    const acTransform = mat4RowMajorToGl([
+      overdrawSpan, 0, 0, -overdrawPad,
+      0, overdrawSpan, 0, -overdrawPad,
+      0, 0, 1, 0,
+      0, 0, 0, 1,
+    ]);
+    const acVtoRSpace = mat4RowMajorToGl([
+      invOverdrawSpan, 0, 0, overdrawPad * invOverdrawSpan,
+      0, invOverdrawSpan, 0, overdrawPad * invOverdrawSpan,
+      0, 0, 1, 0,
+      0, 0, 0, 1,
+    ]);
+
+    // Step 1: Rasterize layer base content into an FBO (covering virtual screen [-pad, 1 + pad])
+    const contentFbo = this.acquireFbo(fboW, fboH);
+    this.clearFbo(contentFbo, fboW, fboH, 0, 0, 0, 0);
 
     let logicalW = 300;
     let logicalH = 300;
@@ -1199,7 +1237,11 @@ export class AlightRenderer {
         tf.px * scale,
         tf.py * scale,
         tf.skewX,
-        tf.skewY
+        tf.skewY,
+        1,
+        1,
+        overdrawPad,
+        overdrawSpan
       );
       this.releaseFbo(grpFbo);
       logicalW = grpW;
@@ -1250,14 +1292,16 @@ export class AlightRenderer {
             tf.skewX,
             tf.skewY,
             coverScaleX,
-            coverScaleY
+            coverScaleY,
+            overdrawPad,
+            overdrawSpan
           );
         }
       }
     } else {
       // Shape / Vector / Freehand / Text -> Canvas2D rasterization in world coordinates (with Repeat effects!)
       const repeatInstances = this.computeRepeatInstances(layer, remappedNormT);
-      const dims = this.rasterizeLayerToCanvas2D(project, layer, remappedNormT, wx, wy, tf.rotation, wsx, wsy, tf.px, tf.py, tf.skewX, tf.skewY, scale, renderW, renderH, repeatInstances);
+      const dims = this.rasterizeLayerToCanvas2D(project, layer, remappedNormT, wx, wy, tf.rotation, wsx, wsy, tf.px, tf.py, tf.skewX, tf.skewY, scale, renderW, renderH, repeatInstances, overdrawPad, overdrawSpan);
       logicalW = dims.w;
       logicalH = dims.h;
 
@@ -1267,18 +1311,25 @@ export class AlightRenderer {
       gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
       gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, 1);
       gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this.canvas2d);
-      this.blitTexture(this.tempUploadTex, contentFbo, renderW, renderH, 1.0, false);
+      this.blitTexture(this.tempUploadTex, contentFbo, fboW, fboH, 1.0, false);
     }
 
     // Step 2: Run GPU Shader / Script Effect Stack
     let currentSlot = contentFbo;
-    const dtMs = 1000 / Math.max(1, project.fps);
-    const tfPrev = this.resolveWorldTransform(layer, layersMap, sceneTimeMs - dtMs * 0.5, project.fps);
-    const tfNext = this.resolveWorldTransform(layer, layersMap, sceneTimeMs + dtMs * 0.5, project.fps);
+    const frameDtMs = 1000 / Math.max(1, project.fps);
+    const isFirstFrame = sceneTimeMs - layer.startTime < frameDtMs * 0.6;
+    const tfPrev = isFirstFrame
+      ? tf
+      : this.resolveWorldTransform(layer, layersMap, sceneTimeMs - frameDtMs, project.fps);
+    const tfCurr = isFirstFrame
+      ? this.resolveWorldTransform(layer, layersMap, Math.min(layer.endTime, sceneTimeMs + frameDtMs), project.fps)
+      : tf;
     const vels = {
-      velocity: [tfNext.x - tfPrev.x, tfNext.y - tfPrev.y] as [number, number],
-      angularVelocity: tfNext.rotation - tfPrev.rotation,
-      scaleVelocity: Math.hypot((tfNext.sx - tfPrev.sx) * logicalW, (tfNext.sy - tfPrev.sy) * logicalH),
+      velocity: [tfCurr.x - tfPrev.x, tfCurr.y - tfPrev.y] as [number, number],
+      angularVelocity: tfCurr.rotation - tfPrev.rotation,
+      scaleVelocity:
+        Math.hypot(tfCurr.sx * logicalW, tfCurr.sy * logicalH) -
+        Math.hypot(tfPrev.sx * logicalW, tfPrev.sy * logicalH),
     };
     const durSec = Math.max(0.001, (layer.endTime - layer.startTime) / 1000);
     const envBase: EffectScriptEnv = {
@@ -1366,6 +1417,8 @@ export class AlightRenderer {
           sceneFbo,
           renderW,
           renderH,
+          fboW,
+          fboH,
           scale,
           project,
           layer,
@@ -1380,7 +1433,9 @@ export class AlightRenderer {
           vels,
           localTimeMs,
           screenToLayer,
-          layerToScreen
+          layerToScreen,
+          acTransform,
+          acVtoRSpace
         );
         if (nextSlot && nextSlot !== currentSlot) {
           this.releaseFbo(currentSlot);
@@ -1390,6 +1445,24 @@ export class AlightRenderer {
     }
 
     const finalAlpha = clamp01(layerOpacity * scriptAlpha);
+
+    // When blendMode !== 'normal' and overdraw margin is active, crop center [0,1] into renderW x renderH
+    // so maskProg / blendProg sample sceneFbo and currentSlot in matching [0,1] space.
+    if (layer.blendMode !== 'normal' && overdrawPad > 0) {
+      const croppedFbo = this.acquireFbo(renderW, renderH);
+      this.blitTexture(
+        currentSlot.tex,
+        croppedFbo,
+        renderW,
+        renderH,
+        1.0,
+        false,
+        invOverdrawSpan,
+        overdrawPad * invOverdrawSpan
+      );
+      this.releaseFbo(currentSlot);
+      currentSlot = croppedFbo;
+    }
 
     // Step 3: Composite onto Scene FBO (Mask / Exclude / 26 APK Blend Modes / Normal)
     if (layer.blendMode === 'mask' || layer.blendMode === 'exclude') {
@@ -1476,10 +1549,28 @@ export class AlightRenderer {
         this.releaseFbo(compFbo);
         this.releaseFbo(blendedFbo);
       } else {
-        this.blitTexture(currentSlot.tex, sceneFbo, renderW, renderH, finalAlpha, true);
+        this.blitTexture(
+          currentSlot.tex,
+          sceneFbo,
+          renderW,
+          renderH,
+          finalAlpha,
+          true,
+          invOverdrawSpan,
+          overdrawPad * invOverdrawSpan
+        );
       }
     } else {
-      this.blitTexture(currentSlot.tex, sceneFbo, renderW, renderH, finalAlpha, true);
+      this.blitTexture(
+        currentSlot.tex,
+        sceneFbo,
+        renderW,
+        renderH,
+        finalAlpha,
+        true,
+        invOverdrawSpan,
+        overdrawPad * invOverdrawSpan
+      );
     }
 
     this.releaseFbo(currentSlot);
@@ -1513,6 +1604,8 @@ export class AlightRenderer {
     sceneFbo: FboSlot,
     renderW: number,
     renderH: number,
+    fboW: number,
+    fboH: number,
     scale: number,
     project: Project,
     layer: Layer,
@@ -1527,7 +1620,9 @@ export class AlightRenderer {
     vels: { velocity: [number, number]; angularVelocity: number; scaleVelocity: number },
     localTimeMs: number,
     screenToLayer: Float32Array,
-    layerToScreen: Float32Array
+    layerToScreen: Float32Array,
+    acTransform?: Float32Array,
+    acVtoRSpace?: Float32Array
   ): FboSlot | null {
     const prog = this.registry.getEffectProgram(def, group);
     if (!prog) return null;
@@ -1536,8 +1631,8 @@ export class AlightRenderer {
     for (const pd of def.params) {
       if (pd.tag === 'texture' && pd.srcType === 'buffer' && pd.id) {
         const ds = Math.max(1, parseInt(pd.downsample || '1', 10) || 1);
-        const bw = Math.max(8, Math.round(renderW / ds));
-        const bh = Math.max(8, Math.round(renderH / ds));
+        const bw = Math.max(8, Math.round(fboW / ds));
+        const bh = Math.max(8, Math.round(fboH / ds));
         const bSlot = this.acquireFbo(bw, bh);
         this.clearFbo(bSlot, bw, bh, 0, 0, 0, 0);
         bufferMap.set(pd.id, bSlot);
@@ -1552,8 +1647,8 @@ export class AlightRenderer {
     const gl = this.gl;
 
     for (let it = 0; it < iterCount; it++) {
-      iterOutput = this.acquireFbo(renderW, renderH);
-      this.clearFbo(iterOutput, renderW, renderH, 0, 0, 0, 0);
+      iterOutput = this.acquireFbo(fboW, fboH);
+      this.clearFbo(iterOutput, fboW, fboH, 0, 0, 0, 0);
 
       for (let pIdx = 0; pIdx < passes.length; pIdx++) {
         const pass = passes[pIdx];
@@ -1572,6 +1667,8 @@ export class AlightRenderer {
               sceneFbo,
               targetSlot.width,
               targetSlot.height,
+              targetSlot.width,
+              targetSlot.height,
               scale,
               project,
               layer,
@@ -1586,7 +1683,9 @@ export class AlightRenderer {
               vels,
               localTimeMs,
               screenToLayer,
-              layerToScreen
+              layerToScreen,
+              acTransform,
+              acVtoRSpace
             );
             if (subRes) {
               this.blitTexture(subRes.tex, targetSlot, targetSlot.width, targetSlot.height, 1, false);
@@ -1620,7 +1719,9 @@ export class AlightRenderer {
           pIdx,
           it,
           screenToLayer,
-          layerToScreen
+          layerToScreen,
+          acTransform,
+          acVtoRSpace
         );
 
         let texUnit = 0;
@@ -1732,7 +1833,9 @@ export class AlightRenderer {
     passIdx: number,
     iterIdx: number,
     screenToLayer: Float32Array,
-    layerToScreen: Float32Array
+    layerToScreen: Float32Array,
+    acTransform?: Float32Array,
+    acVtoRSpace?: Float32Array
   ) {
     const gl = this.gl;
     const id4 = new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
@@ -1756,10 +1859,10 @@ export class AlightRenderer {
     if (u.acPass) gl.uniform1i(u.acPass, passIdx);
     if (u.acIter) gl.uniform1i(u.acIter, iterIdx);
     if (u.acLayerTransform) gl.uniformMatrix3fv(u.acLayerTransform, false, id3);
-    if (u.acTransform) gl.uniformMatrix4fv(u.acTransform, false, id4);
+    if (u.acTransform) gl.uniformMatrix4fv(u.acTransform, false, acTransform ?? id4);
     if (u.acScreenToLayer) gl.uniformMatrix4fv(u.acScreenToLayer, false, screenToLayer);
     if (u.acLayerToScreen) gl.uniformMatrix4fv(u.acLayerToScreen, false, layerToScreen);
-    if (u.acVtoRSpace) gl.uniformMatrix4fv(u.acVtoRSpace, false, id4);
+    if (u.acVtoRSpace) gl.uniformMatrix4fv(u.acVtoRSpace, false, acVtoRSpace ?? id4);
     if (u.acShowGuides) gl.uniform1i(u.acShowGuides, 0);
   }
 
@@ -1781,9 +1884,11 @@ export class AlightRenderer {
     skewX = 0,
     skewY = 0,
     coverScaleX = 1,
-    coverScaleY = 1
+    coverScaleY = 1,
+    overdrawPad = 0,
+    overdrawSpan = 1
   ) {
-    const key = '__internal_tf_blit';
+    const key = '__internal_tf_blit_v2';
     let prog = (this as any)._tfBlitProg as ReturnType<ShaderRegistry['compileRaw']> | undefined;
     if (!prog) {
       prog = this.registry.compileRaw(
@@ -1805,8 +1910,10 @@ export class AlightRenderer {
         uniform mat4 uScreenToLayer;
         uniform int uFlipY;
         uniform vec2 uCoverScale;
+        uniform vec2 uOverdraw;
         void main() {
-          vec2 luv = (vec4(vUv, 0.0, 1.0) * uScreenToLayer).xy;
+          vec2 screenUv = vUv * uOverdraw.x + uOverdraw.y;
+          vec2 luv = (vec4(screenUv, 0.0, 1.0) * uScreenToLayer).xy;
           if (luv.x < 0.0 || luv.x > 1.0 || luv.y < 0.0 || luv.y > 1.0) {
             fragColor = vec4(0.0);
           } else {
@@ -1821,7 +1928,7 @@ export class AlightRenderer {
     const { screenToLayer } = makeTransformMatrices(renderW, renderH, cx, cy, w, h, rotDeg, sx, sy, pivotX, pivotY, skewX, skewY);
     const gl = this.gl;
     gl.bindFramebuffer(gl.FRAMEBUFFER, dst.fbo);
-    gl.viewport(0, 0, renderW, renderH);
+    gl.viewport(0, 0, dst.width, dst.height);
     gl.disable(gl.BLEND);
     gl.useProgram(prog.program);
     gl.activeTexture(gl.TEXTURE0);
@@ -1830,6 +1937,7 @@ export class AlightRenderer {
     gl.uniformMatrix4fv(prog.uniforms.uScreenToLayer, false, screenToLayer);
     if (prog.uniforms.uFlipY) gl.uniform1i(prog.uniforms.uFlipY, flipY ? 1 : 0);
     if (prog.uniforms.uCoverScale) gl.uniform2f(prog.uniforms.uCoverScale, coverScaleX, coverScaleY);
+    if (prog.uniforms.uOverdraw) gl.uniform2f(prog.uniforms.uOverdraw, overdrawSpan, -overdrawPad);
     this.drawQuad(prog.program);
     this.unbindTextureUnits(2);
   }
@@ -1944,15 +2052,22 @@ export class AlightRenderer {
     scale: number,
     renderW: number,
     renderH: number,
-    instances: { dx: number; dy: number; rot: number; scale: number; alpha: number }[]
+    instances: { dx: number; dy: number; rot: number; scale: number; alpha: number }[],
+    overdrawPad = 0,
+    overdrawSpan = 1
   ): { w: number; h: number } {
-    if (this.canvas2d.width !== renderW || this.canvas2d.height !== renderH) {
-      this.canvas2d.width = renderW;
-      this.canvas2d.height = renderH;
+    const fboW = Math.max(1, Math.round(renderW * overdrawSpan));
+    const fboH = Math.max(1, Math.round(renderH * overdrawSpan));
+    if (this.canvas2d.width !== fboW || this.canvas2d.height !== fboH) {
+      this.canvas2d.width = fboW;
+      this.canvas2d.height = fboH;
     }
     const ctx = this.ctx2d;
     ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.clearRect(0, 0, renderW, renderH);
+    ctx.clearRect(0, 0, fboW, fboH);
+    if (overdrawPad !== 0) {
+      ctx.translate(overdrawPad * renderW, overdrawPad * renderH);
+    }
 
     // Precompute shape path or bounds
     let shapePts: any[] | null = null;

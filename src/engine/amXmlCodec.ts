@@ -92,7 +92,8 @@ function layerToXml(layer: Layer, indent = '  '): string {
   }
 
   for (const eff of layer.effects) {
-    parts.push(`${indent}  <effect id="${escapeXml(eff.effectId)}" locallyApplied="${eff.locallyApplied ? 'true' : 'false'}" enabled="${eff.enabled ? 'true' : 'false'}">`);
+    const hiddenAttr = !eff.enabled ? ' hidden="true"' : '';
+    parts.push(`${indent}  <effect id="${escapeXml(eff.effectId)}" locallyApplied="${eff.locallyApplied ? 'true' : 'false'}" enabled="${eff.enabled ? 'true' : 'false'}"${hiddenAttr}>`);
     for (const [pname, pval] of Object.entries(eff.params)) {
       const ptype = Array.isArray(pval.value)
         ? pval.value.length === 2
@@ -327,7 +328,7 @@ function parseXmlLayer(
     effects.push({
       uid: `eff_${Math.random().toString(36).slice(2, 10)}`,
       effectId: eid,
-      enabled: effEl.getAttribute('enabled') !== 'false',
+      enabled: effEl.getAttribute('enabled') !== 'false' && effEl.getAttribute('hidden') !== 'true',
       locallyApplied: effEl.getAttribute('locallyApplied') === 'true',
       params,
     });

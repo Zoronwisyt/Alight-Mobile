@@ -289,6 +289,12 @@ async function resolveFirebasePackageUrl(
   return { downloadUrl: parsed.zipUrl };
 }
 
+function doubleEncodeFirebaseObjectPath(url: string): string {
+  return url.replace(/(\/v0\/b\/[^/]+\/o\/)([^?]+)/, (_m, prefix: string, objPath: string) => {
+    return `${prefix}${encodeURIComponent(objPath)}`;
+  });
+}
+
 function buildProxyEndpoints(targetUrl: string): { label: string; fetchUrl: string; timeoutMs: number }[] {
   const endpoints: { label: string; fetchUrl: string; timeoutMs: number }[] = [];
   const customProxy = getCustomProxyUrl();
@@ -306,6 +312,11 @@ function buildProxyEndpoints(targetUrl: string): { label: string; fetchUrl: stri
     });
   }
 
+  endpoints.push({
+    label: 'isteed-cors',
+    fetchUrl: `https://cors.isteed.cc/${doubleEncodeFirebaseObjectPath(targetUrl)}`,
+    timeoutMs: 25000,
+  });
   endpoints.push({ label: 'direct', fetchUrl: targetUrl, timeoutMs: 12000 });
   endpoints.push({
     label: 'codetabs',
