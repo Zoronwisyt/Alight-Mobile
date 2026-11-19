@@ -575,18 +575,51 @@ dialog.am-dialog::backdrop {
   background: #191B27;
 }
 
+:root {
+  --am-timeline-h: 300px;
+  --am-track-row: 34px;
+  --am-ruler-h: 44px;
+  --am-cts-w: 84px;
+}
+
+@media (min-width: 600px) and (max-width: 1023px) {
+  :root {
+    --am-timeline-h: min(340px, 46vh);
+    --am-track-row: 36px;
+    --am-ruler-h: 48px;
+    --am-cts-w: 90px;
+  }
+}
+
+@media (max-width: 599px) {
+  :root {
+    --am-timeline-h: max(320px, 38vh);
+    --am-track-row: 32px;
+    --am-ruler-h: 44px;
+    --am-cts-w: 84px;
+  }
+}
+
+@media (max-height: 500px) {
+  :root {
+    --am-timeline-h: max(240px, 46vh);
+    --am-track-row: 32px;
+    --am-ruler-h: 40px;
+  }
+}
+
 /* iPad / Desktop Studio Layout: Upper (Stage + Right Docked Element Editor) / Middle Playbar / Bottom Full-Width Timeline */
 .am-editor-body.widescreen {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 390px;
-  grid-template-rows: minmax(220px, 1fr) 46px 250px;
+  grid-template-rows: minmax(200px, 1fr) 46px var(--am-timeline-h);
 }
 
-/* Exact Mobile APK Portrait Layout (activity_edit.xml): Stage -> Playbar (46dp) -> Timeline (280dp) with Element Panel overlaying timeline */
+/* Mobile Portrait Layout: Stage -> Playbar (46px) -> Always-Visible Timeline (R-1 & R-2) */
 .am-editor-body.classic {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  grid-template-rows: minmax(200px, 1fr) 46px 270px;
+  grid-template-rows: minmax(200px, 1fr) 46px var(--am-timeline-h);
 }
 
 /* APK @id/previewGuide (#141620) */
@@ -628,16 +661,19 @@ dialog.am-dialog::backdrop {
   overflow: hidden;
 }
 
-/* Mobile APK @id/elementFragmentHolder (#202332 bottom sheet over timeline) */
+/* R-2: Mobile inspector sheet anchors above Playbar + Timeline so the timeline is NEVER covered */
 .am-editor-body.classic .am-inspector-dock {
   position: absolute;
   left: 0;
   right: 0;
-  bottom: 0;
-  height: 270px;
+  bottom: calc(var(--am-timeline-h) + 46px);
+  max-height: calc(100% - var(--am-timeline-h) - 52px);
+  height: auto;
   z-index: 35;
   background: #202332;
-  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  border-top: 1px solid rgba(255, 255, 255, 0.16);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 14px 14px 0 0;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -958,18 +994,42 @@ dialog.am-dialog::backdrop {
   position: relative;
 }
 
+.am-timeline-resize-handle {
+  height: 6px;
+  min-height: 6px;
+  cursor: ns-resize;
+  background: #141620;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  touch-action: none;
+  z-index: 12;
+}
+
+.am-timeline-resize-handle::after {
+  content: '';
+  width: 36px;
+  height: 3px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.24);
+}
+
+.am-timeline-resize-handle:hover::after {
+  background: var(--am-accent);
+}
+
 .am-timeline-top-row {
   display: flex;
-  height: 36px;
-  min-height: 36px;
+  height: var(--am-ruler-h);
+  min-height: var(--am-ruler-h);
   background: #141620;
   border-bottom: 1px solid rgba(255, 255, 255, 0.07);
 }
 
-/* APK timeline_cts_bg_width (70dp) */
+/* APK timeline_cts_bg_width */
 .am-timeline-cts {
-  width: 70px;
-  min-width: 70px;
+  width: var(--am-cts-w);
+  min-width: var(--am-cts-w);
   height: 100%;
   background: #191B27;
   border-right: 1px solid rgba(255, 255, 255, 0.08);
@@ -1036,10 +1096,10 @@ dialog.am-dialog::backdrop {
   overflow: hidden;
 }
 
-/* APK timeline_header.xml (70dp left column) */
+/* APK timeline_header.xml (left column) */
 .am-timeline-headers {
-  width: 70px;
-  min-width: 70px;
+  width: var(--am-cts-w);
+  min-width: var(--am-cts-w);
   background: #141620;
   border-right: 1px solid rgba(255, 255, 255, 0.08);
   overflow: hidden;
@@ -1048,12 +1108,58 @@ dialog.am-dialog::backdrop {
 }
 
 .am-track-header {
-  height: 32px;
+  height: var(--am-track-row);
   margin-bottom: 3px;
   background: #1E2239;
   display: flex;
   align-items: center;
   position: relative;
+}
+
+.am-track-enter-group-btn {
+  width: 20px;
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  background: rgba(0, 255, 168, 0.16);
+  color: #00FFA8;
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1;
+  margin-left: auto;
+  margin-right: 2px;
+}
+
+.am-track-enter-group-btn:hover {
+  background: rgba(0, 255, 168, 0.3);
+}
+
+.am-centre-playhead {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 2px;
+  transform: translateX(-50%);
+  background: #00FFA8;
+  pointer-events: none;
+  z-index: 18;
+  box-shadow: 0 0 8px rgba(0, 255, 168, 0.65);
+}
+
+.am-centre-playhead-cap {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 12px;
+  height: 10px;
+  background: #00FFA8;
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+  pointer-events: none;
+  z-index: 19;
 }
 
 .am-track-header.selected {
@@ -1096,7 +1202,7 @@ dialog.am-dialog::backdrop {
 
 /* APK timeline_row_height (28dp-32dp) */
 .am-track-row {
-  height: 32px;
+  height: var(--am-track-row);
   position: relative;
   display: flex;
   align-items: center;
@@ -1893,16 +1999,18 @@ dialog.am-dialog::backdrop {
   }
 
   .am-editor-body.classic {
-    grid-template-rows: minmax(190px, 1fr) 46px 265px;
+    grid-template-rows: minmax(190px, 1fr) 46px var(--am-timeline-h);
   }
 
   .am-editor-body.classic .am-inspector-dock {
-    height: 265px;
+    bottom: calc(var(--am-timeline-h) + 46px);
+    height: auto;
+    max-height: calc(100% - var(--am-timeline-h) - 52px);
   }
 
   .am-track-row,
   .am-track-header {
-    height: 36px;
+    height: var(--am-track-row);
   }
 
   .am-track-bar {

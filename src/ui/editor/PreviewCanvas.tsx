@@ -42,6 +42,7 @@ export const PreviewCanvas: React.FC<PreviewCanvasProps> = ({
     previewPan,
     setPreviewPan,
     selectLayer,
+    enterGroup,
     mutateProject,
     drawingBrushColor,
     drawingBrushWidth,
@@ -352,11 +353,30 @@ export const PreviewCanvas: React.FC<PreviewCanvasProps> = ({
     };
   }
 
+  const handleStageDoubleClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    const [px, py] = clientToProject(e.clientX, e.clientY);
+    for (let i = layers.length - 1; i >= 0; i--) {
+      const l = layers[i];
+      if (l.type !== 'group' || !l.visible || l.locked) continue;
+      if (currentTimeMs < l.startTime || currentTimeMs > l.endTime) continue;
+      const { remappedNormT } = evalRemappedTime(l, currentTimeMs);
+      const loc = evalAnimatable(l.transform.location, remappedNormT, [currentProject.width / 2, currentProject.height / 2, 0]);
+      const sc = evalAnimatable(l.transform.scale, remappedNormT, [1, 1]);
+      const halfW = ((l.groupWidth || currentProject.width) * Math.abs(sc[0])) * 0.5;
+      const halfH = ((l.groupHeight || currentProject.height) * Math.abs(sc[1])) * 0.5;
+      if (Math.abs(px - loc[0]) <= Math.max(120, halfW) && Math.abs(py - loc[1]) <= Math.max(120, halfH)) {
+        enterGroup(l.id);
+        return;
+      }
+    }
+  };
+
   return (
     <div
       ref={wrapRef}
       className="am-stage-wrap"
       onPointerDown={handleStagePointerDown}
+      onDoubleClick={handleStageDoubleClick}
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}

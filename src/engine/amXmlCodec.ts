@@ -530,6 +530,7 @@ function parseXmlLayer(
     };
   }
 
+  // Nested <scene> inside <embedScene>: always use width/height (group canvas), never stale exportWidth/exportHeight
   const nestedScene = el.querySelector(':scope > scene');
   const groupWidth = nestedScene ? parseInt(nestedScene.getAttribute('width') || '', 10) || projW : undefined;
   const groupHeight = nestedScene ? parseInt(nestedScene.getAttribute('height') || '', 10) || projH : undefined;
@@ -538,6 +539,11 @@ function parseXmlLayer(
         .filter((c) => LAYER_TAGS.has(c.tagName.toLowerCase()))
         .map((c, j) => parseXmlLayer(c, j, groupWidth!, groupHeight!, mediaMap))
     : undefined;
+
+  const isClippingMask = el.getAttribute('clippingMask') === 'true';
+  const rawBlending = (el.getAttribute('blending') as BlendModeId) || 'normal';
+  const resolvedBlendMode: BlendModeId =
+    isClippingMask && rawBlending !== 'exclude' ? 'mask' : rawBlending;
 
   return {
     id: el.getAttribute('id') || `layer_${Date.now()}_${idx}`,
@@ -549,7 +555,7 @@ function parseXmlLayer(
     visible: el.getAttribute('hidden') !== 'true' && el.getAttribute('visible') !== 'false',
     locked: false,
     parentId: el.getAttribute('parent') || null,
-    blendMode: (el.getAttribute('blending') as BlendModeId) || 'normal',
+    blendMode: resolvedBlendMode,
     opacity: parsePropElement(tf?.querySelector(':scope > opacity') ?? null, parseNum, 1),
     transform: {
       location: parsePropElement(tf?.querySelector(':scope > location') ?? null, parseVec3, [projW / 2, projH / 2, 0]),

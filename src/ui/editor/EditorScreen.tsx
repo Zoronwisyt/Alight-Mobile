@@ -204,10 +204,21 @@ export const EditorScreen: React.FC = () => {
         else if (store.showAddLayerPopup) store.setModal('showAddLayerPopup', false);
         else if (store.showExportDialog) store.setModal('showExportDialog', false);
         else if (store.showProjectSettings) store.setModal('showProjectSettings', false);
+        else if (store.groupStack.length > 0) store.exitGroup();
         else if (store.inspectorTab !== 'none') store.setInspectorTab('none');
         return;
       }
       if (modalOpen) return;
+
+      if (e.key === 'Enter' && store.selectedLayerIds.length === 1) {
+        const active = store.getActiveLayers();
+        const sel = active.find((l) => l.id === store.selectedLayerIds[0]);
+        if (sel?.type === 'group') {
+          e.preventDefault();
+          store.enterGroup(sel.id);
+          return;
+        }
+      }
 
       const mod = e.ctrlKey || e.metaKey;
       const key = e.key.toLowerCase();

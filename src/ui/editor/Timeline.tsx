@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { replaceMediaOnLayers } from '../../engine/mediaReplace';
 import { useEditorStore } from '../../store/useEditorStore';
 import type { Layer } from '../../types/project';
@@ -60,6 +60,7 @@ export const Timeline: React.FC = () => {
     setIsPlaying,
     setLoop,
     selectLayer,
+    enterGroup,
     toggleLayerVisible,
     reorderLayer,
     setTimelineZoom,
@@ -72,32 +73,126 @@ export const Timeline: React.FC = () => {
   const headersRef = useRef<HTMLDivElement>(null);
   const replaceInputRef = useRef<HTMLInputElement>(null);
   const [showOverflowMenu, setShowOverflowMenu] = useState(false);
+  const [trackViewportW, setTrackViewportW] = useState(600);
+
+  // R-1: Restore persisted timeline height from localStorage
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('am.timeline.h');
+      if (saved) {
+        const px = parseInt(saved, 10);
+        if (Number.isFinite(px) && px >= 160 && px <= 700) {
+          document.documentElement.style.setProperty('--am-timeline-h', `${px}px`);
+        }
+      }
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  // R-3: Measure track viewport width so centre-fixed playhead stays exact
+  useEffect(() => {
+    const el = scrollerRef.current;
+    if (!el) return;
+    const update = () => setTrackViewportW(Math.max(160, el.clientWidth));
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [currentProject?.id]);
 
   if (!currentProject) return null;
   const layers = getActiveLayers();
   const totalSec = Math.max(2, currentProject.durationMs / 1000 + 1);
   const trackWidth = Math.max(900, Math.round(totalSec * timelinePxPerSec));
-  const playheadX = (currentTimeMs / 1000) * timelinePxPerSec;
+  const centreX = trackViewportW * 0.5;
+  const contentOffset = centreX - (currentTimeMs / 1000) * timelinePxPerSec;
 
-  const scrubFromClientX = (clientX: number, el: HTMLElement) => {
-    const rect = el.getBoundingClientRect();
-    const x = clientX - rect.left + (scrollerRef.current?.scrollLeft ?? 0);
-    const ms = Math.max(0, Math.min(currentProject.durationMs, (x / timelinePxPerSec) * 1000));
-    setIsPlaying(false);
-    setCurrentTimeMs(ms);
-  };
+  // R-1: Drag top handle to resize timeline height (160px..62vh), double-click resets
+  const handleTimelineResizeDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    e.stopPropagation();
+    const startY = e.clientY;
+    const wrap = e.currentTarget.parentElement;
+    const startH = wrap ? wrap.getBoundingClientRect().height : 300;
+    const maxH = Math.round(window.innerHeight * 0.62);
+    e.currentTarget.setPointerCapture(e.pointerId);
 
-  const handleRulerDown = (e: React.PointerEvent<HTMLDivElement>) => {
-    const el = e.currentTarget;
-    el.setPointerCapture(e.pointerId);
-    scrubFromClientX(e.clientX, el);
-    const onMove = (ev: PointerEvent) => scrubFromClientX(ev.clientX, el);
-    const onUp = () => {
+    const onMove = (ev: PointerEvent) => {
+      const nextH = Math.max(160, Math.min(maxH, Math.round(startH - (ev.clientY - startY))));
+      document.documentElement.style.setProperty('--am-timeline-h', `${nextH}px`);
+    };
+    const onUp = (ev: PointerEvent) => {
+      const finalH = Math.max(160, Math.min(maxH, Math.round(startH - (ev.clientY - startY))));
+      try {
+        localStorage.setItem('am.timeline.h', String(finalH));
+      } catch {
+        // ignore
+      }
       window.removeEventListener('pointermove', onMove);
       window.removeEventListener('pointerup', onUp);
     };
     window.addEventListener('pointermove', onMove);
     window.addEventListener('pointerup', onUp);
+  };
+
+  // R-3: Drag ruler or track background to slide timeline under the fixed centre playhead
+  const handlePanScrubDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    if ((e.target as HTMLElement).closest('.am-track-bar, .am-ruler-bookmark')) return;
+    const startX = e.clientX;
+    const startTimeMs = currentTimeMs;
+    let moved = false;
+    let lastMs = startTimeMs;
+    setIsPlaying(false);
+
+    const onMove = (ev: PointerEvent) => {
+      const dx = ev.clientX - startX;
+      if (Math.abs(dx) > 3) moved = true;
+      lastMs = Math.max(0, Math.min(currentProject.durationMs, startTimeMs - (dx / timelinePxPerSec) * 1000));
+      setCurrentTimeMs(lastMs);
+    };
+    const onUp = () => {
+      window.removeEventListener('pointermove', onMove);
+      window.removeEventListener('pointerup', onUp);
+      if (moved) {
+        // Snap to nearest keyframe within 6px of centre playhead
+        const selLayer = selectedLayerIds.length === 1 ? layers.find((l) => l.id === selectedLayerIds[0]) : undefined;
+        if (selLayer) {
+          const kfs = collectLayerKeyframes(selLayer);
+          const dur = Math.max(1, selLayer.endTime - selLayer.startTime);
+          let bestMs = lastMs;
+          let bestPx = 6.01;
+          for (const kt of kfs) {
+            const kfMs = selLayer.startTime + kt * dur;
+            const distPx = (Math.abs(kfMs - lastMs) / 1000) * timelinePxPerSec;
+            if (distPx < bestPx) {
+              bestPx = distPx;
+              bestMs = kfMs;
+            }
+          }
+          if (bestPx <= 6) setCurrentTimeMs(bestMs);
+        }
+      }
+    };
+    window.addEventListener('pointermove', onMove);
+    window.addEventListener('pointerup', onUp);
+  };
+
+  const handleRulerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    e.stopPropagation();
+    handlePanScrubDown(e);
+  };
+
+  const handleTimelineWheel = (e: React.WheelEvent<HTMLDivElement>) => {
+    if (e.ctrlKey || e.metaKey) {
+      e.preventDefault();
+      const factor = e.deltaY < 0 ? 1.15 : 1 / 1.15;
+      setTimelineZoom(timelinePxPerSec * factor);
+    } else if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
+      e.preventDefault();
+      setIsPlaying(false);
+      const nextMs = Math.max(0, Math.min(currentProject.durationMs, currentTimeMs + (e.deltaX / timelinePxPerSec) * 1000));
+      setCurrentTimeMs(nextMs);
+    }
   };
 
   const handleTrackMove = (e: React.PointerEvent, layerIdx: number, mode: 'move' | 'left' | 'right') => {
@@ -177,9 +272,24 @@ export const Timeline: React.FC = () => {
         }}
       />
 
-      {/* Top Row: 70dp CTS Timecode Box + Scrubbable Time Ruler */}
+      {/* R-1: Top resize handle (drag to resize timeline, double-click to reset) */}
+      <div
+        className="am-timeline-resize-handle"
+        onPointerDown={handleTimelineResizeDown}
+        onDoubleClick={() => {
+          try {
+            localStorage.removeItem('am.timeline.h');
+          } catch {
+            // ignore
+          }
+          document.documentElement.style.removeProperty('--am-timeline-h');
+        }}
+        title="Drag to resize timeline (double-click to reset)"
+      />
+
+      {/* Top Row: CTS Timecode Box + Centre-Fixed Scrubbable Time Ruler */}
       <div className="am-timeline-top-row">
-        {/* APK timeline_cts_bg_width (70dp) */}
+        {/* APK timeline_cts_bg_width */}
         <button
           type="button"
           className={`am-timeline-cts ${loop ? 'loop-on' : ''}`}
@@ -193,11 +303,17 @@ export const Timeline: React.FC = () => {
           ref={rulerRef}
           className="am-timeline-ruler"
           onPointerDown={handleRulerDown}
-          onScroll={(e) => {
-            if (scrollerRef.current) scrollerRef.current.scrollLeft = e.currentTarget.scrollLeft;
-          }}
+          onWheel={handleTimelineWheel}
         >
-          <div style={{ width: trackWidth, height: '100%', position: 'relative' }}>
+          <div
+            style={{
+              width: trackWidth,
+              height: '100%',
+              position: 'relative',
+              transform: `translate3d(${contentOffset}px, 0, 0)`,
+              willChange: 'transform',
+            }}
+          >
             {ticks.map((s) => {
               const left = s * timelinePxPerSec;
               const isMajor = Math.abs(s - Math.round(s)) < 0.01;
@@ -235,13 +351,10 @@ export const Timeline: React.FC = () => {
                 title={`Beat Bookmark (${(bm / 1000).toFixed(2)}s)`}
               />
             ))}
-
-            {/* Playhead Handle */}
-            <div
-              className="am-ruler-playhead-cap"
-              style={{ left: playheadX - 7 }}
-            />
           </div>
+
+          {/* R-3: Fixed Centre Playhead Cap */}
+          <div className="am-centre-playhead-cap" />
         </div>
       </div>
 
@@ -294,24 +407,50 @@ export const Timeline: React.FC = () => {
                     color={isSelected ? '#091318' : 'rgba(255,255,255,0.28)'}
                   />
                 </button>
+
+                {/* R-4: Direct chevron to enter any group layer */}
+                {layer.type === 'group' && (
+                  <button
+                    type="button"
+                    className="am-track-enter-group-btn"
+                    aria-label="Enter group"
+                    title="Enter Group"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      enterGroup(layer.id);
+                    }}
+                  >
+                    ›
+                  </button>
+                )}
               </div>
             );
           })}
         </div>
 
-        {/* Scrollable Layer Tracks */}
+        {/* Scrollable Layer Tracks (slides under fixed centre playhead) */}
         <div
           ref={scrollerRef}
           className="am-timeline-tracks am-scroll"
+          style={{ overflowX: 'hidden', position: 'relative' }}
+          onPointerDown={handlePanScrubDown}
+          onWheel={handleTimelineWheel}
           onScroll={(e) => {
-            if (rulerRef.current) rulerRef.current.scrollLeft = e.currentTarget.scrollLeft;
             if (headersRef.current) headersRef.current.scrollTop = e.currentTarget.scrollTop;
           }}
           onClick={(e) => {
             if (e.target === e.currentTarget) selectLayer('');
           }}
         >
-          <div style={{ width: trackWidth, minHeight: '100%', position: 'relative' }}>
+          <div
+            style={{
+              width: trackWidth,
+              minHeight: '100%',
+              position: 'relative',
+              transform: `translate3d(${contentOffset}px, 0, 0)`,
+              willChange: 'transform',
+            }}
+          >
             {layers.length === 0 && (
               <div style={{ padding: 24, color: 'var(--am-text-muted)', fontSize: 13 }}>
                 Tap the mint <strong>+</strong> button to add Shapes, Text, Media, Audio, Camera, or Vector Drawings.
@@ -339,6 +478,10 @@ export const Timeline: React.FC = () => {
                     onClick={(e) => {
                       e.stopPropagation();
                       selectLayer(layer.id, e.shiftKey || e.ctrlKey || e.metaKey);
+                    }}
+                    onDoubleClick={(e) => {
+                      e.stopPropagation();
+                      if (layer.type === 'group') enterGroup(layer.id);
                     }}
                     onPointerDown={(e) => handleTrackMove(e, idx, 'move')}
                   >
@@ -420,9 +563,10 @@ export const Timeline: React.FC = () => {
               );
             })}
 
-            {/* Vertical Playhead Line (1.5dp) */}
-            <div className="am-playhead-line" style={{ left: playheadX }} />
           </div>
+
+          {/* R-3: Fixed Centre Playhead Line */}
+          <div className="am-centre-playhead" />
         </div>
       </div>
 
