@@ -1,4 +1,14 @@
-export type EasingType = 'linear' | 'cubicBezier' | 'steps' | 'overshoot' | 'bounce' | 'elastic';
+export type EasingType =
+  | 'linear'
+  | 'cubicBezier'
+  | 'steps'
+  | 'step'
+  | 'overshoot'
+  | 'bounce'
+  | 'elastic'
+  | 'elasticStep'
+  | 'cyclic'
+  | 'random';
 
 export interface EasingSpec {
   type: EasingType;
@@ -7,6 +17,12 @@ export interface EasingSpec {
   x2: number;
   y2: number;
   steps?: number;
+  /** Raw numeric tail as written by AM, preserved verbatim for lossless round-trip export. */
+  params?: number[];
+  /** Original AM easing token string. */
+  token?: string;
+  /** True when the token is recognized/preserved but uses an approximation rather than exact APK bytecode. */
+  approximated?: boolean;
 }
 
 export interface Keyframe<T = any> {

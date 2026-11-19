@@ -54,6 +54,30 @@ export function evalEasing(u: number, easing?: EasingSpec): number {
       const steps = Math.max(1, Math.round(easing.steps ?? 4));
       return Math.floor(t * steps) / steps;
     }
+    case 'step': {
+      const stepLen = Math.max(1e-4, easing.params?.[0] ?? 0.25);
+      return Math.min(1, Math.floor(t / stepLen) * stepLen);
+    }
+    case 'elasticStep': {
+      const stepLen = Math.max(1e-4, easing.params?.[0] ?? 0.25);
+      const base = Math.floor(t / stepLen) * stepLen;
+      const local = (t - base) / stepLen;
+      const overshoot = local === 0 || local === 1 ? local : Math.pow(2, -8 * local) * Math.sin((local * 8 - 0.75) * ((2 * Math.PI) / 3)) + 1;
+      return base + stepLen * overshoot;
+    }
+    case 'cyclic': {
+      // AM CyclicEasing: params[0] is stepLength (normalized period in [0, 1])
+      const stepLen = Math.max(1e-4, easing.params?.[0] ?? 0.25);
+      const phase = easing.params?.[1] ?? 0;
+      const cycles = t / stepLen + phase;
+      return 0.5 - 0.5 * Math.cos(cycles * Math.PI * 2);
+    }
+    case 'random': {
+      const freq = Math.max(1, easing.params?.[0] ?? 8);
+      const idx = Math.floor(t * freq);
+      const h = Math.sin(idx * 127.1 + 311.7) * 43758.5453;
+      return h - Math.floor(h);
+    }
     case 'overshoot': {
       const tension = 1.5 + Math.abs(easing.y1) * 2.0;
       const s = t - 1;
@@ -322,20 +346,65 @@ export function evalLayerVelocities(
   };
 }
 
+const EASING_ARITY: Record<string, number | null> = {
+  linear: 0,
+  cubicBezier: 4,
+  cyclic: 5,
+  bounce: null,
+  elastic: null,
+  step: null,
+  elasticStep: null,
+  random: null,
+};
+
+function parseFiniteNum(s: string | undefined): number | null {
+  if (s === undefined) return null;
+  const v = Number(s);
+  return Number.isFinite(v) ? v : null;
+}
+
 export function parseEasingString(eStr?: string): EasingSpec | undefined {
   if (!eStr) return undefined;
   const parts = eStr.trim().split(/\s+/);
-  if (parts[0] === 'cubicBezier' && parts.length >= 5) {
-    return {
-      type: 'cubicBezier',
-      x1: parseFloat(parts[1]) || 0,
-      y1: parseFloat(parts[2]) || 0,
-      x2: parseFloat(parts[3]) || 1,
-      y2: parseFloat(parts[4]) || 1,
-    };
+  const token = parts[0];
+  if (!token) return undefined;
+
+  if (!(token in EASING_ARITY)) {
+    console.warn(`[easing] unrecognized token "${token}" in "${eStr}" — held verbatim, rendered linear`);
+    const tail = parts.slice(1).map(parseFiniteNum).filter((n): n is number => n !== null);
+    return { type: 'linear', x1: 0, y1: 0, x2: 1, y2: 1, token, params: tail, approximated: true };
   }
-  if (parts[0] === 'linear') {
-    return { type: 'linear', x1: 0, y1: 0, x2: 1, y2: 1 };
+
+  if (token === 'linear') {
+    return { type: 'linear', x1: 0, y1: 0, x2: 1, y2: 1, token };
   }
-  return undefined;
+
+  const params = parts.slice(1).map(parseFiniteNum).filter((n): n is number => n !== null);
+
+  if (token === 'cubicBezier') {
+    if (params.length < 4) {
+      console.warn(`[easing] malformed cubicBezier "${eStr}" — rendered linear`);
+      return { type: 'linear', x1: 0, y1: 0, x2: 1, y2: 1, token, params, approximated: true };
+    }
+    // Never use `|| 1` here — 0.0 is a legal and common control point for x2/y2.
+    const [x1, y1, x2, y2] = params;
+    return { type: 'cubicBezier', x1, y1, x2, y2, token };
+  }
+
+  const arity = EASING_ARITY[token];
+  if (arity !== null && params.length < arity) {
+    console.warn(`[easing] "${token}" expected ${arity} params, got ${params.length} — rendered linear`);
+    return { type: 'linear', x1: 0, y1: 0, x2: 1, y2: 1, token, params, approximated: true };
+  }
+
+  return {
+    type: token as EasingSpec['type'],
+    x1: 0,
+    y1: 0,
+    x2: 1,
+    y2: 1,
+    token,
+    params,
+    approximated: true,
+  };
 }

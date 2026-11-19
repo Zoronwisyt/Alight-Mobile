@@ -21,11 +21,18 @@ function escapeXml(str: string): string {
 }
 
 function formatEasingAttr(e?: EasingSpec): string {
-  if (!e || e.type === 'linear') return '';
+  if (!e || (e.type === 'linear' && !e.approximated)) return '';
+  if (e.approximated && e.token) {
+    const raw = [e.token, ...(e.params ?? [])].join(' ');
+    return ` e="${escapeXml(raw)}"`;
+  }
   if (e.type === 'cubicBezier') {
     return ` e="cubicBezier ${e.x1.toFixed(6)} ${e.y1.toFixed(6)} ${e.x2.toFixed(6)} ${e.y2.toFixed(6)}"`;
   }
-  return ` e="${e.type}"`;
+  if (e.token && e.params && e.params.length > 0) {
+    return ` e="${escapeXml([e.token, ...e.params].join(' '))}"`;
+  }
+  return '';
 }
 
 function formatVal(v: unknown): string {
