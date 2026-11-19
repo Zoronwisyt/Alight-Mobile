@@ -1,0 +1,177 @@
+@font-face {
+  font-family: 'Space Grotesk';
+  src: url('/am/fonts/spacegrotesk_regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Space Grotesk';
+  src: url('/am/fonts/spacegrotesk_medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Space Grotesk';
+  src: url('/am/fonts/spacegrotesk_semibold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Space Grotesk';
+  src: url('/am/fonts/spacegrotesk_bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Roboto';
+  src: url('/am/fonts/roboto_regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Roboto';
+  src: url('/am/fonts/roboto_medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Roboto';
+  src: url('/am/fonts/roboto_bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Hind';
+  src: url('/am/fonts/hind_regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Hind';
+  src: url('/am/fonts/hind_semibold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Serif Pro';
+  src: url('/am/fonts/serifpro_regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Serif Pro';
+  src: url('/am/fonts/serifpro_bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root,
+[data-theme='navy'] {
+  color-scheme: dark;
+  /* Exact Alight Motion 5.0.280 ARSC palette tokens */
+  --am-a1: #191C25;
+  --am-a2: #1E2239;
+  --am-a3: #242636;
+  --am-a4: #2B2F39;
+  --am-a5: #2A2F36;
+  --am-a6: #363942;
+  --am-a7: #2C3046;
+  --am-a8: #202B36;
+  --am-a9: #202332;
+  --am-a10: #191B27;
+  --am-a11: #141620;
+  --am-a12: #0C0D13;
+
+  --am-bg-dark: #0E1317;
+  --am-bg: #1F233A;
+  --am-bg-gradient: linear-gradient(180deg, #1F233A 0%, #0E1317 100%);
+  --am-navbar-bg: #43486B;
+  --am-dialog-bg: #1F2238;
+  --am-stage-bg: #0A0C12;
+
+  --am-accent: #00FFA8;
+  --am-accent-med: #29E59C;
+  --am-accent-dark: #52CC91;
+  --am-accent-grad-start: #69FC97;
+  --am-accent-grad-mid: #63F2C6;
+  --am-accent-grad-end: #5CE5FF;
+  --am-accent-grad: linear-gradient(135deg, #69FC97 0%, #5CE5FF 100%);
+  --am-accent-selection: rgba(7, 231, 154, 0.49);
+
+  --am-text-primary: #FFFFFF;
+  --am-text-secondary: #C4C5CB;
+  --am-text-muted: #9395A1;
+  --am-text-dim: #535766;
+  --am-danger: #E01445;
+  --am-pink: #F16586;
+  --am-gold: #FFCD4B;
+
+  /* Timeline track color pairs (amElement1..8) */
+  --am-el-0: linear-gradient(90deg, #69FC97 0%, #5CE5FF 100%);
+  --am-el-1: linear-gradient(90deg, #5FEBFF 0%, #3C8CE7 100%);
+  --am-el-2: linear-gradient(90deg, #7466F0 0%, #CE9FFC 100%);
+  --am-el-3: linear-gradient(90deg, #F16586 0%, #FAD3A5 100%);
+  --am-el-4: linear-gradient(90deg, #E6D68C 0%, #E6F597 100%);
+  --am-el-5: linear-gradient(90deg, #52EEE6 0%, #4EA3D5 100%);
+  --am-el-6: linear-gradient(90deg, #D17EDA 0%, #B32D72 100%);
+  --am-el-7: linear-gradient(90deg, #4BE29D 0%, #9AD843 100%);
+
+  --am-border: rgba(255, 255, 255, 0.08);
+  --am-border-strong: rgba(255, 255, 255, 0.16);
+  --am-panel-tint: rgba(255, 255, 255, 0.07);
+  --am-panel-hover: rgba(255, 255, 255, 0.13);
+
+  --scrollbar-thumb: #3F4361;
+  --scrollbar-track: #141620;
+}
+
+[data-theme='desat'] {
+  color-scheme: dark;
+  --am-a1: #1C1C1C;
+  --am-a2: #222222;
+  --am-a3: #262626;
+  --am-a4: #2E2E2E;
+  --am-a5: #2E2E2E;
+  --am-a6: #393939;
+  --am-a7: #303030;
+  --am-a8: #292929;
+  --am-a9: #232323;
+  --am-a10: #1B1B1B;
+  --am-a11: #161616;
+  --am-a12: #0D0D0D;
+
+  --am-bg-dark: #131313;
+  --am-bg: #1F1F1F;
+  --am-bg-gradient: linear-gradient(180deg, #222222 0%, #131313 100%);
+  --am-navbar-bg: #2E2E2E;
+  --am-dialog-bg: #222222;
+  --am-stage-bg: #0A0A0A;
+
+  --am-accent: #C2C2C2;
+  --am-accent-med: #B7B7B7;
+  --am-accent-dark: #ADADAD;
+  --am-accent-grad-start: #D5D5D5;
+  --am-accent-grad-mid: #D0D0D0;
+  --am-accent-grad-end: #C9C9C9;
+  --am-accent-grad: linear-gradient(135deg, #D5D5D5 0%, #9E9E9E 100%);
+  --am-accent-selection: rgba(200, 200, 200, 0.35);
+
+  --am-text-primary: #FFFFFF;
+  --am-text-secondary: #C5C5C5;
+  --am-text-muted: #959595;
+  --am-text-dim: #575757;
+
+  --scrollbar-thumb: #4E4E4E;
+  --scrollbar-track: #161616;
+}

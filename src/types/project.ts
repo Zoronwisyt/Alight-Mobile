@@ -1,0 +1,356 @@
+export type EasingType = 'linear' | 'cubicBezier' | 'steps' | 'overshoot' | 'bounce' | 'elastic';
+
+export interface EasingSpec {
+  type: EasingType;
+  x1: number;
+  y1: number;
+  x2: number;
+  y2: number;
+  steps?: number;
+}
+
+export interface Keyframe<T = any> {
+  /** Normalized time 0..1 relative to layer [startTime, endTime] */
+  t: number;
+  v: T;
+  easing?: EasingSpec;
+}
+
+export interface Animatable<T = any> {
+  value: T;
+  keyframes: Keyframe<T>[];
+}
+
+export type LayerType =
+  | 'shape'
+  | 'text'
+  | 'image'
+  | 'video'
+  | 'audio'
+  | 'null'
+  | 'camera'
+  | 'group'
+  | 'vector'
+  | 'freehand';
+
+export type BlendModeId =
+  | 'normal'
+  | 'mask'
+  | 'exclude'
+  | 'com.alightcreative.blend.darken'
+  | 'com.alightcreative.blend.multiply'
+  | 'com.alightcreative.blend.colorburn'
+  | 'com.alightcreative.blend.linearburn'
+  | 'com.alightcreative.blend.darkercolor'
+  | 'com.alightcreative.blend.lighten'
+  | 'com.alightcreative.blend.screen'
+  | 'com.alightcreative.blend.colordodge'
+  | 'com.alightcreative.blend.lineardodge'
+  | 'com.alightcreative.blend.lightercolor'
+  | 'com.alightcreative.blend.overlay'
+  | 'com.alightcreative.blend.softlight'
+  | 'com.alightcreative.blend.hardlight'
+  | 'com.alightcreative.blend.vividlight'
+  | 'com.alightcreative.blend.linearlight'
+  | 'com.alightcreative.blend.pinlight'
+  | 'com.alightcreative.blend.difference'
+  | 'com.alightcreative.blend.exclusion'
+  | 'com.alightcreative.blend.subtract'
+  | 'com.alightcreative.blend.divide'
+  | 'com.alightcreative.blend.hue'
+  | 'com.alightcreative.blend.saturation'
+  | 'com.alightcreative.blend.color'
+  | 'com.alightcreative.blend.luminosity';
+
+export interface LayerTransform {
+  location: Animatable<[number, number, number]>;
+  rotation: Animatable<number>;
+  scale: Animatable<[number, number]>;
+  scaleLinked: boolean;
+  pivot: Animatable<[number, number]>;
+  skew: Animatable<[number, number]>;
+  /** 3D orientation Euler [x, y, z] in degrees */
+  orientation?: Animatable<[number, number, number]>;
+}
+
+export interface GradientStop {
+  offset: number;
+  color: string; // #AARRGGBB or #RRGGBB
+}
+
+export interface LayerFill {
+  type: 'none' | 'solid' | 'gradient' | 'media';
+  color: Animatable<string>;
+  gradientType: 'linear' | 'radial' | 'sweep';
+  gradientStops: GradientStop[];
+  gradientStart: [number, number]; // normalized -1..1 or 0..1 relative to layer
+  gradientEnd: [number, number];
+  mediaId?: string;
+  mediaSrc?: string;
+}
+
+export interface LayerStroke {
+  enabled: boolean;
+  color: Animatable<string>;
+  width: Animatable<number>;
+  position: 'inside' | 'center' | 'outside';
+  cap: 'butt' | 'round' | 'square';
+  join: 'miter' | 'round' | 'bevel';
+  dash: boolean;
+  dashLength: number;
+  dashGap: number;
+  dashOffset: number;
+}
+
+export interface LayerShadow {
+  enabled: boolean;
+  color: Animatable<string>;
+  alpha: Animatable<number>;
+  size: Animatable<number>;
+  offsetX: Animatable<number>;
+  offsetY: Animatable<number>;
+}
+
+export interface LayerEffectInstance {
+  uid: string;
+  effectId: string;
+  enabled: boolean;
+  locallyApplied?: boolean;
+  params: Record<string, Animatable<any>>;
+}
+
+export interface VectorPoint {
+  x: number;
+  y: number;
+  /** Handle in relative to point */
+  inX: number;
+  inY: number;
+  /** Handle out relative to point */
+  outX: number;
+  outY: number;
+  corner?: 'smooth' | 'corner' | 'symmetric';
+}
+
+export interface FreehandStroke {
+  points: { x: number; y: number; pressure: number }[];
+  color: string;
+  width: number;
+  opacity: number;
+}
+
+export interface TextData {
+  content: string;
+  fontFamily: string;
+  fontSize: number; // px relative to 1080p project
+  color: string; // #AARRGGBB
+  align: 'left' | 'center' | 'right';
+  lineHeight: number;
+  letterSpacing: number;
+  wrapWidth: number;
+}
+
+export interface MediaData {
+  mediaId?: string;
+  src: string;
+  naturalWidth: number;
+  naturalHeight: number;
+  durationMs?: number;
+  trimStartMs?: number;
+  playbackSpeed?: number;
+  volume?: number;
+  muted?: boolean;
+}
+
+export interface AudioData {
+  mediaId?: string;
+  src: string;
+  name: string;
+  durationMs: number;
+  volume: Animatable<number>;
+  muted: boolean;
+  waveform?: number[];
+  synthPattern?: 'beat' | 'ambient' | 'pulse';
+}
+
+export interface CameraData {
+  fov: Animatable<number>;
+  active: boolean;
+  fogEnabled: boolean;
+  fogColor: string;
+  fogNear: number;
+  fogFar: number;
+  focusDistance: Animatable<number>;
+  blurStrength: Animatable<number>;
+}
+
+export interface Layer {
+  id: string;
+  type: LayerType;
+  label: string;
+  colorIndex: number; // 0..7
+  startTime: number; // ms
+  endTime: number; // ms
+  visible: boolean;
+  locked: boolean;
+  parentId: string | null;
+  blendMode: BlendModeId;
+  opacity: Animatable<number>;
+  transform: LayerTransform;
+  fill: LayerFill;
+  stroke: LayerStroke;
+  shadow: LayerShadow;
+  effects: LayerEffectInstance[];
+  speed: Animatable<number>;
+
+  // Type-specific payloads
+  shapeId?: string;
+  shapeParams?: Record<string, Animatable<any>>;
+  vectorPath?: {
+    points: VectorPoint[];
+    closed: boolean;
+  };
+  freehandStrokes?: FreehandStroke[];
+  textData?: TextData;
+  mediaData?: MediaData;
+  audioData?: AudioData;
+  cameraData?: CameraData;
+  groupLayers?: Layer[];
+  groupMaskMode?: 'none' | 'mask' | 'exclude';
+}
+
+export interface Project {
+  id: string;
+  title: string;
+  width: number;
+  height: number;
+  fps: number;
+  durationMs: number;
+  bgColor: string; // #AARRGGBB or 'transparent'
+  layers: Layer[];
+  bookmarks: number[]; // ms timestamps
+  cameraEnabled: boolean;
+  modifiedTime: number;
+  thumbnailDataUrl?: string;
+}
+
+export interface SavedElement {
+  id: string;
+  name: string;
+  createdAt: number;
+  layers: Layer[];
+  previewDataUrl?: string;
+}
+
+/* Extracted APK Schema Types */
+export interface EffectChoice {
+  label: string;
+  value: string;
+  enableTargets: string;
+}
+
+export interface EffectParamDef {
+  tag:
+    | 'spinner'
+    | 'slider'
+    | 'point'
+    | 'xyz'
+    | 'orient'
+    | 'color'
+    | 'hue-disc'
+    | 'selector'
+    | 'switch'
+    | 'section'
+    | 'tip'
+    | 'texture'
+    | 'float';
+  id?: string;
+  label?: string;
+  text?: string;
+  default?: string;
+  value?: string;
+  min?: string;
+  max?: string;
+  step?: string;
+  ticks?: string;
+  snap?: string;
+  type?: string;
+  multiplier?: string;
+  logscale?: string;
+  alpha?: string;
+  bias?: string;
+  invert?: string;
+  applyto?: string;
+  enabled?: string;
+  style?: string;
+  choices?: EffectChoice[];
+  srcType?: string;
+  downsample?: string;
+  src?: string;
+}
+
+export interface EffectPassDef {
+  target?: string;
+  effect?: string;
+  src?: string;
+  blend?: string;
+}
+
+export interface EffectShaderDef {
+  type: 'fragment' | 'vertex';
+  precision: string;
+  group?: string | null;
+  fastMath: boolean;
+  code: string;
+}
+
+export interface EffectDef {
+  id: string;
+  file: string;
+  name: string;
+  desc: string;
+  category: string;
+  tags: string[];
+  thumb: string;
+  thumbBg?: string;
+  deprecated: boolean;
+  experimental: boolean;
+  internal: boolean;
+  overdraw: boolean;
+  maxOverdraw: number;
+  autoTransform: boolean;
+  affinity: string;
+  type: string;
+  params: EffectParamDef[];
+  passes: EffectPassDef[];
+  iterations?: string | null;
+  shaders: EffectShaderDef[];
+  script?: string | null;
+}
+
+export interface EffectPreset {
+  name: string;
+  pack: string;
+  locallyApplied: boolean;
+  props: {
+    name: string;
+    type: string;
+    value?: string | null;
+    kfs: { t: number; v: string; e: string }[];
+  }[];
+}
+
+export interface ShapeHandleDef {
+  id: string;
+  param: string;
+  type: 'radius' | 'angle' | 'point' | 'size' | string;
+  icon?: string;
+}
+
+export interface ShapeDef {
+  id: string;
+  file: string;
+  name: string;
+  params: EffectParamDef[];
+  handles: ShapeHandleDef[];
+  script: string;
+}
