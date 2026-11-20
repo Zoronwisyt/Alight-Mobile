@@ -440,6 +440,9 @@ export class AlightRenderer {
   private resourceTextures = new Map<string, { tex: WebGLTexture; w: number; h: number }>();
   private mediaImages = new Map<string, ImageMediaEntry>();
   private mediaVideos = new Map<string, VideoMediaEntry>();
+  // G-1a: Isolated offscreen video pool for idle precache so precaching never seeks live parked <video> elements
+  private offscreenVideos = new Map<string, VideoMediaEntry>();
+  private isOffscreenPass = false;
   private svgPathCache = new Map<string, { path: Path2D; w: number; h: number }>();
   private tempUploadTex: WebGLTexture;
   private dummyBlackTex: WebGLTexture;
@@ -685,9 +688,15 @@ export class AlightRenderer {
     return true;
   }
 
-  private getOrCreateVideoEntry(src: string, mediaId?: string, layerId?: string): VideoMediaEntry {
+  private getOrCreateVideoEntry(
+    src: string,
+    mediaId?: string,
+    layerId?: string,
+    offscreen = this.isOffscreenPass
+  ): VideoMediaEntry {
+    const pool = offscreen ? this.offscreenVideos : this.mediaVideos;
     const key = layerId ? `${layerId}::${src}` : src;
-    let entry = this.mediaVideos.get(key);
+    let entry = pool.get(key);
     if (!entry) {
       const video = document.createElement('video');
       video.crossOrigin = 'anonymous';
@@ -709,29 +718,32 @@ export class AlightRenderer {
       };
       const cur = entry;
 
-      const handleFrameReady = () => {
-        if (this.disposed) return;
-        if (this.uploadVideoTex(cur)) {
-          this.onMediaReady?.();
-        }
-      };
-
-      video.addEventListener('loadeddata', handleFrameReady);
-      video.addEventListener('seeked', () => {
-        if (this.disposed) return;
-        if (cur.pendingSeekTarget !== null && Math.abs(video.currentTime - cur.pendingSeekTarget) > 0.02) {
-          const next = cur.pendingSeekTarget;
-          cur.pendingSeekTarget = null;
-          try {
-            video.currentTime = next;
-            return;
-          } catch {
-            // ignore out-of-range seek
+      // Only live video entries trigger onMediaReady redraws (offscreen precache entries never touch the parked canvas)
+      if (!offscreen) {
+        const handleFrameReady = () => {
+          if (this.disposed) return;
+          if (this.uploadVideoTex(cur)) {
+            this.onMediaReady?.();
           }
-        }
-        cur.pendingSeekTarget = null;
-        handleFrameReady();
-      });
+        };
+
+        video.addEventListener('loadeddata', handleFrameReady);
+        video.addEventListener('seeked', () => {
+          if (this.disposed) return;
+          if (cur.pendingSeekTarget !== null && Math.abs(video.currentTime - cur.pendingSeekTarget) > 0.02) {
+            const next = cur.pendingSeekTarget;
+            cur.pendingSeekTarget = null;
+            try {
+              video.currentTime = next;
+              return;
+            } catch {
+              // ignore out-of-range seek
+            }
+          }
+          cur.pendingSeekTarget = null;
+          handleFrameReady();
+        });
+      }
 
       video.addEventListener('error', () => {
         if (this.disposed) return;
@@ -750,7 +762,7 @@ export class AlightRenderer {
 
       video.src = src;
       video.load();
-      this.mediaVideos.set(key, entry);
+      pool.set(key, entry);
     } else if (mediaId && !entry.mediaId) {
       entry.mediaId = mediaId;
     }
@@ -1148,8 +1160,9 @@ export class AlightRenderer {
 
   /** P-4: Only block caching if a video actually visible in this frame is seeking AND has no last-good frame yet */
   private hasUnreadySeekingVideoThisFrame(): boolean {
+    const pool = this.isOffscreenPass ? this.offscreenVideos : this.mediaVideos;
     for (const src of this.usedVideoSrcsThisFrame) {
-      const entry = this.mediaVideos.get(src);
+      const entry = pool.get(src);
       if (entry && entry.video.seeking && !entry.hasFrame) return true;
     }
     return false;
@@ -1240,27 +1253,33 @@ export class AlightRenderer {
     if (sceneTimeMs > project.durationMs) return false;
 
     const myEpoch = this.cacheEpoch;
-    // Await exact video/image decode for this frame (same deterministic contract as WebCodecs export)
-    await this.prepareMediaAtTime(project, sceneTimeMs);
-    if (this.disposed || this.isPlaybackActive || myEpoch !== this.cacheEpoch) return false;
+    // G-1a: Run precache entirely against isolated offscreenVideos pool so live parked <video> never seeks or flickers
+    const prevOffscreen = this.isOffscreenPass;
+    this.isOffscreenPass = true;
+    try {
+      await this.prepareMediaAtTime(project, sceneTimeMs);
+      if (this.disposed || this.isPlaybackActive || myEpoch !== this.cacheEpoch) return false;
 
-    const cScale = this.resolvePlaybackScale(project, previewScale);
-    const cw = Math.max(16, Math.round(project.width * cScale));
-    const ch = Math.max(16, Math.round(project.height * cScale));
+      const cScale = this.resolvePlaybackScale(project, previewScale);
+      const cw = Math.max(16, Math.round(project.width * cScale));
+      const ch = Math.max(16, Math.round(project.height * cScale));
 
-    this.frameUploadGen++;
-    this.usedVideoSrcsThisFrame.clear();
-    this.hadStaleVideoThisFrame = false;
-    const sceneFbo = this.acquireFbo(cw, ch);
-    const [br, bg, bb, ba] =
-      project.bgColor === 'transparent' ? [0, 0, 0, 0] : parseColorArgb(project.bgColor);
-    this.clearFbo(sceneFbo, cw, ch, br * ba, bg * ba, bb * ba, ba);
-    this.renderLayerList(project, project.layers, sceneTimeMs, sceneFbo, cw, ch, cScale, []);
-    if (!this.hadStaleVideoThisFrame && !this.hasUnreadySeekingVideoThisFrame()) {
-      this.storeFrameInCache(frameIdx, sceneFbo, cw, ch, cScale);
+      this.frameUploadGen++;
+      this.usedVideoSrcsThisFrame.clear();
+      this.hadStaleVideoThisFrame = false;
+      const sceneFbo = this.acquireFbo(cw, ch);
+      const [br, bg, bb, ba] =
+        project.bgColor === 'transparent' ? [0, 0, 0, 0] : parseColorArgb(project.bgColor);
+      this.clearFbo(sceneFbo, cw, ch, br * ba, bg * ba, bb * ba, ba);
+      this.renderLayerList(project, project.layers, sceneTimeMs, sceneFbo, cw, ch, cScale, []);
+      if (!this.hadStaleVideoThisFrame && !this.hasUnreadySeekingVideoThisFrame()) {
+        this.storeFrameInCache(frameIdx, sceneFbo, cw, ch, cScale);
+      }
+      this.releaseFbo(sceneFbo);
+      return true;
+    } finally {
+      this.isOffscreenPass = prevOffscreen;
     }
-    this.releaseFbo(sceneFbo);
-    return true;
   }
 
   /** Renders one frame offscreen directly into the L2 preview cache (for projects without video layers) */
@@ -3251,6 +3270,11 @@ export class AlightRenderer {
       gl.deleteTexture(entry.tex);
     }
     this.mediaVideos.clear();
+    for (const entry of this.offscreenVideos.values()) {
+      entry.video.src = '';
+      gl.deleteTexture(entry.tex);
+    }
+    this.offscreenVideos.clear();
     for (const entry of this.mediaImages.values()) {
       gl.deleteTexture(entry.tex);
     }

@@ -138,10 +138,11 @@ export const EditorScreen: React.FC = () => {
     let cacheNotifyTimer = 0;
     renderer.onCacheChange = () => {
       if (cacheNotifyTimer) return;
+      // G-4: Coarser throttle (600ms) so idle cache bar updates never churn EditorScreen
       cacheNotifyTimer = window.setTimeout(() => {
         cacheNotifyTimer = 0;
         setCacheVersion((v) => v + 1);
-      }, 180);
+      }, 600);
     };
     window.__verifyAllShaders = () => renderer.verifyAllShaders();
     window.__rendererRef = rendererRef;
@@ -217,12 +218,15 @@ export const EditorScreen: React.FC = () => {
     };
   }, [currentProject, currentTimeMs, selectedLayerIds, groupStack, previewQuality, visibilityPaused, isPlaying]);
 
-  // Idle render-ahead (After Effects RAM Preview): walks FORWARD monotonically and awaits exact video seeks
+  // Idle render-ahead (After Effects RAM Preview): walks FORWARD monotonically, never restarts on playhead scrub (G-3)
   useEffect(() => {
     const renderer = rendererRef.current;
     if (!renderer || !currentProject || isPlaying || visibilityPaused || isExportingRef.current) return;
     const totalFrames = Math.max(1, Math.ceil((currentProject.durationMs / 1000) * Math.max(1, currentProject.fps)));
-    const startFrame = Math.max(0, Math.round((currentTimeMs / 1000) * Math.max(1, currentProject.fps)));
+    const startFrame = Math.max(
+      0,
+      Math.round((useEditorStore.getState().currentTimeMs / 1000) * Math.max(1, currentProject.fps))
+    );
     // Strictly monotonic forward order (never ping-pong +d/-d which causes video decoders to thrash)
     const order: number[] = [];
     for (let f = startFrame; f < totalFrames; f++) order.push(f);
@@ -291,7 +295,7 @@ export const EditorScreen: React.FC = () => {
       window.removeEventListener('keydown', abortSlice, true);
       window.removeEventListener('blur', abortSlice);
     };
-  }, [currentProject, currentTimeMs, previewQuality, isPlaying, visibilityPaused]);
+  }, [currentProject, previewQuality, isPlaying, visibilityPaused]);
 
   // Playback rAF loop: audio-master clock (or fixed-step without audio) + L2 RAM cache hit path + throttled store sync
   useEffect(() => {

@@ -13,6 +13,8 @@ export const App: React.FC = () => {
 
   useEffect(() => {
     let alive = true;
+    // F-1: Request persistent browser storage at boot so IndexedDB user fonts & media resist eviction
+    navigator.storage?.persist?.().catch(() => {});
     Promise.all([
       ensureCatalogLoaded(),
       initApp(),
