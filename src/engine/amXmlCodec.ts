@@ -508,6 +508,8 @@ function parseXmlLayer(
 
   if (matchedVideo) {
     type = 'video';
+    const rawSpeed = parseFloat(el.getAttribute('speed') || '');
+    const parsedSpeed = Number.isFinite(rawSpeed) && rawSpeed > 0 ? Math.max(0.1, Math.min(4, rawSpeed)) : 1;
     mediaData = {
       mediaId: matchedVideo.mediaId,
       src: matchedVideo.src,
@@ -517,7 +519,7 @@ function parseXmlLayer(
       displayHeight,
       durationMs: matchedVideo.durationMs || 4000,
       trimStartMs: parseFloat(el.getAttribute('inTime') || '0') || 0,
-      playbackSpeed: 1,
+      playbackSpeed: parsedSpeed,
       volume: 1,
       muted: false,
     };

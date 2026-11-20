@@ -685,8 +685,9 @@ export class AlightRenderer {
     return true;
   }
 
-  private getOrCreateVideoEntry(src: string, mediaId?: string): VideoMediaEntry {
-    let entry = this.mediaVideos.get(src);
+  private getOrCreateVideoEntry(src: string, mediaId?: string, layerId?: string): VideoMediaEntry {
+    const key = layerId ? `${layerId}::${src}` : src;
+    let entry = this.mediaVideos.get(key);
     if (!entry) {
       const video = document.createElement('video');
       video.crossOrigin = 'anonymous';
@@ -749,7 +750,7 @@ export class AlightRenderer {
 
       video.src = src;
       video.load();
-      this.mediaVideos.set(src, entry);
+      this.mediaVideos.set(key, entry);
     } else if (mediaId && !entry.mediaId) {
       entry.mediaId = mediaId;
     }
@@ -805,37 +806,38 @@ export class AlightRenderer {
 
   private collectActiveMediaLayers(
     layers: Layer[],
-    sceneTimeMs: number,
-    out: { layer: Layer; localTimeMs: number }[]
+    parentTimeMs: number,
+    out: { layer: Layer; localTimeMs: number; parentTimeMs: number }[]
   ): void {
     for (const layer of layers) {
       if (!layer.visible) continue;
       if (layer.type === 'group' && layer.groupLayers?.length) {
-        if (sceneTimeMs >= layer.startTime && sceneTimeMs <= layer.endTime) {
-          const { localTimeMs } = evalRemappedTime(layer, sceneTimeMs);
+        if (parentTimeMs >= layer.startTime && parentTimeMs <= layer.endTime) {
+          const { localTimeMs } = evalRemappedTime(layer, parentTimeMs);
           this.collectActiveMediaLayers(layer.groupLayers, localTimeMs, out);
         }
       } else if ((layer.type === 'video' || layer.type === 'image') && layer.mediaData?.src) {
-        const { localTimeMs } = evalRemappedTime(layer, sceneTimeMs);
-        out.push({ layer, localTimeMs });
+        const { localTimeMs } = evalRemappedTime(layer, parentTimeMs);
+        out.push({ layer, localTimeMs, parentTimeMs });
       }
     }
   }
 
   public syncVideosForPlayback(project: Project, sceneTimeMs: number, isPlaying: boolean): void {
     this.isPlaybackActive = isPlaying;
-    const activeSrcs = new Set<string>();
-    const items: { layer: Layer; localTimeMs: number }[] = [];
+    const activeKeys = new Set<string>();
+    const items: { layer: Layer; localTimeMs: number; parentTimeMs: number }[] = [];
     this.collectActiveMediaLayers(project.layers, sceneTimeMs, items);
 
-    for (const { layer, localTimeMs } of items) {
+    for (const { layer, localTimeMs, parentTimeMs } of items) {
       if (layer.type !== 'video' || !layer.mediaData?.src) continue;
       const md = layer.mediaData;
-      const entry = this.getOrCreateVideoEntry(md.src, md.mediaId);
+      const videoKey = `${layer.id}::${md.src}`;
+      const entry = this.getOrCreateVideoEntry(md.src, md.mediaId, layer.id);
       const v = entry.video;
-      activeSrcs.add(md.src);
+      activeKeys.add(videoKey);
 
-      const inRange = sceneTimeMs >= layer.startTime && sceneTimeMs <= layer.endTime;
+      const inRange = parentTimeMs >= layer.startTime && parentTimeMs <= layer.endTime;
       const speed = Math.max(0.1, Math.min(4, md.playbackSpeed || 1));
       const rawSec = Math.max(0, ((localTimeMs * speed) + (md.trimStartMs ?? 0)) / 1000);
       const maxSec = Number.isFinite(v.duration) && v.duration > 0 ? Math.max(0, v.duration - 0.02) : rawSec;
@@ -876,7 +878,7 @@ export class AlightRenderer {
       } else {
         if (!v.paused) v.pause();
         // Pre-park video at trimStart up to 1s before its in-point so entry has zero hitch
-        if (isPlaying && sceneTimeMs < layer.startTime && layer.startTime - sceneTimeMs < 1000 && v.readyState >= 1 && !v.seeking) {
+        if (isPlaying && parentTimeMs < layer.startTime && layer.startTime - parentTimeMs < 1000 && v.readyState >= 1 && !v.seeking) {
           const startSec = Math.max(0, (md.trimStartMs ?? 0) / 1000);
           if (Math.abs(v.currentTime - startSec) > 0.05) {
             try {
@@ -889,8 +891,8 @@ export class AlightRenderer {
       }
     }
 
-    for (const [src, entry] of this.mediaVideos.entries()) {
-      if (!activeSrcs.has(src) && !entry.video.paused) {
+    for (const [key, entry] of this.mediaVideos.entries()) {
+      if (!activeKeys.has(key) && !entry.video.paused) {
         entry.video.pause();
       }
     }
@@ -912,12 +914,12 @@ export class AlightRenderer {
   public async prepareMediaAtTime(project: Project, sceneTimeMs: number): Promise<void> {
     this.pauseAllVideos(false);
     this.frameUploadGen++;
-    const items: { layer: Layer; localTimeMs: number }[] = [];
+    const items: { layer: Layer; localTimeMs: number; parentTimeMs: number }[] = [];
     this.collectActiveMediaLayers(project.layers, sceneTimeMs, items);
 
     const tasks: Promise<void>[] = [];
-    for (const { layer, localTimeMs } of items) {
-      if (sceneTimeMs < layer.startTime || sceneTimeMs > layer.endTime) continue;
+    for (const { layer, localTimeMs, parentTimeMs } of items) {
+      if (parentTimeMs < layer.startTime || parentTimeMs > layer.endTime) continue;
       const md = layer.mediaData;
       if (!md?.src) continue;
 
@@ -934,7 +936,7 @@ export class AlightRenderer {
           );
         }
       } else if (layer.type === 'video') {
-        const entry = this.getOrCreateVideoEntry(md.src, md.mediaId);
+        const entry = this.getOrCreateVideoEntry(md.src, md.mediaId, layer.id);
         const v = entry.video;
         const speed = Math.max(0.1, Math.min(4, md.playbackSpeed || 1));
         tasks.push(
@@ -1005,11 +1007,13 @@ export class AlightRenderer {
     trimStart = 0,
     isVideo = false,
     mediaId?: string,
-    playbackSpeed = 1
+    playbackSpeed = 1,
+    layerId?: string
   ): { tex: WebGLTexture; w: number; h: number } | null {
     if (isVideo) {
-      const entry = this.getOrCreateVideoEntry(src, mediaId);
-      this.usedVideoSrcsThisFrame.add(src);
+      const videoKey = layerId ? `${layerId}::${src}` : src;
+      const entry = this.getOrCreateVideoEntry(src, mediaId, layerId);
+      this.usedVideoSrcsThisFrame.add(videoKey);
       const v = entry.video;
       const speed = Math.max(0.1, Math.min(4, playbackSpeed || 1));
       const rawSec = Math.max(0, ((localTimeMs * speed) + trimStart) / 1000);
@@ -1690,7 +1694,8 @@ export class AlightRenderer {
           md.trimStartMs ?? 0,
           layer.type === 'video',
           md.mediaId,
-          md.playbackSpeed ?? 1
+          md.playbackSpeed ?? 1,
+          layer.id
         );
       }
       const srcW = uploadedMedia?.w || md?.naturalWidth || 512;
