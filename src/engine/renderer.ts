@@ -36,14 +36,19 @@ interface TextLayoutMemo {
   allChars: number;
 }
 
+export type PrecacheResult = 'stored' | 'present' | 'full' | 'blocked';
+
 export interface PreviewCacheStats {
   hits: number;
   misses: number;
   bytes: number;
   budgetBytes: number;
+  budgetUsedPct: number;
   evictions: number;
   epoch: number;
   cachedCount: number;
+  pbScale: number;
+  lastPrecacheResult: PrecacheResult;
 }
 
 interface FboSlot {
@@ -463,7 +468,9 @@ export class AlightRenderer {
   private cacheEvictions = 0;
   private lastCacheProjectId = '';
   private lastCacheScale = -1;
+  private lastCachePbScale = -1;
   private lastCacheFontEpoch = -1;
+  private lastPrecacheResult: PrecacheResult = 'present';
   private playbackScale = 0;
   private playbackScaleKey = '';
   private frameUploadGen = 0;
@@ -763,6 +770,19 @@ export class AlightRenderer {
       video.src = src;
       video.load();
       pool.set(key, entry);
+      // ST-4: Cap offscreen video pool to 4 decoders (LRU) so offscreen precaching never leaks GPU memory
+      if (offscreen && this.offscreenVideos.size > 4) {
+        const oldestKey = this.offscreenVideos.keys().next().value;
+        if (oldestKey && oldestKey !== key) {
+          const old = this.offscreenVideos.get(oldestKey);
+          if (old) {
+            old.video.pause();
+            old.video.src = '';
+            this.gl.deleteTexture(old.tex);
+          }
+          this.offscreenVideos.delete(oldestKey);
+        }
+      }
     } else if (mediaId && !entry.mediaId) {
       entry.mediaId = mediaId;
     }
@@ -1020,7 +1040,8 @@ export class AlightRenderer {
     isVideo = false,
     mediaId?: string,
     playbackSpeed = 1,
-    layerId?: string
+    layerId?: string,
+    projectFps = 30
   ): { tex: WebGLTexture; w: number; h: number } | null {
     if (isVideo) {
       const videoKey = layerId ? `${layerId}::${src}` : src;
@@ -1054,9 +1075,9 @@ export class AlightRenderer {
         }
       }
 
-      // Mark frame as video-stale if video is seeking, unready, or drifted > 120ms from target time
-      // so we still display the last good texture smoothly WITHOUT baking a wrong video frame into frameCache
-      if (v.seeking || !entry.hasFrame || Math.abs(v.currentTime - targetSec) > 0.12) {
+      // FL-2: Frame-relative stale tolerance (half a frame) so cached frames never bake >0.5 frame video error
+      const frameTolSec = Math.max(0.004, (1 / Math.max(1, projectFps)) * 0.5);
+      if (v.seeking || !entry.hasFrame || Math.abs(v.currentTime - targetSec) > frameTolSec) {
         this.hadStaleVideoThisFrame = true;
       }
 
@@ -1101,9 +1122,12 @@ export class AlightRenderer {
       misses: this.cacheMisses,
       bytes: this.cacheBytes,
       budgetBytes: this.cacheBudgetBytes,
+      budgetUsedPct: Math.round((this.cacheBytes / Math.max(1, this.cacheBudgetBytes)) * 1000) / 10,
       evictions: this.cacheEvictions,
       epoch: this.cacheEpoch,
       cachedCount: this.frameCache.size,
+      pbScale: this.playbackScale,
+      lastPrecacheResult: this.lastPrecacheResult,
     };
   }
 
@@ -1128,10 +1152,48 @@ export class AlightRenderer {
 
   private computeCacheScale(project: Project, previewScale: number): number {
     const totalFrames = Math.max(1, Math.ceil((project.durationMs / 1000) * Math.max(1, project.fps)));
-    const fullBytes = Math.max(1, totalFrames * project.width * project.height * 4);
+    const singleFrameFullBytes = Math.max(1, project.width * project.height * 4);
+    const fullBytes = Math.max(1, totalFrames * singleFrameFullBytes);
     const adaptive = Math.sqrt((this.cacheBudgetBytes * 0.85) / fullBytes);
+    // CR-2: Also cap scale so a single 4K frame on mobile (192 MiB budget) fits under budget/12 instead of silently dropping
+    const perFrameCap = Math.sqrt((this.cacheBudgetBytes / 12) / singleFrameFullBytes);
     const capped = Math.min(previewScale, 1.0);
-    return Math.max(0.25, Math.min(capped, adaptive));
+    return Math.max(0.25, Math.min(capped, adaptive, perFrameCap));
+  }
+
+  private clearOffscreenVideos(): void {
+    if (this.offscreenVideos.size === 0) return;
+    const gl = this.gl;
+    for (const entry of this.offscreenVideos.values()) {
+      entry.video.pause();
+      entry.video.src = '';
+      gl.deleteTexture(entry.tex);
+    }
+    this.offscreenVideos.clear();
+  }
+
+  /** FL-4 + ST-4: Validates projectId, previewScale, pbScale, and fontEpoch; clears cache & offscreen pool on mismatch */
+  private syncCacheEpoch(project: Project, previewScale: number): number {
+    const qKey = Math.round((previewScale || 1) * 100);
+    const pbScale = this.resolvePlaybackScale(project, previewScale || 1);
+    const pbKey = Math.round(pbScale * 1000);
+    if (this.lastCacheProjectId !== project.id) {
+      this.clearOffscreenVideos();
+    }
+    if (
+      this.lastCacheProjectId !== project.id ||
+      this.lastCacheScale !== qKey ||
+      this.lastCachePbScale !== pbKey ||
+      this.lastCacheFontEpoch !== fontEpoch.value
+    ) {
+      this.lastCacheProjectId = project.id;
+      this.lastCacheScale = qKey;
+      this.lastCachePbScale = pbKey;
+      this.lastCacheFontEpoch = fontEpoch.value;
+      this.clearPreviewCache();
+      this.cacheEpoch++;
+    }
+    return pbScale;
   }
 
   private resolvePlaybackScale(project: Project, previewScale: number): number {
@@ -1208,12 +1270,14 @@ export class AlightRenderer {
     this.onCacheChange?.();
   }
 
-  /** O(1) check whether a frame is already in the current-epoch L2 RAM cache */
+  /** O(1) check whether a frame is already in the current-epoch L2 RAM cache (FL-4: checks pbScale too) */
   public hasCachedFrame(project: Project, sceneTimeMs: number, previewScale: number): boolean {
     const qKey = Math.round((previewScale || 1) * 100);
+    const pbKey = Math.round(this.resolvePlaybackScale(project, previewScale || 1) * 1000);
     if (
       this.lastCacheProjectId !== project.id ||
       this.lastCacheScale !== qKey ||
+      this.lastCachePbScale !== pbKey ||
       this.lastCacheFontEpoch !== fontEpoch.value
     ) {
       return false;
@@ -1224,33 +1288,39 @@ export class AlightRenderer {
     return Boolean(entry && entry.epoch === this.cacheEpoch);
   }
 
-  /** Deterministically awaits exact video seeks via prepareMediaAtTime before baking a frame into L2 cache */
+  /**
+   * ST-1 + G-1a: Deterministically awaits exact offscreen video seeks before baking a frame into L2 cache.
+   * Returns 4-state PrecacheResult so the idle pump yields on 'stored'/'full'/'blocked' and advances on 'present'.
+   */
   public async precacheFrameAsync(
     project: Project,
     frameIdx: number,
     previewScale: number
-  ): Promise<boolean> {
-    if (this.disposed || this.isPlaybackActive) return false;
-    const qKey = Math.round((previewScale || 1) * 100);
-    if (
-      this.lastCacheProjectId !== project.id ||
-      this.lastCacheScale !== qKey ||
-      this.lastCacheFontEpoch !== fontEpoch.value
-    ) {
-      this.lastCacheProjectId = project.id;
-      this.lastCacheScale = qKey;
-      this.lastCacheFontEpoch = fontEpoch.value;
-      this.clearPreviewCache();
-      this.cacheEpoch++;
+  ): Promise<PrecacheResult> {
+    if (this.disposed || this.isPlaybackActive) {
+      this.lastPrecacheResult = 'blocked';
+      return 'blocked';
     }
-
+    const cScale = this.syncCacheEpoch(project, previewScale);
     const existing = this.frameCache.get(frameIdx);
-    if (existing && existing.epoch === this.cacheEpoch) return false;
-    if (this.cacheBytes >= this.cacheBudgetBytes * 0.88) return false;
+    if (existing && existing.epoch === this.cacheEpoch) {
+      this.lastPrecacheResult = 'present';
+      return 'present';
+    }
 
     const fps = Math.max(1, project.fps);
     const sceneTimeMs = (frameIdx / fps) * 1000;
-    if (sceneTimeMs > project.durationMs) return false;
+    if (sceneTimeMs > project.durationMs) {
+      this.lastPrecacheResult = 'present';
+      return 'present';
+    }
+
+    const cw = Math.max(16, Math.round(project.width * cScale));
+    const ch = Math.max(16, Math.round(project.height * cScale));
+    if (cw * ch * 4 > this.cacheBudgetBytes / 12) {
+      this.lastPrecacheResult = 'full';
+      return 'full';
+    }
 
     const myEpoch = this.cacheEpoch;
     // G-1a: Run precache entirely against isolated offscreenVideos pool so live parked <video> never seeks or flickers
@@ -1258,11 +1328,10 @@ export class AlightRenderer {
     this.isOffscreenPass = true;
     try {
       await this.prepareMediaAtTime(project, sceneTimeMs);
-      if (this.disposed || this.isPlaybackActive || myEpoch !== this.cacheEpoch) return false;
-
-      const cScale = this.resolvePlaybackScale(project, previewScale);
-      const cw = Math.max(16, Math.round(project.width * cScale));
-      const ch = Math.max(16, Math.round(project.height * cScale));
+      if (this.disposed || this.isPlaybackActive || myEpoch !== this.cacheEpoch) {
+        this.lastPrecacheResult = 'blocked';
+        return 'blocked';
+      }
 
       this.frameUploadGen++;
       this.usedVideoSrcsThisFrame.clear();
@@ -1272,48 +1341,17 @@ export class AlightRenderer {
         project.bgColor === 'transparent' ? [0, 0, 0, 0] : parseColorArgb(project.bgColor);
       this.clearFbo(sceneFbo, cw, ch, br * ba, bg * ba, bb * ba, ba);
       this.renderLayerList(project, project.layers, sceneTimeMs, sceneFbo, cw, ch, cScale, []);
+      let stored = false;
       if (!this.hadStaleVideoThisFrame && !this.hasUnreadySeekingVideoThisFrame()) {
         this.storeFrameInCache(frameIdx, sceneFbo, cw, ch, cScale);
+        stored = true;
       }
       this.releaseFbo(sceneFbo);
-      return true;
+      this.lastPrecacheResult = stored ? 'stored' : 'blocked';
+      return this.lastPrecacheResult;
     } finally {
       this.isOffscreenPass = prevOffscreen;
     }
-  }
-
-  /** Renders one frame offscreen directly into the L2 preview cache (for projects without video layers) */
-  public precacheFrame(
-    project: Project,
-    frameIdx: number,
-    previewScale: number
-  ): boolean {
-    if (this.disposed || this.isPlaybackActive) return false;
-    const existing = this.frameCache.get(frameIdx);
-    if (existing && existing.epoch === this.cacheEpoch) return false;
-    if (this.cacheBytes >= this.cacheBudgetBytes * 0.88) return false;
-
-    const fps = Math.max(1, project.fps);
-    const sceneTimeMs = (frameIdx / fps) * 1000;
-    if (sceneTimeMs > project.durationMs) return false;
-
-    const cScale = this.resolvePlaybackScale(project, previewScale);
-    const cw = Math.max(16, Math.round(project.width * cScale));
-    const ch = Math.max(16, Math.round(project.height * cScale));
-
-    this.frameUploadGen++;
-    this.usedVideoSrcsThisFrame.clear();
-    this.hadStaleVideoThisFrame = false;
-    const sceneFbo = this.acquireFbo(cw, ch);
-    const [br, bg, bb, ba] =
-      project.bgColor === 'transparent' ? [0, 0, 0, 0] : parseColorArgb(project.bgColor);
-    this.clearFbo(sceneFbo, cw, ch, br * ba, bg * ba, bb * ba, ba);
-    this.renderLayerList(project, project.layers, sceneTimeMs, sceneFbo, cw, ch, cScale, []);
-    if (!this.hadStaleVideoThisFrame && !this.hasUnreadySeekingVideoThisFrame()) {
-      this.storeFrameInCache(frameIdx, sceneFbo, cw, ch, cScale);
-    }
-    this.releaseFbo(sceneFbo);
-    return true;
   }
 
   public renderProject(
@@ -1366,23 +1404,9 @@ export class AlightRenderer {
     const hasGroupIsolation = Boolean(options.activeGroupStack && options.activeGroupStack.length > 0);
     const cacheEligible = Boolean(options.useCache) && !isExport && !hasGroupIsolation;
     if (cacheEligible) {
-      const qKey = Math.round((options.previewScale ?? 1) * 100);
-      if (
-        this.lastCacheProjectId !== project.id ||
-        this.lastCacheScale !== qKey ||
-        this.lastCacheFontEpoch !== fontEpoch.value
-      ) {
-        this.lastCacheProjectId = project.id;
-        this.lastCacheScale = qKey;
-        this.lastCacheFontEpoch = fontEpoch.value;
-        this.clearPreviewCache();
-        this.cacheEpoch++;
-      }
-
+      const pbScale = this.syncCacheEpoch(project, options.previewScale ?? 1);
       const fps = Math.max(1, project.fps);
       const frameIdx = Math.max(0, Math.round((sceneTimeMs / 1000) * fps));
-      // P-1/P-2: Single uniform playbackScale for both hit AND miss -> eliminates soft/sharp alternating flicker
-      const pbScale = this.resolvePlaybackScale(project, options.previewScale ?? 1);
       const cw = Math.max(16, Math.round(project.width * pbScale));
       const ch = Math.max(16, Math.round(project.height * pbScale));
 
@@ -1391,7 +1415,6 @@ export class AlightRenderer {
         cached.lastUsed = ++this.cacheTick;
         this.cacheHits++;
         this.blitTexture(cached.tex, null, this.canvas.width, this.canvas.height, 1.0, false);
-        this.publishCacheStats();
         return;
       }
       this.cacheMisses++;
@@ -1403,12 +1426,12 @@ export class AlightRenderer {
       this.renderLayerList(project, project.layers, sceneTimeMs, sceneFbo, cw, ch, pbScale, []);
       this.blitTexture(sceneFbo.tex, null, this.canvas.width, this.canvas.height, 1.0, false);
 
-      // Only bake into frameCache when every visible video in this frame was decoded & synced (never cache stale/seeking video)
-      if (!this.hadStaleVideoThisFrame && !this.hasUnreadySeekingVideoThisFrame()) {
+      // ST-3: Playback is read-only against the cache (never run copyTexSubImage2D + LRU sort on the playback thread).
+      // Only store on paused renders when video is clean; idle pump fills remaining playback frames.
+      if (!this.isPlaybackActive && !this.hadStaleVideoThisFrame && !this.hasUnreadySeekingVideoThisFrame()) {
         this.storeFrameInCache(frameIdx, sceneFbo, cw, ch, pbScale);
       }
       this.releaseFbo(sceneFbo);
-      this.publishCacheStats();
       return;
     }
 
@@ -1714,7 +1737,8 @@ export class AlightRenderer {
           layer.type === 'video',
           md.mediaId,
           md.playbackSpeed ?? 1,
-          layer.id
+          layer.id,
+          project.fps
         );
       }
       const srcW = uploadedMedia?.w || md?.naturalWidth || 512;

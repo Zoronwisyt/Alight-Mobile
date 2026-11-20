@@ -131,7 +131,7 @@ export const EditorScreen: React.FC = () => {
           previewScale: store.previewQuality,
           selectedIds: store.selectedLayerIds,
           activeGroupStack: store.groupStack,
-          useCache: false,
+          useCache: true,
         });
       });
     };
@@ -205,11 +205,12 @@ export const EditorScreen: React.FC = () => {
       const store = useEditorStore.getState();
       if (store.isPlaying || !store.currentProject) return;
       renderer.syncVideosForPlayback(store.currentProject, store.currentTimeMs, false);
+      // FL-1: Use unified playbackScale (useCache: true) on paused render too -> zero 2-3x sharpness pop on play/pause
       renderer.renderProject(store.currentProject, store.currentTimeMs, {
         previewScale: store.previewQuality,
         selectedIds: store.selectedLayerIds,
         activeGroupStack: store.groupStack,
-        useCache: false,
+        useCache: true,
       });
     });
     return () => {
@@ -265,17 +266,23 @@ export const EditorScreen: React.FC = () => {
         return;
       }
       busy = true;
+      let stopSweep = false;
       try {
-        // Precaching one deterministic async frame per turn guarantees exact video seeks without UI stutter
+        // ST-1: Distinguish 'stored' / 'present' / 'full' / 'blocked' so pump yields cleanly and never spins
         while (cursor < order.length && !cancelled) {
           const frameIdx = order[cursor++];
-          const didCache = await renderer.precacheFrameAsync(currentProject, frameIdx, previewQuality);
-          if (didCache) break;
+          const r = await renderer.precacheFrameAsync(currentProject, frameIdx, previewQuality);
+          if (r === 'stored') break;
+          if (r === 'full' || r === 'blocked') {
+            stopSweep = true;
+            break;
+          }
+          // 'present' -> already cached, advance immediately to next frame
         }
       } finally {
         busy = false;
       }
-      if (cursor < order.length && !cancelled) {
+      if (!stopSweep && cursor < order.length && !cancelled) {
         idleHandle = rIC(pump);
       }
     };
@@ -320,6 +327,7 @@ export const EditorScreen: React.FC = () => {
     let startWallMs = performance.now();
     let lastTs = startWallMs;
     let commitTick = 0;
+    let consecutiveHits = 0;
     let rafId = 0;
 
     const tick = (now: number) => {
@@ -365,13 +373,17 @@ export const EditorScreen: React.FC = () => {
         }
       }
 
-      // On a cache hit, pause live HTMLVideo decoding while keeping playback active -> pure 0.1ms GPU blit with zero video jitter
+      // ST-2: Hysteresis on pausing live HTMLVideo decoders (pause only after 4 consecutive cache hits)
       const isHit =
         store.groupStack.length === 0 &&
         renderer.hasCachedFrame(proj, playheadMs, store.previewQuality);
       if (isHit) {
-        renderer.pauseAllVideos(true);
+        consecutiveHits++;
+        if (consecutiveHits >= 4) {
+          renderer.pauseAllVideos(true);
+        }
       } else {
+        consecutiveHits = 0;
         renderer.syncVideosForPlayback(proj, playheadMs, true);
       }
       renderer.renderProject(proj, playheadMs, {
