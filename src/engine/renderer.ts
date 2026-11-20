@@ -1683,7 +1683,8 @@ export class AlightRenderer {
     selectedIds: string[],
     extraAlpha = 1
   ): void {
-    const { localTimeMs, remappedNormT } = evalRemappedTime(layer, sceneTimeMs);
+    const { localTimeMs, remappedNormT, isBlank } = evalRemappedTime(layer, sceneTimeMs);
+    if (isBlank) return; // A2: ReTimingMethod.blank hides layer content while keeping timeline bar
     const isSelected = selectedIds.includes(layer.id);
     const tf = this.resolveWorldTransform(layer, layersMap, sceneTimeMs, project.fps, new Set<string>(), isSelected);
 
@@ -1845,16 +1846,25 @@ export class AlightRenderer {
       if (uploadedMedia) {
         const srcW = uploadedMedia.w || layer.mediaData?.naturalWidth || 512;
         const srcH = uploadedMedia.h || layer.mediaData?.naturalHeight || 512;
-        // Aspect-fill (cover) UV scale matching Alight Motion's <shape fillType="media">
+        // B4: APK TextureCropMode (fill = cover, fit = contain, stretch = distort to box)
+        const cropMode = layer.mediaData?.cropMode ?? 'fill';
         const srcAspect = srcW / Math.max(1, srcH);
         const boxAspect = logicalW / Math.max(1, logicalH);
+        let drawW = logicalW;
+        let drawH = logicalH;
         let coverScaleX = 1;
         let coverScaleY = 1;
-        if (Math.abs(srcAspect - boxAspect) > 0.002) {
+        if (cropMode === 'fill' && Math.abs(srcAspect - boxAspect) > 0.002) {
           if (srcAspect > boxAspect) {
             coverScaleX = boxAspect / srcAspect;
           } else {
             coverScaleY = srcAspect / boxAspect;
+          }
+        } else if (cropMode === 'fit' && Math.abs(srcAspect - boxAspect) > 0.002) {
+          if (srcAspect > boxAspect) {
+            drawH = logicalW / srcAspect;
+          } else {
+            drawW = logicalH * srcAspect;
           }
         }
         this.blitTransformedFbo(
@@ -1864,8 +1874,8 @@ export class AlightRenderer {
           renderH,
           wx * scale,
           wy * scale,
-          logicalW * scale,
-          logicalH * scale,
+          drawW * scale,
+          drawH * scale,
           wrot,
           wsx,
           wsy,

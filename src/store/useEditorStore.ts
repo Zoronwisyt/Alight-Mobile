@@ -159,6 +159,9 @@ interface EditorState {
   trimSelectedRight: () => void;
   groupSelectedLayers: (maskMode?: 'none' | 'mask' | 'exclude') => void;
   ungroupSelectedLayer: () => void;
+  /** B5: Align & Distribute selection (single undo entry each) */
+  alignSelectedLayers: (axis: 'hcenter' | 'vcenter') => void;
+  distributeSelectedLayers: (axis: 'horizontal' | 'vertical' | 'time') => void;
   copySelectedLayers: () => void;
   pasteLayers: () => void;
   copyLayerEffects: () => void;
@@ -965,6 +968,64 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       list.splice(idx, 1, ...children);
     });
     set({ selectedLayerIds: ungroupedIds });
+  },
+
+  alignSelectedLayers: (axis) => {
+    const s = get();
+    if (!s.currentProject || s.selectedLayerIds.length === 0) return;
+    const cx = s.currentProject.width * 0.5;
+    const cy = s.currentProject.height * 0.5;
+    s.mutateProject((proj) => {
+      const list = getLayersRef(proj, s.groupStack);
+      const targets = list.filter((l) => s.selectedLayerIds.includes(l.id));
+      if (targets.length === 0) return;
+      const targetVal =
+        targets.length === 1
+          ? axis === 'hcenter'
+            ? cx
+            : cy
+          : targets.reduce((sum, l) => sum + (axis === 'hcenter' ? l.transform.location.value[0] : l.transform.location.value[1]), 0) /
+            targets.length;
+      for (const l of targets) {
+        const loc = [...l.transform.location.value] as [number, number, number];
+        if (axis === 'hcenter') loc[0] = Math.round(targetVal);
+        else loc[1] = Math.round(targetVal);
+        l.transform.location.value = loc;
+      }
+    });
+  },
+
+  distributeSelectedLayers: (axis) => {
+    const s = get();
+    if (!s.currentProject || s.selectedLayerIds.length < 3) return;
+    s.mutateProject((proj) => {
+      const list = getLayersRef(proj, s.groupStack);
+      const targets = list.filter((l) => s.selectedLayerIds.includes(l.id));
+      if (targets.length < 3) return;
+      if (axis === 'time') {
+        targets.sort((a, b) => a.startTime - b.startTime);
+        const first = targets[0].startTime;
+        const last = targets[targets.length - 1].startTime;
+        const step = (last - first) / (targets.length - 1);
+        for (let i = 1; i < targets.length - 1; i++) {
+          const dur = targets[i].endTime - targets[i].startTime;
+          const nextStart = Math.round(first + step * i);
+          targets[i].startTime = nextStart;
+          targets[i].endTime = nextStart + dur;
+        }
+      } else {
+        const idx = axis === 'horizontal' ? 0 : 1;
+        targets.sort((a, b) => a.transform.location.value[idx] - b.transform.location.value[idx]);
+        const first = targets[0].transform.location.value[idx];
+        const last = targets[targets.length - 1].transform.location.value[idx];
+        const step = (last - first) / (targets.length - 1);
+        for (let i = 1; i < targets.length - 1; i++) {
+          const loc = [...targets[i].transform.location.value] as [number, number, number];
+          loc[idx] = Math.round(first + step * i);
+          targets[i].transform.location.value = loc;
+        }
+      }
+    });
   },
 
   copySelectedLayers: () => {

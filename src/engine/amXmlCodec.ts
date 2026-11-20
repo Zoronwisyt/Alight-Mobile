@@ -78,11 +78,28 @@ function layerToXml(layer: Layer, indent = '  '): string {
           : ` fillType="none"`;
 
   const parentAttr = layer.parentId ? ` parent="${escapeXml(layer.parentId)}"` : '';
-  const blendAttr = layer.blendMode !== 'normal' ? ` blending="${escapeXml(layer.blendMode)}"` : '';
+  // B6: Preserve AM's clippingMask="true" dialect on export (never emit non-AM blending="mask")
+  const isMask = layer.blendMode === 'mask' || layer.blendMode === 'exclude';
+  const clipAttr = isMask ? ' clippingMask="true"' : '';
+  const blendAttr = isMask
+    ? layer.blendMode === 'exclude'
+      ? ' blending="exclude"'
+      : ''
+    : layer.blendMode !== 'normal'
+      ? ` blending="${escapeXml(layer.blendMode)}"`
+      : '';
+  const retimeAttr =
+    layer.retime && layer.retime.method !== 'none'
+      ? ` retime="${escapeXml(layer.retime.method)}"`
+      : '';
+  const cropAttr =
+    layer.mediaData?.cropMode && layer.mediaData.cropMode !== 'fill'
+      ? ` cropMode="${escapeXml(layer.mediaData.cropMode)}"`
+      : '';
 
   const parts: string[] = [];
   parts.push(
-    `${indent}<${tag} id="${escapeXml(layer.id)}" label="${escapeXml(layer.label)}" startTime="${Math.round(layer.startTime)}" endTime="${Math.round(layer.endTime)}"${fillAttr}${parentAttr}${blendAttr}>`
+    `${indent}<${tag} id="${escapeXml(layer.id)}" label="${escapeXml(layer.label)}" startTime="${Math.round(layer.startTime)}" endTime="${Math.round(layer.endTime)}"${fillAttr}${parentAttr}${clipAttr}${blendAttr}${retimeAttr}${cropAttr}>`
   );
 
   parts.push(`${indent}  <transform>`);
@@ -506,6 +523,10 @@ function parseXmlLayer(
   let mediaData: Layer['mediaData'];
   let audioData: Layer['audioData'];
 
+  const rawCrop = (el.getAttribute('cropMode') || '').toLowerCase();
+  const cropMode: 'fill' | 'fit' | 'stretch' | undefined =
+    rawCrop === 'fit' || rawCrop === 'stretch' || rawCrop === 'fill' ? rawCrop : undefined;
+
   if (matchedVideo) {
     type = 'video';
     const rawSpeed = parseFloat(el.getAttribute('speed') || '');
@@ -517,6 +538,7 @@ function parseXmlLayer(
       naturalHeight: matchedVideo.height || displayHeight || projH,
       displayWidth,
       displayHeight,
+      cropMode,
       durationMs: matchedVideo.durationMs || 4000,
       trimStartMs: parseFloat(el.getAttribute('inTime') || '0') || 0,
       playbackSpeed: parsedSpeed,
@@ -532,6 +554,7 @@ function parseXmlLayer(
       naturalHeight: matchedImage.height || displayHeight || projH,
       displayWidth,
       displayHeight,
+      cropMode,
     };
   } else if (matchedAudio) {
     type = 'audio';
@@ -650,6 +673,13 @@ function parseXmlLayer(
     shadow,
     effects,
     speed: animatable(1),
+    retime: (() => {
+      const r = (el.getAttribute('retime') || '').trim();
+      if (r === 'freeze' || r === 'loop' || r === 'stretch' || r === 'loopStretch' || r === 'blank') {
+        return { method: r };
+      }
+      return undefined;
+    })(),
     shapeId: type === 'shape' ? resolvedShapeId : undefined,
     shapeParams: type === 'shape' ? shapeParams : undefined,
     svgPathD: type === 'shape' ? svgPathD : undefined,

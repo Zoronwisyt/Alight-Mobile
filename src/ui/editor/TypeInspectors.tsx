@@ -391,6 +391,57 @@ export const SpeedRemapPanel: React.FC = () => {
         onOpenCurve={() => setCurveTarget(target)}
         onChange={(v) => updateLayer((l) => setAnimValue(l.speed, v))}
       />
+      <div className="am-field">
+        <label>Re-timing Mode</label>
+        <div className="am-pill-row" style={{ flexWrap: 'wrap' }}>
+          {(
+            [
+              ['none', 'None'],
+              ['freeze', 'Freeze'],
+              ['loop', 'Loop'],
+              ['stretch', 'Stretch'],
+              ['loopStretch', 'Loop & Stretch'],
+              ['blank', 'Blank'],
+            ] as const
+          ).map(([m, lbl]) => (
+            <button
+              key={m}
+              type="button"
+              className={`am-pill ${(layer.retime?.method ?? 'none') === m ? 'active' : ''}`}
+              onClick={() =>
+                updateLayer((l) => {
+                  l.retime = m === 'none' ? undefined : { ...(l.retime ?? {}), method: m };
+                })
+              }
+            >
+              {lbl}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {(layer.type === 'image' || layer.type === 'video') && layer.mediaData && (
+        <div className="am-field">
+          <label>Media Crop Mode</label>
+          <div className="am-pill-row">
+            {(['fill', 'fit', 'stretch'] as const).map((cm) => (
+              <button
+                key={cm}
+                type="button"
+                className={`am-pill ${(layer.mediaData?.cropMode ?? 'fill') === cm ? 'active' : ''}`}
+                onClick={() =>
+                  updateLayer((l) => {
+                    if (l.mediaData) l.mediaData.cropMode = cm;
+                  })
+                }
+              >
+                {cm[0].toUpperCase() + cm.slice(1)}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       <p style={{ margin: 0, fontSize: 12, color: 'var(--am-text-muted)' }}>
         Keyframe Speed over time to create speed ramps and velocity edits!
       </p>

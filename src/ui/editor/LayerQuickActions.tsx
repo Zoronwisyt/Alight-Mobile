@@ -13,6 +13,8 @@ export const LayerQuickActions: React.FC = () => {
     enterGroup,
     groupSelectedLayers,
     ungroupSelectedLayer,
+    alignSelectedLayers,
+    distributeSelectedLayers,
     copySelectedLayers,
     pasteLayers,
     copyLayerEffects,
@@ -34,6 +36,8 @@ export const LayerQuickActions: React.FC = () => {
       enterGroup: s.enterGroup,
       groupSelectedLayers: s.groupSelectedLayers,
       ungroupSelectedLayer: s.ungroupSelectedLayer,
+      alignSelectedLayers: s.alignSelectedLayers,
+      distributeSelectedLayers: s.distributeSelectedLayers,
       copySelectedLayers: s.copySelectedLayers,
       pasteLayers: s.pasteLayers,
       copyLayerEffects: s.copyLayerEffects,
@@ -99,6 +103,55 @@ export const LayerQuickActions: React.FC = () => {
 
       {selLayers.length >= 1 && (
         <>
+          <button
+            type="button"
+            className="am-icon-btn"
+            onClick={() => alignSelectedLayers('hcenter')}
+            title="Center Horizontally"
+            style={{ fontSize: 11, fontWeight: 700 }}
+          >
+            ⬌
+          </button>
+          <button
+            type="button"
+            className="am-icon-btn"
+            onClick={() => alignSelectedLayers('vcenter')}
+            title="Center Vertically"
+            style={{ fontSize: 11, fontWeight: 700 }}
+          >
+            ⬍
+          </button>
+          {selLayers.length >= 3 && (
+            <>
+              <button
+                type="button"
+                className="am-icon-btn"
+                onClick={() => distributeSelectedLayers('horizontal')}
+                title="Distribute Horizontally"
+                style={{ fontSize: 10, fontWeight: 700 }}
+              >
+                ⫴H
+              </button>
+              <button
+                type="button"
+                className="am-icon-btn"
+                onClick={() => distributeSelectedLayers('vertical')}
+                title="Distribute Vertically"
+                style={{ fontSize: 10, fontWeight: 700 }}
+              >
+                ⫴V
+              </button>
+              <button
+                type="button"
+                className="am-icon-btn"
+                onClick={() => distributeSelectedLayers('time')}
+                title="Distribute on Timeline"
+                style={{ fontSize: 10, fontWeight: 700 }}
+              >
+                ⫴T
+              </button>
+            </>
+          )}
           <input
             ref={replaceInputRef}
             type="file"

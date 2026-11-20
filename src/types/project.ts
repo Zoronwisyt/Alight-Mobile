@@ -32,9 +32,18 @@ export interface Keyframe<T = any> {
   easing?: EasingSpec;
 }
 
+export interface WaveGenerator {
+  kind: 'sine' | 'sineMult' | 'triangle' | 'random';
+  amplitude: number;
+  frequency: number;
+  phase: number;
+}
+
 export interface Animatable<T = any> {
   value: T;
   keyframes: Keyframe<T>[];
+  /** B2: Optional wave/oscillator property generator evaluated on top of base value */
+  generator?: WaveGenerator;
 }
 
 export type LayerType =
@@ -175,6 +184,8 @@ export interface MediaData {
   naturalHeight: number;
   displayWidth?: number;
   displayHeight?: number;
+  /** B4: APK TextureCropMode (fill = cover, fit = contain, stretch = distort to box) */
+  cropMode?: 'fill' | 'fit' | 'stretch';
   durationMs?: number;
   trimStartMs?: number;
   playbackSpeed?: number;
@@ -206,6 +217,16 @@ export interface CameraData {
   blurStrength: Animatable<number>;
 }
 
+export type RetimeMethod = 'none' | 'freeze' | 'loop' | 'stretch' | 'loopStretch' | 'blank';
+
+export interface RetimeConfig {
+  method: RetimeMethod;
+  sourceStartMs?: number;
+  sourceEndMs?: number;
+  /** Loop count (0 = fill layer duration) */
+  repeats?: number;
+}
+
 export interface Layer {
   id: string;
   type: LayerType;
@@ -224,6 +245,8 @@ export interface Layer {
   shadow: LayerShadow;
   effects: LayerEffectInstance[];
   speed: Animatable<number>;
+  /** A2: APK ReTimingMethod (freeze / loop / stretch / loopStretch / blank) */
+  retime?: RetimeConfig;
 
   // Type-specific payloads
   shapeId?: string;

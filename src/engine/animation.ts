@@ -251,28 +251,64 @@ export function integrateAnimatable(
 export function evalAnimatable<T>(prop: Animatable<T> | undefined, normT: number, fallback?: T): T {
   if (!prop) return fallback as T;
   const kfs = prop.keyframes;
-  if (!kfs || kfs.length === 0) return prop.value;
-  if (kfs.length === 1) return kfs[0].v;
-
-  const sorted = kfs.length > 1 ? kfs : kfs;
-  if (normT <= sorted[0].t) return sorted[0].v;
-  const last = sorted[sorted.length - 1];
-  if (normT >= last.t) return last.v;
-
-  for (let i = 0; i < sorted.length - 1; i++) {
-    const k0 = sorted[i];
-    const k1 = sorted[i + 1];
-    if (normT >= k0.t && normT <= k1.t) {
-      const span = k1.t - k0.t;
-      if (span <= 1e-7) return k1.v;
-      const rawU = (normT - k0.t) / span;
-      // APK KeyableKt->valueAtTime reads easing strictly from k1 (segment end keyframe)
-      const easing = k1.easing;
-      const e = evalEasing(rawU, easing);
-      return interpolateValue(k0.v, k1.v, e);
+  let baseVal: T;
+  if (!kfs || kfs.length === 0) {
+    baseVal = prop.value;
+  } else if (kfs.length === 1) {
+    baseVal = kfs[0].v;
+  } else if (normT <= kfs[0].t) {
+    baseVal = kfs[0].v;
+  } else {
+    const last = kfs[kfs.length - 1];
+    if (normT >= last.t) {
+      baseVal = last.v;
+    } else {
+      baseVal = last.v;
+      for (let i = 0; i < kfs.length - 1; i++) {
+        const k0 = kfs[i];
+        const k1 = kfs[i + 1];
+        if (normT >= k0.t && normT <= k1.t) {
+          const span = k1.t - k0.t;
+          if (span <= 1e-7) {
+            baseVal = k1.v;
+          } else {
+            const rawU = (normT - k0.t) / span;
+            // APK KeyableKt->valueAtTime reads easing strictly from k1 (segment end keyframe)
+            const e = evalEasing(rawU, k1.easing);
+            baseVal = interpolateValue(k0.v, k1.v, e);
+          }
+          break;
+        }
+      }
     }
   }
-  return last.v;
+
+  // B2: Apply optional wave/oscillator property generator (sine / sineMult / triangle / random)
+  const gen = prop.generator;
+  if (gen && gen.amplitude !== 0) {
+    const theta = (normT * gen.frequency + gen.phase) * Math.PI * 2;
+    let wave = 0;
+    if (gen.kind === 'sine' || gen.kind === 'sineMult') {
+      wave = Math.sin(theta);
+    } else if (gen.kind === 'triangle') {
+      const p = ((normT * gen.frequency + gen.phase) % 1 + 1) % 1;
+      wave = p < 0.25 ? p * 4 : p < 0.75 ? 2 - p * 4 : p * 4 - 4;
+    } else if (gen.kind === 'random') {
+      const step = Math.floor((normT * Math.max(0.1, gen.frequency) + gen.phase) * 8);
+      const s = Math.sin(step * 12.9898 + 78.233) * 43758.5453;
+      wave = (s - Math.floor(s)) * 2 - 1;
+    }
+    const delta = wave * gen.amplitude;
+    if (typeof baseVal === 'number') {
+      return (gen.kind === 'sineMult' ? baseVal * (1 + delta) : baseVal + delta) as unknown as T;
+    }
+    if (Array.isArray(baseVal)) {
+      return baseVal.map((v) =>
+        typeof v === 'number' ? (gen.kind === 'sineMult' ? v * (1 + delta) : v + delta) : v
+      ) as unknown as T;
+    }
+  }
+  return baseVal;
 }
 
 export function animatable<T>(value: T, keyframes: Keyframe<T>[] = []): Animatable<T> {
@@ -286,12 +322,41 @@ export function evalRemappedTime(layer: Layer, sceneTimeMs: number): {
   localTimeMs: number;
   normT: number;
   remappedNormT: number;
+  isBlank?: boolean;
 } {
   const dur = Math.max(1, layer.endTime - layer.startTime);
-  const localTimeMs = sceneTimeMs - layer.startTime;
+  let localTimeMs = sceneTimeMs - layer.startTime;
   const normT = clamp01(localTimeMs / dur);
 
-  let remappedNormT = normT;
+  // A2: Apply ReTimingMethod (freeze / loop / stretch / loopStretch / blank) before speed
+  const retime = layer.retime;
+  if (retime && retime.method !== 'none') {
+    if (retime.method === 'blank') {
+      return { localTimeMs: 0, normT, remappedNormT: 0, isBlank: true };
+    }
+    const srcStart = retime.sourceStartMs ?? 0;
+    const srcDur = Math.max(
+      1,
+      (retime.sourceEndMs && retime.sourceEndMs > srcStart
+        ? retime.sourceEndMs - srcStart
+        : layer.mediaData?.durationMs ?? dur)
+    );
+    if (retime.method === 'freeze') {
+      localTimeMs = srcStart;
+      return { localTimeMs, normT, remappedNormT: 0 };
+    } else if (retime.method === 'loop') {
+      const looped = ((localTimeMs % srcDur) + srcDur) % srcDur;
+      localTimeMs = srcStart + looped;
+    } else if (retime.method === 'stretch') {
+      localTimeMs = srcStart + normT * srcDur;
+    } else if (retime.method === 'loopStretch') {
+      const repeats = Math.max(1, retime.repeats || Math.round(dur / srcDur) || 1);
+      const cyclePos = (normT * repeats) % 1;
+      localTimeMs = srcStart + (normT >= 0.9999 ? srcDur : cyclePos * srcDur);
+    }
+  }
+
+  let remappedNormT = clamp01(localTimeMs / dur);
   const speedProp = layer.speed;
   if (speedProp && (speedProp.keyframes.length > 0 || Math.abs(speedProp.value - 1) > 1e-4)) {
     // Numerical integration of speed(u) over [0, normT] normalized so speed=1 maps 0..1
