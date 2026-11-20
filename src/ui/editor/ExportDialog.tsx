@@ -330,13 +330,30 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({ rendererRef, isExpor
                     name="exportBitrate"
                     type="range"
                     min={2}
-                    max={30}
+                    max={100}
                     step={1}
                     disabled={progress !== null}
                     value={qualityMbps}
                     onChange={(e) => setQualityMbps(Number(e.target.value))}
                     style={{ accentColor: 'var(--am-accent)' }}
                   />
+                  <div style={{ display: 'flex', gap: 6, marginTop: 6, alignItems: 'center' }}>
+                    {[12, 40, 100].map((mbps) => (
+                      <button
+                        key={mbps}
+                        type="button"
+                        disabled={progress !== null}
+                        className={`am-pill ${qualityMbps === mbps ? 'active' : ''}`}
+                        onClick={() => setQualityMbps(mbps)}
+                        title={mbps === 100 ? 'Mastering ceiling — 100 Mbps' : undefined}
+                      >
+                        {mbps} Mbps
+                      </button>
+                    ))}
+                    <span style={{ marginLeft: 'auto', fontSize: 10, color: 'var(--am-text-muted)' }}>
+                      ≈ {((qualityMbps * Math.max(0.1, currentProject.durationMs / 1000)) / 8).toFixed(1)} MB
+                    </span>
+                  </div>
                 </div>
 
                 <label

@@ -1,6 +1,12 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { downloadGoogleFamily } from '../../engine/fontDownload';
+import {
+  importFontsFromZip,
+  isFontArchive,
+  summariseZipImport,
+  type FontZipEntryResult,
+} from '../../engine/fontZipImport';
 import { humaniseFamily, weightToLabel } from '../../engine/fontNames';
 import {
   getCatalogFamilies,
@@ -57,6 +63,8 @@ export const FontPickerModal: React.FC<FontPickerModalProps> = ({
   const [expandedFamily, setExpandedFamily] = useState<string | null>(humaniseFamily(currentFamily));
   const [downloadingFam, setDownloadingFam] = useState<string | null>(null);
   const [importError, setImportError] = useState<string | null>(null);
+  const [zipFailures, setZipFailures] = useState<FontZipEntryResult[]>([]);
+  const [zipProgress, setZipProgress] = useState<{ done: number; total: number; name: string } | null>(null);
   const [dragActive, setDragActive] = useState(false);
   const [, setTick] = useState(0);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -112,22 +120,67 @@ export const FontPickerModal: React.FC<FontPickerModalProps> = ({
 
   const handleFiles = async (files: FileList | File[]) => {
     setImportError(null);
+    setZipFailures([]);
     const arr = Array.from(files);
+
+    // Archives first: one .zip is "all of these at once", which is the whole point of
+    // the drop target. Loose font files in the same drop are handled after it.
+    const archives = arr.filter(isFontArchive);
+    const loose = arr.filter((f) => !isFontArchive(f));
+
     let imported = 0;
-    let lastMeta: UserFontMeta | undefined;
-    for (const file of arr) {
-      const res = await importFontFile(file);
-      if (!res.ok) {
-        setImportError(`${file.name}: ${res.error || 'Import failed'}`);
-      } else {
-        imported++;
-        lastMeta = res.meta;
-        if (res.warning) showToast(res.warning);
+    let lastFamily: string | undefined;
+    const failures: FontZipEntryResult[] = [];
+
+    for (const zipFile of archives) {
+      setZipProgress({ done: 0, total: 0, name: zipFile.name });
+      const res = await importFontsFromZip(zipFile, (done, total, name) =>
+        setZipProgress({ done, total, name })
+      );
+      setZipProgress(null);
+      if (res.error) {
+        setImportError(`${zipFile.name}: ${res.error}`);
+      }
+      imported += res.imported;
+      for (const e of res.entries) {
+        if (!e.ok) failures.push(e);
+      }
+      const firstFamily = res.families[0];
+      if (firstFamily) {
+        lastFamily = res.families[res.families.length - 1];
+        if (res.families.length === 1) setExpandedFamily(firstFamily);
+      }
+      if (res.imported > 0 || res.duplicates > 0) {
+        showToast(`${zipFile.name}: ${summariseZipImport(res)}`);
       }
     }
-    if (imported > 0 && lastMeta) {
-      showToast(imported === 1 ? `Imported "${lastMeta.family}"` : `Imported ${imported} fonts`);
-      setExpandedFamily(lastMeta.family);
+
+    for (const file of loose) {
+      const res = await importFontFile(file);
+      if (!res.ok) {
+        failures.push({ fileName: file.name, ok: false, error: res.error || 'Import failed' });
+      } else {
+        imported++;
+        lastFamily = res.meta?.family;
+        if (res.warning) showToast(res.warning);
+        if (res.meta?.family) setExpandedFamily(res.meta.family);
+      }
+    }
+
+    if (failures.length > 0) {
+      setZipFailures(failures.slice(0, 12));
+      const first = failures[0];
+      setImportError(
+        failures.length === 1
+          ? `${first.fileName}: ${first.error || 'Import failed'}`
+          : `${failures.length} files could not be imported — first: ${first.fileName}: ${first.error || 'Import failed'}`
+      );
+    }
+
+    if (imported > 0) {
+      showToast(
+        imported === 1 && lastFamily ? `Imported "${lastFamily}"` : `Imported ${imported} fonts`
+      );
     }
   };
 
@@ -351,8 +404,9 @@ export const FontPickerModal: React.FC<FontPickerModalProps> = ({
               className="am-btn am-btn-accent"
               style={{ padding: '4px 10px', fontSize: 11 }}
               onClick={() => fileInputRef.current?.click()}
+              title="Import font files, or a .zip of a whole font pack, in one go"
             >
-              + Import TTF/OTF/WOFF2
+              + Import Fonts / ZIP
             </button>
             <button type="button" className="am-icon-btn" onClick={onClose} title="Close">
               ✕
@@ -361,7 +415,7 @@ export const FontPickerModal: React.FC<FontPickerModalProps> = ({
           <input
             ref={fileInputRef}
             type="file"
-            accept=".ttf,.otf,.woff,.woff2,.ttc"
+            accept=".ttf,.otf,.woff,.woff2,.ttc,.zip,application/zip"
             multiple
             style={{ display: 'none' }}
             onChange={(e) => {
@@ -381,13 +435,32 @@ export const FontPickerModal: React.FC<FontPickerModalProps> = ({
             autoFocus
             style={{ width: '100%' }}
           />
+          {zipProgress && (
+            <div style={{ marginTop: 6, fontSize: 11, color: 'var(--am-accent)', fontWeight: 700 }}>
+              {zipProgress.total > 0
+                ? `Importing fonts ${Math.min(zipProgress.done + 1, zipProgress.total)}/${zipProgress.total}${
+                    zipProgress.name ? ` — ${zipProgress.name}` : ''
+                  }`
+                : `Reading ${zipProgress.name}…`}
+            </div>
+          )}
           {dragActive && (
             <div style={{ marginTop: 6, fontSize: 11, color: 'var(--am-accent)', fontWeight: 700 }}>
-              Drop .ttf / .otf / .woff2 font files to import…
+              Drop .ttf / .otf / .woff2 files, or a .zip of a whole font pack…
             </div>
           )}
           {importError && (
             <div style={{ marginTop: 6, fontSize: 11, color: '#FF6B81' }}>{importError}</div>
+          )}
+          {zipFailures.length > 0 && (
+            <ul style={{ margin: '6px 0 0', paddingLeft: 16, fontSize: 10, color: 'var(--am-text-muted)' }}>
+              {zipFailures.map((f, i) => (
+                <li key={`${f.fileName}-${i}`}>
+                  {f.fileName}
+                  {f.error ? ` — ${f.error}` : ''}
+                </li>
+              ))}
+            </ul>
           )}
         </div>
 
