@@ -1,4 +1,5 @@
 import React from 'react';
+import { useShallow } from 'zustand/react/shallow';
 import { evalAnimatable } from '../../engine/animation';
 import { formatEffectDisplayName, getEffectById, parseDefaultParamValue } from '../../engine/catalog';
 import { useEditorStore, type ActiveCurveTarget } from '../../store/useEditorStore';
@@ -14,7 +15,15 @@ export const EffectSettingsPanel: React.FC = () => {
     toggleKeyframeOnProp,
     stepKeyframe,
     setCurveTarget,
-  } = useEditorStore();
+  } = useEditorStore(
+    useShallow((s) => ({
+      activeEffectUid: s.activeEffectUid,
+      setInspectorTab: s.setInspectorTab,
+      toggleKeyframeOnProp: s.toggleKeyframeOnProp,
+      stepKeyframe: s.stepKeyframe,
+      setCurveTarget: s.setCurveTarget,
+    }))
+  );
   const { layer, normT, updateLayer, setAnimValue, hasKfHere } = useSelectedLayer();
 
   if (!layer || !activeEffectUid) return null;

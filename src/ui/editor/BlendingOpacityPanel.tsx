@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 import { useEditorStore } from '../../store/useEditorStore';
 import type { BlendModeId } from '../../types/project';
 import { SpinnerControl } from '../components/SpinnerControl';
@@ -65,7 +66,13 @@ const BLEND_GROUPS: { group: string; items: { id: BlendModeId; label: string }[]
 ];
 
 export const BlendingOpacityPanel: React.FC = () => {
-  const { toggleKeyframeOnProp, stepKeyframe, setCurveTarget } = useEditorStore();
+  const { toggleKeyframeOnProp, stepKeyframe, setCurveTarget } = useEditorStore(
+    useShallow((s) => ({
+      toggleKeyframeOnProp: s.toggleKeyframeOnProp,
+      stepKeyframe: s.stepKeyframe,
+      setCurveTarget: s.setCurveTarget,
+    }))
+  );
   const { layer, normT, updateLayer, setAnimValue, hasKfHere, readAnim } = useSelectedLayer();
   const [openGroup, setOpenGroup] = useState('Darken');
 

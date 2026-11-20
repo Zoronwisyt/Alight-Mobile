@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 import { replaceMediaOnLayers } from '../../engine/mediaReplace';
 import type { AlightRenderer } from '../../engine/renderer';
 import { useEditorStore } from '../../store/useEditorStore';
@@ -14,7 +15,12 @@ interface TimelineProps {
   onRenderCacheNow?: () => void;
 }
 
+// I-9: Memoise per-layer keyframe list by Layer object identity (O(1) hit for unchanged COW layers)
+const layerKeyframesCache = new WeakMap<Layer, number[]>();
+
 function collectLayerKeyframes(layer: Layer): number[] {
+  const cached = layerKeyframesCache.get(layer);
+  if (cached) return cached;
   const ts = new Set<number>();
   const addProp = (kfs?: { t: number }[]) => {
     if (!kfs) return;
@@ -34,7 +40,9 @@ function collectLayerKeyframes(layer: Layer): number[] {
       addProp(p?.keyframes);
     }
   }
-  return Array.from(ts);
+  const out = Array.from(ts);
+  layerKeyframesCache.set(layer, out);
+  return out;
 }
 
 const LAYER_GRADIENTS = [
@@ -84,7 +92,28 @@ export const Timeline: React.FC<TimelineProps> = ({
     setTimelineZoom,
     mutateProject,
     setModal,
-  } = useEditorStore();
+  } = useEditorStore(
+    useShallow((s) => ({
+      currentProject: s.currentProject,
+      currentTimeMs: s.currentTimeMs,
+      timelinePxPerSec: s.timelinePxPerSec,
+      selectedLayerIds: s.selectedLayerIds,
+      groupStack: s.groupStack,
+      loop: s.loop,
+      previewQuality: s.previewQuality,
+      getActiveLayers: s.getActiveLayers,
+      setCurrentTimeMs: s.setCurrentTimeMs,
+      setIsPlaying: s.setIsPlaying,
+      setLoop: s.setLoop,
+      selectLayer: s.selectLayer,
+      enterGroup: s.enterGroup,
+      toggleLayerVisible: s.toggleLayerVisible,
+      reorderLayer: s.reorderLayer,
+      setTimelineZoom: s.setTimelineZoom,
+      mutateProject: s.mutateProject,
+      setModal: s.setModal,
+    }))
+  );
 
   const scrollerRef = useRef<HTMLDivElement>(null);
   const rulerRef = useRef<HTMLDivElement>(null);

@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 import { audioEngine } from '../../engine/audioEngine';
 import {
   collectMissingFonts,
@@ -44,7 +45,26 @@ export const EditorScreen: React.FC = () => {
     undo,
     redo,
     deleteSelectedLayers,
-  } = useEditorStore();
+  } = useEditorStore(
+    useShallow((s) => ({
+      currentProject: s.currentProject,
+      currentTimeMs: s.currentTimeMs,
+      isPlaying: s.isPlaying,
+      loop: s.loop,
+      layoutMode: s.layoutMode,
+      selectedLayerIds: s.selectedLayerIds,
+      groupStack: s.groupStack,
+      previewQuality: s.previewQuality,
+      toastMessage: s.toastMessage,
+      setCurrentTimeMs: s.setCurrentTimeMs,
+      setIsPlaying: s.setIsPlaying,
+      togglePlay: s.togglePlay,
+      setAudioLevel: s.setAudioLevel,
+      undo: s.undo,
+      redo: s.redo,
+      deleteSelectedLayers: s.deleteSelectedLayers,
+    }))
+  );
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const rendererRef = useRef<AlightRenderer | null>(null);
@@ -174,17 +194,27 @@ export const EditorScreen: React.FC = () => {
     }
   }, [currentProject?.id]);
 
-  // Render single frame whenever project, playhead, quality, or visibility changes while paused (always exact native res)
+  // Render single frame whenever project, playhead, quality, or visibility changes while paused (I-6: coalesced to 1 per rAF)
   useEffect(() => {
     const renderer = rendererRef.current;
     if (!renderer || !currentProject || visibilityPaused || isPlaying || isExportingRef.current) return;
-    renderer.syncVideosForPlayback(currentProject, currentTimeMs, false);
-    renderer.renderProject(currentProject, currentTimeMs, {
-      previewScale: previewQuality,
-      selectedIds: selectedLayerIds,
-      activeGroupStack: groupStack,
-      useCache: false,
+    let cancelled = false;
+    const rafId = requestAnimationFrame(() => {
+      if (cancelled || isExportingRef.current) return;
+      const store = useEditorStore.getState();
+      if (store.isPlaying || !store.currentProject) return;
+      renderer.syncVideosForPlayback(store.currentProject, store.currentTimeMs, false);
+      renderer.renderProject(store.currentProject, store.currentTimeMs, {
+        previewScale: store.previewQuality,
+        selectedIds: store.selectedLayerIds,
+        activeGroupStack: store.groupStack,
+        useCache: false,
+      });
     });
+    return () => {
+      cancelled = true;
+      cancelAnimationFrame(rafId);
+    };
   }, [currentProject, currentTimeMs, selectedLayerIds, groupStack, previewQuality, visibilityPaused, isPlaying]);
 
   // Idle render-ahead (After Effects RAM Preview): walks FORWARD monotonically and awaits exact video seeks

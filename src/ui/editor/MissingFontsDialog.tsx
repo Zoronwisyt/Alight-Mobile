@@ -1,4 +1,5 @@
 import React, { useRef, useState } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 import { downloadGoogleFamily } from '../../engine/fontDownload';
 import { weightToLabel } from '../../engine/fontNames';
 import {
@@ -21,7 +22,12 @@ export const MissingFontsDialog: React.FC<MissingFontsDialogProps> = ({
   onResolved,
   onClose,
 }) => {
-  const { mutateProject, showToast } = useEditorStore();
+  const { mutateProject, showToast } = useEditorStore(
+    useShallow((s) => ({
+      mutateProject: s.mutateProject,
+      showToast: s.showToast,
+    }))
+  );
   const [rowStatus, setRowStatus] = useState<Record<string, string>>({});
   const [downloadingAll, setDownloadingAll] = useState(false);
   const [mismatchPrompt, setMismatchPrompt] = useState<{

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 import { evalAnimatable } from '../../engine/animation';
 import { useEditorStore, type ActiveCurveTarget } from '../../store/useEditorStore';
 import type { Layer, Project } from '../../types/project';
@@ -33,7 +34,13 @@ function getLayerBaseDimensions(layer: Layer, project: Project, normT: number): 
 }
 
 export const MoveTransformPanel: React.FC = () => {
-  const { toggleKeyframeOnProp, stepKeyframe, setCurveTarget } = useEditorStore();
+  const { toggleKeyframeOnProp, stepKeyframe, setCurveTarget } = useEditorStore(
+    useShallow((s) => ({
+      toggleKeyframeOnProp: s.toggleKeyframeOnProp,
+      stepKeyframe: s.stepKeyframe,
+      setCurveTarget: s.setCurveTarget,
+    }))
+  );
   const { project, layer, normT, updateLayer, setAnimValue, hasKfHere, readAnim } = useSelectedLayer();
   const [mode, setMode] = useState<Mode>('location');
   const [editPivot, setEditPivot] = useState(false);
@@ -98,14 +105,32 @@ export const MoveTransformPanel: React.FC = () => {
       }, record);
     };
 
-    const onMove = (ev: PointerEvent) => apply(ev.clientX, ev.clientY, false);
+    // I-10: Coalesce pointermove updates to 1 store write per animation frame, commit final value on release
+    let dragRaf = 0;
+    let lastX = startX;
+    let lastY = startY;
+    const onMove = (ev: PointerEvent) => {
+      lastX = ev.clientX;
+      lastY = ev.clientY;
+      if (dragRaf) return;
+      dragRaf = requestAnimationFrame(() => {
+        dragRaf = 0;
+        apply(lastX, lastY, false);
+      });
+    };
     const onUp = (ev: PointerEvent) => {
+      if (dragRaf) {
+        cancelAnimationFrame(dragRaf);
+        dragRaf = 0;
+      }
       apply(ev.clientX, ev.clientY, true);
       window.removeEventListener('pointermove', onMove);
       window.removeEventListener('pointerup', onUp);
+      window.removeEventListener('pointercancel', onUp);
     };
     window.addEventListener('pointermove', onMove);
     window.addEventListener('pointerup', onUp);
+    window.addEventListener('pointercancel', onUp);
   };
 
   return (

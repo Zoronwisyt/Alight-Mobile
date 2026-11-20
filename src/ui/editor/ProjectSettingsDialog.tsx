@@ -1,9 +1,17 @@
 import React, { useEffect, useState } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 import { useEditorStore } from '../../store/useEditorStore';
 import { AmDialog } from '../components/AmDialog';
 
 export const ProjectSettingsDialog: React.FC = () => {
-  const { showProjectSettings, setModal, currentProject, mutateProject } = useEditorStore();
+  const { showProjectSettings, setModal, currentProject, mutateProject } = useEditorStore(
+    useShallow((s) => ({
+      showProjectSettings: s.showProjectSettings,
+      setModal: s.setModal,
+      currentProject: s.currentProject,
+      mutateProject: s.mutateProject,
+    }))
+  );
   const [title, setTitle] = useState('');
   const [width, setWidth] = useState(1080);
   const [height, setHeight] = useState(1080);

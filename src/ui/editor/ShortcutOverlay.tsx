@@ -1,4 +1,5 @@
 import React from 'react';
+import { useShallow } from 'zustand/react/shallow';
 import { useEditorStore } from '../../store/useEditorStore';
 import { AmDialog } from '../components/AmDialog';
 
@@ -42,7 +43,16 @@ const GROUPS: { title: string; items: [string, string][] }[] = [
 ];
 
 export const ShortcutOverlay: React.FC = () => {
-  const { showShortcutOverlay, setShowShortcutOverlay, density, setDensity, uiScale, setUiScale } = useEditorStore();
+  const { showShortcutOverlay, setShowShortcutOverlay, density, setDensity, uiScale, setUiScale } = useEditorStore(
+    useShallow((s) => ({
+      showShortcutOverlay: s.showShortcutOverlay,
+      setShowShortcutOverlay: s.setShowShortcutOverlay,
+      density: s.density,
+      setDensity: s.setDensity,
+      uiScale: s.uiScale,
+      setUiScale: s.setUiScale,
+    }))
+  );
 
   return (
     <AmDialog

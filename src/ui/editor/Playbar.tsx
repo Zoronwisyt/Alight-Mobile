@@ -1,4 +1,5 @@
 import React, { useRef, useState } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 import { replaceMediaOnLayers } from '../../engine/mediaReplace';
 import { useEditorStore } from '../../store/useEditorStore';
 import { AmIcon } from '../components/AmIcon';
@@ -33,7 +34,33 @@ export const Playbar: React.FC<PlaybarProps> = ({ viewModeOpen, onToggleViewMode
     copyLayerEffects,
     pasteLayerEffects,
     mutateProject,
-  } = useEditorStore();
+  } = useEditorStore(
+    useShallow((s) => ({
+      currentProject: s.currentProject,
+      currentTimeMs: s.currentTimeMs,
+      isPlaying: s.isPlaying,
+      audioLevel: s.audioLevel,
+      selectedLayerIds: s.selectedLayerIds,
+      groupStack: s.groupStack,
+      past: s.past,
+      future: s.future,
+      layerClipboard: s.layerClipboard,
+      effectsClipboard: s.effectsClipboard,
+      undo: s.undo,
+      redo: s.redo,
+      setCurrentTimeMs: s.setCurrentTimeMs,
+      togglePlay: s.togglePlay,
+      setIsPlaying: s.setIsPlaying,
+      toggleBookmarkAtPlayhead: s.toggleBookmarkAtPlayhead,
+      jumpBookmark: s.jumpBookmark,
+      copySelectedLayers: s.copySelectedLayers,
+      pasteLayers: s.pasteLayers,
+      duplicateSelectedLayers: s.duplicateSelectedLayers,
+      copyLayerEffects: s.copyLayerEffects,
+      pasteLayerEffects: s.pasteLayerEffects,
+      mutateProject: s.mutateProject,
+    }))
+  );
 
   const [showCopyMenu, setShowCopyMenu] = useState(false);
   const replaceInputRef = useRef<HTMLInputElement>(null);

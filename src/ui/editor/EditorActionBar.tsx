@@ -1,4 +1,5 @@
 import React, { useRef } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 import { replaceMediaOnLayers } from '../../engine/mediaReplace';
 import { useEditorStore } from '../../store/useEditorStore';
 import { AmIcon } from '../components/AmIcon';
@@ -28,7 +29,24 @@ export const EditorActionBar: React.FC = () => {
     setLayoutMode,
     setModal,
     setShowShortcutOverlay,
-  } = useEditorStore();
+  } = useEditorStore(
+    useShallow((s) => ({
+      currentProject: s.currentProject,
+      currentTimeMs: s.currentTimeMs,
+      selectedLayerIds: s.selectedLayerIds,
+      groupStack: s.groupStack,
+      exitGroup: s.exitGroup,
+      closeEditor: s.closeEditor,
+      mutateProject: s.mutateProject,
+      selectLayer: s.selectLayer,
+      groupSelectedLayers: s.groupSelectedLayers,
+      deleteSelectedLayers: s.deleteSelectedLayers,
+      layoutMode: s.layoutMode,
+      setLayoutMode: s.setLayoutMode,
+      setModal: s.setModal,
+      setShowShortcutOverlay: s.setShowShortcutOverlay,
+    }))
+  );
 
   const replaceMultiRef = useRef<HTMLInputElement>(null);
 

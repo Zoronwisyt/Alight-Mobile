@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 import JSZip from 'jszip';
 import { exportProjectToAmXml } from '../../engine/amXmlCodec';
 import { encodeAnimatedGif } from '../../engine/gifEncoder';
@@ -33,7 +34,15 @@ function downloadBlob(blob: Blob, filename: string) {
 }
 
 export const ExportDialog: React.FC<ExportDialogProps> = ({ rendererRef, isExportingRef }) => {
-  const { showExportDialog, setModal, currentProject, currentTimeMs, setIsPlaying } = useEditorStore();
+  const { showExportDialog, setModal, currentProject, currentTimeMs, setIsPlaying } = useEditorStore(
+    useShallow((s) => ({
+      showExportDialog: s.showExportDialog,
+      setModal: s.setModal,
+      currentProject: s.currentProject,
+      currentTimeMs: s.currentTimeMs,
+      setIsPlaying: s.setIsPlaying,
+    }))
+  );
   const [format, setFormat] = useState<ExportFormat>('video');
   const [container, setContainer] = useState<VideoContainer>('mp4');
   const [exportFps, setExportFps] = useState(30);

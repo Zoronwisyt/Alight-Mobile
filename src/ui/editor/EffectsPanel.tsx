@@ -1,4 +1,5 @@
 import React from 'react';
+import { useShallow } from 'zustand/react/shallow';
 import { formatEffectDisplayName, getEffectById } from '../../engine/catalog';
 import { useEditorStore } from '../../store/useEditorStore';
 import { AmIcon } from '../components/AmIcon';
@@ -12,7 +13,16 @@ export const EffectsPanel: React.FC = () => {
     copyLayerEffects,
     pasteLayerEffects,
     effectsClipboard,
-  } = useEditorStore();
+  } = useEditorStore(
+    useShallow((s) => ({
+      setModal: s.setModal,
+      setInspectorTab: s.setInspectorTab,
+      setActiveEffectUid: s.setActiveEffectUid,
+      copyLayerEffects: s.copyLayerEffects,
+      pasteLayerEffects: s.pasteLayerEffects,
+      effectsClipboard: s.effectsClipboard,
+    }))
+  );
   const { layer, updateLayer } = useSelectedLayer();
 
   if (!layer) return null;

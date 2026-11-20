@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 import { animatable } from '../../engine/animation';
 import { audioEngine } from '../../engine/audioEngine';
 import { getDefaultShapeParams, getShapes } from '../../engine/catalog';
@@ -31,7 +32,17 @@ export const AddLayerPopup: React.FC = () => {
     addLayer,
     elements,
     setInspectorTab,
-  } = useEditorStore();
+  } = useEditorStore(
+    useShallow((s) => ({
+      showAddLayerPopup: s.showAddLayerPopup,
+      setModal: s.setModal,
+      currentProject: s.currentProject,
+      currentTimeMs: s.currentTimeMs,
+      addLayer: s.addLayer,
+      elements: s.elements,
+      setInspectorTab: s.setInspectorTab,
+    }))
+  );
 
   const [tab, setTab] = useState<AddTab>('shape');
   const shapes = getShapes();

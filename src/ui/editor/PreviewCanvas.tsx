@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 import { evalAnimatable, evalRemappedTime } from '../../engine/animation';
 import { getShapeById, parseDefaultParamValue } from '../../engine/catalog';
 import { evaluateShapeHandles } from '../../engine/scriptRuntime';
@@ -47,7 +48,32 @@ export const PreviewCanvas: React.FC<PreviewCanvasProps> = ({
     drawingBrushColor,
     drawingBrushWidth,
     drawingBrushOpacity,
-  } = useEditorStore();
+  } = useEditorStore(
+    useShallow((s) => ({
+      currentProject: s.currentProject,
+      currentTimeMs: s.currentTimeMs,
+      selectedLayerIds: s.selectedLayerIds,
+      groupStack: s.groupStack,
+      getActiveLayers: s.getActiveLayers,
+      inspectorTab: s.inspectorTab,
+      gridVisible: s.gridVisible,
+      toggleGrid: s.toggleGrid,
+      snapEnabled: s.snapEnabled,
+      toggleSnap: s.toggleSnap,
+      previewQuality: s.previewQuality,
+      setPreviewQuality: s.setPreviewQuality,
+      previewZoom: s.previewZoom,
+      setPreviewZoom: s.setPreviewZoom,
+      previewPan: s.previewPan,
+      setPreviewPan: s.setPreviewPan,
+      selectLayer: s.selectLayer,
+      enterGroup: s.enterGroup,
+      mutateProject: s.mutateProject,
+      drawingBrushColor: s.drawingBrushColor,
+      drawingBrushWidth: s.drawingBrushWidth,
+      drawingBrushOpacity: s.drawingBrushOpacity,
+    }))
+  );
 
   const wrapRef = useRef<HTMLDivElement>(null);
   const [stageSize, setStageSize] = useState<{ w: number; h: number }>({ w: 360, h: 360 });

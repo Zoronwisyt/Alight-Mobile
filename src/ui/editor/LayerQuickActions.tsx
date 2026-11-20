@@ -1,4 +1,5 @@
 import React, { useRef, useState } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 import { replaceMediaOnLayers } from '../../engine/mediaReplace';
 import { useEditorStore } from '../../store/useEditorStore';
 import { AmIcon } from '../components/AmIcon';
@@ -24,7 +25,29 @@ export const LayerQuickActions: React.FC = () => {
     toggleLayerLocked,
     saveSelectedAsElement,
     setInspectorTab,
-  } = useEditorStore();
+  } = useEditorStore(
+    useShallow((s) => ({
+      selectedLayerIds: s.selectedLayerIds,
+      getActiveLayers: s.getActiveLayers,
+      groupStack: s.groupStack,
+      mutateProject: s.mutateProject,
+      enterGroup: s.enterGroup,
+      groupSelectedLayers: s.groupSelectedLayers,
+      ungroupSelectedLayer: s.ungroupSelectedLayer,
+      copySelectedLayers: s.copySelectedLayers,
+      pasteLayers: s.pasteLayers,
+      copyLayerEffects: s.copyLayerEffects,
+      pasteLayerEffects: s.pasteLayerEffects,
+      layerClipboard: s.layerClipboard,
+      effectsClipboard: s.effectsClipboard,
+      duplicateSelectedLayers: s.duplicateSelectedLayers,
+      deleteSelectedLayers: s.deleteSelectedLayers,
+      toggleLayerVisible: s.toggleLayerVisible,
+      toggleLayerLocked: s.toggleLayerLocked,
+      saveSelectedAsElement: s.saveSelectedAsElement,
+      setInspectorTab: s.setInspectorTab,
+    }))
+  );
 
   const [showCopyMenu, setShowCopyMenu] = useState(false);
   const [showParentMenu, setShowParentMenu] = useState(false);

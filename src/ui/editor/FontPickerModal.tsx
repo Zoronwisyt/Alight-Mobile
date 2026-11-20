@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 import { downloadGoogleFamily } from '../../engine/fontDownload';
 import { humaniseFamily, weightToLabel } from '../../engine/fontNames';
 import {
@@ -46,7 +47,12 @@ export const FontPickerModal: React.FC<FontPickerModalProps> = ({
   onClose,
   onFontDeleted,
 }) => {
-  const { currentProject, showToast } = useEditorStore();
+  const { currentProject, showToast } = useEditorStore(
+    useShallow((s) => ({
+      currentProject: s.currentProject,
+      showToast: s.showToast,
+    }))
+  );
   const [search, setSearch] = useState('');
   const [expandedFamily, setExpandedFamily] = useState<string | null>(humaniseFamily(currentFamily));
   const [downloadingFam, setDownloadingFam] = useState<string | null>(null);

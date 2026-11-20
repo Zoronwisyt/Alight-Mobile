@@ -1,4 +1,5 @@
 import React, { useMemo, useRef, useState } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 import {
   createEffectInstance,
   EFFECT_CATEGORIES,
@@ -30,7 +31,19 @@ export const EffectBrowserDialog: React.FC = () => {
     deleteCustomEffect,
     toggleCustomEffect,
     showToast,
-  } = useEditorStore();
+  } = useEditorStore(
+    useShallow((s) => ({
+      showEffectBrowser: s.showEffectBrowser,
+      setModal: s.setModal,
+      setActiveEffectUid: s.setActiveEffectUid,
+      setInspectorTab: s.setInspectorTab,
+      customEffects: s.customEffects,
+      addCustomEffect: s.addCustomEffect,
+      deleteCustomEffect: s.deleteCustomEffect,
+      toggleCustomEffect: s.toggleCustomEffect,
+      showToast: s.showToast,
+    }))
+  );
   const { layer, updateLayer } = useSelectedLayer();
 
   const [category, setCategory] = useState('all');

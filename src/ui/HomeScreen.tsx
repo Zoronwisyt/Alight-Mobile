@@ -1,4 +1,5 @@
 import React, { useRef, useState } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 import {
   getCustomProxyUrl,
   importAlightMotionLink,
@@ -30,7 +31,24 @@ export const HomeScreen: React.FC = () => {
     setModal,
     showDrawer,
     clearCache,
-  } = useEditorStore();
+  } = useEditorStore(
+    useShallow((s) => ({
+      homeTab: s.homeTab,
+      setHomeTab: s.setHomeTab,
+      projects: s.projects,
+      elements: s.elements,
+      theme: s.theme,
+      setTheme: s.setTheme,
+      openProject: s.openProject,
+      duplicateProject: s.duplicateProject,
+      deleteProject: s.deleteProject,
+      deleteElement: s.deleteElement,
+      importProject: s.importProject,
+      setModal: s.setModal,
+      showDrawer: s.showDrawer,
+      clearCache: s.clearCache,
+    }))
+  );
 
   const [search, setSearch] = useState('');
   const [importError, setImportError] = useState<string | null>(null);

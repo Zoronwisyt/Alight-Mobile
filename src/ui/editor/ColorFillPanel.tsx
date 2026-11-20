@@ -1,11 +1,17 @@
 import React, { useState } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 import { useEditorStore } from '../../store/useEditorStore';
 import { AmIcon } from '../components/AmIcon';
 import { ColorPicker } from '../components/ColorPicker';
 import { useSelectedLayer } from './useSelectedLayer';
 
 export const ColorFillPanel: React.FC = () => {
-  const { toggleKeyframeOnProp, stepKeyframe } = useEditorStore();
+  const { toggleKeyframeOnProp, stepKeyframe } = useEditorStore(
+    useShallow((s) => ({
+      toggleKeyframeOnProp: s.toggleKeyframeOnProp,
+      stepKeyframe: s.stepKeyframe,
+    }))
+  );
   const { layer, normT, updateLayer, setAnimValue, hasKfHere, readAnim } = useSelectedLayer();
   const [activeStopIdx, setActiveStopIdx] = useState(0);
 

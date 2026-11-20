@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 import { evalAnimatable } from '../../engine/animation';
 import { getShapeById, parseDefaultParamValue } from '../../engine/catalog';
 import { normalizeFontWeight, weightToLabel } from '../../engine/fontNames';
@@ -10,7 +11,12 @@ import { FontPickerModal } from './FontPickerModal';
 import { useSelectedLayer } from './useSelectedLayer';
 
 export const ShapeEditPanel: React.FC = () => {
-  const { toggleKeyframeOnProp, setCurveTarget } = useEditorStore();
+  const { toggleKeyframeOnProp, setCurveTarget } = useEditorStore(
+    useShallow((s) => ({
+      toggleKeyframeOnProp: s.toggleKeyframeOnProp,
+      setCurveTarget: s.setCurveTarget,
+    }))
+  );
   const { layer, normT, updateLayer, setAnimValue, hasKfHere } = useSelectedLayer();
   if (!layer || layer.type !== 'shape' || !layer.shapeId) return null;
   const def = getShapeById(layer.shapeId);
@@ -113,7 +119,11 @@ export const ShapeEditPanel: React.FC = () => {
 };
 
 export const TextEditPanel: React.FC = () => {
-  const { currentProject } = useEditorStore();
+  const { currentProject } = useEditorStore(
+    useShallow((s) => ({
+      currentProject: s.currentProject,
+    }))
+  );
   const { layer, updateLayer } = useSelectedLayer();
   const [showFontPicker, setShowFontPicker] = useState(false);
   if (!layer || layer.type !== 'text' || !layer.textData) return null;
@@ -271,7 +281,14 @@ export const EditPointsPanel: React.FC = () => {
 };
 
 export const DrawingToolbar: React.FC = () => {
-  const { drawingBrushColor, drawingBrushWidth, drawingBrushOpacity, setDrawingBrush } = useEditorStore();
+  const { drawingBrushColor, drawingBrushWidth, drawingBrushOpacity, setDrawingBrush } = useEditorStore(
+    useShallow((s) => ({
+      drawingBrushColor: s.drawingBrushColor,
+      drawingBrushWidth: s.drawingBrushWidth,
+      drawingBrushOpacity: s.drawingBrushOpacity,
+      setDrawingBrush: s.setDrawingBrush,
+    }))
+  );
   const { layer, updateLayer } = useSelectedLayer();
   if (!layer || layer.type !== 'freehand') return null;
 
@@ -345,7 +362,13 @@ export const CameraOptionsPanel: React.FC = () => {
 };
 
 export const SpeedRemapPanel: React.FC = () => {
-  const { toggleKeyframeOnProp, stepKeyframe, setCurveTarget } = useEditorStore();
+  const { toggleKeyframeOnProp, stepKeyframe, setCurveTarget } = useEditorStore(
+    useShallow((s) => ({
+      toggleKeyframeOnProp: s.toggleKeyframeOnProp,
+      stepKeyframe: s.stepKeyframe,
+      setCurveTarget: s.setCurveTarget,
+    }))
+  );
   const { layer, normT, updateLayer, setAnimValue, hasKfHere, readAnim } = useSelectedLayer();
   if (!layer) return null;
   const spd = readAnim(layer.speed, 1);

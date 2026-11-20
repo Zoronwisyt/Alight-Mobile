@@ -1,3 +1,5 @@
+import { useCallback } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 import { evalAnimatable, evalRemappedTime } from '../../engine/animation';
 import { useEditorStore } from '../../store/useEditorStore';
 import type { Animatable, Layer } from '../../types/project';
@@ -8,26 +10,33 @@ export function useSelectedLayer() {
     currentTimeMs,
     selectedLayerIds,
     groupStack,
-    getActiveLayers,
-    mutateProject,
-  } = useEditorStore();
+    mutateLayer,
+  } = useEditorStore(
+    useShallow((s) => ({
+      currentProject: s.currentProject,
+      currentTimeMs: s.currentTimeMs,
+      selectedLayerIds: s.selectedLayerIds,
+      groupStack: s.groupStack,
+      mutateLayer: s.mutateLayer,
+    }))
+  );
 
-  const layers = getActiveLayers();
+  let layers = currentProject?.layers ?? [];
+  for (const gid of groupStack) {
+    const g = layers.find((x) => x.id === gid && x.type === 'group');
+    if (g?.groupLayers) layers = g.groupLayers;
+  }
   const layer = selectedLayerIds.length === 1 ? layers.find((l) => l.id === selectedLayerIds[0]) : undefined;
+  const layerId = layer?.id;
 
-  const updateLayer = (fn: (l: Layer) => void, recordHistory = true) => {
-    if (!layer) return;
-    const lid = layer.id;
-    mutateProject((proj) => {
-      let list = proj.layers;
-      for (const gid of groupStack) {
-        const g = list.find((x) => x.id === gid && x.type === 'group');
-        if (g?.groupLayers) list = g.groupLayers;
-      }
-      const target = list.find((x) => x.id === lid);
-      if (target) fn(target);
-    }, recordHistory);
-  };
+  // I-1 + I-2: Copy-on-write single-layer mutation (shares all other layers by reference)
+  const updateLayer = useCallback(
+    (fn: (l: Layer) => void, recordHistory = true) => {
+      if (!layerId) return;
+      mutateLayer(layerId, fn, recordHistory);
+    },
+    [layerId, mutateLayer]
+  );
 
   const normT = layer ? evalRemappedTime(layer, currentTimeMs).remappedNormT : 0;
 

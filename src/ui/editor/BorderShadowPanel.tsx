@@ -1,11 +1,18 @@
 import React, { useState } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 import { useEditorStore } from '../../store/useEditorStore';
 import { ColorPicker } from '../components/ColorPicker';
 import { SpinnerControl } from '../components/SpinnerControl';
 import { useSelectedLayer } from './useSelectedLayer';
 
 export const BorderShadowPanel: React.FC = () => {
-  const { toggleKeyframeOnProp, stepKeyframe, setCurveTarget } = useEditorStore();
+  const { toggleKeyframeOnProp, stepKeyframe, setCurveTarget } = useEditorStore(
+    useShallow((s) => ({
+      toggleKeyframeOnProp: s.toggleKeyframeOnProp,
+      stepKeyframe: s.stepKeyframe,
+      setCurveTarget: s.setCurveTarget,
+    }))
+  );
   const { layer, normT, updateLayer, setAnimValue, hasKfHere, readAnim } = useSelectedLayer();
   const [subTab, setSubTab] = useState<'stroke' | 'shadow'>('stroke');
 

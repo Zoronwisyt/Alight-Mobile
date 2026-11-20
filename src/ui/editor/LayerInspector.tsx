@@ -1,4 +1,5 @@
 import React, { useRef, useState } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 import { replaceMediaOnLayers } from '../../engine/mediaReplace';
 import { useEditorStore, type InspectorTab } from '../../store/useEditorStore';
 import { AmIcon } from '../components/AmIcon';
@@ -44,7 +45,32 @@ export const LayerInspector: React.FC = () => {
     groupSelectedLayers,
     deleteSelectedLayers,
     mutateProject,
-  } = useEditorStore();
+  } = useEditorStore(
+    useShallow((s) => ({
+      inspectorTab: s.inspectorTab,
+      setInspectorTab: s.setInspectorTab,
+      curveTarget: s.curveTarget,
+      setCurveTarget: s.setCurveTarget,
+      layoutMode: s.layoutMode,
+      enterGroup: s.enterGroup,
+      selectedLayerIds: s.selectedLayerIds,
+      groupStack: s.groupStack,
+      currentTimeMs: s.currentTimeMs,
+      getActiveLayers: s.getActiveLayers,
+      selectLayer: s.selectLayer,
+      trimSelectedLeft: s.trimSelectedLeft,
+      splitSelectedAtPlayhead: s.splitSelectedAtPlayhead,
+      trimSelectedRight: s.trimSelectedRight,
+      duplicateSelectedLayers: s.duplicateSelectedLayers,
+      copyLayerEffects: s.copyLayerEffects,
+      pasteLayerEffects: s.pasteLayerEffects,
+      effectsClipboard: s.effectsClipboard,
+      saveSelectedAsElement: s.saveSelectedAsElement,
+      groupSelectedLayers: s.groupSelectedLayers,
+      deleteSelectedLayers: s.deleteSelectedLayers,
+      mutateProject: s.mutateProject,
+    }))
+  );
 
   const { layer, updateLayer } = useSelectedLayer();
   const replaceMediaRef = useRef<HTMLInputElement>(null);

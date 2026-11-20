@@ -1,4 +1,5 @@
 import React, { useRef } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 import { evalEasing } from '../../engine/animation';
 import { getAnimatableByTarget, useEditorStore } from '../../store/useEditorStore';
 import type { EasingSpec } from '../../types/project';
@@ -20,7 +21,15 @@ const PRESET_CURVES: { label: string; easing: EasingSpec }[] = [
 ];
 
 export const EasingCurvePanel: React.FC = () => {
-  const { curveTarget, setCurveTarget, updateKeyframeEasing, curveClipboard, setCurveClipboard } = useEditorStore();
+  const { curveTarget, setCurveTarget, updateKeyframeEasing, curveClipboard, setCurveClipboard } = useEditorStore(
+    useShallow((s) => ({
+      curveTarget: s.curveTarget,
+      setCurveTarget: s.setCurveTarget,
+      updateKeyframeEasing: s.updateKeyframeEasing,
+      curveClipboard: s.curveClipboard,
+      setCurveClipboard: s.setCurveClipboard,
+    }))
+  );
   const { layer, normT, updateLayer } = useSelectedLayer();
   const svgRef = useRef<SVGSVGElement>(null);
 
