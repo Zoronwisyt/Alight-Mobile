@@ -15,6 +15,14 @@ export const App: React.FC = () => {
     let alive = true;
     // F-1: Request persistent browser storage at boot so IndexedDB user fonts & media resist eviction
     navigator.storage?.persist?.().catch(() => {});
+    // MO-9: Track visualViewport height (--vvh) so mobile on-screen keyboards don't shove layout off-screen
+    const syncVvh = () => {
+      const h = window.visualViewport?.height ?? window.innerHeight;
+      document.documentElement.style.setProperty('--vvh', `${Math.round(h)}px`);
+    };
+    syncVvh();
+    window.visualViewport?.addEventListener('resize', syncVvh);
+    window.visualViewport?.addEventListener('scroll', syncVvh);
     Promise.all([
       ensureCatalogLoaded(),
       initApp(),

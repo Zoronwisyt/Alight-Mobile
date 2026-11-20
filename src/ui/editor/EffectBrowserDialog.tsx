@@ -20,6 +20,68 @@ import { AmDialog } from '../components/AmDialog';
 import { AmIcon } from '../components/AmIcon';
 import { useSelectedLayer } from './useSelectedLayer';
 
+const CUSTOM_LIBS_STORAGE_KEY = 'am.customEffectLibs.v1';
+
+const AM_CUSTOM_EFFECT_GUIDE = `# Alight Motion Custom Effect Format (WebGL2 / XML)
+
+An Alight Motion effect is a single <effect> XML file (<= 64 KB) with <params>, <shader> (GLSL), and optional <script> (JS).
+
+## 1. Root Tag
+<effect id="custom.my_effect" name="My Effect" category="color" desc="Short description">
+
+## 2. Parameters (<params>)
+- Texture input: <texture id="inputImg" srcType="content" /> (or srcType="comp" for scene backdrop, srcType="buffer" for multi-pass)
+- Number slider/spinner: <spinner id="strength" name="Strength" default="0.5" min="0" max="2" step="0.01" />
+- Color: <color id="tint" name="Tint" default="#FF00FFA8" /> (ARGB hex -> bound as vec4 RGBA 0..1)
+- 2D point: <point id="center" name="Center" default="0.5,0.5" /> (bound as vec2)
+- Switch: <switch id="invert" name="Invert" default="false" /> (bound as bool/int)
+- Selector: <selector id="mode" name="Mode" default="0"><choice value="0" label="Normal" /><choice value="1" label="Add" /></selector>
+
+## 3. Fragment Shader (<shader type="fragment">)
+Built-in uniforms & varyings available automatically:
+- acScreenNorm (vec2 0..1 screen UV), acLayerNorm (vec2 0..1 layer UV)
+- acTime (float seconds), acProjectSize (vec2 px), acLayerSize (vec2 px), acLayerScale (vec2), acLayerCenter (vec2)
+- Sample textures with: texture2DCv(inputImg.texture, acScreenNorm)
+- Output premultiplied RGBA to gl_FragColor.
+
+## 4. Optional Script (<script>)
+function animate(env, el, p) {
+  // env: { time (0..1), absTime (sec), duration, fps, frame, selected }
+  // el: { alpha, shaderGroups, transform: { location: {x,y,z}, angle, scale: {x,y} } }
+  return el;
+}
+
+## 5. Working Example
+<effect id="custom.neon_tint" name="Neon Tint" category="color">
+  <params>
+    <texture id="inputImg" srcType="content" />
+    <color id="tint" name="Tint" default="#FF00FFA8" />
+    <spinner id="amount" name="Amount" default="0.5" min="0" max="1" step="0.01" />
+  </params>
+  <shader type="fragment">
+    void main() {
+      vec4 c = texture2DCv(inputImg.texture, acScreenNorm);
+      vec3 rgb = mix(c.rgb, tint.rgb * c.a, amount);
+      gl_FragColor = vec4(rgb, c.a);
+    }
+  </shader>
+</effect>`;
+
+function loadSavedLibraries(): string[] {
+  try {
+    const raw = localStorage.getItem(CUSTOM_LIBS_STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return Array.from(new Set(['Default', ...parsed.map((x) => String(x).trim()).filter(Boolean)]));
+      }
+    }
+  } catch {
+    // ignore
+  }
+  return ['Default'];
+}
+
 export const EffectBrowserDialog: React.FC = () => {
   const {
     showEffectBrowser,
@@ -30,6 +92,8 @@ export const EffectBrowserDialog: React.FC = () => {
     addCustomEffect,
     deleteCustomEffect,
     toggleCustomEffect,
+    renameCustomEffect,
+    moveCustomEffectToLibrary,
     showToast,
   } = useEditorStore(
     useShallow((s) => ({
@@ -41,6 +105,8 @@ export const EffectBrowserDialog: React.FC = () => {
       addCustomEffect: s.addCustomEffect,
       deleteCustomEffect: s.deleteCustomEffect,
       toggleCustomEffect: s.toggleCustomEffect,
+      renameCustomEffect: s.renameCustomEffect,
+      moveCustomEffectToLibrary: s.moveCustomEffectToLibrary,
       showToast: s.showToast,
     }))
   );
@@ -51,10 +117,12 @@ export const EffectBrowserDialog: React.FC = () => {
   const [includeLegacy, setIncludeLegacy] = useState(false);
   const [detailEffect, setDetailEffect] = useState<EffectDef | null>(null);
 
-  // Track D: Custom XML effect import state
+  // Track D: Custom XML effect import & multi-library state
   const [xmlInput, setXmlInput] = useState('');
   const [validating, setValidating] = useState(false);
   const [validationErr, setValidationErr] = useState<CustomEffectValidationError | null>(null);
+  const [savedLibraries, setSavedLibraries] = useState<string[]>(() => loadSavedLibraries());
+  const [activeLibrary, setActiveLibrary] = useState<string>('Default');
   const [pendingImport, setPendingImport] = useState<{
     res: CustomEffectValidationResult;
     xml: string;
@@ -62,6 +130,130 @@ export const EffectBrowserDialog: React.FC = () => {
     duplicate?: CustomEffectRecord;
   } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const allLibraries = useMemo(() => {
+    const set = new Set<string>(['Default', ...savedLibraries]);
+    for (const c of customEffects) {
+      if (c.library?.trim()) set.add(c.library.trim());
+    }
+    return Array.from(set);
+  }, [savedLibraries, customEffects]);
+
+  const persistLibraries = (libs: string[]) => {
+    const clean = Array.from(new Set(['Default', ...libs.map((l) => l.trim()).filter(Boolean)]));
+    setSavedLibraries(clean);
+    try {
+      localStorage.setItem(CUSTOM_LIBS_STORAGE_KEY, JSON.stringify(clean));
+    } catch {
+      // ignore
+    }
+  };
+
+  const visibleCustomEffects = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return customEffects.filter((rec) => {
+      const lib = rec.library?.trim() || 'Default';
+      if (activeLibrary !== '__ALL__' && lib !== activeLibrary) return false;
+      if (!q) return true;
+      return rec.name.toLowerCase().includes(q) || rec.id.toLowerCase().includes(q);
+    });
+  }, [customEffects, activeLibrary, query]);
+
+  const handleCopyGuide = async () => {
+    try {
+      await navigator.clipboard.writeText(AM_CUSTOM_EFFECT_GUIDE);
+      showToast('Copied Alight Motion effect guide to clipboard!');
+    } catch {
+      showToast('Clipboard blocked — allow clipboard access');
+    }
+  };
+
+  const handleCopyLibraryJson = async () => {
+    const list = visibleCustomEffects;
+    if (list.length === 0) {
+      showToast('No custom effects in this library to copy');
+      return;
+    }
+    const payload = {
+      format: 'am-web-custom-effects-library',
+      version: 1,
+      library: activeLibrary === '__ALL__' ? 'All Libraries' : activeLibrary,
+      exportedAt: new Date().toISOString(),
+      effects: list.map((rec) => ({
+        name: rec.name,
+        library: rec.library || 'Default',
+        xml: rec.xml,
+      })),
+    };
+    try {
+      await navigator.clipboard.writeText(JSON.stringify(payload, null, 2));
+      showToast(`Copied ${list.length} effect(s) as JSON library!`);
+    } catch {
+      showToast('Clipboard blocked — allow clipboard access');
+    }
+  };
+
+  const handleImportLibraryJson = async () => {
+    const raw = window.prompt('Paste shared Custom Effect Library JSON:');
+    if (!raw || !raw.trim()) return;
+    try {
+      const parsed = JSON.parse(raw);
+      const items = Array.isArray(parsed?.effects) ? parsed.effects : Array.isArray(parsed) ? parsed : [];
+      if (items.length === 0) {
+        showToast('No effects found in JSON');
+        return;
+      }
+      const targetLib =
+        typeof parsed?.library === 'string' && parsed.library.trim() && parsed.library !== 'All Libraries'
+          ? parsed.library.trim()
+          : activeLibrary === '__ALL__'
+            ? 'Default'
+            : activeLibrary;
+      persistLibraries([...allLibraries, targetLib]);
+      let imported = 0;
+      for (const item of items) {
+        if (!item || typeof item.xml !== 'string') continue;
+        const res = await validateCustomEffectXml(item.xml, getBuiltInEffectIds());
+        if (!res.ok || !res.def || !res.hash) continue;
+        const rec = buildCustomEffectRecord(res.def, item.xml, res.hash, 'paste');
+        if (typeof item.name === 'string' && item.name.trim()) {
+          rec.name = item.name.trim();
+          rec.def = { ...rec.def, name: rec.name };
+        }
+        rec.library = typeof item.library === 'string' && item.library.trim() ? item.library.trim() : targetLib;
+        await addCustomEffect(rec);
+        imported++;
+      }
+      setActiveLibrary(targetLib);
+      showToast(`Imported ${imported} custom effect(s) into "${targetLib}"!`);
+    } catch {
+      showToast('Invalid library JSON');
+    }
+  };
+
+  const handleCreateLibrary = () => {
+    const name = window.prompt('New custom effect library name:');
+    if (!name || !name.trim()) return;
+    const clean = name.trim();
+    persistLibraries([...allLibraries, clean]);
+    setActiveLibrary(clean);
+    showToast(`Created library "${clean}"`);
+  };
+
+  const handleRenameLibrary = async () => {
+    if (activeLibrary === '__ALL__' || activeLibrary === 'Default') return;
+    const next = window.prompt(`Rename library "${activeLibrary}" to:`, activeLibrary);
+    if (!next || !next.trim() || next.trim() === activeLibrary) return;
+    const clean = next.trim();
+    persistLibraries(allLibraries.map((l) => (l === activeLibrary ? clean : l)));
+    for (const rec of customEffects) {
+      if ((rec.library || 'Default') === activeLibrary) {
+        await moveCustomEffectToLibrary(rec.uid, clean);
+      }
+    }
+    setActiveLibrary(clean);
+    showToast(`Renamed library to "${clean}"`);
+  };
 
   const allEffects = getEffects();
 
@@ -126,6 +318,7 @@ export const EffectBrowserDialog: React.FC = () => {
       def = { ...def, id: `${def.id}_${suffix}`, name: `${def.name} (${suffix})` };
     }
     const rec = buildCustomEffectRecord(def, pendingImport.xml, pendingImport.res.hash, pendingImport.source);
+    rec.library = activeLibrary === '__ALL__' ? 'Default' : activeLibrary;
     await addCustomEffect(rec, replaceUid);
     setXmlInput('');
     setPendingImport(null);
@@ -259,6 +452,52 @@ export const EffectBrowserDialog: React.FC = () => {
 
           {category === 'custom' ? (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              {/* Custom Effect Libraries & Sharing Toolbar */}
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, alignItems: 'center', justifyContent: 'space-between' }}>
+                <div className="am-pill-row" style={{ flexWrap: 'wrap', gap: 4 }}>
+                  <button
+                    type="button"
+                    className={`am-pill ${activeLibrary === '__ALL__' ? 'active' : ''}`}
+                    onClick={() => setActiveLibrary('__ALL__')}
+                  >
+                    All ({customEffects.length})
+                  </button>
+                  {allLibraries.map((lib) => {
+                    const count = customEffects.filter((c) => (c.library || 'Default') === lib).length;
+                    return (
+                      <button
+                        key={lib}
+                        type="button"
+                        className={`am-pill ${activeLibrary === lib ? 'active' : ''}`}
+                        onClick={() => setActiveLibrary(lib)}
+                      >
+                        {lib} ({count})
+                      </button>
+                    );
+                  })}
+                  <button type="button" className="am-pill" onClick={handleCreateLibrary} title="Create a new custom effect library">
+                    + New Library
+                  </button>
+                  {activeLibrary !== '__ALL__' && activeLibrary !== 'Default' && (
+                    <button type="button" className="am-pill" onClick={handleRenameLibrary} title="Rename active library">
+                      Rename Lib
+                    </button>
+                  )}
+                </div>
+
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                  <button type="button" className="am-btn" onClick={handleCopyGuide} title="Copy Alight Motion custom effect XML/GLSL guide to clipboard">
+                    📋 Copy Effect Guide
+                  </button>
+                  <button type="button" className="am-btn" onClick={handleCopyLibraryJson} title="Copy this custom effect library as JSON to share">
+                    📋 Copy Library JSON
+                  </button>
+                  <button type="button" className="am-btn" onClick={handleImportLibraryJson} title="Import a shared custom effect library JSON">
+                    Import Library JSON
+                  </button>
+                </div>
+              </div>
+
               <div
                 className="am-custom-import-box"
                 onDragOver={(e) => e.preventDefault()}
@@ -357,13 +596,13 @@ export const EffectBrowserDialog: React.FC = () => {
                 )}
               </div>
 
-              {customEffects.length === 0 ? (
+              {visibleCustomEffects.length === 0 ? (
                 <div style={{ textAlign: 'center', color: 'var(--am-text-muted)', padding: '18px 0', fontSize: 12 }}>
-                  No custom effects imported yet. Paste or drop an &lt;effect&gt; XML file above.
+                  No custom effects in {activeLibrary === '__ALL__' ? 'any library' : `"${activeLibrary}"`} yet. Paste or drop an &lt;effect&gt; XML file above.
                 </div>
               ) : (
                 <div className="am-effect-grid">
-                  {customEffects.map((rec) => (
+                  {visibleCustomEffects.map((rec) => (
                     <div
                       key={rec.uid}
                       className="am-effect-card"
@@ -378,10 +617,21 @@ export const EffectBrowserDialog: React.FC = () => {
                         <AmIcon name="effects" fallback="effects" size={26} color="var(--am-accent)" />
                         <span style={{ fontSize: 12, fontWeight: 700, textAlign: 'center' }}>{rec.name}</span>
                         <span style={{ fontSize: 10, color: 'var(--am-accent)' }}>
-                          Custom · {rec.source}
+                          {rec.library || 'Default'} · {rec.source}
                         </span>
                       </button>
-                      <div style={{ display: 'flex', justifyContent: 'center', gap: 4, marginTop: 4 }}>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 4, marginTop: 4 }}>
+                        <button
+                          type="button"
+                          className="am-pill"
+                          style={{ padding: '2px 7px', fontSize: 10 }}
+                          onClick={() => {
+                            const next = window.prompt('Rename custom effect:', rec.name);
+                            if (next && next.trim()) void renameCustomEffect(rec.uid, next);
+                          }}
+                        >
+                          Rename
+                        </button>
                         <button type="button" className="am-pill" style={{ padding: '2px 7px', fontSize: 10 }} onClick={() => toggleCustomEffect(rec.uid)}>
                           {rec.enabled ? 'Disable' : 'Enable'}
                         </button>

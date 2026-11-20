@@ -2122,3 +2122,24 @@ button:active {
   font-family: monospace;
   font-weight: 700;
 }
+
+/* MO-4 & MO-5: Mobile touch smoothness — prevent scroll/zoom fighting stage drags & enforce 44px touch targets */
+.am-stage-wrap,
+.am-stage-wrap canvas {
+  touch-action: none;
+}
+
+@media (pointer: coarse) {
+  .am-icon-btn {
+    min-width: 44px;
+    min-height: 44px;
+  }
+  .am-gizmo-handle {
+    position: relative;
+  }
+  .am-gizmo-handle::before {
+    content: '';
+    position: absolute;
+    inset: -16px;
+  }
+}

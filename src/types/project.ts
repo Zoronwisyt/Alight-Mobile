@@ -399,6 +399,7 @@ export interface CustomEffectRecord {
   uid: string;
   id: string;
   name: string;
+  library?: string;
   xml: string;
   source: 'paste' | 'file';
   created: number;

@@ -45,6 +45,7 @@ export const PreviewCanvas: React.FC<PreviewCanvasProps> = ({
     selectLayer,
     enterGroup,
     mutateProject,
+    mutateLayer,
     drawingBrushColor,
     drawingBrushWidth,
     drawingBrushOpacity,
@@ -69,6 +70,7 @@ export const PreviewCanvas: React.FC<PreviewCanvasProps> = ({
       selectLayer: s.selectLayer,
       enterGroup: s.enterGroup,
       mutateProject: s.mutateProject,
+      mutateLayer: s.mutateLayer,
       drawingBrushColor: s.drawingBrushColor,
       drawingBrushWidth: s.drawingBrushWidth,
       drawingBrushOpacity: s.drawingBrushOpacity,
@@ -265,32 +267,35 @@ export const PreviewCanvas: React.FC<PreviewCanvasProps> = ({
     const startLoc = [...evalAnimatable(singleLayer.transform.location, remappedNormT, [currentProject.width / 2, currentProject.height / 2, 0])] as [number, number, number];
     const startScale = [...evalAnimatable(singleLayer.transform.scale, remappedNormT, [1, 1])] as [number, number];
     const startRot = evalAnimatable(singleLayer.transform.rotation, remappedNormT, 0);
+    const projW = currentProject.width;
+    const projH = currentProject.height;
+    const layerId = singleLayer.id;
+
+    // MO-3: Capture pointer on drag surface so fast touch drags never strand listeners
+    try {
+      e.currentTarget.setPointerCapture(e.pointerId);
+    } catch {
+      // ignore if synthetic pointer event
+    }
 
     const applyUpdate = (clientX: number, clientY: number, record: boolean) => {
       const dx = (clientX - startX) / (projScale * previewZoom);
       const dy = (clientY - startY) / (projScale * previewZoom);
 
-      mutateProject((proj) => {
-        let list = proj.layers;
-        for (const gid of groupStack) {
-          const g = list.find((l) => l.id === gid);
-          if (g?.groupLayers) list = g.groupLayers;
-        }
-        const target = list.find((l) => l.id === singleLayer.id);
-        if (!target) return;
-
+      // MO-2: Layer-scoped COW write (never deep-clones the whole project per pointermove)
+      mutateLayer(layerId, (target) => {
         if (mode === 'move') {
           let nx = Math.round(startLoc[0] + dx);
           let ny = Math.round(startLoc[1] + dy);
           let gx = false;
           let gy = false;
           if (snapEnabled) {
-            if (Math.abs(nx - proj.width / 2) < 16) {
-              nx = proj.width / 2;
+            if (Math.abs(nx - projW / 2) < 16) {
+              nx = projW / 2;
               gx = true;
             }
-            if (Math.abs(ny - proj.height / 2) < 16) {
-              ny = proj.height / 2;
+            if (Math.abs(ny - projH / 2) < 16) {
+              ny = projH / 2;
               gy = true;
             }
           }
@@ -332,15 +337,33 @@ export const PreviewCanvas: React.FC<PreviewCanvasProps> = ({
       }, record);
     };
 
-    const onMove = (ev: PointerEvent) => applyUpdate(ev.clientX, ev.clientY, false);
+    // MO-1 + MO-3: Coalesce pointermove to 1 store write per rAF + handle pointercancel cleanly
+    let dragRaf = 0;
+    let lastX = startX;
+    let lastY = startY;
+    const onMove = (ev: PointerEvent) => {
+      lastX = ev.clientX;
+      lastY = ev.clientY;
+      if (dragRaf) return;
+      dragRaf = requestAnimationFrame(() => {
+        dragRaf = 0;
+        applyUpdate(lastX, lastY, false);
+      });
+    };
     const onUp = (ev: PointerEvent) => {
+      if (dragRaf) {
+        cancelAnimationFrame(dragRaf);
+        dragRaf = 0;
+      }
       setSnapGuide({ x: false, y: false });
       applyUpdate(ev.clientX, ev.clientY, true);
       window.removeEventListener('pointermove', onMove);
       window.removeEventListener('pointerup', onUp);
+      window.removeEventListener('pointercancel', onUp);
     };
     window.addEventListener('pointermove', onMove);
     window.addEventListener('pointerup', onUp);
+    window.addEventListener('pointercancel', onUp);
   };
 
   // Compute selected layer overlay gizmo coordinates

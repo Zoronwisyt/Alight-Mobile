@@ -127,6 +127,8 @@ interface EditorState {
   addCustomEffect: (rec: CustomEffectRecord, replaceUid?: string) => Promise<void>;
   deleteCustomEffect: (uid: string) => Promise<void>;
   toggleCustomEffect: (uid: string) => Promise<void>;
+  renameCustomEffect: (uid: string, nextName: string) => Promise<void>;
+  moveCustomEffectToLibrary: (uid: string, library: string) => Promise<void>;
   openProject: (id: string) => void;
   createProject: (opts: { title: string; width: number; height: number; fps: number; bgColor: string; durationMs?: number }) => void;
   importProject: (project: Project) => void;
@@ -500,6 +502,25 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     const target = next.find((c) => c.uid === uid);
     if (target) await saveCustomEffectToDb(target);
     setCustomEffects(next.filter((c) => c.enabled).map((c) => c.def));
+    set({ customEffects: next });
+  },
+  renameCustomEffect: async (uid, nextName) => {
+    const clean = nextName.trim();
+    if (!clean) return;
+    const next = get().customEffects.map((c) =>
+      c.uid === uid ? { ...c, name: clean, def: { ...c.def, name: clean } } : c
+    );
+    const target = next.find((c) => c.uid === uid);
+    if (target) await saveCustomEffectToDb(target);
+    setCustomEffects(next.filter((c) => c.enabled).map((c) => c.def));
+    set({ customEffects: next });
+    get().showToast(`Renamed custom effect to "${clean}"`);
+  },
+  moveCustomEffectToLibrary: async (uid, library) => {
+    const clean = library.trim() || 'Default';
+    const next = get().customEffects.map((c) => (c.uid === uid ? { ...c, library: clean } : c));
+    const target = next.find((c) => c.uid === uid);
+    if (target) await saveCustomEffectToDb(target);
     set({ customEffects: next });
   },
 
