@@ -6,11 +6,13 @@ class AudioEngine {
   private analyser: AnalyserNode | null = null;
   private dataArr: Uint8Array<ArrayBuffer> | null = null;
   private buffers = new Map<string, AudioBuffer>();
+  private failedAudioSrcs = new Set<string>();
   private activeSources: AudioBufferSourceNode[] = [];
-  private loading = new Set<string>();
+  private loading = new Map<string, Promise<AudioBuffer>>();
   private playbackStartCtxTime = 0;
   private playbackStartSceneMs = 0;
   private playbackActive = false;
+  private playbackSessionId = 0;
 
   public hasAudio(project: Project): boolean {
     const out: { layer: Layer; absStart: number; absEnd: number }[] = [];
@@ -22,6 +24,19 @@ class AudioEngine {
     if (!this.playbackActive || !this.ctx || this.ctx.state !== 'running') return null;
     const elapsedSec = Math.max(0, this.ctx.currentTime - this.playbackStartCtxTime);
     return this.playbackStartSceneMs + elapsedSec * 1000;
+  }
+
+  /** Pre-decodes audio & video audio tracks in the background so pressing Play has zero audio lag */
+  public preloadProjectAudio(project: Project): void {
+    const items: { layer: Layer; absStart: number; absEnd: number }[] = [];
+    this.collectAudioLayers(project.layers, 0, items);
+    for (const { layer } of items) {
+      const src = layer.type === 'audio' ? layer.audioData?.src : layer.mediaData?.src;
+      const synth = layer.type === 'audio' ? layer.audioData?.synthPattern : undefined;
+      if (src || synth) {
+        void this.loadAudioBuffer(src || '', synth).catch(() => {});
+      }
+    }
   }
 
   public ensureContext(): AudioContext {
@@ -67,19 +82,28 @@ class AudioEngine {
       return buf;
     }
 
-    if (this.loading.has(key)) {
-      throw new Error('Loading');
+    if (this.failedAudioSrcs.has(key)) {
+      throw new Error('No audio track');
     }
-    this.loading.add(key);
-    try {
-      const res = await fetch(src);
-      const arr = await res.arrayBuffer();
-      const buf = await ctx.decodeAudioData(arr);
-      this.buffers.set(key, buf);
-      return buf;
-    } finally {
-      this.loading.delete(key);
-    }
+    const inflight = this.loading.get(key);
+    if (inflight) return inflight;
+
+    const promise = (async () => {
+      try {
+        const res = await fetch(src);
+        const arr = await res.arrayBuffer();
+        const buf = await ctx.decodeAudioData(arr);
+        this.buffers.set(key, buf);
+        return buf;
+      } catch (err) {
+        this.failedAudioSrcs.add(key);
+        throw err;
+      } finally {
+        this.loading.delete(key);
+      }
+    })();
+    this.loading.set(key, promise);
+    return promise;
   }
 
   public extractPeaks(buf: AudioBuffer, bars = 96): number[] {
@@ -105,6 +129,8 @@ class AudioEngine {
         this.collectAudioLayers(l.groupLayers, offsetMs + l.startTime, out);
       } else if (l.type === 'audio' && l.audioData && !l.audioData.muted) {
         out.push({ layer: l, absStart: offsetMs + l.startTime, absEnd: offsetMs + l.endTime });
+      } else if (l.type === 'video' && l.mediaData?.src && !l.mediaData.muted && (l.mediaData.volume ?? 1) > 0.001) {
+        out.push({ layer: l, absStart: offsetMs + l.startTime, absEnd: offsetMs + l.endTime });
       }
     }
   }
@@ -112,6 +138,7 @@ class AudioEngine {
   public startPlayback(project: Project, startMs: number): void {
     this.stopPlayback();
     const ctx = this.ensureContext();
+    const sessionId = ++this.playbackSessionId;
     this.playbackStartCtxTime = ctx.currentTime;
     this.playbackStartSceneMs = startMs;
     this.playbackActive = true;
@@ -119,39 +146,65 @@ class AudioEngine {
     this.collectAudioLayers(project.layers, 0, audioLayers);
 
     for (const item of audioLayers) {
-      this.startLayerAudio(item.layer, item.absStart, item.absEnd, startMs, ctx);
+      void this.startLayerAudio(item.layer, item.absStart, item.absEnd, startMs, ctx, sessionId);
     }
   }
 
-  private async startLayerAudio(layer: Layer, absStart: number, absEnd: number, sceneMs: number, ctx: AudioContext) {
-    if (!layer.audioData) return;
+  private async startLayerAudio(
+    layer: Layer,
+    absStart: number,
+    absEnd: number,
+    sceneMs: number,
+    ctx: AudioContext,
+    sessionId: number
+  ) {
+    const isVideo = layer.type === 'video';
+    const mediaSrc = isVideo ? layer.mediaData?.src : layer.audioData?.src;
+    const synthPattern = isVideo ? undefined : layer.audioData?.synthPattern;
+    if (!mediaSrc && !synthPattern) return;
     if (sceneMs > absEnd) return;
     try {
-      const buf = await this.loadAudioBuffer(layer.audioData.src, layer.audioData.synthPattern);
+      const buf = await this.loadAudioBuffer(mediaSrc || '', synthPattern);
+      // Abort if playback was paused, stopped, or restarted while decoding
+      if (sessionId !== this.playbackSessionId || !this.playbackActive) return;
+
+      // Compensate for any async decode latency so audio locks tightly to the hardware clock
+      const decodeElapsedMs = Math.max(0, (ctx.currentTime - this.playbackStartCtxTime) * 1000);
+      const effectiveSceneMs = sceneMs + decodeElapsedMs;
+      if (effectiveSceneMs >= absEnd) return;
+
       const src = ctx.createBufferSource();
       src.buffer = buf;
+      const speed = isVideo ? Math.max(0.1, Math.min(4, layer.mediaData?.playbackSpeed || 1)) : 1;
+      src.playbackRate.value = speed;
+
       const gain = ctx.createGain();
-      const { remappedNormT } = evalRemappedTime(layer, sceneMs);
-      const vol = evalAnimatable(layer.audioData.volume, remappedNormT, 1);
+      const { remappedNormT } = evalRemappedTime(layer, effectiveSceneMs);
+      const vol = isVideo
+        ? (layer.mediaData?.volume ?? 1)
+        : evalAnimatable(layer.audioData!.volume, remappedNormT, 1);
       gain.gain.value = Math.max(0, Math.min(2, vol));
       src.connect(gain);
       gain.connect(this.analyser!);
 
-      const trimSec = Math.max(0, (layer.audioData.trimStartMs ?? 0) / 1000);
-      const delaySec = Math.max(0, (absStart - sceneMs) / 1000);
-      const elapsedSec = Math.max(0, (sceneMs - absStart) / 1000);
-      const rawOffset = trimSec + elapsedSec;
+      const trimSec = Math.max(0, ((isVideo ? layer.mediaData?.trimStartMs : layer.audioData?.trimStartMs) ?? 0) / 1000);
+      const delaySec = Math.max(0, (absStart - effectiveSceneMs) / 1000);
+      const elapsedSec = Math.max(0, (effectiveSceneMs - absStart) / 1000);
+      const rawOffset = trimSec + elapsedSec * speed;
+      if (buf.duration > 0 && rawOffset >= buf.duration - 0.02) return;
       const offsetSec = buf.duration > 0 ? Math.min(rawOffset, Math.max(0, buf.duration - 0.02)) : 0;
-      const playDur = Math.max(0.05, (absEnd - Math.max(sceneMs, absStart)) / 1000);
-      src.start(ctx.currentTime + delaySec, offsetSec, Math.min(playDur, Math.max(0.02, buf.duration - offsetSec)));
+      const remainingClipSec = Math.max(0.05, (absEnd - Math.max(effectiveSceneMs, absStart)) / 1000);
+      const remainingBufSec = Math.max(0.02, (buf.duration - offsetSec) / speed);
+      src.start(ctx.currentTime + delaySec, offsetSec, Math.min(remainingClipSec, remainingBufSec));
       this.activeSources.push(src);
     } catch {
-      // ignore fetch/decode failure
+      // ignore fetch/decode failure (e.g. silent video with no audio track)
     }
   }
 
   public stopPlayback(): void {
     this.playbackActive = false;
+    this.playbackSessionId++;
     for (const s of this.activeSources) {
       try {
         s.stop();

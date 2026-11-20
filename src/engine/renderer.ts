@@ -847,8 +847,8 @@ export class AlightRenderer {
         if (Math.abs(v.playbackRate - speed) > 0.01) {
           v.playbackRate = speed;
         }
-        v.muted = Boolean(md.muted);
-        v.volume = Math.max(0, Math.min(1, md.volume ?? 1));
+        // Web Audio (audioEngine) owns all video & audio playback sound so cache hits never stutter/mute audio
+        v.muted = true;
 
         if (v.paused) {
           if (v.readyState >= 1 && !v.seeking && Math.abs(v.currentTime - targetSec) > 0.08) {

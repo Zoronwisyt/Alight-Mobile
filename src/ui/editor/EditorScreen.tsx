@@ -162,6 +162,7 @@ export const EditorScreen: React.FC = () => {
   useEffect(() => {
     const renderer = rendererRef.current;
     if (!renderer || !currentProject) return;
+    audioEngine.preloadProjectAudio(currentProject);
     const check = renderer.verifyProjectEffects(currentProject);
     if (check.failed.length > 0) {
       console.warn('[shader-verify] Failed effects in project:', check.failed);
@@ -279,11 +280,11 @@ export const EditorScreen: React.FC = () => {
     }
 
     const hasAudioTrack = audioEngine.hasAudio(currentProject);
-    const frameMs = 1000 / Math.max(1, currentProject.fps);
     renderer.syncVideosForPlayback(currentProject, playheadMs, true);
     audioEngine.startPlayback(currentProject, playheadMs);
-    let lastTs = performance.now();
-    let accumMs = 0;
+    let startSceneMs = playheadMs;
+    let startWallMs = performance.now();
+    let lastTs = startWallMs;
     let commitTick = 0;
     let rafId = 0;
 
@@ -292,32 +293,28 @@ export const EditorScreen: React.FC = () => {
       const proj = store.currentProject;
       if (!proj || !store.isPlaying || isExportingRef.current) return;
 
+      const rawDt = Math.max(0, now - lastTs);
+      lastTs = now;
+
       if (hasAudioTrack) {
         const audioPos = audioEngine.getPlaybackPositionMs();
         if (audioPos !== null) {
           playheadMs = audioPos;
         } else {
-          playheadMs += Math.min(frameMs * 2, Math.max(0, now - lastTs));
+          if (rawDt > 250) startWallMs += rawDt - 16;
+          playheadMs = startSceneMs + (now - startWallMs);
         }
-        lastTs = now;
       } else {
-        // Fixed-step accumulator: advances by exact frame steps without swallowing hitches silently
-        const rawDt = Math.max(0, now - lastTs);
-        lastTs = now;
-        accumMs += Math.min(rawDt, frameMs * 3);
-        const steps = Math.max(1, Math.floor(accumMs / frameMs));
-        if (accumMs >= frameMs) {
-          accumMs -= steps * frameMs;
-          playheadMs += steps * frameMs;
-        } else {
-          playheadMs += rawDt;
-        }
+        // Monotonic real-time clock (never double-counts sub-frame deltas on 60/120Hz displays)
+        if (rawDt > 250) startWallMs += rawDt - 16;
+        playheadMs = startSceneMs + (now - startWallMs);
       }
 
       if (playheadMs >= proj.durationMs) {
         if (store.loop) {
           playheadMs = 0;
-          accumMs = 0;
+          startSceneMs = 0;
+          startWallMs = now;
           audioEngine.startPlayback(proj, 0);
         } else {
           playheadMs = proj.durationMs;
