@@ -71,9 +71,23 @@ interface VideoMediaEntry {
   h: number;
   hasFrame: boolean;
   lastUploadedTime: number;
+  lastUploadGen: number;
   pendingSeekTarget: number | null;
   mediaId?: string;
   rehydrated?: boolean;
+}
+
+// Static scan to detect transform-mutating effect scripts (fixes Scale Assist where autoTransform=false)
+const TRANSFORM_SCRIPT_RE = /\bel\s*\.\s*transform\s*\.|\btransform\s*\.\s*(scale|location|angle)\b/;
+const transformScriptCache = new Map<string, boolean>();
+
+function scriptMutatesTransform(effectId: string): boolean {
+  const hit = transformScriptCache.get(effectId);
+  if (hit !== undefined) return hit;
+  const def = getEffectById(effectId);
+  const result = Boolean(def?.script) && TRANSFORM_SCRIPT_RE.test(def!.script!);
+  transformScriptCache.set(effectId, result);
+  return result;
 }
 
 const BLIT_VERT = `#version 300 es
@@ -447,6 +461,10 @@ export class AlightRenderer {
   private lastCacheProjectId = '';
   private lastCacheScale = -1;
   private lastCacheFontEpoch = -1;
+  private playbackScale = 0;
+  private playbackScaleKey = '';
+  private frameUploadGen = 0;
+  private usedVideoSrcsThisFrame = new Set<string>();
   private onContextLostHandler: (e: Event) => void;
 
   constructor(canvas: HTMLCanvasElement) {
@@ -635,11 +653,16 @@ export class AlightRenderer {
   private uploadVideoTex(entry: VideoMediaEntry): boolean {
     if (this.disposed) return false;
     const v = entry.video;
+    // P-5: Freeze source per rendered frame so multi-pass effects (motion blur) sample one consistent decode
+    if (entry.hasFrame && entry.lastUploadGen === this.frameUploadGen) {
+      return true;
+    }
     if (v.readyState < 2 || v.seeking || v.videoWidth === 0 || v.videoHeight === 0) {
       return false;
     }
     // Skip redundant upload when video frame time hasn't advanced (paused scrubs / stills)
     if (entry.hasFrame && entry.w === v.videoWidth && entry.h === v.videoHeight && Math.abs(entry.lastUploadedTime - v.currentTime) < 0.0005) {
+      entry.lastUploadGen = this.frameUploadGen;
       return true;
     }
     const gl = this.gl;
@@ -657,6 +680,7 @@ export class AlightRenderer {
     entry.h = v.videoHeight;
     entry.hasFrame = true;
     entry.lastUploadedTime = v.currentTime;
+    entry.lastUploadGen = this.frameUploadGen;
     return true;
   }
 
@@ -676,6 +700,7 @@ export class AlightRenderer {
         h: 0,
         hasFrame: false,
         lastUploadedTime: -1,
+        lastUploadGen: -1,
         pendingSeekTarget: null,
         mediaId,
         rehydrated: false,
@@ -849,8 +874,8 @@ export class AlightRenderer {
         }
       } else {
         if (!v.paused) v.pause();
-        // Pre-park video at trimStart shortly before its in-point so entry has zero hitch
-        if (isPlaying && sceneTimeMs < layer.startTime && layer.startTime - sceneTimeMs < 500 && v.readyState >= 1 && !v.seeking) {
+        // Pre-park video at trimStart up to 1s before its in-point so entry has zero hitch
+        if (isPlaying && sceneTimeMs < layer.startTime && layer.startTime - sceneTimeMs < 1000 && v.readyState >= 1 && !v.seeking) {
           const startSec = Math.max(0, (md.trimStartMs ?? 0) / 1000);
           if (Math.abs(v.currentTime - startSec) > 0.05) {
             try {
@@ -982,6 +1007,7 @@ export class AlightRenderer {
   ): { tex: WebGLTexture; w: number; h: number } | null {
     if (isVideo) {
       const entry = this.getOrCreateVideoEntry(src, mediaId);
+      this.usedVideoSrcsThisFrame.add(src);
       const v = entry.video;
       const speed = Math.max(0.1, Math.min(4, playbackSpeed || 1));
       const rawSec = Math.max(0, ((localTimeMs * speed) + trimStart) / 1000);
@@ -1064,13 +1090,13 @@ export class AlightRenderer {
     }
   }
 
-  /** Returns per-frame cache state for the timeline cache bar: 0 = uncached, 1 = lower scale, 2 = full scale */
-  public getCachedFrameMap(totalFrames: number, targetScale: number): Uint8Array {
+  /** Returns per-frame cache state for the timeline cache bar: 0 = uncached, 2 = cached at playbackScale */
+  public getCachedFrameMap(totalFrames: number, _targetScale?: number): Uint8Array {
     const out = new Uint8Array(Math.max(1, totalFrames));
     for (const [frameIdx, entry] of this.frameCache.entries()) {
       if (entry.epoch !== this.cacheEpoch) continue;
       if (frameIdx >= 0 && frameIdx < out.length) {
-        out[frameIdx] = entry.scale >= targetScale - 0.02 ? 2 : 1;
+        out[frameIdx] = 2;
       }
     }
     return out;
@@ -1082,6 +1108,14 @@ export class AlightRenderer {
     const adaptive = Math.sqrt((this.cacheBudgetBytes * 0.85) / fullBytes);
     const capped = Math.min(previewScale, 1.0);
     return Math.max(0.25, Math.min(capped, adaptive));
+  }
+
+  private resolvePlaybackScale(project: Project, previewScale: number): number {
+    const key = `${project.id}|${project.width}x${project.height}|${previewScale}|${this.cacheBudgetBytes}|${project.durationMs}|${project.fps}`;
+    if (key === this.playbackScaleKey && this.playbackScale > 0) return this.playbackScale;
+    this.playbackScaleKey = key;
+    this.playbackScale = this.computeCacheScale(project, previewScale);
+    return this.playbackScale;
   }
 
   private evictPreviewCache(protectFrame: number): void {
@@ -1100,9 +1134,11 @@ export class AlightRenderer {
     }
   }
 
-  private hasActiveSeekingVideo(): boolean {
-    for (const entry of this.mediaVideos.values()) {
-      if (entry.video.seeking) return true;
+  /** P-4: Only block caching if a video actually visible in this frame is seeking AND has no last-good frame yet */
+  private hasUnreadySeekingVideoThisFrame(): boolean {
+    for (const src of this.usedVideoSrcsThisFrame) {
+      const entry = this.mediaVideos.get(src);
+      if (entry && entry.video.seeking && !entry.hasFrame) return true;
     }
     return false;
   }
@@ -1162,16 +1198,18 @@ export class AlightRenderer {
     const sceneTimeMs = (frameIdx / fps) * 1000;
     if (sceneTimeMs > project.durationMs) return false;
 
-    const cScale = this.computeCacheScale(project, previewScale);
+    const cScale = this.resolvePlaybackScale(project, previewScale);
     const cw = Math.max(16, Math.round(project.width * cScale));
     const ch = Math.max(16, Math.round(project.height * cScale));
 
+    this.frameUploadGen++;
+    this.usedVideoSrcsThisFrame.clear();
     const sceneFbo = this.acquireFbo(cw, ch);
     const [br, bg, bb, ba] =
       project.bgColor === 'transparent' ? [0, 0, 0, 0] : parseColorArgb(project.bgColor);
     this.clearFbo(sceneFbo, cw, ch, br * ba, bg * ba, bb * ba, ba);
     this.renderLayerList(project, project.layers, sceneTimeMs, sceneFbo, cw, ch, cScale, []);
-    if (!this.hasActiveSeekingVideo()) {
+    if (!this.hasUnreadySeekingVideoThisFrame()) {
       this.storeFrameInCache(frameIdx, sceneFbo, cw, ch, cScale);
     }
     this.releaseFbo(sceneFbo);
@@ -1190,6 +1228,9 @@ export class AlightRenderer {
       useCache?: boolean;
     } = {}
   ): void {
+    this.frameUploadGen++;
+    this.usedVideoSrcsThisFrame.clear();
+
     let renderW: number;
     let renderH: number;
     let scale: number;
@@ -1220,8 +1261,11 @@ export class AlightRenderer {
       }
     }
 
-    // Invalidate L2 cache if project, fontEpoch, or previewScale changed
-    const cacheEligible = Boolean(options.useCache) && !isExport;
+    // P-3: Skip L2 cache when anything is selected or inside a nested group isolation view
+    const hasSelectionOrGroup =
+      Boolean(options.selectedIds && options.selectedIds.length > 0) ||
+      Boolean(options.activeGroupStack && options.activeGroupStack.length > 0);
+    const cacheEligible = Boolean(options.useCache) && !isExport && !hasSelectionOrGroup;
     if (cacheEligible) {
       const qKey = Math.round((options.previewScale ?? 1) * 100);
       if (
@@ -1238,36 +1282,30 @@ export class AlightRenderer {
 
       const fps = Math.max(1, project.fps);
       const frameIdx = Math.max(0, Math.round((sceneTimeMs / 1000) * fps));
+      // P-1/P-2: Single uniform playbackScale for both hit AND miss -> eliminates soft/sharp alternating flicker
+      const pbScale = this.resolvePlaybackScale(project, options.previewScale ?? 1);
+      const cw = Math.max(16, Math.round(project.width * pbScale));
+      const ch = Math.max(16, Math.round(project.height * pbScale));
+
       const cached = this.frameCache.get(frameIdx);
       if (cached && cached.epoch === this.cacheEpoch) {
         cached.lastUsed = ++this.cacheTick;
         this.cacheHits++;
-        this.blitTexture(cached.tex, null, renderW, renderH, 1.0, false);
+        this.blitTexture(cached.tex, null, this.canvas.width, this.canvas.height, 1.0, false);
         this.publishCacheStats();
         return;
       }
       this.cacheMisses++;
 
-      const sceneFbo = this.acquireFbo(renderW, renderH);
+      const sceneFbo = this.acquireFbo(cw, ch);
       const [br, bg, bb, ba] =
         project.bgColor === 'transparent' ? [0, 0, 0, 0] : parseColorArgb(project.bgColor);
-      this.clearFbo(sceneFbo, renderW, renderH, br * ba, bg * ba, bb * ba, ba);
-      this.renderLayerList(project, project.layers, sceneTimeMs, sceneFbo, renderW, renderH, scale, options.selectedIds ?? []);
-      this.blitTexture(sceneFbo.tex, null, renderW, renderH, 1.0, false);
+      this.clearFbo(sceneFbo, cw, ch, br * ba, bg * ba, bb * ba, ba);
+      this.renderLayerList(project, project.layers, sceneTimeMs, sceneFbo, cw, ch, pbScale, []);
+      this.blitTexture(sceneFbo.tex, null, this.canvas.width, this.canvas.height, 1.0, false);
 
-      // Store in L2 cache (at adaptive cacheScale if needed) when no video is mid-seek
-      if (!this.hasActiveSeekingVideo()) {
-        const cScale = this.computeCacheScale(project, options.previewScale ?? 1);
-        const cw = Math.max(16, Math.round(project.width * cScale));
-        const ch = Math.max(16, Math.round(project.height * cScale));
-        if (cw === renderW && ch === renderH) {
-          this.storeFrameInCache(frameIdx, sceneFbo, renderW, renderH, scale);
-        } else {
-          const downFbo = this.acquireFbo(cw, ch);
-          this.blitTexture(sceneFbo.tex, downFbo, cw, ch, 1.0, false);
-          this.storeFrameInCache(frameIdx, downFbo, cw, ch, cScale);
-          this.releaseFbo(downFbo);
-        }
+      if (!this.hasUnreadySeekingVideoThisFrame()) {
+        this.storeFrameInCache(frameIdx, sceneFbo, cw, ch, pbScale);
       }
       this.releaseFbo(sceneFbo);
       this.publishCacheStats();
@@ -1349,7 +1387,9 @@ export class AlightRenderer {
     for (const effInst of layer.effects) {
       if (!effInst.enabled) continue;
       const def = getEffectById(effInst.effectId);
-      if (!def || !def.script || !def.autoTransform) continue;
+      if (!def || !def.script) continue;
+      // S-1: Derive transform mutation from script source as well as autoTransform flag (fixes Scale Assist)
+      if (!def.autoTransform && !scriptMutatesTransform(effInst.effectId)) continue;
       const paramsEval = this.evalEffectParams(def, effInst, remappedNormT, durSec);
       const el: EffectScriptElement = {
         alpha: alphaMul,
@@ -1799,9 +1839,9 @@ export class AlightRenderer {
     for (const effInst of layer.effects) {
       if (!effInst.enabled) continue;
       const def = getEffectById(effInst.effectId);
-      if (!def || def.autoTransform || def.shaders.length === 0) {
+      if (!def || def.autoTransform || scriptMutatesTransform(effInst.effectId) || def.shaders.length === 0) {
         // Check non-autoTransform script-only opacity effects (like fade)
-        if (def?.script && def.shaders.length === 0) {
+        if (def?.script && def.shaders.length === 0 && !scriptMutatesTransform(effInst.effectId)) {
           const paramsEval = this.evalEffectParams(def, effInst, remappedNormT, durSec);
           const out = runEffectScript(
             def,
@@ -3077,6 +3117,43 @@ export class AlightRenderer {
     failed: { id: string; file: string; group: string | null; error: string }[];
   } {
     return this.registry.verifyAllEffects(getEffects());
+  }
+
+  /** K-2 / X-5: Compile & verify all effect shaders referenced by a project (surfaces silent compile failures) */
+  public verifyProjectEffects(project: Project): {
+    failed: { id: string; group: string | null; error: string }[];
+    groupChromaKeyWarnings: string[];
+  } {
+    const seenIds = new Set<string>();
+    const groupChromaKeyWarnings: string[] = [];
+    const walk = (layers: Layer[]) => {
+      for (const l of layers) {
+        for (const eff of l.effects) {
+          if (!eff.enabled) continue;
+          seenIds.add(eff.effectId);
+          if (
+            l.type === 'group' &&
+            (eff.effectId === 'com.alightcreative.effects.chromakey' ||
+              eff.effectId === 'com.alightcreative.effects.chromakey-adv')
+          ) {
+            groupChromaKeyWarnings.push(l.label || l.id);
+          }
+        }
+        if (l.groupLayers?.length) walk(l.groupLayers);
+      }
+    };
+    walk(project.layers);
+
+    const defs: EffectDef[] = [];
+    for (const id of seenIds) {
+      const d = getEffectById(id);
+      if (d) defs.push(d);
+    }
+    const res = this.registry.verifyAllEffects(defs);
+    return {
+      failed: res.failed.map((f) => ({ id: f.id, group: f.group, error: f.error })),
+      groupChromaKeyWarnings,
+    };
   }
 
   public dispose(): void {

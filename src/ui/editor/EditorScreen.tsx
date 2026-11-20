@@ -111,7 +111,7 @@ export const EditorScreen: React.FC = () => {
           previewScale: store.previewQuality,
           selectedIds: store.selectedLayerIds,
           activeGroupStack: store.groupStack,
-          useCache: true,
+          useCache: false,
         });
       });
     };
@@ -149,7 +149,7 @@ export const EditorScreen: React.FC = () => {
     };
   }, [refreshMissingFonts]);
 
-  // Detect missing fonts on project open / edit & invalidate L2 cache on project mutations
+  // Detect missing fonts, verify project shaders (K-2/K-1), & invalidate L2 cache on project mutations
   useEffect(() => {
     if (!currentProject) return;
     if (lastModifiedTimeRef.current !== currentProject.modifiedTime) {
@@ -159,7 +159,21 @@ export const EditorScreen: React.FC = () => {
     refreshMissingFonts(true);
   }, [currentProject, currentProject?.id, currentProject?.modifiedTime, refreshMissingFonts]);
 
-  // Render single frame whenever project, playhead, quality, or visibility changes while paused
+  useEffect(() => {
+    const renderer = rendererRef.current;
+    if (!renderer || !currentProject) return;
+    const check = renderer.verifyProjectEffects(currentProject);
+    if (check.failed.length > 0) {
+      console.warn('[shader-verify] Failed effects in project:', check.failed);
+      useEditorStore.getState().showToast(`Shader compile failed: ${check.failed[0].id}`);
+    } else if (check.groupChromaKeyWarnings.length > 0) {
+      useEditorStore
+        .getState()
+        .showToast(`Chroma Key on group "${check.groupChromaKeyWarnings[0]}" — apply directly to media layer instead`);
+    }
+  }, [currentProject?.id]);
+
+  // Render single frame whenever project, playhead, quality, or visibility changes while paused (always exact native res)
   useEffect(() => {
     const renderer = rendererRef.current;
     if (!renderer || !currentProject || visibilityPaused || isPlaying || isExportingRef.current) return;
@@ -168,17 +182,16 @@ export const EditorScreen: React.FC = () => {
       previewScale: previewQuality,
       selectedIds: selectedLayerIds,
       activeGroupStack: groupStack,
-      useCache: true,
+      useCache: false,
     });
   }, [currentProject, currentTimeMs, selectedLayerIds, groupStack, previewQuality, visibilityPaused, isPlaying]);
 
-  // Idle render-ahead (After Effects RAM Preview): walks outward from playhead on idle turns
+  // Idle render-ahead (After Effects RAM Preview): walks outward from playhead on idle turns, cancels on interaction
   useEffect(() => {
     const renderer = rendererRef.current;
     if (!renderer || !currentProject || isPlaying || visibilityPaused || isExportingRef.current) return;
     const totalFrames = Math.max(1, Math.ceil((currentProject.durationMs / 1000) * Math.max(1, currentProject.fps)));
     const centerFrame = Math.max(0, Math.round((currentTimeMs / 1000) * Math.max(1, currentProject.fps)));
-    // Build outward frame order from playhead
     const order: number[] = [];
     for (let d = 1; d < totalFrames; d++) {
       if (centerFrame + d < totalFrames) order.push(centerFrame + d);
@@ -199,12 +212,25 @@ export const EditorScreen: React.FC = () => {
       ? (id: number) => win.cancelIdleCallback!(id)
       : (id: number) => globalThis.clearTimeout(id);
 
+    const abortSlice = () => {
+      cancelled = true;
+      if (idleHandle) {
+        cIC(idleHandle);
+        idleHandle = 0;
+      }
+    };
+
     const pump = (deadline: { timeRemaining: () => number }) => {
       if (cancelled || isExportingRef.current) return;
       const store = useEditorStore.getState();
       if (store.isPlaying || !store.currentProject || store.currentProject.id !== currentProject.id) return;
       const start = performance.now();
-      while (cursor < order.length && performance.now() - start < Math.min(8, Math.max(2, deadline.timeRemaining()))) {
+      // P-6: Hard timeRemaining() > 6 check so idle precache never steals a UI frame
+      while (
+        cursor < order.length &&
+        deadline.timeRemaining() > 6 &&
+        performance.now() - start < 8
+      ) {
         const frameIdx = order[cursor++];
         renderer.precacheFrame(currentProject, frameIdx, previewQuality);
       }
@@ -213,14 +239,20 @@ export const EditorScreen: React.FC = () => {
       }
     };
 
+    window.addEventListener('pointerdown', abortSlice, true);
+    window.addEventListener('keydown', abortSlice, true);
+    window.addEventListener('blur', abortSlice);
+
     const delayTimer = window.setTimeout(() => {
       if (!cancelled) idleHandle = rIC(pump);
     }, 350);
 
     return () => {
-      cancelled = true;
+      abortSlice();
       clearTimeout(delayTimer);
-      if (idleHandle) cIC(idleHandle);
+      window.removeEventListener('pointerdown', abortSlice, true);
+      window.removeEventListener('keydown', abortSlice, true);
+      window.removeEventListener('blur', abortSlice);
     };
   }, [currentProject, currentTimeMs, previewQuality, isPlaying, visibilityPaused]);
 

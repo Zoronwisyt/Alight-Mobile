@@ -207,6 +207,10 @@ async function encodeAudioBuffer(
  * Deterministic offline constant-framerate (CFR) video exporter powered by WebCodecs + mp4-muxer / webm-muxer.
  * Guarantees exact frame rate (e.g. 60.000 fps), exact even pixel dimensions, and exact bitrate.
  */
+export function isWebCodecsExportSupported(): boolean {
+  return typeof VideoEncoder !== 'undefined' && typeof VideoFrame !== 'undefined';
+}
+
 export async function exportProjectVideo(
   renderer: AlightRenderer,
   project: Project,
@@ -315,6 +319,12 @@ export async function exportProjectVideo(
   videoEncoder.configure(picked.config);
   const keyFrameInterval = Math.max(1, Math.round(fps * 2));
 
+  // X-5: Pre-warm all project shaders, media, and FBO pool before frame 0
+  renderer.verifyProjectEffects(project);
+  await renderer.prepareMediaAtTime(project, 0);
+  renderer.renderProject(project, 0, { renderWidth: width, renderHeight: height });
+  await new Promise((r) => requestAnimationFrame(() => r(null)));
+
   try {
     for (let f = 0; f < totalFrames; f++) {
       if (options.signal?.aborted) {
@@ -360,8 +370,9 @@ export async function exportProjectVideo(
 
     options.onProgress?.(0.96, 'Flushing video stream...');
     await videoEncoder.flush();
-    videoEncoder.close();
+    // X-4: Check encoderError after flush BEFORE close so last-frame errors are never lost
     if (encoderError) throw encoderError;
+    videoEncoder.close();
 
     let hasAudio = false;
     if (audioBuf && audioSupported) {
@@ -433,12 +444,17 @@ async function exportViaMediaRecorderFallback(
     videoBitsPerSecond: bitrateMbps * 1_000_000,
   });
   const chunks: Blob[] = [];
+  let recorderError: Error | null = null;
   recorder.ondataavailable = (e) => {
     if (e.data.size > 0) chunks.push(e.data);
   };
-  const stopped = new Promise<void>((resolve) => {
-    recorder.onstop = () => resolve();
+  recorder.onerror = (e) => {
+    recorderError = new Error(`MediaRecorder error: ${(e as Event & { error?: Error }).error?.message || 'encoding failed'}`);
+  };
+  const stopped = new Promise<void>((resolve, reject) => {
+    recorder.onstop = () => (recorderError ? reject(recorderError) : resolve());
   });
+  renderer.verifyProjectEffects(project);
   recorder.start(100);
 
   const frameMs = 1000 / fps;

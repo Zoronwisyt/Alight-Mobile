@@ -3,7 +3,7 @@ import JSZip from 'jszip';
 import { exportProjectToAmXml } from '../../engine/amXmlCodec';
 import { encodeAnimatedGif } from '../../engine/gifEncoder';
 import type { AlightRenderer } from '../../engine/renderer';
-import { exportProjectVideo, type VideoContainer } from '../../engine/videoExporter';
+import { exportProjectVideo, isWebCodecsExportSupported, type VideoContainer } from '../../engine/videoExporter';
 import { useEditorStore } from '../../store/useEditorStore';
 import { AmDialog } from '../components/AmDialog';
 import { AmIcon } from '../components/AmIcon';
@@ -232,6 +232,21 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({ rendererRef, isExpor
             <AmIcon name="ic_export_arrow_right" fallback="next" size={16} />
           </button>
         ))}
+
+        {format === 'video' && !isWebCodecsExportSupported() && (
+          <div
+            style={{
+              padding: '8px 10px',
+              borderRadius: 10,
+              background: 'rgba(255, 196, 61, 0.14)',
+              border: '1px solid rgba(255, 196, 61, 0.45)',
+              fontSize: 11,
+              color: '#FFD166',
+            }}
+          >
+            WebCodecs is unavailable in this browser. Export will fall back to real-time MediaRecorder (audio omitted; complex scenes may drop frames). Use Chrome, Edge, or Safari 17+ for deterministic CFR MP4 export.
+          </div>
+        )}
 
         {(format === 'video' || format === 'png' || format === 'seq' || format === 'gif') && (
           <div style={{ background: 'var(--am-a1)', padding: 12, borderRadius: 12, border: '1px solid var(--am-border)' }}>
