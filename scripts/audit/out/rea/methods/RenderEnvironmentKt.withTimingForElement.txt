@@ -1,0 +1,5 @@
+{
+  "status": "complete",
+  "text": "    public static final RenderEnvironmentForElement withTimingForElement(RenderEnvironment renderEnvironment, SceneElement el2) {\r\n        Intrinsics.checkNotNullParameter(renderEnvironment, \"<this>\");\r\n        Intrinsics.checkNotNullParameter(el2, \"el\");\r\n        return new RenderEnvironmentForElement(renderEnvironment, el2);\r\n    }",
+  "reported_total_bytes": null
+}

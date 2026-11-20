@@ -1,0 +1,5 @@
+.method static constructor <clinit>()V
+    .registers 0
+
+    return-void
+.end method

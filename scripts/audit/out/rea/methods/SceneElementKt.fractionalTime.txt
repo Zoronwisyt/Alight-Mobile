@@ -1,0 +1,4 @@
+    public static final float fractionalTime(SceneElement sceneElement, int i2) {
+        Intrinsics.checkNotNullParameter(sceneElement, "<this>");
+        return (i2 - sceneElement.getStartTime()) / (sceneElement.getEndTime() - sceneElement.getStartTime());
+    }

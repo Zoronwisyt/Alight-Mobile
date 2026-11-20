@@ -1,0 +1,303 @@
+{
+  "engine": {
+    "name": "jadx-headless-mcp",
+    "version": "0.7.1",
+    "artifact_sha256": "6e5eacf500b64292bfb73c49797c1958f6ee44646e43e868039ae7feb573ff75",
+    "source_revision": "5844800a486d2248fa949b74c9896285f5b54de2",
+    "worker_count": 1,
+    "heap_limit_mib": 8192
+  },
+  "target_definition": "defined",
+  "class_name": "com.alightcreative.app.motion.scene.SceneElement",
+  "method_name": "getClippingMask",
+  "overload_index": 0,
+  "reported_signature": "getClippingMask(): boolean",
+  "dex_descriptor": "()Z",
+  "total": 9,
+  "direct_invokes_coverage": {
+    "complete_using_nodes": 9,
+    "partial_using_nodes": 0,
+    "unknown_using_nodes": 0,
+    "recorded_sites": 24
+  },
+  "references": [
+    {
+      "kind": "method",
+      "name": "Rw",
+      "reported_full_name": "WHy.s7w.euv.Rw",
+      "containing_class": "WHy.s7w.euv",
+      "top_class": "WHy.s7w",
+      "source_line": null,
+      "dex_offset": null,
+      "direct_invokes_exhaustive": true,
+      "direct_invokes": [
+        {
+          "dex_entry": "classes.dex",
+          "source_raw_method_id": "WHy.s7w$euv.Rw(Lcom/alightcreative/widget/xUY;)V",
+          "dex_code_unit_offset": 120,
+          "dex_method_index": 23359,
+          "opcode": "INVOKE_VIRTUAL"
+        }
+      ]
+    },
+    {
+      "kind": "method",
+      "name": "Rw",
+      "reported_full_name": "WHy.s7w.euv.Gv.Rw",
+      "containing_class": "WHy.s7w.euv.Gv",
+      "top_class": "WHy.s7w",
+      "source_line": null,
+      "dex_offset": null,
+      "direct_invokes_exhaustive": true,
+      "direct_invokes": [
+        {
+          "dex_entry": "classes10.dex",
+          "source_raw_method_id": "WHy.s7w$euv$Gv.Rw(Lcom/alightcreative/widget/pQm;)V",
+          "dex_code_unit_offset": 28,
+          "dex_method_index": 13008,
+          "opcode": "INVOKE_VIRTUAL"
+        }
+      ]
+    },
+    {
+      "kind": "method",
+      "name": "Rw",
+      "reported_full_name": "WHy.s7w.euv.Gv.fs.fs.Rw",
+      "containing_class": "WHy.s7w.euv.Gv.fs.C0832fs",
+      "top_class": "WHy.s7w",
+      "source_line": null,
+      "dex_offset": null,
+      "direct_invokes_exhaustive": true,
+      "direct_invokes": [
+        {
+          "dex_entry": "classes7.dex",
+          "source_raw_method_id": "WHy.s7w$euv$Gv$fs$fs.Rw(Lcom/alightcreative/app/motion/scene/Scene;Lcom/alightcreative/app/motion/scene/SceneElement;)Lcom/alightcreative/app/motion/scene/SceneElement;",
+          "dex_code_unit_offset": 74,
+          "dex_method_index": 23658,
+          "opcode": "INVOKE_VIRTUAL_RANGE"
+        }
+      ]
+    },
+    {
+      "kind": "method",
+      "name": "editClippingMask",
+      "reported_full_name": "com.alightcreative.app.motion.scene.AssociatedEditKt.editClippingMask",
+      "containing_class": "com.alightcreative.app.motion.scene.AssociatedEditKt",
+      "top_class": "com.alightcreative.app.motion.scene.AssociatedEditKt",
+      "source_line": null,
+      "dex_offset": null,
+      "direct_invokes_exhaustive": true,
+      "direct_invokes": [
+        {
+          "dex_entry": "classes6.dex",
+          "source_raw_method_id": "com.alightcreative.app.motion.scene.AssociatedEditKt.editClippingMask(Lcom/alightcreative/app/motion/scene/Scene;Lcom/alightcreative/app/motion/scene/EditCategory;)Lcom/alightcreative/app/motion/scene/Scene;",
+          "dex_code_unit_offset": 27,
+          "dex_method_index": 8746,
+          "opcode": "INVOKE_VIRTUAL"
+        },
+        {
+          "dex_entry": "classes6.dex",
+          "source_raw_method_id": "com.alightcreative.app.motion.scene.AssociatedEditKt.editClippingMask(Lcom/alightcreative/app/motion/scene/Scene;Lcom/alightcreative/app/motion/scene/EditCategory;)Lcom/alightcreative/app/motion/scene/Scene;",
+          "dex_code_unit_offset": 51,
+          "dex_method_index": 8746,
+          "opcode": "INVOKE_VIRTUAL"
+        },
+        {
+          "dex_entry": "classes6.dex",
+          "source_raw_method_id": "com.alightcreative.app.motion.scene.AssociatedEditKt.editClippingMask(Lcom/alightcreative/app/motion/scene/Scene;Lcom/alightcreative/app/motion/scene/EditCategory;)Lcom/alightcreative/app/motion/scene/Scene;",
+          "dex_code_unit_offset": 84,
+          "dex_method_index": 8746,
+          "opcode": "INVOKE_VIRTUAL"
+        },
+        {
+          "dex_entry": "classes6.dex",
+          "source_raw_method_id": "com.alightcreative.app.motion.scene.AssociatedEditKt.editClippingMask(Lcom/alightcreative/app/motion/scene/Scene;Lcom/alightcreative/app/motion/scene/EditCategory;)Lcom/alightcreative/app/motion/scene/Scene;",
+          "dex_code_unit_offset": 121,
+          "dex_method_index": 8746,
+          "opcode": "INVOKE_VIRTUAL"
+        },
+        {
+          "dex_entry": "classes6.dex",
+          "source_raw_method_id": "com.alightcreative.app.motion.scene.AssociatedEditKt.editClippingMask(Lcom/alightcreative/app/motion/scene/Scene;Lcom/alightcreative/app/motion/scene/EditCategory;)Lcom/alightcreative/app/motion/scene/Scene;",
+          "dex_code_unit_offset": 144,
+          "dex_method_index": 8746,
+          "opcode": "INVOKE_VIRTUAL"
+        },
+        {
+          "dex_entry": "classes6.dex",
+          "source_raw_method_id": "com.alightcreative.app.motion.scene.AssociatedEditKt.editClippingMask(Lcom/alightcreative/app/motion/scene/Scene;Lcom/alightcreative/app/motion/scene/EditCategory;)Lcom/alightcreative/app/motion/scene/Scene;",
+          "dex_code_unit_offset": 294,
+          "dex_method_index": 8746,
+          "opcode": "INVOKE_VIRTUAL"
+        },
+        {
+          "dex_entry": "classes6.dex",
+          "source_raw_method_id": "com.alightcreative.app.motion.scene.AssociatedEditKt.editClippingMask(Lcom/alightcreative/app/motion/scene/Scene;Lcom/alightcreative/app/motion/scene/EditCategory;)Lcom/alightcreative/app/motion/scene/Scene;",
+          "dex_code_unit_offset": 315,
+          "dex_method_index": 8746,
+          "opcode": "INVOKE_VIRTUAL"
+        },
+        {
+          "dex_entry": "classes6.dex",
+          "source_raw_method_id": "com.alightcreative.app.motion.scene.AssociatedEditKt.editClippingMask(Lcom/alightcreative/app/motion/scene/Scene;Lcom/alightcreative/app/motion/scene/EditCategory;)Lcom/alightcreative/app/motion/scene/Scene;",
+          "dex_code_unit_offset": 345,
+          "dex_method_index": 8746,
+          "opcode": "INVOKE_VIRTUAL"
+        },
+        {
+          "dex_entry": "classes6.dex",
+          "source_raw_method_id": "com.alightcreative.app.motion.scene.AssociatedEditKt.editClippingMask(Lcom/alightcreative/app/motion/scene/Scene;Lcom/alightcreative/app/motion/scene/EditCategory;)Lcom/alightcreative/app/motion/scene/Scene;",
+          "dex_code_unit_offset": 492,
+          "dex_method_index": 8746,
+          "opcode": "INVOKE_VIRTUAL"
+        },
+        {
+          "dex_entry": "classes6.dex",
+          "source_raw_method_id": "com.alightcreative.app.motion.scene.AssociatedEditKt.editClippingMask(Lcom/alightcreative/app/motion/scene/Scene;Lcom/alightcreative/app/motion/scene/EditCategory;)Lcom/alightcreative/app/motion/scene/Scene;",
+          "dex_code_unit_offset": 522,
+          "dex_method_index": 8746,
+          "opcode": "INVOKE_VIRTUAL"
+        },
+        {
+          "dex_entry": "classes6.dex",
+          "source_raw_method_id": "com.alightcreative.app.motion.scene.AssociatedEditKt.editClippingMask(Lcom/alightcreative/app/motion/scene/Scene;Lcom/alightcreative/app/motion/scene/EditCategory;)Lcom/alightcreative/app/motion/scene/Scene;",
+          "dex_code_unit_offset": 659,
+          "dex_method_index": 8746,
+          "opcode": "INVOKE_VIRTUAL"
+        },
+        {
+          "dex_entry": "classes6.dex",
+          "source_raw_method_id": "com.alightcreative.app.motion.scene.AssociatedEditKt.editClippingMask(Lcom/alightcreative/app/motion/scene/Scene;Lcom/alightcreative/app/motion/scene/EditCategory;)Lcom/alightcreative/app/motion/scene/Scene;",
+          "dex_code_unit_offset": 993,
+          "dex_method_index": 8746,
+          "opcode": "INVOKE_VIRTUAL"
+        },
+        {
+          "dex_entry": "classes6.dex",
+          "source_raw_method_id": "com.alightcreative.app.motion.scene.AssociatedEditKt.editClippingMask(Lcom/alightcreative/app/motion/scene/Scene;Lcom/alightcreative/app/motion/scene/EditCategory;)Lcom/alightcreative/app/motion/scene/Scene;",
+          "dex_code_unit_offset": 1027,
+          "dex_method_index": 8746,
+          "opcode": "INVOKE_VIRTUAL"
+        },
+        {
+          "dex_entry": "classes6.dex",
+          "source_raw_method_id": "com.alightcreative.app.motion.scene.AssociatedEditKt.editClippingMask(Lcom/alightcreative/app/motion/scene/Scene;Lcom/alightcreative/app/motion/scene/EditCategory;)Lcom/alightcreative/app/motion/scene/Scene;",
+          "dex_code_unit_offset": 1161,
+          "dex_method_index": 8746,
+          "opcode": "INVOKE_VIRTUAL"
+        },
+        {
+          "dex_entry": "classes6.dex",
+          "source_raw_method_id": "com.alightcreative.app.motion.scene.AssociatedEditKt.editClippingMask(Lcom/alightcreative/app/motion/scene/Scene;Lcom/alightcreative/app/motion/scene/EditCategory;)Lcom/alightcreative/app/motion/scene/Scene;",
+          "dex_code_unit_offset": 1204,
+          "dex_method_index": 8746,
+          "opcode": "INVOKE_VIRTUAL"
+        }
+      ]
+    },
+    {
+      "kind": "method",
+      "name": "serializeCommonAttributes",
+      "reported_full_name": "com.alightcreative.app.motion.scene.SceneElementKt.serializeCommonAttributes",
+      "containing_class": "com.alightcreative.app.motion.scene.SceneElementKt",
+      "top_class": "com.alightcreative.app.motion.scene.SceneElementKt",
+      "source_line": null,
+      "dex_offset": null,
+      "direct_invokes_exhaustive": true,
+      "direct_invokes": [
+        {
+          "dex_entry": "classes10.dex",
+          "source_raw_method_id": "com.alightcreative.app.motion.scene.SceneElementKt.serializeCommonAttributes(Lcom/alightcreative/app/motion/scene/SceneElement;Ljava/lang/String;Lorg/xmlpull/v1/XmlSerializer;)V",
+          "dex_code_unit_offset": 97,
+          "dex_method_index": 13008,
+          "opcode": "INVOKE_VIRTUAL"
+        }
+      ]
+    },
+    {
+      "kind": "method",
+      "name": "renderWithEffectsInternal",
+      "reported_full_name": "com.alightcreative.app.motion.scene.rendering.SceneElementRenderingKt.renderWithEffectsInternal",
+      "containing_class": "com.alightcreative.app.motion.scene.rendering.SceneElementRenderingKt",
+      "top_class": "com.alightcreative.app.motion.scene.rendering.SceneElementRenderingKt",
+      "source_line": null,
+      "dex_offset": null,
+      "direct_invokes_exhaustive": true,
+      "direct_invokes": [
+        {
+          "dex_entry": "classes.dex",
+          "source_raw_method_id": "com.alightcreative.app.motion.scene.rendering.SceneElementRenderingKt.renderWithEffectsInternal(Lcom/alightcreative/app/motion/scene/SceneElement;LjD/SfT;Lcom/alightcreative/app/motion/scene/rendering/RenderEnvironment;Lcom/alightcreative/app/motion/scene/SceneSelection;Lcom/alightcreative/app/motion/scene/Transform;Lcom/alightcreative/app/motion/scene/Rectangle;)V",
+          "dex_code_unit_offset": 391,
+          "dex_method_index": 23359,
+          "opcode": "INVOKE_VIRTUAL"
+        },
+        {
+          "dex_entry": "classes.dex",
+          "source_raw_method_id": "com.alightcreative.app.motion.scene.rendering.SceneElementRenderingKt.renderWithEffectsInternal(Lcom/alightcreative/app/motion/scene/SceneElement;LjD/SfT;Lcom/alightcreative/app/motion/scene/rendering/RenderEnvironment;Lcom/alightcreative/app/motion/scene/SceneSelection;Lcom/alightcreative/app/motion/scene/Transform;Lcom/alightcreative/app/motion/scene/Rectangle;)V",
+          "dex_code_unit_offset": 1698,
+          "dex_method_index": 23359,
+          "opcode": "INVOKE_VIRTUAL"
+        }
+      ]
+    },
+    {
+      "kind": "method",
+      "name": "renderWithGpu",
+      "reported_full_name": "com.alightcreative.app.motion.scene.rendering.SceneRenderingKt.renderWithGpu",
+      "containing_class": "com.alightcreative.app.motion.scene.rendering.SceneRenderingKt",
+      "top_class": "com.alightcreative.app.motion.scene.rendering.SceneRenderingKt",
+      "source_line": null,
+      "dex_offset": null,
+      "direct_invokes_exhaustive": true,
+      "direct_invokes": [
+        {
+          "dex_entry": "classes3.dex",
+          "source_raw_method_id": "com.alightcreative.app.motion.scene.rendering.SceneRenderingKt.renderWithGpu(Lcom/alightcreative/app/motion/scene/Scene;LpsA/HT;IIIIILbYT/ny6;LbYT/BAQ;Ljava/util/Map;Lcom/alightcreative/app/motion/scene/rendering/RenderMode;Lcom/alightcreative/app/motion/scene/SceneSelection;IILcom/alightcreative/app/motion/scene/SpoidEnv;ZLjava/lang/Long;ZZLcom/alightcreative/app/motion/scene/Rectangle;Ljava/lang/Integer;Lcom/alightcreative/app/motion/scene/Rectangle;ILjava/util/Map;Lcom/alightcreative/app/motion/scene/ExportParams;LKZf/fs;ZLfi/lG;)V",
+          "dex_code_unit_offset": 1481,
+          "dex_method_index": 6657,
+          "opcode": "INVOKE_VIRTUAL"
+        }
+      ]
+    },
+    {
+      "kind": "method",
+      "name": "s",
+      "reported_full_name": "fi.s2Y.s",
+      "containing_class": "fi.s2Y",
+      "top_class": "fi.s2Y",
+      "source_line": null,
+      "dex_offset": null,
+      "direct_invokes_exhaustive": true,
+      "direct_invokes": [
+        {
+          "dex_entry": "classes6.dex",
+          "source_raw_method_id": "fi.s2Y.s(Lcom/alightcreative/app/motion/scene/Scene;Lcom/alightcreative/app/motion/scene/SceneElement;ILcom/alightcreative/app/motion/scene/SceneThumbnailMaker;Ljava/util/List;IZ)V",
+          "dex_code_unit_offset": 109,
+          "dex_method_index": 8746,
+          "opcode": "INVOKE_VIRTUAL_RANGE"
+        }
+      ]
+    },
+    {
+      "kind": "method",
+      "name": "Xu",
+      "reported_full_name": "qNi.euv.Xu",
+      "containing_class": "qNi.euv",
+      "top_class": "qNi.euv",
+      "source_line": null,
+      "dex_offset": null,
+      "direct_invokes_exhaustive": true,
+      "direct_invokes": [
+        {
+          "dex_entry": "classes2.dex",
+          "source_raw_method_id": "qNi.euv.Xu(Lcom/alightcreative/app/motion/scene/SceneElement;)LCbb/Bb;",
+          "dex_code_unit_offset": 28,
+          "dex_method_index": 20770,
+          "opcode": "INVOKE_VIRTUAL"
+        }
+      ]
+    }
+  ],
+  "coverage": "complete",
+  "reference_unit": "using_node"
+}

@@ -1,0 +1,8 @@
+{
+  "query": "Composition",
+  "total_classes": 24194,
+  "count": 1,
+  "matches": [
+    "androidx.compose.ui.platform.WrappedComposition"
+  ]
+}

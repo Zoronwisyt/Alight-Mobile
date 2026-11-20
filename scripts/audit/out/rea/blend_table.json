@@ -1,0 +1,205 @@
+[
+  {
+    "ordinal": 0,
+    "kotlinName": "NORMAL",
+    "xmlId": "normal",
+    "usesBackingStore": false,
+    "effectId": null
+  },
+  {
+    "ordinal": 1,
+    "kotlinName": "MULTIPLY",
+    "xmlId": "multiply",
+    "usesBackingStore": true,
+    "effectId": "com.alightcreative.blend.colormultiply"
+  },
+  {
+    "ordinal": 2,
+    "kotlinName": "SCREEN",
+    "xmlId": "screen",
+    "usesBackingStore": false,
+    "effectId": null
+  },
+  {
+    "ordinal": 3,
+    "kotlinName": "MASK",
+    "xmlId": "mask",
+    "usesBackingStore": false,
+    "effectId": null
+  },
+  {
+    "ordinal": 4,
+    "kotlinName": "CLIPPING_MASK",
+    "xmlId": "clipping-mask",
+    "usesBackingStore": false,
+    "effectId": null
+  },
+  {
+    "ordinal": 5,
+    "kotlinName": "EXCLUDE",
+    "xmlId": "exclude",
+    "usesBackingStore": false,
+    "effectId": null
+  },
+  {
+    "ordinal": 6,
+    "kotlinName": "DIFF",
+    "xmlId": "diff",
+    "usesBackingStore": true,
+    "effectId": "com.alightcreative.blend.diff"
+  },
+  {
+    "ordinal": 7,
+    "kotlinName": "EXCLUSION",
+    "xmlId": "exclusion",
+    "usesBackingStore": true,
+    "effectId": "com.alightcreative.blend.exclusion"
+  },
+  {
+    "ordinal": 8,
+    "kotlinName": "LIGHTEN",
+    "xmlId": "lighten",
+    "usesBackingStore": false,
+    "effectId": "com.alightcreative.blend.lighten"
+  },
+  {
+    "ordinal": 9,
+    "kotlinName": "DARKEN",
+    "xmlId": "darken",
+    "usesBackingStore": false,
+    "effectId": "com.alightcreative.blend.darken"
+  },
+  {
+    "ordinal": 10,
+    "kotlinName": "LIGHTER_COLOR",
+    "xmlId": "lighter-color",
+    "usesBackingStore": false,
+    "effectId": "com.alightcreative.blend.lightercolor"
+  },
+  {
+    "ordinal": 11,
+    "kotlinName": "DARKER_COLOR",
+    "xmlId": "darker-color",
+    "usesBackingStore": false,
+    "effectId": "com.alightcreative.blend.darkercolor"
+  },
+  {
+    "ordinal": 12,
+    "kotlinName": "COLOR_BURN",
+    "xmlId": "color-burn",
+    "usesBackingStore": false,
+    "effectId": "com.alightcreative.blend.colorburn"
+  },
+  {
+    "ordinal": 13,
+    "kotlinName": "LINEAR_BURN",
+    "xmlId": "linear-burn",
+    "usesBackingStore": false,
+    "effectId": "com.alightcreative.blend.linearburn"
+  },
+  {
+    "ordinal": 14,
+    "kotlinName": "COLOR_DODGE",
+    "xmlId": "color-dodge",
+    "usesBackingStore": false,
+    "effectId": "com.alightcreative.blend.colordodge"
+  },
+  {
+    "ordinal": 15,
+    "kotlinName": "LINEAR_DODGE",
+    "xmlId": "linear-dodge",
+    "usesBackingStore": false,
+    "effectId": "com.alightcreative.blend.lineardodge"
+  },
+  {
+    "ordinal": 16,
+    "kotlinName": "OVERLAY",
+    "xmlId": "overlay",
+    "usesBackingStore": false,
+    "effectId": "com.alightcreative.blend.overlay"
+  },
+  {
+    "ordinal": 17,
+    "kotlinName": "SOFT_LIGHT",
+    "xmlId": "soft-light",
+    "usesBackingStore": false,
+    "effectId": "com.alightcreative.blend.softlight"
+  },
+  {
+    "ordinal": 18,
+    "kotlinName": "HARD_LIGHT",
+    "xmlId": "hard-light",
+    "usesBackingStore": false,
+    "effectId": "com.alightcreative.blend.hardlight"
+  },
+  {
+    "ordinal": 19,
+    "kotlinName": "SOFT_OVERLAY",
+    "xmlId": "soft-overlay",
+    "usesBackingStore": false,
+    "effectId": "com.alightcreative.blend.softoverlay"
+  },
+  {
+    "ordinal": 20,
+    "kotlinName": "VIVID_LIGHT",
+    "xmlId": "vivid-light",
+    "usesBackingStore": false,
+    "effectId": "com.alightcreative.blend.vividlight"
+  },
+  {
+    "ordinal": 21,
+    "kotlinName": "LINEAR_LIGHT",
+    "xmlId": "linear-light",
+    "usesBackingStore": false,
+    "effectId": "com.alightcreative.blend.linearlight"
+  },
+  {
+    "ordinal": 22,
+    "kotlinName": "PIN_LIGHT",
+    "xmlId": "pin-light",
+    "usesBackingStore": false,
+    "effectId": "com.alightcreative.blend.pinlight"
+  },
+  {
+    "ordinal": 23,
+    "kotlinName": "HUE",
+    "xmlId": "hue",
+    "usesBackingStore": false,
+    "effectId": "com.alightcreative.blend.hue"
+  },
+  {
+    "ordinal": 24,
+    "kotlinName": "SATURATION",
+    "xmlId": "saturation",
+    "usesBackingStore": false,
+    "effectId": "com.alightcreative.blend.saturation"
+  },
+  {
+    "ordinal": 25,
+    "kotlinName": "COLOR",
+    "xmlId": "color",
+    "usesBackingStore": false,
+    "effectId": "com.alightcreative.blend.color"
+  },
+  {
+    "ordinal": 26,
+    "kotlinName": "LUMINANCE",
+    "xmlId": "luminance",
+    "usesBackingStore": false,
+    "effectId": "com.alightcreative.blend.luminance"
+  },
+  {
+    "ordinal": 27,
+    "kotlinName": "SUBTRACT",
+    "xmlId": "subtract",
+    "usesBackingStore": false,
+    "effectId": null
+  },
+  {
+    "ordinal": 28,
+    "kotlinName": "DIVIDE",
+    "xmlId": "divide",
+    "usesBackingStore": false,
+    "effectId": "com.alightcreative.blend.divide"
+  }
+]

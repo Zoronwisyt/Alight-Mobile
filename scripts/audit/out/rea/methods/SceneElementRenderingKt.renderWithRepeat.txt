@@ -1,0 +1,5 @@
+{
+  "status": "complete",
+  "text": "            private static final void renderWithRepeat(SceneElement sceneElement, SfT sfT, RenderEnvironment renderEnvironment, SceneSelection sceneSelection, Rectangle rectangle) {\r\n                Collection<KeyableVisualEffectRef> collectionValues = sceneElement.getVisualEffects().values();\r\n                ArrayList arrayList = new ArrayList();\r\n                for (Object obj : collectionValues) {\r\n                    if (getNeedsSpecialCaseRender((KeyableVisualEffectRef) obj)) {\r\n                        arrayList.add(obj);\r\n                    }\r\n                }\r\n                renderWithRepeat(sceneElement, arrayList, sfT, renderEnvironment, sceneSelection, rectangle);\r\n            }",
+  "reported_total_bytes": null
+}

@@ -1,0 +1,67 @@
+.method static constructor <clinit>()V
+    .registers 3
+
+    new-instance v0, Lcom/alightcreative/app/motion/scene/rendering/RenderMode;
+
+    const-string v1, "PLAY"
+
+    const/4 v2, 0x0
+
+    invoke-direct {v0, v1, v2}, Lcom/alightcreative/app/motion/scene/rendering/RenderMode;-><init>(Ljava/lang/String;I)V
+
+    sput-object v0, Lcom/alightcreative/app/motion/scene/rendering/RenderMode;->PLAY:Lcom/alightcreative/app/motion/scene/rendering/RenderMode;
+
+    new-instance v0, Lcom/alightcreative/app/motion/scene/rendering/RenderMode;
+
+    const-string v1, "PAUSE"
+
+    const/4 v2, 0x1
+
+    invoke-direct {v0, v1, v2}, Lcom/alightcreative/app/motion/scene/rendering/RenderMode;-><init>(Ljava/lang/String;I)V
+
+    sput-object v0, Lcom/alightcreative/app/motion/scene/rendering/RenderMode;->PAUSE:Lcom/alightcreative/app/motion/scene/rendering/RenderMode;
+
+    new-instance v0, Lcom/alightcreative/app/motion/scene/rendering/RenderMode;
+
+    const-string v1, "EXPORT"
+
+    const/4 v2, 0x2
+
+    invoke-direct {v0, v1, v2}, Lcom/alightcreative/app/motion/scene/rendering/RenderMode;-><init>(Ljava/lang/String;I)V
+
+    sput-object v0, Lcom/alightcreative/app/motion/scene/rendering/RenderMode;->EXPORT:Lcom/alightcreative/app/motion/scene/rendering/RenderMode;
+
+    new-instance v0, Lcom/alightcreative/app/motion/scene/rendering/RenderMode;
+
+    const-string v1, "THUMB"
+
+    const/4 v2, 0x3
+
+    invoke-direct {v0, v1, v2}, Lcom/alightcreative/app/motion/scene/rendering/RenderMode;-><init>(Ljava/lang/String;I)V
+
+    sput-object v0, Lcom/alightcreative/app/motion/scene/rendering/RenderMode;->THUMB:Lcom/alightcreative/app/motion/scene/rendering/RenderMode;
+
+    new-instance v0, Lcom/alightcreative/app/motion/scene/rendering/RenderMode;
+
+    const-string v1, "SCENE_THUMB"
+
+    const/4 v2, 0x4
+
+    invoke-direct {v0, v1, v2}, Lcom/alightcreative/app/motion/scene/rendering/RenderMode;-><init>(Ljava/lang/String;I)V
+
+    sput-object v0, Lcom/alightcreative/app/motion/scene/rendering/RenderMode;->SCENE_THUMB:Lcom/alightcreative/app/motion/scene/rendering/RenderMode;
+
+    invoke-static {}, Lcom/alightcreative/app/motion/scene/rendering/RenderMode;->$values()[Lcom/alightcreative/app/motion/scene/rendering/RenderMode;
+
+    move-result-object v0
+
+    sput-object v0, Lcom/alightcreative/app/motion/scene/rendering/RenderMode;->$VALUES:[Lcom/alightcreative/app/motion/scene/rendering/RenderMode;
+
+    invoke-static {v0}, Lkotlin/enums/EnumEntriesKt;->enumEntries([Ljava/lang/Enum;)Lkotlin/enums/EnumEntries;
+
+    move-result-object v0
+
+    sput-object v0, Lcom/alightcreative/app/motion/scene/rendering/RenderMode;->$ENTRIES:Lkotlin/enums/EnumEntries;
+
+    return-void
+.end method

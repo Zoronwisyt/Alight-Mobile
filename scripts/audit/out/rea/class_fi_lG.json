@@ -1,0 +1,264 @@
+{
+  "engine": {
+    "name": "jadx-headless-mcp",
+    "version": "0.7.1",
+    "artifact_sha256": "6e5eacf500b64292bfb73c49797c1958f6ee44646e43e868039ae7feb573ff75",
+    "source_revision": "5844800a486d2248fa949b74c9896285f5b54de2",
+    "worker_count": 1,
+    "heap_limit_mib": 8192
+  },
+  "class_name": "fi.lG",
+  "methods": [
+    {
+      "name": "<clinit>",
+      "reported_signature": "<clinit>(): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()V"
+    },
+    {
+      "name": "<init>",
+      "reported_signature": "<init>(float, com.alightcreative.app.motion.scene.Vector2D, float, com.alightcreative.app.motion.scene.Vector2D, boolean, boolean, boolean, float, float, com.alightcreative.app.motion.scene.Vector2D, float, com.alightcreative.app.motion.scene.Vector2D, boolean, boolean, fi.bN): void",
+      "overload_index": 0,
+      "is_constructor": true,
+      "dex_descriptor": "(FLcom/alightcreative/app/motion/scene/Vector2D;FLcom/alightcreative/app/motion/scene/Vector2D;ZZZFFLcom/alightcreative/app/motion/scene/Vector2D;FLcom/alightcreative/app/motion/scene/Vector2D;ZZLfi/bN;)V"
+    },
+    {
+      "name": "<init>",
+      "reported_signature": "<init>(float, com.alightcreative.app.motion.scene.Vector2D, float, com.alightcreative.app.motion.scene.Vector2D, boolean, boolean, boolean, float, float, com.alightcreative.app.motion.scene.Vector2D, float, com.alightcreative.app.motion.scene.Vector2D, boolean, boolean, fi.bN, int, kotlin.jvm.internal.DefaultConstructorMarker): void",
+      "overload_index": 1,
+      "is_constructor": true,
+      "dex_descriptor": "(FLcom/alightcreative/app/motion/scene/Vector2D;FLcom/alightcreative/app/motion/scene/Vector2D;ZZZFFLcom/alightcreative/app/motion/scene/Vector2D;FLcom/alightcreative/app/motion/scene/Vector2D;ZZLfi/bN;ILkotlin/jvm/internal/DefaultConstructorMarker;)V"
+    },
+    {
+      "name": "BWM",
+      "reported_signature": "BWM(fi.lG, float, com.alightcreative.app.motion.scene.Vector2D, float, com.alightcreative.app.motion.scene.Vector2D, boolean, boolean, boolean, float, float, com.alightcreative.app.motion.scene.Vector2D, float, com.alightcreative.app.motion.scene.Vector2D, boolean, boolean, fi.bN, int, java.lang.Object): fi.lG",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lfi/lG;FLcom/alightcreative/app/motion/scene/Vector2D;FLcom/alightcreative/app/motion/scene/Vector2D;ZZZFFLcom/alightcreative/app/motion/scene/Vector2D;FLcom/alightcreative/app/motion/scene/Vector2D;ZZLfi/bN;ILjava/lang/Object;)Lfi/lG;"
+    },
+    {
+      "name": "Fcf",
+      "reported_signature": "Fcf(): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Z"
+    },
+    {
+      "name": "Hfr",
+      "reported_signature": "Hfr(float, com.alightcreative.app.motion.scene.Vector2D, float, com.alightcreative.app.motion.scene.Vector2D, boolean, boolean, boolean, float, float, com.alightcreative.app.motion.scene.Vector2D, float, com.alightcreative.app.motion.scene.Vector2D, boolean, boolean, fi.bN): fi.lG",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(FLcom/alightcreative/app/motion/scene/Vector2D;FLcom/alightcreative/app/motion/scene/Vector2D;ZZZFFLcom/alightcreative/app/motion/scene/Vector2D;FLcom/alightcreative/app/motion/scene/Vector2D;ZZLfi/bN;)Lfi/lG;"
+    },
+    {
+      "name": "L",
+      "reported_signature": "L(): com.alightcreative.app.motion.scene.Vector2D",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/Vector2D;"
+    },
+    {
+      "name": "Pl3",
+      "reported_signature": "Pl3(): float",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()F"
+    },
+    {
+      "name": "R83",
+      "reported_signature": "R83(): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Z"
+    },
+    {
+      "name": "Rw",
+      "reported_signature": "Rw(): fi.lG",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lfi/lG;"
+    },
+    {
+      "name": "Xu",
+      "reported_signature": "Xu(): float",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()F"
+    },
+    {
+      "name": "bG",
+      "reported_signature": "bG(): float",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()F"
+    },
+    {
+      "name": "dMq",
+      "reported_signature": "dMq(): fi.bN",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lfi/bN;"
+    },
+    {
+      "name": "dZ",
+      "reported_signature": "dZ(): com.alightcreative.app.motion.scene.Vector2D",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/Vector2D;"
+    },
+    {
+      "name": "eLy",
+      "reported_signature": "eLy(): com.alightcreative.app.motion.scene.Vector2D",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/Vector2D;"
+    },
+    {
+      "name": "equals",
+      "reported_signature": "equals(java.lang.Object): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Ljava/lang/Object;)Z"
+    },
+    {
+      "name": "g",
+      "reported_signature": "g(): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Z"
+    },
+    {
+      "name": "hashCode",
+      "reported_signature": "hashCode(): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()I"
+    },
+    {
+      "name": "nDH",
+      "reported_signature": "nDH(): com.alightcreative.app.motion.scene.Vector2D",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/Vector2D;"
+    },
+    {
+      "name": "q2G",
+      "reported_signature": "q2G(): float",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()F"
+    },
+    {
+      "name": "s",
+      "reported_signature": "s(): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Z"
+    },
+    {
+      "name": "toString",
+      "reported_signature": "toString(): java.lang.String",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/lang/String;"
+    },
+    {
+      "name": "u",
+      "reported_signature": "u(): float",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()F"
+    }
+  ],
+  "fields": [
+    {
+      "name": "BWM",
+      "reported_type": "float",
+      "dex_static_value": null
+    },
+    {
+      "name": "Fcf",
+      "reported_type": "fi.lG$fs",
+      "dex_static_value": null
+    },
+    {
+      "name": "Hfr",
+      "reported_type": "com.alightcreative.app.motion.scene.Vector2D",
+      "dex_static_value": null
+    },
+    {
+      "name": "Pl3",
+      "reported_type": "boolean",
+      "dex_static_value": null
+    },
+    {
+      "name": "R83",
+      "reported_type": "fi.lG",
+      "dex_static_value": null
+    },
+    {
+      "name": "Rw",
+      "reported_type": "float",
+      "dex_static_value": null
+    },
+    {
+      "name": "Xu",
+      "reported_type": "boolean",
+      "dex_static_value": null
+    },
+    {
+      "name": "bG",
+      "reported_type": "com.alightcreative.app.motion.scene.Vector2D",
+      "dex_static_value": null
+    },
+    {
+      "name": "dMq",
+      "reported_type": "fi.bN",
+      "dex_static_value": null
+    },
+    {
+      "name": "dZ",
+      "reported_type": "boolean",
+      "dex_static_value": null
+    },
+    {
+      "name": "eLy",
+      "reported_type": "boolean",
+      "dex_static_value": null
+    },
+    {
+      "name": "f33240L",
+      "reported_type": "float",
+      "dex_static_value": null
+    },
+    {
+      "name": "f33241g",
+      "reported_type": "float",
+      "dex_static_value": null
+    },
+    {
+      "name": "f33242s",
+      "reported_type": "com.alightcreative.app.motion.scene.Vector2D",
+      "dex_static_value": null
+    },
+    {
+      "name": "f33243u",
+      "reported_type": "boolean",
+      "dex_static_value": null
+    },
+    {
+      "name": "nDH",
+      "reported_type": "float",
+      "dex_static_value": null
+    },
+    {
+      "name": "q2G",
+      "reported_type": "com.alightcreative.app.motion.scene.Vector2D",
+      "dex_static_value": null
+    }
+  ],
+  "inner_classes": [
+    "fi.lG.fs"
+  ]
+}

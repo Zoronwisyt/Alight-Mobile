@@ -453,3 +453,28 @@ Carry forward: the web is missing **two structural things**, not thirty small on
 (A1) and re-timing (A2) — plus one **data-loss** defect in masking (B6), which is the smallest and most
 urgent item on the list. Everything else is a tool, and eight previously suspected gaps turned out to be
 already implemented.
+
+---
+
+---
+
+## Correction log — blend-mode counts (append-only)
+
+> [!warning] CORRECTION — 2026-11-20 — the blend id count and the mask claim in this document are wrong
+> Two statements above are superseded by `PLAYBACK_PREVIEW_DECOMPILED.md` §10–§11, which read
+> `BlendingMode.<clinit>` directly instead of grepping dex string literals:
+>
+> 1. **The APK has 29 blend modes, not 23.** 24 of them carry a `com.alightcreative.blend.*` effect id;
+>    five do not (`normal`, `mask`, `clipping-mask`, `exclude`, `subtract`) because the compositor
+>    evaluates them inline. Rows 55 and 370 above — "23 literals" — are corrected to
+>    **29 constants / 25 wired effect ids** (24 in the APK, plus `subtract`, whose effect ships in the
+>    catalogue without being wired into the enum).
+> 2. **`mask` IS a blend mode.** Row 275 above states `mask` is not a blend id because it is absent from
+>    the literal set. It is absent from the *effect-id* set precisely because it has no effect: it is enum
+>    ordinal 3, `xmlId = "mask"`, and `CLIPPING_MASK` is ordinal 4, `xmlId = "clipping-mask"`. The element
+>    boolean `clippingMask` is a **separate, independent** mechanism, not a substitute and not a wrapper.
+> 3. The three id drifts listed at row 410 are confirmed and now fixed in the port: `multiply` →
+>    `colormultiply`, `difference` → `diff`, `luminosity` → `luminance`, plus the missing `soft-overlay`
+>    / `softoverlay` pair. `src/engine/blendModes.ts` is the single source of truth for both.
+>
+> Nothing else in this document is affected; B6's round-trip conclusion still stands, and its fix shipped.

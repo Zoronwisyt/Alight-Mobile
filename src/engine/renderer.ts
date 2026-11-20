@@ -15,9 +15,10 @@ import {
   integrateAnimatable,
   parseColorArgb,
 } from './animation';
+import { canonicalizeBlendMode } from './blendModes';
 import { getEffectById, getEffects, getShapeById, parseDefaultParamValue } from './catalog';
 import { evaluateShapePath, runEffectScript, type EffectScriptElement, type EffectScriptEnv } from './scriptRuntime';
-import { sanitizeGlslUniformName, ShaderRegistry } from './shaderCompiler';
+import { sanitizeGlslUniformName, ShaderRegistry, type CompiledShaderProgram } from './shaderCompiler';
 import { fontEpoch, resolveFontTriple } from './fontRegistry';
 import { loadMediaUrl } from '../store/storage';
 
@@ -439,6 +440,12 @@ export class AlightRenderer {
   private compositeBlendProg: ReturnType<ShaderRegistry['compileRaw']>;
 
   private fboPool: FboSlot[] = [];
+  /**
+   * Resolved blend program per blend id. `ShaderRegistry.getEffectProgram` memoises the compile but
+   * still filters the shader array on every call; at 60 fps × N blended layers that is pure garbage.
+   * Cleared on dispose so a rebuilt registry is never served a stale program.
+   */
+  private blendProgramCache = new Map<string, { def: EffectDef | null; prog: CompiledShaderProgram | null }>();
   private canvas2d: HTMLCanvasElement;
   private ctx2d: CanvasRenderingContext2D;
 
@@ -2071,8 +2078,9 @@ export class AlightRenderer {
       currentSlot = croppedFbo;
     }
 
-    // Step 3: Composite onto Scene FBO (Mask / Exclude / 26 APK Blend Modes / Normal)
-    if (layer.blendMode === 'mask' || layer.blendMode === 'exclude') {
+    // Step 3: Composite onto Scene FBO (Mask / Clipping Mask / Exclude / 26 APK Blend Modes / Normal)
+    const blendId = canonicalizeBlendMode(layer.blendMode);
+    if (blendId === 'mask' || blendId === 'clipping-mask' || blendId === 'exclude') {
       const outFbo = this.acquireFbo(renderW, renderH);
       const gl = this.gl;
       gl.bindFramebuffer(gl.FRAMEBUFFER, outFbo.fbo);
@@ -2085,15 +2093,24 @@ export class AlightRenderer {
       gl.activeTexture(gl.TEXTURE1);
       gl.bindTexture(gl.TEXTURE_2D, currentSlot.tex);
       gl.uniform1i(this.maskProg.uniforms.uMask, 1);
-      gl.uniform1i(this.maskProg.uniforms.uExclude, layer.blendMode === 'exclude' ? 1 : 0);
+      gl.uniform1i(this.maskProg.uniforms.uExclude, blendId === 'exclude' ? 1 : 0);
       gl.bindVertexArray(this.quadVao);
       gl.drawArrays(gl.TRIANGLES, 0, 6);
       this.unbindTextureUnits(2);
       this.blitTexture(outFbo.tex, sceneFbo, renderW, renderH, 1, false);
       this.releaseFbo(outFbo);
-    } else if (layer.blendMode !== 'normal') {
-      const blendDef = getEffectById(layer.blendMode);
-      const blendProg = blendDef ? this.registry.getEffectProgram(blendDef, null) : null;
+    } else if (blendId !== 'normal') {
+      const cachedBlend = this.blendProgramCache.get(blendId);
+      const blendDef = cachedBlend !== undefined ? cachedBlend.def : getEffectById(blendId);
+      const blendProg =
+        cachedBlend !== undefined
+          ? cachedBlend.prog
+          : blendDef
+            ? this.registry.getEffectProgram(blendDef, null)
+            : null;
+      if (cachedBlend === undefined) {
+        this.blendProgramCache.set(blendId, { def: blendDef ?? null, prog: blendProg });
+      }
       if (blendDef && blendProg) {
         const blendedFbo = this.acquireFbo(renderW, renderH);
         const gl = this.gl;
@@ -3293,6 +3310,7 @@ export class AlightRenderer {
 
   public dispose(): void {
     this.disposed = true;
+    this.blendProgramCache.clear();
     this.canvas.removeEventListener('webglcontextlost', this.onContextLostHandler);
     this.clearPreviewCache();
     this.textLayoutCache.clear();

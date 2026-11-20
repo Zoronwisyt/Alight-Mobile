@@ -1,0 +1,17 @@
+    public RenderEnvironmentForElement(RenderEnvironment env, SceneElement el2) {
+        Intrinsics.checkNotNullParameter(env, "env");
+        Intrinsics.checkNotNullParameter(el2, "el");
+        this.env = env;
+        this.el = el2;
+        int currentFrame = (int) ((((long) env.getCurrentFrame()) * 100000) / ((long) getFramesPerHundredSeconds()));
+        this.t = currentFrame;
+        int rootFPHS = currentFrame - (100000 / getRootFPHS());
+        this.tPrev = rootFPHS;
+        float startTime = (currentFrame - el2.getStartTime()) / (el2.getEndTime() - el2.getStartTime());
+        this.p = startTime;
+        float startTime2 = (rootFPHS - el2.getStartTime()) / (el2.getEndTime() - el2.getStartTime());
+        this.pPrev = startTime2;
+        this.durationInSeconds = ((double) (el2.getEndTime() - el2.getStartTime())) / 1000.0d;
+        this.time = startTime;
+        this.previousFrameTime = startTime2;
+    }

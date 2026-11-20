@@ -1,0 +1,122 @@
+{
+  "engine": {
+    "name": "jadx-headless-mcp",
+    "version": "0.7.1",
+    "artifact_sha256": "6e5eacf500b64292bfb73c49797c1958f6ee44646e43e868039ae7feb573ff75",
+    "source_revision": "5844800a486d2248fa949b74c9896285f5b54de2",
+    "worker_count": 1,
+    "heap_limit_mib": 8192
+  },
+  "class_name": "fi.Uf",
+  "methods": [
+    {
+      "name": "<clinit>",
+      "reported_signature": "<clinit>(): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()V"
+    },
+    {
+      "name": "BWM",
+      "reported_signature": "BWM(com.alightcreative.app.motion.scene.SceneHolder, float, float, float, float): com.alightcreative.app.motion.scene.Vector2D",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneHolder;FFFF)Lcom/alightcreative/app/motion/scene/Vector2D;"
+    },
+    {
+      "name": "Hfr",
+      "reported_signature": "Hfr(fi.lG): com.alightcreative.app.motion.scene.Vector2D",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lfi/lG;)Lcom/alightcreative/app/motion/scene/Vector2D;"
+    },
+    {
+      "name": "L",
+      "reported_signature": "L(fi.lG, com.alightcreative.app.motion.scene.Vector2D, float): fi.lG",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lfi/lG;Lcom/alightcreative/app/motion/scene/Vector2D;F)Lfi/lG;"
+    },
+    {
+      "name": "Rw",
+      "reported_signature": "Rw(fi.lG): fi.lG",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lfi/lG;)Lfi/lG;"
+    },
+    {
+      "name": "Xu",
+      "reported_signature": "Xu(): float",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()F"
+    },
+    {
+      "name": "bG",
+      "reported_signature": "bG(fi.lG, com.alightcreative.app.motion.scene.Vector2D): fi.lG",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lfi/lG;Lcom/alightcreative/app/motion/scene/Vector2D;)Lfi/lG;"
+    },
+    {
+      "name": "dZ",
+      "reported_signature": "dZ(): float[]",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()[F"
+    },
+    {
+      "name": "g",
+      "reported_signature": "g(fi.lG): float",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lfi/lG;)F"
+    },
+    {
+      "name": "nDH",
+      "reported_signature": "nDH(fi.lG): fi.lG",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lfi/lG;)Lfi/lG;"
+    },
+    {
+      "name": "q2G",
+      "reported_signature": "q2G(fi.lG, float): fi.lG",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lfi/lG;F)Lfi/lG;"
+    },
+    {
+      "name": "s",
+      "reported_signature": "s(com.alightcreative.app.motion.scene.SceneHolder, float, float, android.view.View): com.alightcreative.app.motion.scene.Vector2D",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneHolder;FFLandroid/view/View;)Lcom/alightcreative/app/motion/scene/Vector2D;"
+    },
+    {
+      "name": "u",
+      "reported_signature": "u(): float",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()F"
+    }
+  ],
+  "fields": [
+    {
+      "name": "BWM",
+      "reported_type": "float",
+      "dex_static_value": null
+    },
+    {
+      "name": "Hfr",
+      "reported_type": "float",
+      "dex_static_value": null
+    },
+    {
+      "name": "Rw",
+      "reported_type": "float[]",
+      "dex_static_value": null
+    }
+  ],
+  "inner_classes": []
+}

@@ -1,0 +1,5 @@
+{
+  "status": "complete",
+  "text": "                private static final void renderWithGpu$lambda$29$adjustMatrix(ny6 ny6Var, float f2, float f3, xUY xuy, Rectangle rectangle) {\r\n                    float fFcf = ny6Var.Fcf() / rectangle.getWidth();\r\n                    float fPl3 = ny6Var.Pl3() / rectangle.getHeight();\r\n                    float f4 = f2 > f3 ? fPl3 : fFcf;\r\n                    xuy.lTc();\r\n                    Matrix matrix = new Matrix();\r\n                    if (renderDepth > 1) {\r\n                        matrix.postScale(fFcf, fPl3);\r\n                    } else {\r\n                        matrix.postScale(f4, f4);\r\n                    }\r\n                    matrix.postTranslate(((-rectangle.getLeft()) / rectangle.getWidth()) * ny6Var.Fcf(), ((-rectangle.getTop()) / rectangle.getHeight()) * ny6Var.Pl3());\r\n                    xuy.A(matrix);\r\n                }",
+  "reported_total_bytes": null
+}

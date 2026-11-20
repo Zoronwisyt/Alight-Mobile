@@ -1,0 +1,47 @@
+.method static constructor <clinit>()V
+    .registers 3
+
+    new-instance v0, Lfi/K;
+
+    const-string v1, "HIDE"
+
+    const/4 v2, 0x0
+
+    invoke-direct {v0, v1, v2}, Lfi/K;-><init>(Ljava/lang/String;I)V
+
+    sput-object v0, Lfi/K;->s:Lfi/K;
+
+    new-instance v0, Lfi/K;
+
+    const-string v1, "SHOW"
+
+    const/4 v2, 0x1
+
+    invoke-direct {v0, v1, v2}, Lfi/K;-><init>(Ljava/lang/String;I)V
+
+    sput-object v0, Lfi/K;->dZ:Lfi/K;
+
+    new-instance v0, Lfi/K;
+
+    const-string v1, "REDUCED_OPACITY"
+
+    const/4 v2, 0x2
+
+    invoke-direct {v0, v1, v2}, Lfi/K;-><init>(Ljava/lang/String;I)V
+
+    sput-object v0, Lfi/K;->u:Lfi/K;
+
+    invoke-static {}, Lfi/K;->Rw()[Lfi/K;
+
+    move-result-object v0
+
+    sput-object v0, Lfi/K;->g:[Lfi/K;
+
+    invoke-static {v0}, Lkotlin/enums/EnumEntriesKt;->enumEntries([Ljava/lang/Enum;)Lkotlin/enums/EnumEntries;
+
+    move-result-object v0
+
+    sput-object v0, Lfi/K;->bG:Lkotlin/enums/EnumEntries;
+
+    return-void
+.end method

@@ -1,0 +1,438 @@
+{
+  "engine": {
+    "name": "jadx-headless-mcp",
+    "version": "0.7.1",
+    "artifact_sha256": "6e5eacf500b64292bfb73c49797c1958f6ee44646e43e868039ae7feb573ff75",
+    "source_revision": "5844800a486d2248fa949b74c9896285f5b54de2",
+    "worker_count": 1,
+    "heap_limit_mib": 8192
+  },
+  "class_name": "com.alightcreative.app.motion.scene.ExportParams",
+  "methods": [
+    {
+      "name": "<clinit>",
+      "reported_signature": "<clinit>(): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()V"
+    },
+    {
+      "name": "<init>",
+      "reported_signature": "<init>(int, int, int, int, int, int, com.alightcreative.app.motion.scene.ExportFormat, boolean, boolean, int, int, java.lang.String, java.lang.String, int, int, int, int, int, boolean): void",
+      "overload_index": 0,
+      "is_constructor": true,
+      "dex_descriptor": "(IIIIIILcom/alightcreative/app/motion/scene/ExportFormat;ZZIILjava/lang/String;Ljava/lang/String;IIIIIZ)V"
+    },
+    {
+      "name": "<init>",
+      "reported_signature": "<init>(int, int, int, int, int, int, com.alightcreative.app.motion.scene.ExportFormat, boolean, boolean, int, int, java.lang.String, java.lang.String, int, int, int, int, int, boolean, int, kotlin.jvm.internal.DefaultConstructorMarker): void",
+      "overload_index": 1,
+      "is_constructor": true,
+      "dex_descriptor": "(IIIIIILcom/alightcreative/app/motion/scene/ExportFormat;ZZIILjava/lang/String;Ljava/lang/String;IIIIIZILkotlin/jvm/internal/DefaultConstructorMarker;)V"
+    },
+    {
+      "name": "component1",
+      "reported_signature": "component1(): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()I"
+    },
+    {
+      "name": "component10",
+      "reported_signature": "component10(): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()I"
+    },
+    {
+      "name": "component11",
+      "reported_signature": "component11(): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()I"
+    },
+    {
+      "name": "component12",
+      "reported_signature": "component12(): java.lang.String",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/lang/String;"
+    },
+    {
+      "name": "component13",
+      "reported_signature": "component13(): java.lang.String",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/lang/String;"
+    },
+    {
+      "name": "component14",
+      "reported_signature": "component14(): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()I"
+    },
+    {
+      "name": "component15",
+      "reported_signature": "component15(): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()I"
+    },
+    {
+      "name": "component16",
+      "reported_signature": "component16(): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()I"
+    },
+    {
+      "name": "component17",
+      "reported_signature": "component17(): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()I"
+    },
+    {
+      "name": "component18",
+      "reported_signature": "component18(): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()I"
+    },
+    {
+      "name": "component19",
+      "reported_signature": "component19(): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Z"
+    },
+    {
+      "name": "component2",
+      "reported_signature": "component2(): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()I"
+    },
+    {
+      "name": "component3",
+      "reported_signature": "component3(): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()I"
+    },
+    {
+      "name": "component4",
+      "reported_signature": "component4(): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()I"
+    },
+    {
+      "name": "component5",
+      "reported_signature": "component5(): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()I"
+    },
+    {
+      "name": "component6",
+      "reported_signature": "component6(): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()I"
+    },
+    {
+      "name": "component7",
+      "reported_signature": "component7(): com.alightcreative.app.motion.scene.ExportFormat",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/ExportFormat;"
+    },
+    {
+      "name": "component8",
+      "reported_signature": "component8(): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Z"
+    },
+    {
+      "name": "component9",
+      "reported_signature": "component9(): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Z"
+    },
+    {
+      "name": "copy",
+      "reported_signature": "copy(int, int, int, int, int, int, com.alightcreative.app.motion.scene.ExportFormat, boolean, boolean, int, int, java.lang.String, java.lang.String, int, int, int, int, int, boolean): com.alightcreative.app.motion.scene.ExportParams",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(IIIIIILcom/alightcreative/app/motion/scene/ExportFormat;ZZIILjava/lang/String;Ljava/lang/String;IIIIIZ)Lcom/alightcreative/app/motion/scene/ExportParams;"
+    },
+    {
+      "name": "copy$default",
+      "reported_signature": "copy$default(com.alightcreative.app.motion.scene.ExportParams, int, int, int, int, int, int, com.alightcreative.app.motion.scene.ExportFormat, boolean, boolean, int, int, java.lang.String, java.lang.String, int, int, int, int, int, boolean, int, java.lang.Object): com.alightcreative.app.motion.scene.ExportParams",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/ExportParams;IIIIIILcom/alightcreative/app/motion/scene/ExportFormat;ZZIILjava/lang/String;Ljava/lang/String;IIIIIZILjava/lang/Object;)Lcom/alightcreative/app/motion/scene/ExportParams;"
+    },
+    {
+      "name": "equals",
+      "reported_signature": "equals(java.lang.Object): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Ljava/lang/Object;)Z"
+    },
+    {
+      "name": "getAudio",
+      "reported_signature": "getAudio(): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Z"
+    },
+    {
+      "name": "getAudioBitrate",
+      "reported_signature": "getAudioBitrate(): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()I"
+    },
+    {
+      "name": "getAudioChannelCount",
+      "reported_signature": "getAudioChannelCount(): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()I"
+    },
+    {
+      "name": "getAudioMime",
+      "reported_signature": "getAudioMime(): java.lang.String",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/lang/String;"
+    },
+    {
+      "name": "getAudioSampleRate",
+      "reported_signature": "getAudioSampleRate(): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()I"
+    },
+    {
+      "name": "getDurationOfNoWatermarkPeriod",
+      "reported_signature": "getDurationOfNoWatermarkPeriod(): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()I"
+    },
+    {
+      "name": "getEndFrame",
+      "reported_signature": "getEndFrame(): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()I"
+    },
+    {
+      "name": "getFormat",
+      "reported_signature": "getFormat(): com.alightcreative.app.motion.scene.ExportFormat",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/ExportFormat;"
+    },
+    {
+      "name": "getFphs",
+      "reported_signature": "getFphs(): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()I"
+    },
+    {
+      "name": "getHeight",
+      "reported_signature": "getHeight(): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()I"
+    },
+    {
+      "name": "getIdrInterval",
+      "reported_signature": "getIdrInterval(): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()I"
+    },
+    {
+      "name": "getImageQuality",
+      "reported_signature": "getImageQuality(): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()I"
+    },
+    {
+      "name": "getOpaque",
+      "reported_signature": "getOpaque(): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Z"
+    },
+    {
+      "name": "getStartFrame",
+      "reported_signature": "getStartFrame(): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()I"
+    },
+    {
+      "name": "getStartOfNoWatermarkPeriod",
+      "reported_signature": "getStartOfNoWatermarkPeriod(): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()I"
+    },
+    {
+      "name": "getVideo",
+      "reported_signature": "getVideo(): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Z"
+    },
+    {
+      "name": "getVideoBitrate",
+      "reported_signature": "getVideoBitrate(): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()I"
+    },
+    {
+      "name": "getVideoMime",
+      "reported_signature": "getVideoMime(): java.lang.String",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/lang/String;"
+    },
+    {
+      "name": "getWidth",
+      "reported_signature": "getWidth(): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()I"
+    },
+    {
+      "name": "hashCode",
+      "reported_signature": "hashCode(): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()I"
+    },
+    {
+      "name": "toString",
+      "reported_signature": "toString(): java.lang.String",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/lang/String;"
+    }
+  ],
+  "fields": [
+    {
+      "name": "$stable",
+      "reported_type": "int",
+      "dex_static_value": null
+    },
+    {
+      "name": "audio",
+      "reported_type": "boolean",
+      "dex_static_value": null
+    },
+    {
+      "name": "audioBitrate",
+      "reported_type": "int",
+      "dex_static_value": null
+    },
+    {
+      "name": "audioChannelCount",
+      "reported_type": "int",
+      "dex_static_value": null
+    },
+    {
+      "name": "audioMime",
+      "reported_type": "java.lang.String",
+      "dex_static_value": null
+    },
+    {
+      "name": "audioSampleRate",
+      "reported_type": "int",
+      "dex_static_value": null
+    },
+    {
+      "name": "durationOfNoWatermarkPeriod",
+      "reported_type": "int",
+      "dex_static_value": null
+    },
+    {
+      "name": "endFrame",
+      "reported_type": "int",
+      "dex_static_value": null
+    },
+    {
+      "name": "format",
+      "reported_type": "com.alightcreative.app.motion.scene.ExportFormat",
+      "dex_static_value": null
+    },
+    {
+      "name": "fphs",
+      "reported_type": "int",
+      "dex_static_value": null
+    },
+    {
+      "name": "height",
+      "reported_type": "int",
+      "dex_static_value": null
+    },
+    {
+      "name": "idrInterval",
+      "reported_type": "int",
+      "dex_static_value": null
+    },
+    {
+      "name": "imageQuality",
+      "reported_type": "int",
+      "dex_static_value": null
+    },
+    {
+      "name": "opaque",
+      "reported_type": "boolean",
+      "dex_static_value": null
+    },
+    {
+      "name": "startFrame",
+      "reported_type": "int",
+      "dex_static_value": null
+    },
+    {
+      "name": "startOfNoWatermarkPeriod",
+      "reported_type": "int",
+      "dex_static_value": null
+    },
+    {
+      "name": "video",
+      "reported_type": "boolean",
+      "dex_static_value": null
+    },
+    {
+      "name": "videoBitrate",
+      "reported_type": "int",
+      "dex_static_value": null
+    },
+    {
+      "name": "videoMime",
+      "reported_type": "java.lang.String",
+      "dex_static_value": null
+    },
+    {
+      "name": "width",
+      "reported_type": "int",
+      "dex_static_value": null
+    }
+  ],
+  "inner_classes": []
+}

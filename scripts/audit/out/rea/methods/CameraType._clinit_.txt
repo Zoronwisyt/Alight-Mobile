@@ -1,0 +1,49 @@
+.method static constructor <clinit>()V
+    .registers 4
+
+    new-instance v0, Lcom/alightcreative/app/motion/scene/CameraType;
+
+    const/4 v1, 0x0
+
+    const-string v2, "perspective"
+
+    const-string v3, "Perspective"
+
+    invoke-direct {v0, v3, v1, v2}, Lcom/alightcreative/app/motion/scene/CameraType;-><init>(Ljava/lang/String;ILjava/lang/String;)V
+
+    sput-object v0, Lcom/alightcreative/app/motion/scene/CameraType;->Perspective:Lcom/alightcreative/app/motion/scene/CameraType;
+
+    new-instance v0, Lcom/alightcreative/app/motion/scene/CameraType;
+
+    const/4 v1, 0x1
+
+    const-string v2, "orthographic"
+
+    const-string v3, "Orthographic"
+
+    invoke-direct {v0, v3, v1, v2}, Lcom/alightcreative/app/motion/scene/CameraType;-><init>(Ljava/lang/String;ILjava/lang/String;)V
+
+    sput-object v0, Lcom/alightcreative/app/motion/scene/CameraType;->Orthographic:Lcom/alightcreative/app/motion/scene/CameraType;
+
+    invoke-static {}, Lcom/alightcreative/app/motion/scene/CameraType;->$values()[Lcom/alightcreative/app/motion/scene/CameraType;
+
+    move-result-object v0
+
+    sput-object v0, Lcom/alightcreative/app/motion/scene/CameraType;->$VALUES:[Lcom/alightcreative/app/motion/scene/CameraType;
+
+    invoke-static {v0}, Lkotlin/enums/EnumEntriesKt;->enumEntries([Ljava/lang/Enum;)Lkotlin/enums/EnumEntries;
+
+    move-result-object v0
+
+    sput-object v0, Lcom/alightcreative/app/motion/scene/CameraType;->$ENTRIES:Lkotlin/enums/EnumEntries;
+
+    new-instance v0, Lcom/alightcreative/app/motion/scene/CameraType$Companion;
+
+    const/4 v1, 0x0
+
+    invoke-direct {v0, v1}, Lcom/alightcreative/app/motion/scene/CameraType$Companion;-><init>(Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+
+    sput-object v0, Lcom/alightcreative/app/motion/scene/CameraType;->Companion:Lcom/alightcreative/app/motion/scene/CameraType$Companion;
+
+    return-void
+.end method

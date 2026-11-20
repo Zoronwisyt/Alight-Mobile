@@ -1,0 +1,13 @@
+    @Override // jD.SfT
+    public void PW(float f2, float f3, float f4, float f5, jD.Jb paint) {
+        Intrinsics.checkNotNullParameter(paint, "paint");
+        Vector2D vector2DTimes = GeometryKt.times(new Vector2D(f2, f3), X());
+        float x2 = vector2DTimes.getX();
+        float y2 = vector2DTimes.getY();
+        Vector2D vector2DTimes2 = GeometryKt.times(new Vector2D(f4, f5), X());
+        float x3 = vector2DTimes2.getX();
+        float y3 = vector2DTimes2.getY();
+        this.dMq.Hfr();
+        this.dMq.Fcf(x2, y2, x3 - x2, y3 - y2);
+        paint.s(this.dMq, qsB());
+    }

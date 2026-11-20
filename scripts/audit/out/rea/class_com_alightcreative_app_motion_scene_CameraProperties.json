@@ -1,0 +1,293 @@
+{
+  "engine": {
+    "name": "jadx-headless-mcp",
+    "version": "0.7.1",
+    "artifact_sha256": "6e5eacf500b64292bfb73c49797c1958f6ee44646e43e868039ae7feb573ff75",
+    "source_revision": "5844800a486d2248fa949b74c9896285f5b54de2",
+    "worker_count": 1,
+    "heap_limit_mib": 8192
+  },
+  "class_name": "com.alightcreative.app.motion.scene.CameraProperties",
+  "methods": [
+    {
+      "name": "<clinit>",
+      "reported_signature": "<clinit>(): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()V"
+    },
+    {
+      "name": "<init>",
+      "reported_signature": "<init>(): void",
+      "overload_index": 0,
+      "is_constructor": true,
+      "dex_descriptor": "()V"
+    },
+    {
+      "name": "<init>",
+      "reported_signature": "<init>(com.alightcreative.app.motion.scene.CameraType, com.alightcreative.app.motion.scene.KeyableFloat, boolean, com.alightcreative.app.motion.scene.KeyableFloat, com.alightcreative.app.motion.scene.KeyableFloat, com.alightcreative.app.motion.scene.KeyableFloat, boolean, com.alightcreative.app.motion.scene.KeyableSolidColor, com.alightcreative.app.motion.scene.KeyableFloat, com.alightcreative.app.motion.scene.KeyableFloat): void",
+      "overload_index": 1,
+      "is_constructor": true,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/CameraType;Lcom/alightcreative/app/motion/scene/KeyableFloat;ZLcom/alightcreative/app/motion/scene/KeyableFloat;Lcom/alightcreative/app/motion/scene/KeyableFloat;Lcom/alightcreative/app/motion/scene/KeyableFloat;ZLcom/alightcreative/app/motion/scene/KeyableSolidColor;Lcom/alightcreative/app/motion/scene/KeyableFloat;Lcom/alightcreative/app/motion/scene/KeyableFloat;)V"
+    },
+    {
+      "name": "<init>",
+      "reported_signature": "<init>(com.alightcreative.app.motion.scene.CameraType, com.alightcreative.app.motion.scene.KeyableFloat, boolean, com.alightcreative.app.motion.scene.KeyableFloat, com.alightcreative.app.motion.scene.KeyableFloat, com.alightcreative.app.motion.scene.KeyableFloat, boolean, com.alightcreative.app.motion.scene.KeyableSolidColor, com.alightcreative.app.motion.scene.KeyableFloat, com.alightcreative.app.motion.scene.KeyableFloat, int, kotlin.jvm.internal.DefaultConstructorMarker): void",
+      "overload_index": 2,
+      "is_constructor": true,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/CameraType;Lcom/alightcreative/app/motion/scene/KeyableFloat;ZLcom/alightcreative/app/motion/scene/KeyableFloat;Lcom/alightcreative/app/motion/scene/KeyableFloat;Lcom/alightcreative/app/motion/scene/KeyableFloat;ZLcom/alightcreative/app/motion/scene/KeyableSolidColor;Lcom/alightcreative/app/motion/scene/KeyableFloat;Lcom/alightcreative/app/motion/scene/KeyableFloat;ILkotlin/jvm/internal/DefaultConstructorMarker;)V"
+    },
+    {
+      "name": "access$getDEFAULT$cp",
+      "reported_signature": "access$getDEFAULT$cp(): com.alightcreative.app.motion.scene.CameraProperties",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/CameraProperties;"
+    },
+    {
+      "name": "component1",
+      "reported_signature": "component1(): com.alightcreative.app.motion.scene.CameraType",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/CameraType;"
+    },
+    {
+      "name": "component10",
+      "reported_signature": "component10(): com.alightcreative.app.motion.scene.KeyableFloat",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/KeyableFloat;"
+    },
+    {
+      "name": "component2",
+      "reported_signature": "component2(): com.alightcreative.app.motion.scene.KeyableFloat",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/KeyableFloat;"
+    },
+    {
+      "name": "component3",
+      "reported_signature": "component3(): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Z"
+    },
+    {
+      "name": "component4",
+      "reported_signature": "component4(): com.alightcreative.app.motion.scene.KeyableFloat",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/KeyableFloat;"
+    },
+    {
+      "name": "component5",
+      "reported_signature": "component5(): com.alightcreative.app.motion.scene.KeyableFloat",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/KeyableFloat;"
+    },
+    {
+      "name": "component6",
+      "reported_signature": "component6(): com.alightcreative.app.motion.scene.KeyableFloat",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/KeyableFloat;"
+    },
+    {
+      "name": "component7",
+      "reported_signature": "component7(): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Z"
+    },
+    {
+      "name": "component8",
+      "reported_signature": "component8(): com.alightcreative.app.motion.scene.KeyableSolidColor",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/KeyableSolidColor;"
+    },
+    {
+      "name": "component9",
+      "reported_signature": "component9(): com.alightcreative.app.motion.scene.KeyableFloat",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/KeyableFloat;"
+    },
+    {
+      "name": "copy",
+      "reported_signature": "copy(com.alightcreative.app.motion.scene.CameraType, com.alightcreative.app.motion.scene.KeyableFloat, boolean, com.alightcreative.app.motion.scene.KeyableFloat, com.alightcreative.app.motion.scene.KeyableFloat, com.alightcreative.app.motion.scene.KeyableFloat, boolean, com.alightcreative.app.motion.scene.KeyableSolidColor, com.alightcreative.app.motion.scene.KeyableFloat, com.alightcreative.app.motion.scene.KeyableFloat): com.alightcreative.app.motion.scene.CameraProperties",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/CameraType;Lcom/alightcreative/app/motion/scene/KeyableFloat;ZLcom/alightcreative/app/motion/scene/KeyableFloat;Lcom/alightcreative/app/motion/scene/KeyableFloat;Lcom/alightcreative/app/motion/scene/KeyableFloat;ZLcom/alightcreative/app/motion/scene/KeyableSolidColor;Lcom/alightcreative/app/motion/scene/KeyableFloat;Lcom/alightcreative/app/motion/scene/KeyableFloat;)Lcom/alightcreative/app/motion/scene/CameraProperties;"
+    },
+    {
+      "name": "copy$default",
+      "reported_signature": "copy$default(com.alightcreative.app.motion.scene.CameraProperties, com.alightcreative.app.motion.scene.CameraType, com.alightcreative.app.motion.scene.KeyableFloat, boolean, com.alightcreative.app.motion.scene.KeyableFloat, com.alightcreative.app.motion.scene.KeyableFloat, com.alightcreative.app.motion.scene.KeyableFloat, boolean, com.alightcreative.app.motion.scene.KeyableSolidColor, com.alightcreative.app.motion.scene.KeyableFloat, com.alightcreative.app.motion.scene.KeyableFloat, int, java.lang.Object): com.alightcreative.app.motion.scene.CameraProperties",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/CameraProperties;Lcom/alightcreative/app/motion/scene/CameraType;Lcom/alightcreative/app/motion/scene/KeyableFloat;ZLcom/alightcreative/app/motion/scene/KeyableFloat;Lcom/alightcreative/app/motion/scene/KeyableFloat;Lcom/alightcreative/app/motion/scene/KeyableFloat;ZLcom/alightcreative/app/motion/scene/KeyableSolidColor;Lcom/alightcreative/app/motion/scene/KeyableFloat;Lcom/alightcreative/app/motion/scene/KeyableFloat;ILjava/lang/Object;)Lcom/alightcreative/app/motion/scene/CameraProperties;"
+    },
+    {
+      "name": "equals",
+      "reported_signature": "equals(java.lang.Object): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Ljava/lang/Object;)Z"
+    },
+    {
+      "name": "getFocusBlurEnabled",
+      "reported_signature": "getFocusBlurEnabled(): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Z"
+    },
+    {
+      "name": "getFocusBlurStrength",
+      "reported_signature": "getFocusBlurStrength(): com.alightcreative.app.motion.scene.KeyableFloat",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/KeyableFloat;"
+    },
+    {
+      "name": "getFocusDepthOfField",
+      "reported_signature": "getFocusDepthOfField(): com.alightcreative.app.motion.scene.KeyableFloat",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/KeyableFloat;"
+    },
+    {
+      "name": "getFocusDistance",
+      "reported_signature": "getFocusDistance(): com.alightcreative.app.motion.scene.KeyableFloat",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/KeyableFloat;"
+    },
+    {
+      "name": "getFogColor",
+      "reported_signature": "getFogColor(): com.alightcreative.app.motion.scene.KeyableSolidColor",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/KeyableSolidColor;"
+    },
+    {
+      "name": "getFogEnabled",
+      "reported_signature": "getFogEnabled(): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Z"
+    },
+    {
+      "name": "getFogFarZ",
+      "reported_signature": "getFogFarZ(): com.alightcreative.app.motion.scene.KeyableFloat",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/KeyableFloat;"
+    },
+    {
+      "name": "getFogNearZ",
+      "reported_signature": "getFogNearZ(): com.alightcreative.app.motion.scene.KeyableFloat",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/KeyableFloat;"
+    },
+    {
+      "name": "getFov",
+      "reported_signature": "getFov(): com.alightcreative.app.motion.scene.KeyableFloat",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/KeyableFloat;"
+    },
+    {
+      "name": "getType",
+      "reported_signature": "getType(): com.alightcreative.app.motion.scene.CameraType",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/CameraType;"
+    },
+    {
+      "name": "hashCode",
+      "reported_signature": "hashCode(): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()I"
+    },
+    {
+      "name": "toString",
+      "reported_signature": "toString(): java.lang.String",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/lang/String;"
+    }
+  ],
+  "fields": [
+    {
+      "name": "$stable",
+      "reported_type": "int",
+      "dex_static_value": null
+    },
+    {
+      "name": "Companion",
+      "reported_type": "com.alightcreative.app.motion.scene.CameraProperties$Companion",
+      "dex_static_value": null
+    },
+    {
+      "name": "DEFAULT",
+      "reported_type": "com.alightcreative.app.motion.scene.CameraProperties",
+      "dex_static_value": null
+    },
+    {
+      "name": "focusBlurEnabled",
+      "reported_type": "boolean",
+      "dex_static_value": null
+    },
+    {
+      "name": "focusBlurStrength",
+      "reported_type": "com.alightcreative.app.motion.scene.KeyableFloat",
+      "dex_static_value": null
+    },
+    {
+      "name": "focusDepthOfField",
+      "reported_type": "com.alightcreative.app.motion.scene.KeyableFloat",
+      "dex_static_value": null
+    },
+    {
+      "name": "focusDistance",
+      "reported_type": "com.alightcreative.app.motion.scene.KeyableFloat",
+      "dex_static_value": null
+    },
+    {
+      "name": "fogColor",
+      "reported_type": "com.alightcreative.app.motion.scene.KeyableSolidColor",
+      "dex_static_value": null
+    },
+    {
+      "name": "fogEnabled",
+      "reported_type": "boolean",
+      "dex_static_value": null
+    },
+    {
+      "name": "fogFarZ",
+      "reported_type": "com.alightcreative.app.motion.scene.KeyableFloat",
+      "dex_static_value": null
+    },
+    {
+      "name": "fogNearZ",
+      "reported_type": "com.alightcreative.app.motion.scene.KeyableFloat",
+      "dex_static_value": null
+    },
+    {
+      "name": "fov",
+      "reported_type": "com.alightcreative.app.motion.scene.KeyableFloat",
+      "dex_static_value": null
+    },
+    {
+      "name": "type",
+      "reported_type": "com.alightcreative.app.motion.scene.CameraType",
+      "dex_static_value": null
+    }
+  ],
+  "inner_classes": [
+    "com.alightcreative.app.motion.scene.CameraProperties.Companion"
+  ]
+}

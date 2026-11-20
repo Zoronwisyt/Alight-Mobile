@@ -1,0 +1,480 @@
+{
+  "engine": {
+    "name": "jadx-headless-mcp",
+    "version": "0.7.1",
+    "artifact_sha256": "6e5eacf500b64292bfb73c49797c1958f6ee44646e43e868039ae7feb573ff75",
+    "source_revision": "5844800a486d2248fa949b74c9896285f5b54de2",
+    "worker_count": 1,
+    "heap_limit_mib": 8192
+  },
+  "class_name": "com.alightcreative.app.motion.scene.rendering.RenderEnvironmentImpl",
+  "methods": [
+    {
+      "name": "<init>",
+      "reported_signature": "<init>(): void",
+      "overload_index": 0,
+      "is_constructor": true,
+      "dex_descriptor": "()V"
+    },
+    {
+      "name": "colorFromAttr",
+      "reported_signature": "colorFromAttr(int, com.alightcreative.app.motion.scene.SolidColor): com.alightcreative.app.motion.scene.SolidColor",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(ILcom/alightcreative/app/motion/scene/SolidColor;)Lcom/alightcreative/app/motion/scene/SolidColor;"
+    },
+    {
+      "name": "getActiveCamera",
+      "reported_signature": "getActiveCamera(): com.alightcreative.app.motion.scene.SceneElement",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/SceneElement;"
+    },
+    {
+      "name": "getContentResolver",
+      "reported_signature": "getContentResolver(): psA.HT",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()LpsA/HT;"
+    },
+    {
+      "name": "getContext",
+      "reported_signature": "getContext(): android.content.Context",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Landroid/content/Context;"
+    },
+    {
+      "name": "getCurrentFrame",
+      "reported_signature": "getCurrentFrame(): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()I"
+    },
+    {
+      "name": "getDurationInSeconds",
+      "reported_signature": "getDurationInSeconds(): double",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()D"
+    },
+    {
+      "name": "getEditMode",
+      "reported_signature": "getEditMode(): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()I"
+    },
+    {
+      "name": "getExportParams",
+      "reported_signature": "getExportParams(): com.alightcreative.app.motion.scene.ExportParams",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/ExportParams;"
+    },
+    {
+      "name": "getFramesPerHundredSeconds",
+      "reported_signature": "getFramesPerHundredSeconds(): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()I"
+    },
+    {
+      "name": "getOptiRate",
+      "reported_signature": "getOptiRate(): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()I"
+    },
+    {
+      "name": "getOverrideVideoTextures",
+      "reported_signature": "getOverrideVideoTextures(): java.util.Map<java.lang.Long, bYT.R9l>",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/util/Map;"
+    },
+    {
+      "name": "getPreviousFrameTime",
+      "reported_signature": "getPreviousFrameTime(): float",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()F"
+    },
+    {
+      "name": "getRenderMode",
+      "reported_signature": "getRenderMode(): com.alightcreative.app.motion.scene.rendering.RenderMode",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/rendering/RenderMode;"
+    },
+    {
+      "name": "getRootFPHS",
+      "reported_signature": "getRootFPHS(): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()I"
+    },
+    {
+      "name": "getScene",
+      "reported_signature": "getScene(): com.alightcreative.app.motion.scene.Scene",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/Scene;"
+    },
+    {
+      "name": "getSpoidEnv",
+      "reported_signature": "getSpoidEnv(): com.alightcreative.app.motion.scene.SpoidEnv",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/SpoidEnv;"
+    },
+    {
+      "name": "getTargetHasAlpha",
+      "reported_signature": "getTargetHasAlpha(): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Z"
+    },
+    {
+      "name": "getTime",
+      "reported_signature": "getTime(): float",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()F"
+    },
+    {
+      "name": "getUiColors",
+      "reported_signature": "getUiColors(): com.alightcreative.app.motion.scene.UIColors",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/UIColors;"
+    },
+    {
+      "name": "getUserElementParamValues",
+      "reported_signature": "getUserElementParamValues(): java.util.Map<java.lang.String, com.alightcreative.app.motion.scene.userparam.UserParameterValue>",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/util/Map;"
+    },
+    {
+      "name": "getUserPreviewMode",
+      "reported_signature": "getUserPreviewMode(): fi.lG",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lfi/lG;"
+    },
+    {
+      "name": "getVideoTextureCache",
+      "reported_signature": "getVideoTextureCache(): bYT.BAQ",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()LbYT/BAQ;"
+    },
+    {
+      "name": "getVideoThumbnails",
+      "reported_signature": "getVideoThumbnails(): kya.SfT",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lkya/SfT;"
+    },
+    {
+      "name": "get_contentResolver",
+      "reported_signature": "get_contentResolver(): psA.HT",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()LpsA/HT;"
+    },
+    {
+      "name": "get_videoThumbnails",
+      "reported_signature": "get_videoThumbnails(): kya.SfT",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lkya/SfT;"
+    },
+    {
+      "name": "reset",
+      "reported_signature": "reset(): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()V"
+    },
+    {
+      "name": "setActiveCamera",
+      "reported_signature": "setActiveCamera(com.alightcreative.app.motion.scene.SceneElement): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneElement;)V"
+    },
+    {
+      "name": "setContext",
+      "reported_signature": "setContext(android.content.Context): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Landroid/content/Context;)V"
+    },
+    {
+      "name": "setCurrentFrame",
+      "reported_signature": "setCurrentFrame(int): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(I)V"
+    },
+    {
+      "name": "setDurationInSeconds",
+      "reported_signature": "setDurationInSeconds(double): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(D)V"
+    },
+    {
+      "name": "setEditMode",
+      "reported_signature": "setEditMode(int): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(I)V"
+    },
+    {
+      "name": "setExportParams",
+      "reported_signature": "setExportParams(com.alightcreative.app.motion.scene.ExportParams): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/ExportParams;)V"
+    },
+    {
+      "name": "setFramesPerHundredSeconds",
+      "reported_signature": "setFramesPerHundredSeconds(int): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(I)V"
+    },
+    {
+      "name": "setOptiRate",
+      "reported_signature": "setOptiRate(int): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(I)V"
+    },
+    {
+      "name": "setOverrideVideoTextures",
+      "reported_signature": "setOverrideVideoTextures(java.util.Map<java.lang.Long, ? extends bYT.R9l>): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Ljava/util/Map;)V"
+    },
+    {
+      "name": "setPreviousFrameTime",
+      "reported_signature": "setPreviousFrameTime(float): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(F)V"
+    },
+    {
+      "name": "setRenderMode",
+      "reported_signature": "setRenderMode(com.alightcreative.app.motion.scene.rendering.RenderMode): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/rendering/RenderMode;)V"
+    },
+    {
+      "name": "setRootFPHS",
+      "reported_signature": "setRootFPHS(int): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(I)V"
+    },
+    {
+      "name": "setScene",
+      "reported_signature": "setScene(com.alightcreative.app.motion.scene.Scene): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/Scene;)V"
+    },
+    {
+      "name": "setSpoidEnv",
+      "reported_signature": "setSpoidEnv(com.alightcreative.app.motion.scene.SpoidEnv): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SpoidEnv;)V"
+    },
+    {
+      "name": "setTargetHasAlpha",
+      "reported_signature": "setTargetHasAlpha(boolean): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Z)V"
+    },
+    {
+      "name": "setTime",
+      "reported_signature": "setTime(float): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(F)V"
+    },
+    {
+      "name": "setUiColors",
+      "reported_signature": "setUiColors(com.alightcreative.app.motion.scene.UIColors): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/UIColors;)V"
+    },
+    {
+      "name": "setUserElementParamValues",
+      "reported_signature": "setUserElementParamValues(java.util.Map<java.lang.String, com.alightcreative.app.motion.scene.userparam.UserParameterValue>): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Ljava/util/Map;)V"
+    },
+    {
+      "name": "setUserPreviewMode",
+      "reported_signature": "setUserPreviewMode(fi.lG): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lfi/lG;)V"
+    },
+    {
+      "name": "setVideoTextureCache",
+      "reported_signature": "setVideoTextureCache(bYT.BAQ): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(LbYT/BAQ;)V"
+    },
+    {
+      "name": "set_contentResolver",
+      "reported_signature": "set_contentResolver(psA.HT): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(LpsA/HT;)V"
+    },
+    {
+      "name": "set_videoThumbnails",
+      "reported_signature": "set_videoThumbnails(kya.SfT): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lkya/SfT;)V"
+    },
+    {
+      "name": "textureForVideoTrack",
+      "reported_signature": "textureForVideoTrack(long): bYT.R9l",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(J)LbYT/R9l;"
+    }
+  ],
+  "fields": [
+    {
+      "name": "_contentResolver",
+      "reported_type": "psA.HT",
+      "dex_static_value": null
+    },
+    {
+      "name": "_videoThumbnails",
+      "reported_type": "kya.SfT",
+      "dex_static_value": null
+    },
+    {
+      "name": "activeCamera",
+      "reported_type": "com.alightcreative.app.motion.scene.SceneElement",
+      "dex_static_value": null
+    },
+    {
+      "name": "context",
+      "reported_type": "android.content.Context",
+      "dex_static_value": null
+    },
+    {
+      "name": "currentFrame",
+      "reported_type": "int",
+      "dex_static_value": null
+    },
+    {
+      "name": "durationInSeconds",
+      "reported_type": "double",
+      "dex_static_value": null
+    },
+    {
+      "name": "editMode",
+      "reported_type": "int",
+      "dex_static_value": null
+    },
+    {
+      "name": "exportParams",
+      "reported_type": "com.alightcreative.app.motion.scene.ExportParams",
+      "dex_static_value": null
+    },
+    {
+      "name": "framesPerHundredSeconds",
+      "reported_type": "int",
+      "dex_static_value": null
+    },
+    {
+      "name": "optiRate",
+      "reported_type": "int",
+      "dex_static_value": null
+    },
+    {
+      "name": "overrideVideoTextures",
+      "reported_type": "java.util.Map<java.lang.Long, ? extends bYT.R9l>",
+      "dex_static_value": null
+    },
+    {
+      "name": "previousFrameTime",
+      "reported_type": "float",
+      "dex_static_value": null
+    },
+    {
+      "name": "renderMode",
+      "reported_type": "com.alightcreative.app.motion.scene.rendering.RenderMode",
+      "dex_static_value": null
+    },
+    {
+      "name": "rootFPHS",
+      "reported_type": "int",
+      "dex_static_value": null
+    },
+    {
+      "name": "scene",
+      "reported_type": "com.alightcreative.app.motion.scene.Scene",
+      "dex_static_value": null
+    },
+    {
+      "name": "spoidEnv",
+      "reported_type": "com.alightcreative.app.motion.scene.SpoidEnv",
+      "dex_static_value": null
+    },
+    {
+      "name": "targetHasAlpha",
+      "reported_type": "boolean",
+      "dex_static_value": null
+    },
+    {
+      "name": "time",
+      "reported_type": "float",
+      "dex_static_value": null
+    },
+    {
+      "name": "uiColors",
+      "reported_type": "com.alightcreative.app.motion.scene.UIColors",
+      "dex_static_value": null
+    },
+    {
+      "name": "userElementParamValues",
+      "reported_type": "java.util.Map<java.lang.String, com.alightcreative.app.motion.scene.userparam.UserParameterValue>",
+      "dex_static_value": null
+    },
+    {
+      "name": "userPreviewMode",
+      "reported_type": "fi.lG",
+      "dex_static_value": null
+    },
+    {
+      "name": "videoTextureCache",
+      "reported_type": "bYT.BAQ",
+      "dex_static_value": null
+    }
+  ],
+  "inner_classes": [
+    "com.alightcreative.app.motion.scene.rendering.RenderEnvironmentImpl.WhenMappings",
+    "com.alightcreative.app.motion.scene.rendering.RenderEnvironmentImpl.AnonymousClass1",
+    "com.alightcreative.app.motion.scene.rendering.RenderEnvironmentImpl.AnonymousClass2"
+  ]
+}

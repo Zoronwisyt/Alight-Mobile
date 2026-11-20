@@ -1,0 +1,136 @@
+{
+  "engine": {
+    "name": "jadx-headless-mcp",
+    "version": "0.7.1",
+    "artifact_sha256": "6e5eacf500b64292bfb73c49797c1958f6ee44646e43e868039ae7feb573ff75",
+    "source_revision": "5844800a486d2248fa949b74c9896285f5b54de2",
+    "worker_count": 1,
+    "heap_limit_mib": 8192
+  },
+  "class_name": "com.alightcreative.app.motion.scene.CameraElementKt",
+  "methods": [
+    {
+      "name": "<clinit>",
+      "reported_signature": "<clinit>(): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()V"
+    },
+    {
+      "name": "CameraElement",
+      "reported_signature": "CameraElement(com.alightcreative.app.motion.scene.KeyableTransform, int, int, long, java.lang.String, int, int, com.alightcreative.app.motion.scene.CameraProperties, long): com.alightcreative.app.motion.scene.SceneElement",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/KeyableTransform;IIJLjava/lang/String;IILcom/alightcreative/app/motion/scene/CameraProperties;J)Lcom/alightcreative/app/motion/scene/SceneElement;"
+    },
+    {
+      "name": "CameraElement$default",
+      "reported_signature": "CameraElement$default(com.alightcreative.app.motion.scene.KeyableTransform, int, int, long, java.lang.String, int, int, com.alightcreative.app.motion.scene.CameraProperties, long, int, java.lang.Object): com.alightcreative.app.motion.scene.SceneElement",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/KeyableTransform;IIJLjava/lang/String;IILcom/alightcreative/app/motion/scene/CameraProperties;JILjava/lang/Object;)Lcom/alightcreative/app/motion/scene/SceneElement;"
+    },
+    {
+      "name": "applyCameraAndParenting",
+      "reported_signature": "applyCameraAndParenting(com.alightcreative.app.motion.scene.SceneElement, com.alightcreative.app.motion.scene.Scene, float, fi.lG): com.alightcreative.app.motion.scene.SceneElement",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneElement;Lcom/alightcreative/app/motion/scene/Scene;FLfi/lG;)Lcom/alightcreative/app/motion/scene/SceneElement;"
+    },
+    {
+      "name": "applyCameraAndParenting",
+      "reported_signature": "applyCameraAndParenting(com.alightcreative.app.motion.scene.SceneElement, com.alightcreative.app.motion.scene.rendering.RenderEnvironment, float): com.alightcreative.app.motion.scene.SceneElement",
+      "overload_index": 1,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneElement;Lcom/alightcreative/app/motion/scene/rendering/RenderEnvironment;F)Lcom/alightcreative/app/motion/scene/SceneElement;"
+    },
+    {
+      "name": "bakeCamera",
+      "reported_signature": "bakeCamera(com.alightcreative.app.motion.scene.SceneElement, com.alightcreative.app.motion.scene.Scene, fi.lG, float): com.alightcreative.app.motion.scene.SceneElement",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneElement;Lcom/alightcreative/app/motion/scene/Scene;Lfi/lG;F)Lcom/alightcreative/app/motion/scene/SceneElement;"
+    },
+    {
+      "name": "bakeCamera",
+      "reported_signature": "bakeCamera(com.alightcreative.app.motion.scene.SceneElement, com.alightcreative.app.motion.scene.rendering.RenderEnvironment, float): com.alightcreative.app.motion.scene.SceneElement",
+      "overload_index": 1,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneElement;Lcom/alightcreative/app/motion/scene/rendering/RenderEnvironment;F)Lcom/alightcreative/app/motion/scene/SceneElement;"
+    },
+    {
+      "name": "bakeCameraInternal",
+      "reported_signature": "bakeCameraInternal(com.alightcreative.app.motion.scene.SceneElement, com.alightcreative.app.motion.scene.rendering.RenderEnvironment, fi.lG, com.alightcreative.app.motion.scene.Scene, com.alightcreative.app.motion.scene.SceneElement, float): com.alightcreative.app.motion.scene.SceneElement",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneElement;Lcom/alightcreative/app/motion/scene/rendering/RenderEnvironment;Lfi/lG;Lcom/alightcreative/app/motion/scene/Scene;Lcom/alightcreative/app/motion/scene/SceneElement;F)Lcom/alightcreative/app/motion/scene/SceneElement;"
+    },
+    {
+      "name": "calcCameraDimensions",
+      "reported_signature": "calcCameraDimensions(com.alightcreative.app.motion.scene.Scene, float, float): com.alightcreative.app.motion.scene.Vector2D",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/Scene;FF)Lcom/alightcreative/app/motion/scene/Vector2D;"
+    },
+    {
+      "name": "calcCameraFov",
+      "reported_signature": "calcCameraFov(com.alightcreative.app.motion.scene.Scene, float): float",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/Scene;F)F"
+    },
+    {
+      "name": "calcCameraFovForSize",
+      "reported_signature": "calcCameraFovForSize(float, float): float",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(FF)F"
+    },
+    {
+      "name": "calcCameraLargeDimension",
+      "reported_signature": "calcCameraLargeDimension(float, float): float",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(FF)F"
+    },
+    {
+      "name": "calcCameraZoom",
+      "reported_signature": "calcCameraZoom(com.alightcreative.app.motion.scene.Scene, float): float",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/Scene;F)F"
+    },
+    {
+      "name": "getActiveCameraAtTime",
+      "reported_signature": "getActiveCameraAtTime(com.alightcreative.app.motion.scene.Scene, int): com.alightcreative.app.motion.scene.SceneElement",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/Scene;I)Lcom/alightcreative/app/motion/scene/SceneElement;"
+    },
+    {
+      "name": "getCameraTransform",
+      "reported_signature": "getCameraTransform(com.alightcreative.app.motion.scene.SceneElement, com.alightcreative.app.motion.scene.Scene, int, float): com.alightcreative.app.motion.scene.Transform",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneElement;Lcom/alightcreative/app/motion/scene/Scene;IF)Lcom/alightcreative/app/motion/scene/Transform;"
+    },
+    {
+      "name": "makeDefaultCamera",
+      "reported_signature": "makeDefaultCamera(com.alightcreative.app.motion.scene.Scene): com.alightcreative.app.motion.scene.SceneElement",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/Scene;)Lcom/alightcreative/app/motion/scene/SceneElement;"
+    }
+  ],
+  "fields": [
+    {
+      "name": "pi",
+      "reported_type": "float",
+      "dex_static_value": {
+        "type": "float",
+        "value": "3.1415927"
+      }
+    }
+  ],
+  "inner_classes": []
+}

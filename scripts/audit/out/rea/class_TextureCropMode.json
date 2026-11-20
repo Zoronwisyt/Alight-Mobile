@@ -1,0 +1,83 @@
+{
+  "engine": {
+    "name": "jadx-headless-mcp",
+    "version": "0.7.1",
+    "artifact_sha256": "6e5eacf500b64292bfb73c49797c1958f6ee44646e43e868039ae7feb573ff75",
+    "source_revision": "5844800a486d2248fa949b74c9896285f5b54de2",
+    "worker_count": 1,
+    "heap_limit_mib": 8192
+  },
+  "class_name": "com.alightcreative.app.motion.scene.rendering.TextureCropMode",
+  "methods": [
+    {
+      "name": "$values",
+      "reported_signature": "$values(): com.alightcreative.app.motion.scene.rendering.TextureCropMode[]",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()[Lcom/alightcreative/app/motion/scene/rendering/TextureCropMode;"
+    },
+    {
+      "name": "<clinit>",
+      "reported_signature": "<clinit>(): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()V"
+    },
+    {
+      "name": "<init>",
+      "reported_signature": "<init>(java.lang.String, int): void",
+      "overload_index": 0,
+      "is_constructor": true,
+      "dex_descriptor": "(Ljava/lang/String;I)V"
+    },
+    {
+      "name": "getEntries",
+      "reported_signature": "getEntries(): kotlin.enums.EnumEntries<com.alightcreative.app.motion.scene.rendering.TextureCropMode>",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lkotlin/enums/EnumEntries;"
+    },
+    {
+      "name": "valueOf",
+      "reported_signature": "valueOf(java.lang.String): com.alightcreative.app.motion.scene.rendering.TextureCropMode",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Ljava/lang/String;)Lcom/alightcreative/app/motion/scene/rendering/TextureCropMode;"
+    },
+    {
+      "name": "values",
+      "reported_signature": "values(): com.alightcreative.app.motion.scene.rendering.TextureCropMode[]",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()[Lcom/alightcreative/app/motion/scene/rendering/TextureCropMode;"
+    }
+  ],
+  "fields": [
+    {
+      "name": "$ENTRIES",
+      "reported_type": "kotlin.enums.EnumEntries",
+      "dex_static_value": null
+    },
+    {
+      "name": "$VALUES",
+      "reported_type": "com.alightcreative.app.motion.scene.rendering.TextureCropMode[]",
+      "dex_static_value": null
+    },
+    {
+      "name": "FILL",
+      "reported_type": "com.alightcreative.app.motion.scene.rendering.TextureCropMode",
+      "dex_static_value": null
+    },
+    {
+      "name": "FIT",
+      "reported_type": "com.alightcreative.app.motion.scene.rendering.TextureCropMode",
+      "dex_static_value": null
+    },
+    {
+      "name": "STRETCH",
+      "reported_type": "com.alightcreative.app.motion.scene.rendering.TextureCropMode",
+      "dex_static_value": null
+    }
+  ],
+  "inner_classes": []
+}

@@ -1,0 +1,178 @@
+{
+  "engine": {
+    "name": "jadx-headless-mcp",
+    "version": "0.7.1",
+    "artifact_sha256": "6e5eacf500b64292bfb73c49797c1958f6ee44646e43e868039ae7feb573ff75",
+    "source_revision": "5844800a486d2248fa949b74c9896285f5b54de2",
+    "worker_count": 1,
+    "heap_limit_mib": 8192
+  },
+  "class_name": "com.alightcreative.app.motion.scene.LayerParentingKt",
+  "methods": [
+    {
+      "name": "<clinit>",
+      "reported_signature": "<clinit>(): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()V"
+    },
+    {
+      "name": "applyLayerParenting",
+      "reported_signature": "applyLayerParenting(com.alightcreative.app.motion.scene.SceneElement, com.alightcreative.app.motion.scene.Scene, float): com.alightcreative.app.motion.scene.SceneElement",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneElement;Lcom/alightcreative/app/motion/scene/Scene;F)Lcom/alightcreative/app/motion/scene/SceneElement;"
+    },
+    {
+      "name": "applyParentingInternal",
+      "reported_signature": "applyParentingInternal(com.alightcreative.app.motion.scene.SceneElement, com.alightcreative.app.motion.scene.Scene, float, long[]): com.alightcreative.app.motion.scene.SceneElement",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneElement;Lcom/alightcreative/app/motion/scene/Scene;F[J)Lcom/alightcreative/app/motion/scene/SceneElement;"
+    },
+    {
+      "name": "checkParent",
+      "reported_signature": "checkParent(com.alightcreative.app.motion.scene.SceneElement, com.alightcreative.app.motion.scene.Scene, long): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneElement;Lcom/alightcreative/app/motion/scene/Scene;J)Z"
+    },
+    {
+      "name": "getBendPosRot",
+      "reported_signature": "getBendPosRot(com.alightcreative.app.motion.scene.SceneElement, int, float, float, int, float, float, com.alightcreative.app.motion.scene.SceneElement, com.alightcreative.app.motion.scene.Scene, int, float, float, float, float): com.alightcreative.app.motion.scene.Vector3D",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneElement;IFFIFFLcom/alightcreative/app/motion/scene/SceneElement;Lcom/alightcreative/app/motion/scene/Scene;IFFFF)Lcom/alightcreative/app/motion/scene/Vector3D;"
+    },
+    {
+      "name": "getBendSolutionHorizontal",
+      "reported_signature": "getBendSolutionHorizontal(float, float, float, float, float, com.alightcreative.app.motion.scene.Rectangle, boolean): com.alightcreative.app.motion.scene.Vector3D",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(FFFFFLcom/alightcreative/app/motion/scene/Rectangle;Z)Lcom/alightcreative/app/motion/scene/Vector3D;"
+    },
+    {
+      "name": "getBendSolutionVertical",
+      "reported_signature": "getBendSolutionVertical(float, float, float, float, float, com.alightcreative.app.motion.scene.Rectangle, boolean): com.alightcreative.app.motion.scene.Vector3D",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(FFFFFLcom/alightcreative/app/motion/scene/Rectangle;Z)Lcom/alightcreative/app/motion/scene/Vector3D;"
+    },
+    {
+      "name": "getDockedInfo",
+      "reported_signature": "getDockedInfo(com.alightcreative.app.motion.scene.SceneElement, com.alightcreative.app.motion.scene.Scene, com.alightcreative.app.motion.scene.Vector2D, int): com.alightcreative.app.motion.scene.Vector3D",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneElement;Lcom/alightcreative/app/motion/scene/Scene;Lcom/alightcreative/app/motion/scene/Vector2D;I)Lcom/alightcreative/app/motion/scene/Vector3D;"
+    },
+    {
+      "name": "getDockedUVAngle",
+      "reported_signature": "getDockedUVAngle(com.alightcreative.app.motion.scene.SceneElement, com.alightcreative.app.motion.scene.Scene, int, float, float, int, float, float, com.alightcreative.app.motion.scene.Vector2D): com.alightcreative.app.motion.scene.PosPos",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneElement;Lcom/alightcreative/app/motion/scene/Scene;IFFIFFLcom/alightcreative/app/motion/scene/Vector2D;)Lcom/alightcreative/app/motion/scene/PosPos;"
+    },
+    {
+      "name": "getDockedUVAngle",
+      "reported_signature": "getDockedUVAngle(com.alightcreative.app.motion.scene.SceneElement, com.alightcreative.app.motion.scene.SceneElement, com.alightcreative.app.motion.scene.Scene, int, int, float, float, int, float, float): com.alightcreative.app.motion.scene.PosPos",
+      "overload_index": 1,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneElement;Lcom/alightcreative/app/motion/scene/SceneElement;Lcom/alightcreative/app/motion/scene/Scene;IIFFIFF)Lcom/alightcreative/app/motion/scene/PosPos;"
+    },
+    {
+      "name": "getDockedUVAngle$getHorizontalUVAngle",
+      "reported_signature": "getDockedUVAngle$getHorizontalUVAngle(double, float, double, float, float): com.alightcreative.app.motion.scene.Vector3D",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(DFDFF)Lcom/alightcreative/app/motion/scene/Vector3D;"
+    },
+    {
+      "name": "getDockedUVAngle$getHorizontalUVAngle$2",
+      "reported_signature": "getDockedUVAngle$getHorizontalUVAngle$2(double, float, double, float, float): com.alightcreative.app.motion.scene.Vector3D",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(DFDFF)Lcom/alightcreative/app/motion/scene/Vector3D;"
+    },
+    {
+      "name": "getDockedUVAngle$getVerticalUVAngle",
+      "reported_signature": "getDockedUVAngle$getVerticalUVAngle(double, float, double, float, float): com.alightcreative.app.motion.scene.Vector3D",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(DFDFF)Lcom/alightcreative/app/motion/scene/Vector3D;"
+    },
+    {
+      "name": "getDockedUVAngle$getVerticalUVAngle$3",
+      "reported_signature": "getDockedUVAngle$getVerticalUVAngle$3(double, float, double, float, float): com.alightcreative.app.motion.scene.Vector3D",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(DFDFF)Lcom/alightcreative/app/motion/scene/Vector3D;"
+    },
+    {
+      "name": "getInitialGlobalPos",
+      "reported_signature": "getInitialGlobalPos(com.alightcreative.app.motion.scene.SceneElement, com.alightcreative.app.motion.scene.Scene, int): com.alightcreative.app.motion.scene.Vector3D",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneElement;Lcom/alightcreative/app/motion/scene/Scene;I)Lcom/alightcreative/app/motion/scene/Vector3D;"
+    },
+    {
+      "name": "getLowerAngle",
+      "reported_signature": "getLowerAngle(float, float, float, int): float",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(FFFI)F"
+    },
+    {
+      "name": "getParentTransform",
+      "reported_signature": "getParentTransform(com.alightcreative.app.motion.scene.SceneElement, com.alightcreative.app.motion.scene.Scene, float): com.alightcreative.app.motion.scene.Transform",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneElement;Lcom/alightcreative/app/motion/scene/Scene;F)Lcom/alightcreative/app/motion/scene/Transform;"
+    },
+    {
+      "name": "getUpperAngle",
+      "reported_signature": "getUpperAngle(float, float, float): float",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(FFF)F"
+    },
+    {
+      "name": "localTime",
+      "reported_signature": "localTime(com.alightcreative.app.motion.scene.SceneElement, int): float",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneElement;I)F"
+    },
+    {
+      "name": "updateParent",
+      "reported_signature": "updateParent(com.alightcreative.app.motion.scene.SceneElement, com.alightcreative.app.motion.scene.Scene, java.lang.Long, float): com.alightcreative.app.motion.scene.SceneElement",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneElement;Lcom/alightcreative/app/motion/scene/Scene;Ljava/lang/Long;F)Lcom/alightcreative/app/motion/scene/SceneElement;"
+    },
+    {
+      "name": "updateParent$O",
+      "reported_signature": "updateParent$O(com.alightcreative.app.motion.scene.SceneElement, float, com.alightcreative.app.motion.scene.Vector3D, com.alightcreative.app.motion.scene.Transform, com.alightcreative.app.motion.scene.Transform): com.alightcreative.app.motion.scene.Vector3D",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneElement;FLcom/alightcreative/app/motion/scene/Vector3D;Lcom/alightcreative/app/motion/scene/Transform;Lcom/alightcreative/app/motion/scene/Transform;)Lcom/alightcreative/app/motion/scene/Vector3D;"
+    }
+  ],
+  "fields": [
+    {
+      "name": "deg2rad",
+      "reported_type": "double",
+      "dex_static_value": {
+        "type": "double",
+        "value": "0.017453292519943295"
+      }
+    },
+    {
+      "name": "emptyLongArray",
+      "reported_type": "long[]",
+      "dex_static_value": null
+    }
+  ],
+  "inner_classes": [
+    "com.alightcreative.app.motion.scene.LayerParentingKt.AnonymousClass1"
+  ]
+}

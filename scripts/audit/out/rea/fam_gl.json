@@ -1,0 +1,14 @@
+{
+  "query": "Gl",
+  "total_classes": 24194,
+  "count": 7,
+  "matches": [
+    "androidx.compose.ui.layout.OnGloballyPositionedElement",
+    "androidx.media3.common.util.GlUtil",
+    "com.alightcreative.app.motion.scene.rendering.GlobalSceneRenderLock",
+    "com.bumptech.glide.GeneratedAppGlideModule",
+    "com.bumptech.glide.load.engine.GlideException",
+    "com.caoccao.javet.values.reference.V8ValueGlobalObject",
+    "com.google.android.exoplayer2.util.GlUtil"
+  ]
+}

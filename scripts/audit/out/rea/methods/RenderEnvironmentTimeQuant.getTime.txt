@@ -1,0 +1,5 @@
+{
+  "status": "complete",
+  "text": "    @Override // com.alightcreative.app.motion.scene.animators.AnimatorEnvironment\r\n    public float getTime() {\r\n        double time = ((double) this.env.getTime()) * this.env.getDurationInSeconds();\r\n        float f2 = this.stepDuration;\r\n        return (float) ((((((double) f2) * 0.5d) + time) - (time % ((double) f2))) / this.env.getDurationInSeconds());\r\n    }",
+  "reported_total_bytes": null
+}

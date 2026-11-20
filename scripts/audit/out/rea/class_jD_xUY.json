@@ -1,0 +1,652 @@
+{
+  "engine": {
+    "name": "jadx-headless-mcp",
+    "version": "0.7.1",
+    "artifact_sha256": "6e5eacf500b64292bfb73c49797c1958f6ee44646e43e868039ae7feb573ff75",
+    "source_revision": "5844800a486d2248fa949b74c9896285f5b54de2",
+    "worker_count": 1,
+    "heap_limit_mib": 8192
+  },
+  "class_name": "jD.xUY",
+  "methods": [
+    {
+      "name": "<clinit>",
+      "reported_signature": "<clinit>(): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()V"
+    },
+    {
+      "name": "<init>",
+      "reported_signature": "<init>(bYT.ny6, psA.HT, int, int, int, int, int, int, int, int, com.alightcreative.app.motion.scene.rendering.RenderEnvironment, int, float): void",
+      "overload_index": 0,
+      "is_constructor": true,
+      "dex_descriptor": "(LbYT/ny6;LpsA/HT;IIIIIIIILcom/alightcreative/app/motion/scene/rendering/RenderEnvironment;IF)V"
+    },
+    {
+      "name": "A",
+      "reported_signature": "A(android.graphics.Matrix): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Landroid/graphics/Matrix;)V"
+    },
+    {
+      "name": "BWM",
+      "reported_signature": "BWM(float, float, float, float, jD.Jb): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(FFFFLjD/Jb;)V"
+    },
+    {
+      "name": "C",
+      "reported_signature": "C(jD.xUY): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(LjD/xUY;)I"
+    },
+    {
+      "name": "FCL",
+      "reported_signature": "FCL(): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()I"
+    },
+    {
+      "name": "Fcf",
+      "reported_signature": "Fcf(): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()V"
+    },
+    {
+      "name": "H",
+      "reported_signature": "H(bYT.R9l, android.graphics.RectF, android.graphics.Matrix, float, com.alightcreative.app.motion.scene.rendering.TextureCropMode): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(LbYT/R9l;Landroid/graphics/RectF;Landroid/graphics/Matrix;FLcom/alightcreative/app/motion/scene/rendering/TextureCropMode;)V"
+    },
+    {
+      "name": "Hfr",
+      "reported_signature": "Hfr(): float",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()F"
+    },
+    {
+      "name": "J5",
+      "reported_signature": "J5(): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()I"
+    },
+    {
+      "name": "J8c",
+      "reported_signature": "J8c(): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()I"
+    },
+    {
+      "name": "L",
+      "reported_signature": "L(boolean): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Z)V"
+    },
+    {
+      "name": "PW",
+      "reported_signature": "PW(float, float, float, float, jD.Jb): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(FFFFLjD/Jb;)V"
+    },
+    {
+      "name": "Pl3",
+      "reported_signature": "Pl3(java.util.List, android.graphics.Matrix, jD.Jb): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Ljava/util/List;Landroid/graphics/Matrix;LjD/Jb;)V"
+    },
+    {
+      "name": "R5h",
+      "reported_signature": "R5h(jD.xUY): float",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(LjD/xUY;)F"
+    },
+    {
+      "name": "R83",
+      "reported_signature": "R83(): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()V"
+    },
+    {
+      "name": "Rw",
+      "reported_signature": "Rw(): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()I"
+    },
+    {
+      "name": "SmL",
+      "reported_signature": "SmL(jD.xUY): hr0.fs",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(LjD/xUY;)Lhr0/fs;"
+    },
+    {
+      "name": "StB",
+      "reported_signature": "StB(jD.xUY): bYT.vlE",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(LjD/xUY;)LbYT/vlE;"
+    },
+    {
+      "name": "TG",
+      "reported_signature": "TG(jD.xUY): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(LjD/xUY;)I"
+    },
+    {
+      "name": "VK",
+      "reported_signature": "VK(jD.A, jD.Jb): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(LjD/A;LjD/Jb;)V"
+    },
+    {
+      "name": "X",
+      "reported_signature": "X(): android.graphics.Matrix",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Landroid/graphics/Matrix;"
+    },
+    {
+      "name": "Xu",
+      "reported_signature": "Xu(): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()V"
+    },
+    {
+      "name": "Y",
+      "reported_signature": "Y(): bYT.EIS",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()LbYT/EIS;"
+    },
+    {
+      "name": "Z",
+      "reported_signature": "Z(android.graphics.Bitmap, android.graphics.RectF, android.graphics.Matrix, float, jD.Jb, com.alightcreative.app.motion.scene.GradientFill, com.alightcreative.app.motion.scene.rendering.TextureCropMode): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Landroid/graphics/Bitmap;Landroid/graphics/RectF;Landroid/graphics/Matrix;FLjD/Jb;Lcom/alightcreative/app/motion/scene/GradientFill;Lcom/alightcreative/app/motion/scene/rendering/TextureCropMode;)V"
+    },
+    {
+      "name": "a",
+      "reported_signature": "a(int, java.lang.String, com.alightcreative.app.motion.scene.visualeffect.VisualEffectRef, bYT.HT, com.alightcreative.app.motion.scene.Rectangle, com.alightcreative.app.motion.scene.Transform, com.alightcreative.app.motion.scene.Transform, int, android.graphics.Matrix): bYT.HT",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(ILjava/lang/String;Lcom/alightcreative/app/motion/scene/visualeffect/VisualEffectRef;LbYT/HT;Lcom/alightcreative/app/motion/scene/Rectangle;Lcom/alightcreative/app/motion/scene/Transform;Lcom/alightcreative/app/motion/scene/Transform;ILandroid/graphics/Matrix;)LbYT/HT;"
+    },
+    {
+      "name": "as",
+      "reported_signature": "as(): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()I"
+    },
+    {
+      "name": "bG",
+      "reported_signature": "bG(jD.A): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(LjD/A;)V"
+    },
+    {
+      "name": "bdS",
+      "reported_signature": "bdS(): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()V"
+    },
+    {
+      "name": "bka",
+      "reported_signature": "bka(): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()I"
+    },
+    {
+      "name": "dMq",
+      "reported_signature": "dMq(): com.alightcreative.app.motion.scene.rendering.RenderEnvironment",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/rendering/RenderEnvironment;"
+    },
+    {
+      "name": "dZ",
+      "reported_signature": "dZ(float, float, float, jD.Jb): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(FFFLjD/Jb;)V"
+    },
+    {
+      "name": "eLy",
+      "reported_signature": "eLy(com.alightcreative.app.motion.scene.GradientFill, android.graphics.RectF, android.graphics.Matrix, float): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/GradientFill;Landroid/graphics/RectF;Landroid/graphics/Matrix;F)V"
+    },
+    {
+      "name": "f",
+      "reported_signature": "f(): bYT.EIS",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()LbYT/EIS;"
+    },
+    {
+      "name": "f1k",
+      "reported_signature": "f1k(jD.xUY): float",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(LjD/xUY;)F"
+    },
+    {
+      "name": "g",
+      "reported_signature": "g(boolean): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Z)V"
+    },
+    {
+      "name": "gOC",
+      "reported_signature": "gOC(android.graphics.Matrix): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Landroid/graphics/Matrix;)V"
+    },
+    {
+      "name": "hTJ",
+      "reported_signature": "hTJ(): android.graphics.Matrix",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Landroid/graphics/Matrix;"
+    },
+    {
+      "name": "hfJ",
+      "reported_signature": "hfJ(): float",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()F"
+    },
+    {
+      "name": "hs",
+      "reported_signature": "hs(): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()I"
+    },
+    {
+      "name": "j4",
+      "reported_signature": "j4(java.lang.Object, com.alightcreative.app.motion.scene.Rectangle, android.graphics.Matrix, float, jD.fs, kotlin.jvm.functions.Function0): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Ljava/lang/Object;Lcom/alightcreative/app/motion/scene/Rectangle;Landroid/graphics/Matrix;FLjD/fs;Lkotlin/jvm/functions/Function0;)V"
+    },
+    {
+      "name": "jCs",
+      "reported_signature": "jCs(): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()V"
+    },
+    {
+      "name": "k",
+      "reported_signature": "k(): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Z"
+    },
+    {
+      "name": "kKw",
+      "reported_signature": "kKw(jD.xUY): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(LjD/xUY;)I"
+    },
+    {
+      "name": "lT",
+      "reported_signature": "lT(com.alightcreative.app.motion.scene.Rectangle): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/Rectangle;)V"
+    },
+    {
+      "name": "lTc",
+      "reported_signature": "lTc(): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()V"
+    },
+    {
+      "name": "n3",
+      "reported_signature": "n3(jD.xUY, boolean): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(LjD/xUY;Z)V"
+    },
+    {
+      "name": "n7J",
+      "reported_signature": "n7J(): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()V"
+    },
+    {
+      "name": "nDH",
+      "reported_signature": "nDH(): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()I"
+    },
+    {
+      "name": "oo",
+      "reported_signature": "oo(): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()I"
+    },
+    {
+      "name": "pQ",
+      "reported_signature": "pQ(java.util.List, android.graphics.Matrix, jD.Jb, boolean, boolean): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Ljava/util/List;Landroid/graphics/Matrix;LjD/Jb;ZZ)V"
+    },
+    {
+      "name": "pY",
+      "reported_signature": "pY(com.alightcreative.app.motion.scene.Rectangle, com.alightcreative.app.motion.scene.Transform, com.alightcreative.app.motion.scene.Transform, java.util.List, com.alightcreative.app.motion.scene.BlendingMode, float, java.util.List, com.alightcreative.app.motion.scene.Vector2D): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/Rectangle;Lcom/alightcreative/app/motion/scene/Transform;Lcom/alightcreative/app/motion/scene/Transform;Ljava/util/List;Lcom/alightcreative/app/motion/scene/BlendingMode;FLjava/util/List;Lcom/alightcreative/app/motion/scene/Vector2D;)V"
+    },
+    {
+      "name": "q2G",
+      "reported_signature": "q2G(): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()V"
+    },
+    {
+      "name": "qLL",
+      "reported_signature": "qLL(): bYT.ny6",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()LbYT/ny6;"
+    },
+    {
+      "name": "qsB",
+      "reported_signature": "qsB(): float",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()F"
+    },
+    {
+      "name": "s",
+      "reported_signature": "s(): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()V"
+    },
+    {
+      "name": "sRA",
+      "reported_signature": "sRA(java.util.List, android.graphics.Matrix, jD.Jb): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Ljava/util/List;Landroid/graphics/Matrix;LjD/Jb;)V"
+    },
+    {
+      "name": "u",
+      "reported_signature": "u(): bYT.ny6",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()LbYT/ny6;"
+    },
+    {
+      "name": "v",
+      "reported_signature": "v(): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Z"
+    },
+    {
+      "name": "zhF",
+      "reported_signature": "zhF(jD.xUY): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(LjD/xUY;)I"
+    }
+  ],
+  "fields": [
+    {
+      "name": "BWM",
+      "reported_type": "int",
+      "dex_static_value": null
+    },
+    {
+      "name": "Fcf",
+      "reported_type": "android.graphics.Path",
+      "dex_static_value": null
+    },
+    {
+      "name": "Hfr",
+      "reported_type": "psA.HT",
+      "dex_static_value": null
+    },
+    {
+      "name": "PW",
+      "reported_type": "jD.Jb",
+      "dex_static_value": null
+    },
+    {
+      "name": "Pl3",
+      "reported_type": "boolean",
+      "dex_static_value": null
+    },
+    {
+      "name": "R5h",
+      "reported_type": "bYT.ny6",
+      "dex_static_value": null
+    },
+    {
+      "name": "R83",
+      "reported_type": "jD.mY0",
+      "dex_static_value": null
+    },
+    {
+      "name": "Rw",
+      "reported_type": "bYT.ny6",
+      "dex_static_value": null
+    },
+    {
+      "name": "SmL",
+      "reported_type": "boolean",
+      "dex_static_value": null
+    },
+    {
+      "name": "StB",
+      "reported_type": "bYT.HT",
+      "dex_static_value": null
+    },
+    {
+      "name": "TG",
+      "reported_type": "bYT.vlE",
+      "dex_static_value": null
+    },
+    {
+      "name": "Xu",
+      "reported_type": "int",
+      "dex_static_value": null
+    },
+    {
+      "name": "as",
+      "reported_type": "int",
+      "dex_static_value": null
+    },
+    {
+      "name": "bG",
+      "reported_type": "int",
+      "dex_static_value": null
+    },
+    {
+      "name": "dMq",
+      "reported_type": "jD.B8K",
+      "dex_static_value": null
+    },
+    {
+      "name": "dZ",
+      "reported_type": "int",
+      "dex_static_value": null
+    },
+    {
+      "name": "eLy",
+      "reported_type": "float",
+      "dex_static_value": null
+    },
+    {
+      "name": "f1k",
+      "reported_type": "boolean",
+      "dex_static_value": null
+    },
+    {
+      "name": "f34924C",
+      "reported_type": "bYT.EIS",
+      "dex_static_value": null
+    },
+    {
+      "name": "f34925H",
+      "reported_type": "android.graphics.Matrix",
+      "dex_static_value": null
+    },
+    {
+      "name": "f34926L",
+      "reported_type": "com.alightcreative.app.motion.scene.rendering.RenderEnvironment",
+      "dex_static_value": null
+    },
+    {
+      "name": "f34927VK",
+      "reported_type": "float",
+      "dex_static_value": null
+    },
+    {
+      "name": "f34928Z",
+      "reported_type": "boolean",
+      "dex_static_value": null
+    },
+    {
+      "name": "f34929g",
+      "reported_type": "int",
+      "dex_static_value": null
+    },
+    {
+      "name": "f34930oo",
+      "reported_type": "float",
+      "dex_static_value": null
+    },
+    {
+      "name": "f34931s",
+      "reported_type": "int",
+      "dex_static_value": null
+    },
+    {
+      "name": "f34932u",
+      "reported_type": "int",
+      "dex_static_value": null
+    },
+    {
+      "name": "gOC",
+      "reported_type": "jD.xUY$fs",
+      "dex_static_value": null
+    },
+    {
+      "name": "hTJ",
+      "reported_type": "int",
+      "dex_static_value": null
+    },
+    {
+      "name": "j4",
+      "reported_type": "hr0.fs",
+      "dex_static_value": null
+    },
+    {
+      "name": "kKw",
+      "reported_type": "bYT.vlE",
+      "dex_static_value": null
+    },
+    {
+      "name": "lT",
+      "reported_type": "int",
+      "dex_static_value": null
+    },
+    {
+      "name": "n3",
+      "reported_type": "jD.xUY$gj",
+      "dex_static_value": null
+    },
+    {
+      "name": "nDH",
+      "reported_type": "int",
+      "dex_static_value": null
+    },
+    {
+      "name": "pY",
+      "reported_type": "int",
+      "dex_static_value": null
+    },
+    {
+      "name": "q2G",
+      "reported_type": "int",
+      "dex_static_value": null
+    },
+    {
+      "name": "sRA",
+      "reported_type": "float",
+      "dex_static_value": null
+    },
+    {
+      "name": "zhF",
+      "reported_type": "bYT.EIS",
+      "dex_static_value": null
+    }
+  ],
+  "inner_classes": [
+    "jD.xUY.A",
+    "jD.xUY.B",
+    "jD.xUY.B8K",
+    "jD.xUY.Bb",
+    "jD.xUY.Clo",
+    "jD.xUY.Gu5",
+    "jD.xUY.Gv",
+    "jD.xUY.HT",
+    "jD.xUY.Jb",
+    "jD.xUY.R9l",
+    "jD.xUY.RxB",
+    "jD.xUY.SfT",
+    "jD.xUY.Ub",
+    "jD.xUY.c",
+    "jD.xUY.euv",
+    "jD.xUY.f",
+    "jD.xUY.fs",
+    "jD.xUY.gj",
+    "jD.xUY.mY0",
+    "jD.xUY.pQm",
+    "jD.xUY.rs",
+    "jD.xUY.sK",
+    "jD.xUY.v",
+    "jD.xUY.C1692xUY",
+    "jD.xUY.xv"
+  ]
+}

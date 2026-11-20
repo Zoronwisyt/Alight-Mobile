@@ -1,0 +1,20 @@
+    public CameraProperties(CameraType type, KeyableFloat fov, boolean z2, KeyableFloat focusDistance, KeyableFloat focusDepthOfField, KeyableFloat focusBlurStrength, boolean z4, KeyableSolidColor fogColor, KeyableFloat fogNearZ, KeyableFloat fogFarZ) {
+        Intrinsics.checkNotNullParameter(type, "type");
+        Intrinsics.checkNotNullParameter(fov, "fov");
+        Intrinsics.checkNotNullParameter(focusDistance, "focusDistance");
+        Intrinsics.checkNotNullParameter(focusDepthOfField, "focusDepthOfField");
+        Intrinsics.checkNotNullParameter(focusBlurStrength, "focusBlurStrength");
+        Intrinsics.checkNotNullParameter(fogColor, "fogColor");
+        Intrinsics.checkNotNullParameter(fogNearZ, "fogNearZ");
+        Intrinsics.checkNotNullParameter(fogFarZ, "fogFarZ");
+        this.type = type;
+        this.fov = fov;
+        this.focusBlurEnabled = z2;
+        this.focusDistance = focusDistance;
+        this.focusDepthOfField = focusDepthOfField;
+        this.focusBlurStrength = focusBlurStrength;
+        this.fogEnabled = z4;
+        this.fogColor = fogColor;
+        this.fogNearZ = fogNearZ;
+        this.fogFarZ = fogFarZ;
+    }

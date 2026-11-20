@@ -1,0 +1,590 @@
+{
+  "engine": {
+    "name": "jadx-headless-mcp",
+    "version": "0.7.1",
+    "artifact_sha256": "6e5eacf500b64292bfb73c49797c1958f6ee44646e43e868039ae7feb573ff75",
+    "source_revision": "5844800a486d2248fa949b74c9896285f5b54de2",
+    "worker_count": 1,
+    "heap_limit_mib": 8192
+  },
+  "class_name": "com.alightcreative.app.motion.scene.SceneElementKt",
+  "methods": [
+    {
+      "name": "<clinit>",
+      "reported_signature": "<clinit>(): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()V"
+    },
+    {
+      "name": "absoluteTimingInScene",
+      "reported_signature": "absoluteTimingInScene(com.alightcreative.app.motion.scene.SceneElement, com.alightcreative.app.motion.scene.Scene): com.alightcreative.app.motion.scene.ElementTiming",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneElement;Lcom/alightcreative/app/motion/scene/Scene;)Lcom/alightcreative/app/motion/scene/ElementTiming;"
+    },
+    {
+      "name": "access$unserializeStroke$requireMinLengthOrNull",
+      "reported_signature": "access$unserializeStroke$requireMinLengthOrNull(java.util.List, int): java.util.List",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Ljava/util/List;I)Ljava/util/List;"
+    },
+    {
+      "name": "actualBoundsFor",
+      "reported_signature": "actualBoundsFor(com.alightcreative.app.motion.scene.Scene, java.lang.Iterable<com.alightcreative.app.motion.scene.SceneElement>): com.alightcreative.app.motion.scene.Rectangle",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/Scene;Ljava/lang/Iterable;)Lcom/alightcreative/app/motion/scene/Rectangle;"
+    },
+    {
+      "name": "boundsAtTime",
+      "reported_signature": "boundsAtTime(com.alightcreative.app.motion.scene.SceneElement, com.alightcreative.app.motion.scene.Scene, float): com.alightcreative.app.motion.scene.Rectangle",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneElement;Lcom/alightcreative/app/motion/scene/Scene;F)Lcom/alightcreative/app/motion/scene/Rectangle;"
+    },
+    {
+      "name": "boundsAtTime",
+      "reported_signature": "boundsAtTime(com.alightcreative.app.motion.scene.SceneElement, com.alightcreative.app.motion.scene.Scene, float, int, int): com.alightcreative.app.motion.scene.Rectangle",
+      "overload_index": 1,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneElement;Lcom/alightcreative/app/motion/scene/Scene;FII)Lcom/alightcreative/app/motion/scene/Rectangle;"
+    },
+    {
+      "name": "boundsInScene",
+      "reported_signature": "boundsInScene(com.alightcreative.app.motion.scene.SceneElement, com.alightcreative.app.motion.scene.Scene): com.alightcreative.app.motion.scene.Rectangle",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneElement;Lcom/alightcreative/app/motion/scene/Scene;)Lcom/alightcreative/app/motion/scene/Rectangle;"
+    },
+    {
+      "name": "boundsOverLifetime",
+      "reported_signature": "boundsOverLifetime(com.alightcreative.app.motion.scene.SceneElement, com.alightcreative.app.motion.scene.Scene): com.alightcreative.app.motion.scene.Rectangle",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneElement;Lcom/alightcreative/app/motion/scene/Scene;)Lcom/alightcreative/app/motion/scene/Rectangle;"
+    },
+    {
+      "name": "copyAdjustingKeyframeTiming",
+      "reported_signature": "copyAdjustingKeyframeTiming(com.alightcreative.app.motion.scene.SceneElement, kotlin.jvm.functions.Function1<? super java.lang.Float, java.lang.Float>): com.alightcreative.app.motion.scene.SceneElement",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneElement;Lkotlin/jvm/functions/Function1;)Lcom/alightcreative/app/motion/scene/SceneElement;"
+    },
+    {
+      "name": "directParent",
+      "reported_signature": "directParent(com.alightcreative.app.motion.scene.SceneElement, java.lang.Long): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneElement;Ljava/lang/Long;)Z"
+    },
+    {
+      "name": "forEachVisualEffect",
+      "reported_signature": "forEachVisualEffect(com.alightcreative.app.motion.scene.SceneElement, kotlin.jvm.functions.Function2<? super java.lang.Long, ? super com.alightcreative.app.motion.scene.visualeffect.KeyableVisualEffectRef, kotlin.Unit>): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneElement;Lkotlin/jvm/functions/Function2;)V"
+    },
+    {
+      "name": "forEachVisualEffectIndexed",
+      "reported_signature": "forEachVisualEffectIndexed(com.alightcreative.app.motion.scene.SceneElement, kotlin.jvm.functions.Function3<? super java.lang.Integer, ? super java.lang.Long, ? super com.alightcreative.app.motion.scene.visualeffect.KeyableVisualEffectRef, kotlin.Unit>): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneElement;Lkotlin/jvm/functions/Function3;)V"
+    },
+    {
+      "name": "fractionalTime",
+      "reported_signature": "fractionalTime(com.alightcreative.app.motion.scene.SceneElement, int): float",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneElement;I)F"
+    },
+    {
+      "name": "getActualBounds",
+      "reported_signature": "getActualBounds(com.alightcreative.app.motion.scene.Scene): com.alightcreative.app.motion.scene.Rectangle",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/Scene;)Lcom/alightcreative/app/motion/scene/Rectangle;"
+    },
+    {
+      "name": "getAdjustablePropertyLenses",
+      "reported_signature": "getAdjustablePropertyLenses(com.alightcreative.app.motion.scene.SceneElement): java.util.List<xb.fs>",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneElement;)Ljava/util/List;"
+    },
+    {
+      "name": "getAudioVideoSpeedFactor",
+      "reported_signature": "getAudioVideoSpeedFactor(com.alightcreative.app.motion.scene.SceneElement): float",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneElement;)F"
+    },
+    {
+      "name": "getBounds",
+      "reported_signature": "getBounds(com.alightcreative.app.motion.scene.Drawing): com.alightcreative.app.motion.scene.Rectangle",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/Drawing;)Lcom/alightcreative/app/motion/scene/Rectangle;"
+    },
+    {
+      "name": "getBounds",
+      "reported_signature": "getBounds(com.alightcreative.app.motion.scene.Scene): com.alightcreative.app.motion.scene.Rectangle",
+      "overload_index": 1,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/Scene;)Lcom/alightcreative/app/motion/scene/Rectangle;"
+    },
+    {
+      "name": "getBounds",
+      "reported_signature": "getBounds(com.alightcreative.app.motion.scene.Stroke): com.alightcreative.app.motion.scene.Rectangle",
+      "overload_index": 2,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/Stroke;)Lcom/alightcreative/app/motion/scene/Rectangle;"
+    },
+    {
+      "name": "getCenter",
+      "reported_signature": "getCenter(com.alightcreative.app.motion.scene.Scene): com.alightcreative.app.motion.scene.Vector2D",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/Scene;)Lcom/alightcreative/app/motion/scene/Vector2D;"
+    },
+    {
+      "name": "getDisplayLabel",
+      "reported_signature": "getDisplayLabel(com.alightcreative.app.motion.scene.SceneElement): java.lang.String",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneElement;)Ljava/lang/String;"
+    },
+    {
+      "name": "getDurationInSeconds",
+      "reported_signature": "getDurationInSeconds(com.alightcreative.app.motion.scene.SceneElement): float",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneElement;)F"
+    },
+    {
+      "name": "getEdgeDecorations",
+      "reported_signature": "getEdgeDecorations(com.alightcreative.app.motion.scene.SceneElement): java.util.List<com.alightcreative.app.motion.scene.KeyableEdgeDecoration>",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneElement;)Ljava/util/List;"
+    },
+    {
+      "name": "getElementReaders",
+      "reported_signature": "getElementReaders(): java.util.Map<java.lang.String, kotlin.jvm.functions.Function3<java.lang.String, org.xmlpull.v1.XmlPullParser, java.lang.Boolean, com.alightcreative.app.motion.scene.SceneElement>>",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/util/Map;"
+    },
+    {
+      "name": "getFrame",
+      "reported_signature": "getFrame(com.alightcreative.app.motion.scene.Scene): com.alightcreative.app.motion.scene.Rectangle",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/Scene;)Lcom/alightcreative/app/motion/scene/Rectangle;"
+    },
+    {
+      "name": "getHasFill",
+      "reported_signature": "getHasFill(com.alightcreative.app.motion.scene.SceneElementType): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneElementType;)Z"
+    },
+    {
+      "name": "getKeyableProperties",
+      "reported_signature": "getKeyableProperties(com.alightcreative.app.motion.scene.SceneElement): java.util.List<com.alightcreative.app.motion.scene.Keyable<? extends java.lang.Object>>",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneElement;)Ljava/util/List;"
+    },
+    {
+      "name": "getKeyablePropertyLenses",
+      "reported_signature": "getKeyablePropertyLenses(com.alightcreative.app.motion.scene.SceneElement): java.util.List<xb.fs>",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneElement;)Ljava/util/List;"
+    },
+    {
+      "name": "getMissingMedia",
+      "reported_signature": "getMissingMedia(com.alightcreative.app.motion.scene.SceneElement): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneElement;)Z"
+    },
+    {
+      "name": "getSettableUserParams",
+      "reported_signature": "getSettableUserParams(com.alightcreative.app.motion.scene.SceneElement): java.util.List<com.alightcreative.app.motion.scene.UserElementProperty>",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneElement;)Ljava/util/List;"
+    },
+    {
+      "name": "getUserElementTagId",
+      "reported_signature": "getUserElementTagId(java.lang.String): java.lang.String",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Ljava/lang/String;)Ljava/lang/String;"
+    },
+    {
+      "name": "getUserElementTagLabel",
+      "reported_signature": "getUserElementTagLabel(java.lang.String): java.lang.String",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Ljava/lang/String;)Ljava/lang/String;"
+    },
+    {
+      "name": "getUserElementTagRaw",
+      "reported_signature": "getUserElementTagRaw(java.lang.String): java.lang.String",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Ljava/lang/String;)Ljava/lang/String;"
+    },
+    {
+      "name": "getUserElementTextProperty",
+      "reported_signature": "getUserElementTextProperty(java.lang.String): com.alightcreative.app.motion.scene.UserElementProperty",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Ljava/lang/String;)Lcom/alightcreative/app/motion/scene/UserElementProperty;"
+    },
+    {
+      "name": "getVisualEffectsInOrder",
+      "reported_signature": "getVisualEffectsInOrder(com.alightcreative.app.motion.scene.SceneElement): java.util.List<com.alightcreative.app.motion.scene.visualeffect.KeyableVisualEffectRef>",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneElement;)Ljava/util/List;"
+    },
+    {
+      "name": "hasAnyAudio",
+      "reported_signature": "hasAnyAudio(com.alightcreative.app.motion.scene.SceneElement): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneElement;)Z"
+    },
+    {
+      "name": "hasAnyVideo",
+      "reported_signature": "hasAnyVideo(com.alightcreative.app.motion.scene.SceneElement): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneElement;)Z"
+    },
+    {
+      "name": "hitTestAtTime",
+      "reported_signature": "hitTestAtTime(com.alightcreative.app.motion.scene.SceneElement, com.alightcreative.app.motion.scene.Scene, float, float, float, fi.lG, int, int): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneElement;Lcom/alightcreative/app/motion/scene/Scene;FFFLfi/lG;II)Z"
+    },
+    {
+      "name": "includesScriptEffects",
+      "reported_signature": "includesScriptEffects(java.util.Collection<com.alightcreative.app.motion.scene.visualeffect.KeyableVisualEffectRef>): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Ljava/util/Collection;)Z"
+    },
+    {
+      "name": "includesScriptEffects",
+      "reported_signature": "includesScriptEffects(java.util.Map<?, com.alightcreative.app.motion.scene.visualeffect.KeyableVisualEffectRef>): boolean",
+      "overload_index": 1,
+      "is_constructor": false,
+      "dex_descriptor": "(Ljava/util/Map;)Z"
+    },
+    {
+      "name": "includesShaderEffects",
+      "reported_signature": "includesShaderEffects(java.util.Collection<com.alightcreative.app.motion.scene.visualeffect.KeyableVisualEffectRef>): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Ljava/util/Collection;)Z"
+    },
+    {
+      "name": "includesShaderEffects",
+      "reported_signature": "includesShaderEffects(java.util.Map<?, com.alightcreative.app.motion.scene.visualeffect.KeyableVisualEffectRef>): boolean",
+      "overload_index": 1,
+      "is_constructor": false,
+      "dex_descriptor": "(Ljava/util/Map;)Z"
+    },
+    {
+      "name": "indirectParent",
+      "reported_signature": "indirectParent(com.alightcreative.app.motion.scene.SceneElement, com.alightcreative.app.motion.scene.Scene, long): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneElement;Lcom/alightcreative/app/motion/scene/Scene;J)Z"
+    },
+    {
+      "name": "isElementOrLinkedProject",
+      "reported_signature": "isElementOrLinkedProject(com.alightcreative.app.motion.scene.SceneElement): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneElement;)Z"
+    },
+    {
+      "name": "isGroup",
+      "reported_signature": "isGroup(com.alightcreative.app.motion.scene.SceneElement): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneElement;)Z"
+    },
+    {
+      "name": "isTimeDependent",
+      "reported_signature": "isTimeDependent(com.alightcreative.app.motion.scene.Scene): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/Scene;)Z"
+    },
+    {
+      "name": "isTimeDependent",
+      "reported_signature": "isTimeDependent(com.alightcreative.app.motion.scene.SceneElement): boolean",
+      "overload_index": 1,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneElement;)Z"
+    },
+    {
+      "name": "isValidUserElementTag",
+      "reported_signature": "isValidUserElementTag(java.lang.String): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Ljava/lang/String;)Z"
+    },
+    {
+      "name": "mapChildren",
+      "reported_signature": "mapChildren(com.alightcreative.app.motion.scene.SceneElement, kotlin.jvm.functions.Function1<? super com.alightcreative.app.motion.scene.SceneElement, com.alightcreative.app.motion.scene.SceneElement>): com.alightcreative.app.motion.scene.SceneElement",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneElement;Lkotlin/jvm/functions/Function1;)Lcom/alightcreative/app/motion/scene/SceneElement;"
+    },
+    {
+      "name": "mapChildrenWithDepth",
+      "reported_signature": "mapChildrenWithDepth(com.alightcreative.app.motion.scene.SceneElement, int, kotlin.jvm.functions.Function2<? super java.lang.Integer, ? super com.alightcreative.app.motion.scene.SceneElement, com.alightcreative.app.motion.scene.SceneElement>): com.alightcreative.app.motion.scene.SceneElement",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneElement;ILkotlin/jvm/functions/Function2;)Lcom/alightcreative/app/motion/scene/SceneElement;"
+    },
+    {
+      "name": "mapChildrenWithDepth$default",
+      "reported_signature": "mapChildrenWithDepth$default(com.alightcreative.app.motion.scene.SceneElement, int, kotlin.jvm.functions.Function2, int, java.lang.Object): com.alightcreative.app.motion.scene.SceneElement",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneElement;ILkotlin/jvm/functions/Function2;ILjava/lang/Object;)Lcom/alightcreative/app/motion/scene/SceneElement;"
+    },
+    {
+      "name": "recreateEngineState",
+      "reported_signature": "recreateEngineState(com.alightcreative.app.motion.scene.SceneElement): com.alightcreative.app.motion.scene.SceneElement",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneElement;)Lcom/alightcreative/app/motion/scene/SceneElement;"
+    },
+    {
+      "name": "sceneFrameToMediaFrameMillis",
+      "reported_signature": "sceneFrameToMediaFrameMillis(com.alightcreative.app.motion.scene.SceneElement, int, int): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneElement;II)I"
+    },
+    {
+      "name": "sceneFrameToMediaTimeMillis",
+      "reported_signature": "sceneFrameToMediaTimeMillis(com.alightcreative.app.motion.scene.SceneElement, int, int, int): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneElement;III)I"
+    },
+    {
+      "name": "sceneTime",
+      "reported_signature": "sceneTime(com.alightcreative.app.motion.scene.SceneElement, float): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneElement;F)I"
+    },
+    {
+      "name": "sceneTimeSeconds",
+      "reported_signature": "sceneTimeSeconds(com.alightcreative.app.motion.scene.SceneElement, float): double",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneElement;F)D"
+    },
+    {
+      "name": "sceneTimeToMediaTimeMicros",
+      "reported_signature": "sceneTimeToMediaTimeMicros(com.alightcreative.app.motion.scene.SceneElement, long): long",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneElement;J)J"
+    },
+    {
+      "name": "sceneTimeToMediaTimeMillis",
+      "reported_signature": "sceneTimeToMediaTimeMillis(com.alightcreative.app.motion.scene.SceneElement, int): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneElement;I)I"
+    },
+    {
+      "name": "sceneTimeToMediaTimeNanos",
+      "reported_signature": "sceneTimeToMediaTimeNanos(com.alightcreative.app.motion.scene.SceneElement, long): long",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneElement;J)J"
+    },
+    {
+      "name": "serialize",
+      "reported_signature": "serialize(com.alightcreative.app.motion.scene.SceneElement, java.lang.String, org.xmlpull.v1.XmlSerializer): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneElement;Ljava/lang/String;Lorg/xmlpull/v1/XmlSerializer;)V"
+    },
+    {
+      "name": "serialize",
+      "reported_signature": "serialize(com.alightcreative.app.motion.scene.Stroke, java.lang.String, org.xmlpull.v1.XmlSerializer): void",
+      "overload_index": 1,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/Stroke;Ljava/lang/String;Lorg/xmlpull/v1/XmlSerializer;)V"
+    },
+    {
+      "name": "serializeCommonAttributes",
+      "reported_signature": "serializeCommonAttributes(com.alightcreative.app.motion.scene.SceneElement, java.lang.String, org.xmlpull.v1.XmlSerializer): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneElement;Ljava/lang/String;Lorg/xmlpull/v1/XmlSerializer;)V"
+    },
+    {
+      "name": "serializeCommonChildTags",
+      "reported_signature": "serializeCommonChildTags(com.alightcreative.app.motion.scene.SceneElement, java.lang.String, org.xmlpull.v1.XmlSerializer): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneElement;Ljava/lang/String;Lorg/xmlpull/v1/XmlSerializer;)V"
+    },
+    {
+      "name": "unserializeBaseSceneElement",
+      "reported_signature": "unserializeBaseSceneElement(com.alightcreative.app.motion.scene.SceneElementType, java.lang.String, org.xmlpull.v1.XmlPullParser): com.alightcreative.app.motion.scene.SceneElement",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneElementType;Ljava/lang/String;Lorg/xmlpull/v1/XmlPullParser;)Lcom/alightcreative/app/motion/scene/SceneElement;"
+    },
+    {
+      "name": "unserializeCommonChildTag",
+      "reported_signature": "unserializeCommonChildTag(com.alightcreative.app.motion.scene.SceneElement, java.lang.String, java.lang.String, org.xmlpull.v1.XmlPullParser, boolean): com.alightcreative.app.motion.scene.SceneElement",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneElement;Ljava/lang/String;Ljava/lang/String;Lorg/xmlpull/v1/XmlPullParser;Z)Lcom/alightcreative/app/motion/scene/SceneElement;"
+    },
+    {
+      "name": "unserializeStroke",
+      "reported_signature": "unserializeStroke(java.lang.String, org.xmlpull.v1.XmlPullParser): com.alightcreative.app.motion.scene.Stroke",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Ljava/lang/String;Lorg/xmlpull/v1/XmlPullParser;)Lcom/alightcreative/app/motion/scene/Stroke;"
+    },
+    {
+      "name": "unserializeStroke$requireMinLengthOrNull",
+      "reported_signature": "unserializeStroke$requireMinLengthOrNull(java.util.List<? extends T>, int): java.util.List<T>",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Ljava/util/List;I)Ljava/util/List;"
+    },
+    {
+      "name": "visualEffectAtPosition",
+      "reported_signature": "visualEffectAtPosition(com.alightcreative.app.motion.scene.SceneElement, int): com.alightcreative.app.motion.scene.visualeffect.KeyableVisualEffectRef",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneElement;I)Lcom/alightcreative/app/motion/scene/visualeffect/KeyableVisualEffectRef;"
+    },
+    {
+      "name": "withAbsoluteTimingAndSpeedInScene",
+      "reported_signature": "withAbsoluteTimingAndSpeedInScene(com.alightcreative.app.motion.scene.SceneElement, java.util.List<com.alightcreative.app.motion.scene.SceneElement>, java.util.Map<com.alightcreative.app.motion.scene.SceneElement, com.alightcreative.app.motion.scene.SceneElement>): com.alightcreative.app.motion.scene.SceneElement",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneElement;Ljava/util/List;Ljava/util/Map;)Lcom/alightcreative/app/motion/scene/SceneElement;"
+    }
+  ],
+  "fields": [
+    {
+      "name": "InfinityBounds",
+      "reported_type": "android.graphics.Region",
+      "dex_static_value": null
+    },
+    {
+      "name": "MAX_SCENE_SIZE",
+      "reported_type": "int",
+      "dex_static_value": {
+        "type": "int",
+        "value": 100000
+      }
+    },
+    {
+      "name": "MINIMUM_ELEMENT_SPEED",
+      "reported_type": "float",
+      "dex_static_value": {
+        "type": "float",
+        "value": "0.001"
+      }
+    },
+    {
+      "name": "actualBoundsCache",
+      "reported_type": "java.util.WeakHashMap<com.alightcreative.app.motion.scene.Scene, com.alightcreative.app.motion.scene.Rectangle>",
+      "dex_static_value": null
+    },
+    {
+      "name": "boundsOverLifetimeCache",
+      "reported_type": "java.util.WeakHashMap<kotlin.Pair<com.alightcreative.app.motion.scene.Scene, com.alightcreative.app.motion.scene.SceneElement>, com.alightcreative.app.motion.scene.Rectangle>",
+      "dex_static_value": null
+    },
+    {
+      "name": "drawingBoundsCache",
+      "reported_type": "java.util.WeakHashMap<com.alightcreative.app.motion.scene.Drawing, com.alightcreative.app.motion.scene.Rectangle>",
+      "dex_static_value": null
+    },
+    {
+      "name": "elementReaders",
+      "reported_type": "java.util.Map<java.lang.String, kotlin.jvm.functions.Function3<java.lang.String, org.xmlpull.v1.XmlPullParser, java.lang.Boolean, com.alightcreative.app.motion.scene.SceneElement>>",
+      "dex_static_value": null
+    },
+    {
+      "name": "pointStringCache",
+      "reported_type": "java.util.WeakHashMap<com.alightcreative.app.motion.scene.Stroke, java.lang.String>",
+      "dex_static_value": null
+    },
+    {
+      "name": "strokeBoundsCache",
+      "reported_type": "java.util.WeakHashMap<com.alightcreative.app.motion.scene.Stroke, com.alightcreative.app.motion.scene.Rectangle>",
+      "dex_static_value": null
+    },
+    {
+      "name": "timingCache",
+      "reported_type": "java.util.WeakHashMap<com.alightcreative.app.motion.scene.SceneElement, java.util.WeakHashMap<com.alightcreative.app.motion.scene.Scene, com.alightcreative.app.motion.scene.ElementTiming>>",
+      "dex_static_value": null
+    }
+  ],
+  "inner_classes": [
+    "com.alightcreative.app.motion.scene.SceneElementKt.WhenMappings",
+    "com.alightcreative.app.motion.scene.SceneElementKt.AnonymousClass2",
+    "com.alightcreative.app.motion.scene.SceneElementKt.AnonymousClass10",
+    "com.alightcreative.app.motion.scene.SceneElementKt.AnonymousClass11",
+    "com.alightcreative.app.motion.scene.SceneElementKt.AnonymousClass12",
+    "com.alightcreative.app.motion.scene.SceneElementKt.AnonymousClass13",
+    "com.alightcreative.app.motion.scene.SceneElementKt.AnonymousClass14",
+    "com.alightcreative.app.motion.scene.SceneElementKt.AnonymousClass15",
+    "com.alightcreative.app.motion.scene.SceneElementKt.AnonymousClass16",
+    "com.alightcreative.app.motion.scene.SceneElementKt.AnonymousClass17",
+    "com.alightcreative.app.motion.scene.SceneElementKt.AnonymousClass18",
+    "com.alightcreative.app.motion.scene.SceneElementKt.AnonymousClass2",
+    "com.alightcreative.app.motion.scene.SceneElementKt.AnonymousClass21",
+    "com.alightcreative.app.motion.scene.SceneElementKt.AnonymousClass22",
+    "com.alightcreative.app.motion.scene.SceneElementKt.AnonymousClass23",
+    "com.alightcreative.app.motion.scene.SceneElementKt.AnonymousClass24",
+    "com.alightcreative.app.motion.scene.SceneElementKt.AnonymousClass25",
+    "com.alightcreative.app.motion.scene.SceneElementKt.AnonymousClass26",
+    "com.alightcreative.app.motion.scene.SceneElementKt.AnonymousClass27",
+    "com.alightcreative.app.motion.scene.SceneElementKt.AnonymousClass28",
+    "com.alightcreative.app.motion.scene.SceneElementKt.AnonymousClass29",
+    "com.alightcreative.app.motion.scene.SceneElementKt.AnonymousClass3",
+    "com.alightcreative.app.motion.scene.SceneElementKt.AnonymousClass30",
+    "com.alightcreative.app.motion.scene.SceneElementKt.AnonymousClass31",
+    "com.alightcreative.app.motion.scene.SceneElementKt.AnonymousClass32",
+    "com.alightcreative.app.motion.scene.SceneElementKt.AnonymousClass33",
+    "com.alightcreative.app.motion.scene.SceneElementKt.AnonymousClass34",
+    "com.alightcreative.app.motion.scene.SceneElementKt.AnonymousClass4",
+    "com.alightcreative.app.motion.scene.SceneElementKt.AnonymousClass5",
+    "com.alightcreative.app.motion.scene.SceneElementKt.AnonymousClass7",
+    "com.alightcreative.app.motion.scene.SceneElementKt.AnonymousClass8",
+    "com.alightcreative.app.motion.scene.SceneElementKt.AnonymousClass9",
+    "com.alightcreative.app.motion.scene.SceneElementKt.AnonymousClass1",
+    "com.alightcreative.app.motion.scene.SceneElementKt.AnonymousClass1"
+  ]
+}

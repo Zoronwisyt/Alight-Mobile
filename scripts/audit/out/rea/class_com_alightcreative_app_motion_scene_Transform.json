@@ -1,0 +1,305 @@
+{
+  "engine": {
+    "name": "jadx-headless-mcp",
+    "version": "0.7.1",
+    "artifact_sha256": "6e5eacf500b64292bfb73c49797c1958f6ee44646e43e868039ae7feb573ff75",
+    "source_revision": "5844800a486d2248fa949b74c9896285f5b54de2",
+    "worker_count": 1,
+    "heap_limit_mib": 8192
+  },
+  "class_name": "com.alightcreative.app.motion.scene.Transform",
+  "methods": [
+    {
+      "name": "<clinit>",
+      "reported_signature": "<clinit>(): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()V"
+    },
+    {
+      "name": "<init>",
+      "reported_signature": "<init>(): void",
+      "overload_index": 0,
+      "is_constructor": true,
+      "dex_descriptor": "()V"
+    },
+    {
+      "name": "<init>",
+      "reported_signature": "<init>(com.alightcreative.app.motion.scene.Vector3D, com.alightcreative.app.motion.scene.Vector2D, com.alightcreative.app.motion.scene.Vector2D, float, float, float, float, com.alightcreative.app.motion.scene.Vector2D, android.graphics.Matrix): void",
+      "overload_index": 1,
+      "is_constructor": true,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/Vector3D;Lcom/alightcreative/app/motion/scene/Vector2D;Lcom/alightcreative/app/motion/scene/Vector2D;FFFFLcom/alightcreative/app/motion/scene/Vector2D;Landroid/graphics/Matrix;)V"
+    },
+    {
+      "name": "<init>",
+      "reported_signature": "<init>(com.alightcreative.app.motion.scene.Vector3D, com.alightcreative.app.motion.scene.Vector2D, com.alightcreative.app.motion.scene.Vector2D, float, float, float, float, com.alightcreative.app.motion.scene.Vector2D, android.graphics.Matrix, int, kotlin.jvm.internal.DefaultConstructorMarker): void",
+      "overload_index": 2,
+      "is_constructor": true,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/Vector3D;Lcom/alightcreative/app/motion/scene/Vector2D;Lcom/alightcreative/app/motion/scene/Vector2D;FFFFLcom/alightcreative/app/motion/scene/Vector2D;Landroid/graphics/Matrix;ILkotlin/jvm/internal/DefaultConstructorMarker;)V"
+    },
+    {
+      "name": "access$getIDENTITY$cp",
+      "reported_signature": "access$getIDENTITY$cp(): com.alightcreative.app.motion.scene.Transform",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/Transform;"
+    },
+    {
+      "name": "component1",
+      "reported_signature": "component1(): com.alightcreative.app.motion.scene.Vector3D",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/Vector3D;"
+    },
+    {
+      "name": "component2",
+      "reported_signature": "component2(): com.alightcreative.app.motion.scene.Vector2D",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/Vector2D;"
+    },
+    {
+      "name": "component3",
+      "reported_signature": "component3(): com.alightcreative.app.motion.scene.Vector2D",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/Vector2D;"
+    },
+    {
+      "name": "component4",
+      "reported_signature": "component4(): float",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()F"
+    },
+    {
+      "name": "component5",
+      "reported_signature": "component5(): float",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()F"
+    },
+    {
+      "name": "component6",
+      "reported_signature": "component6(): float",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()F"
+    },
+    {
+      "name": "component7",
+      "reported_signature": "component7(): float",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()F"
+    },
+    {
+      "name": "component8",
+      "reported_signature": "component8(): com.alightcreative.app.motion.scene.Vector2D",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/Vector2D;"
+    },
+    {
+      "name": "component9",
+      "reported_signature": "component9(): android.graphics.Matrix",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Landroid/graphics/Matrix;"
+    },
+    {
+      "name": "copy",
+      "reported_signature": "copy(com.alightcreative.app.motion.scene.Vector3D, com.alightcreative.app.motion.scene.Vector2D, com.alightcreative.app.motion.scene.Vector2D, float, float, float, float, com.alightcreative.app.motion.scene.Vector2D, android.graphics.Matrix): com.alightcreative.app.motion.scene.Transform",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/Vector3D;Lcom/alightcreative/app/motion/scene/Vector2D;Lcom/alightcreative/app/motion/scene/Vector2D;FFFFLcom/alightcreative/app/motion/scene/Vector2D;Landroid/graphics/Matrix;)Lcom/alightcreative/app/motion/scene/Transform;"
+    },
+    {
+      "name": "copy$default",
+      "reported_signature": "copy$default(com.alightcreative.app.motion.scene.Transform, com.alightcreative.app.motion.scene.Vector3D, com.alightcreative.app.motion.scene.Vector2D, com.alightcreative.app.motion.scene.Vector2D, float, float, float, float, com.alightcreative.app.motion.scene.Vector2D, android.graphics.Matrix, int, java.lang.Object): com.alightcreative.app.motion.scene.Transform",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/Transform;Lcom/alightcreative/app/motion/scene/Vector3D;Lcom/alightcreative/app/motion/scene/Vector2D;Lcom/alightcreative/app/motion/scene/Vector2D;FFFFLcom/alightcreative/app/motion/scene/Vector2D;Landroid/graphics/Matrix;ILjava/lang/Object;)Lcom/alightcreative/app/motion/scene/Transform;"
+    },
+    {
+      "name": "equals",
+      "reported_signature": "equals(java.lang.Object): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Ljava/lang/Object;)Z"
+    },
+    {
+      "name": "getLocation",
+      "reported_signature": "getLocation(): com.alightcreative.app.motion.scene.Vector3D",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/Vector3D;"
+    },
+    {
+      "name": "getMatrix",
+      "reported_signature": "getMatrix(): android.graphics.Matrix",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Landroid/graphics/Matrix;"
+    },
+    {
+      "name": "getMatrixReverseRotation",
+      "reported_signature": "getMatrixReverseRotation(): android.graphics.Matrix",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Landroid/graphics/Matrix;"
+    },
+    {
+      "name": "getOpacity",
+      "reported_signature": "getOpacity(): float",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()F"
+    },
+    {
+      "name": "getOptiMatrix",
+      "reported_signature": "getOptiMatrix(float, float, float, float): android.graphics.Matrix",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(FFFF)Landroid/graphics/Matrix;"
+    },
+    {
+      "name": "getOrientation",
+      "reported_signature": "getOrientation(): float",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()F"
+    },
+    {
+      "name": "getParentTransform",
+      "reported_signature": "getParentTransform(): android.graphics.Matrix",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Landroid/graphics/Matrix;"
+    },
+    {
+      "name": "getPivot",
+      "reported_signature": "getPivot(): com.alightcreative.app.motion.scene.Vector2D",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/Vector2D;"
+    },
+    {
+      "name": "getRotation",
+      "reported_signature": "getRotation(): float",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()F"
+    },
+    {
+      "name": "getScale",
+      "reported_signature": "getScale(): com.alightcreative.app.motion.scene.Vector2D",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/Vector2D;"
+    },
+    {
+      "name": "getSize",
+      "reported_signature": "getSize(): float",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()F"
+    },
+    {
+      "name": "getSkew",
+      "reported_signature": "getSkew(): com.alightcreative.app.motion.scene.Vector2D",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/Vector2D;"
+    },
+    {
+      "name": "hashCode",
+      "reported_signature": "hashCode(): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()I"
+    },
+    {
+      "name": "toString",
+      "reported_signature": "toString(): java.lang.String",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/lang/String;"
+    }
+  ],
+  "fields": [
+    {
+      "name": "$stable",
+      "reported_type": "int",
+      "dex_static_value": null
+    },
+    {
+      "name": "Companion",
+      "reported_type": "com.alightcreative.app.motion.scene.Transform$Companion",
+      "dex_static_value": null
+    },
+    {
+      "name": "IDENTITY",
+      "reported_type": "com.alightcreative.app.motion.scene.Transform",
+      "dex_static_value": null
+    },
+    {
+      "name": "location",
+      "reported_type": "com.alightcreative.app.motion.scene.Vector3D",
+      "dex_static_value": null
+    },
+    {
+      "name": "matrix$delegate",
+      "reported_type": "kotlin.Lazy",
+      "dex_static_value": null
+    },
+    {
+      "name": "matrixReverseRotation$delegate",
+      "reported_type": "kotlin.Lazy",
+      "dex_static_value": null
+    },
+    {
+      "name": "opacity",
+      "reported_type": "float",
+      "dex_static_value": null
+    },
+    {
+      "name": "orientation",
+      "reported_type": "float",
+      "dex_static_value": null
+    },
+    {
+      "name": "parentTransform",
+      "reported_type": "android.graphics.Matrix",
+      "dex_static_value": null
+    },
+    {
+      "name": "pivot",
+      "reported_type": "com.alightcreative.app.motion.scene.Vector2D",
+      "dex_static_value": null
+    },
+    {
+      "name": "rotation",
+      "reported_type": "float",
+      "dex_static_value": null
+    },
+    {
+      "name": "scale",
+      "reported_type": "com.alightcreative.app.motion.scene.Vector2D",
+      "dex_static_value": null
+    },
+    {
+      "name": "size",
+      "reported_type": "float",
+      "dex_static_value": null
+    },
+    {
+      "name": "skew",
+      "reported_type": "com.alightcreative.app.motion.scene.Vector2D",
+      "dex_static_value": null
+    }
+  ],
+  "inner_classes": [
+    "com.alightcreative.app.motion.scene.Transform.Companion"
+  ]
+}

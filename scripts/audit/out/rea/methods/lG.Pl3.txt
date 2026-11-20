@@ -1,0 +1,3 @@
+    public final float Pl3() {
+        return this.Rw;
+    }

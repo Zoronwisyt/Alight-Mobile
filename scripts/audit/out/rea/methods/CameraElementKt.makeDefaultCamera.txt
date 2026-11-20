@@ -1,0 +1,5 @@
+    public static final SceneElement makeDefaultCamera(Scene scene) {
+        Intrinsics.checkNotNullParameter(scene, "<this>");
+        CameraProperties cameraProperties = CameraProperties.INSTANCE.getDEFAULT();
+        return CameraElement$default(new KeyableTransform(KeyableKt.keyable(new Vector3D(scene.getWidth() / 2.0f, scene.getHeight() / 2.0f, -calcCameraZoom(scene, ((Number) KeyableKt.valueAtTime(cameraProperties.getFov(), 0.0f)).floatValue()))), null, null, null, 0.0f, 0.0f, null, null, false, 510, null), 0, scene.getTotalTime(), 0L, "Camera", 0, 0, cameraProperties, 640982598L, 104, null);
+    }

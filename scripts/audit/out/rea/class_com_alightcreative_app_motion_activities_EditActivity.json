@@ -1,0 +1,3815 @@
+{
+  "engine": {
+    "name": "jadx-headless-mcp",
+    "version": "0.7.1",
+    "artifact_sha256": "6e5eacf500b64292bfb73c49797c1958f6ee44646e43e868039ae7feb573ff75",
+    "source_revision": "5844800a486d2248fa949b74c9896285f5b54de2",
+    "worker_count": 1,
+    "heap_limit_mib": 8192
+  },
+  "class_name": "com.alightcreative.app.motion.activities.EditActivity",
+  "methods": [
+    {
+      "name": "<clinit>",
+      "reported_signature": "<clinit>(): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()V"
+    },
+    {
+      "name": "<init>",
+      "reported_signature": "<init>(): void",
+      "overload_index": 0,
+      "is_constructor": true,
+      "dex_descriptor": "()V"
+    },
+    {
+      "name": "A2o",
+      "reported_signature": "A2o(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "A6",
+      "reported_signature": "A6(): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()V"
+    },
+    {
+      "name": "AN",
+      "reported_signature": "AN(): android.net.Uri",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Landroid/net/Uri;"
+    },
+    {
+      "name": "AZl",
+      "reported_signature": "AZl(com.alightcreative.app.motion.activities.EditActivity): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;)I"
+    },
+    {
+      "name": "Ajs",
+      "reported_signature": "Ajs(android.content.DialogInterface, int): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Landroid/content/DialogInterface;I)V"
+    },
+    {
+      "name": "B",
+      "reported_signature": "B(kotlin.jvm.functions.Function0): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lkotlin/jvm/functions/Function0;)V"
+    },
+    {
+      "name": "B4",
+      "reported_signature": "B4(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "B7B",
+      "reported_signature": "B7B(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "BGy",
+      "reported_signature": "BGy(com.alightcreative.app.motion.activities.EditActivity): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;)V"
+    },
+    {
+      "name": "BN",
+      "reported_signature": "BN(java.util.List): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Ljava/util/List;)V"
+    },
+    {
+      "name": "BZr",
+      "reported_signature": "BZr(com.alightcreative.app.motion.activities.EditActivity): IJ.mY0$fs",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;)LIJ/mY0$fs;"
+    },
+    {
+      "name": "Bcb",
+      "reported_signature": "Bcb(boolean): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Z)V"
+    },
+    {
+      "name": "Bhm",
+      "reported_signature": "Bhm(com.alightcreative.app.motion.activities.EditActivity, IJ.mY0$fs): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;LIJ/mY0$fs;)V"
+    },
+    {
+      "name": "Bux",
+      "reported_signature": "Bux(com.alightcreative.app.motion.activities.EditActivity, android.content.DialogInterface, int): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/content/DialogInterface;I)V"
+    },
+    {
+      "name": "C12",
+      "reported_signature": "C12(android.content.DialogInterface, int): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Landroid/content/DialogInterface;I)V"
+    },
+    {
+      "name": "C4b",
+      "reported_signature": "C4b(com.alightcreative.app.motion.activities.EditActivity): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;)V"
+    },
+    {
+      "name": "CAm",
+      "reported_signature": "CAm(): bT.K",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()LbT/K;"
+    },
+    {
+      "name": "CB",
+      "reported_signature": "CB(com.alightcreative.app.motion.activities.EditActivity, long): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;J)V"
+    },
+    {
+      "name": "CH",
+      "reported_signature": "CH(com.alightcreative.app.motion.activities.EditActivity, boolean): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Z)V"
+    },
+    {
+      "name": "CI",
+      "reported_signature": "CI(com.alightcreative.app.motion.activities.EditActivity, android.content.DialogInterface): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/content/DialogInterface;)V"
+    },
+    {
+      "name": "CJ2",
+      "reported_signature": "CJ2(android.content.DialogInterface, int): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Landroid/content/DialogInterface;I)V"
+    },
+    {
+      "name": "CQ",
+      "reported_signature": "CQ(android.content.DialogInterface, int): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Landroid/content/DialogInterface;I)V"
+    },
+    {
+      "name": "CTN",
+      "reported_signature": "CTN(): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()V"
+    },
+    {
+      "name": "Ci",
+      "reported_signature": "Ci(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "Crz",
+      "reported_signature": "Crz(android.content.DialogInterface, int): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Landroid/content/DialogInterface;I)V"
+    },
+    {
+      "name": "Csd",
+      "reported_signature": "Csd(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "D",
+      "reported_signature": "D(): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()V"
+    },
+    {
+      "name": "DB",
+      "reported_signature": "DB(com.alightcreative.app.motion.activities.EditActivity, com.alightcreative.app.motion.scene.SceneElement): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Lcom/alightcreative/app/motion/scene/SceneElement;)V"
+    },
+    {
+      "name": "DC",
+      "reported_signature": "DC(): androidx.fragment.app.Fragment",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Landroidx/fragment/app/Fragment;"
+    },
+    {
+      "name": "DE2",
+      "reported_signature": "DE2(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "DEY",
+      "reported_signature": "DEY(): java.util.Set",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/util/Set;"
+    },
+    {
+      "name": "DH6",
+      "reported_signature": "DH6(): android.media.MediaPlayer",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Landroid/media/MediaPlayer;"
+    },
+    {
+      "name": "DHp",
+      "reported_signature": "DHp(com.alightcreative.app.motion.activities.EditActivity): java.util.List",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;)Ljava/util/List;"
+    },
+    {
+      "name": "Dl",
+      "reported_signature": "Dl(kotlin.jvm.functions.Function0, android.content.DialogInterface): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lkotlin/jvm/functions/Function0;Landroid/content/DialogInterface;)V"
+    },
+    {
+      "name": "Dn",
+      "reported_signature": "Dn(): C3A.sK",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()LC3A/sK;"
+    },
+    {
+      "name": "Dt",
+      "reported_signature": "Dt(com.alightcreative.app.motion.activities.EditActivity, com.alightcreative.account.B8K): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Lcom/alightcreative/account/B8K;)V"
+    },
+    {
+      "name": "E",
+      "reported_signature": "E(com.alightcreative.app.motion.activities.EditActivity, java.lang.String, java.lang.String): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Ljava/lang/String;Ljava/lang/String;)V"
+    },
+    {
+      "name": "E6",
+      "reported_signature": "E6(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "EE",
+      "reported_signature": "EE(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "ELg",
+      "reported_signature": "ELg(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "EUu",
+      "reported_signature": "EUu(): java.lang.String",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/lang/String;"
+    },
+    {
+      "name": "EcY",
+      "reported_signature": "EcY(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "Ep8",
+      "reported_signature": "Ep8(com.alightcreative.app.motion.activities.EditActivity): java.util.List",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;)Ljava/util/List;"
+    },
+    {
+      "name": "Ev",
+      "reported_signature": "Ev(com.alightcreative.app.motion.activities.EditActivity): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;)I"
+    },
+    {
+      "name": "F",
+      "reported_signature": "F(com.alightcreative.app.motion.activities.EditActivity): long",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;)J"
+    },
+    {
+      "name": "F4L",
+      "reported_signature": "F4L(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "FC",
+      "reported_signature": "FC(com.alightcreative.app.motion.activities.EditActivity, long): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;J)V"
+    },
+    {
+      "name": "FJl",
+      "reported_signature": "FJl(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "Fgx",
+      "reported_signature": "Fgx(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "Fv1",
+      "reported_signature": "Fv1(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "G",
+      "reported_signature": "G(kotlin.jvm.functions.Function0, android.content.DialogInterface): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lkotlin/jvm/functions/Function0;Landroid/content/DialogInterface;)V"
+    },
+    {
+      "name": "GOR",
+      "reported_signature": "GOR(android.content.DialogInterface, int): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Landroid/content/DialogInterface;I)V"
+    },
+    {
+      "name": "Guz",
+      "reported_signature": "Guz(com.alightcreative.app.motion.activities.EditActivity): long",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;)J"
+    },
+    {
+      "name": "Gv",
+      "reported_signature": "Gv(com.alightcreative.app.motion.activities.EditActivity, android.content.DialogInterface, int): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/content/DialogInterface;I)V"
+    },
+    {
+      "name": "Gva",
+      "reported_signature": "Gva(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "Gw",
+      "reported_signature": "Gw(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "Gwh",
+      "reported_signature": "Gwh(): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()V"
+    },
+    {
+      "name": "H1o",
+      "reported_signature": "H1o(com.alightcreative.app.motion.activities.EditActivity): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;)Z"
+    },
+    {
+      "name": "HPL",
+      "reported_signature": "HPL(): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()V"
+    },
+    {
+      "name": "Hi",
+      "reported_signature": "Hi(): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()V"
+    },
+    {
+      "name": "Hk",
+      "reported_signature": "Hk(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "Hk2",
+      "reported_signature": "Hk2(com.alightcreative.app.motion.activities.EditActivity, androidx.appcompat.app.mY0, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroidx/appcompat/app/mY0;Landroid/view/View;)V"
+    },
+    {
+      "name": "Hv",
+      "reported_signature": "Hv(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "I",
+      "reported_signature": "I(com.alightcreative.app.motion.activities.EditActivity): psA.kfX",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;)LpsA/kfX;"
+    },
+    {
+      "name": "I4",
+      "reported_signature": "I4(): java.util.List",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/util/List;"
+    },
+    {
+      "name": "I6",
+      "reported_signature": "I6(): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()V"
+    },
+    {
+      "name": "IK4",
+      "reported_signature": "IK4(): long",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()J"
+    },
+    {
+      "name": "IQx",
+      "reported_signature": "IQx(com.alightcreative.app.motion.activities.EditActivity): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;)V"
+    },
+    {
+      "name": "IU0",
+      "reported_signature": "IU0(com.alightcreative.app.motion.activities.EditActivity): androidx.activity.result.B8K",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;)Landroidx/activity/result/B8K;"
+    },
+    {
+      "name": "IW",
+      "reported_signature": "IW(com.alightcreative.app.motion.activities.EditActivity, androidx.activity.result.fs): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroidx/activity/result/fs;)V"
+    },
+    {
+      "name": "Ikm",
+      "reported_signature": "Ikm(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "Iv",
+      "reported_signature": "Iv(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "Ix",
+      "reported_signature": "Ix(com.alightcreative.app.motion.activities.EditActivity): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;)Z"
+    },
+    {
+      "name": "J",
+      "reported_signature": "J(androidx.appcompat.app.mY0, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Landroidx/appcompat/app/mY0;Landroid/view/View;)V"
+    },
+    {
+      "name": "J0",
+      "reported_signature": "J0(): MG.Bb",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()LMG/Bb;"
+    },
+    {
+      "name": "J8",
+      "reported_signature": "J8(com.alightcreative.app.motion.activities.EditActivity, boolean): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Z)V"
+    },
+    {
+      "name": "JCT",
+      "reported_signature": "JCT(kotlin.jvm.internal.Ref$ObjectRef, com.alightcreative.app.motion.activities.EditActivity, java.lang.String, java.lang.String, android.content.DialogInterface, int): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lkotlin/jvm/internal/Ref$ObjectRef;Lcom/alightcreative/app/motion/activities/EditActivity;Ljava/lang/String;Ljava/lang/String;Landroid/content/DialogInterface;I)V"
+    },
+    {
+      "name": "JD",
+      "reported_signature": "JD(com.alightcreative.app.motion.activities.EditActivity): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;)V"
+    },
+    {
+      "name": "JZ",
+      "reported_signature": "JZ(com.alightcreative.app.motion.activities.EditActivity): float",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;)F"
+    },
+    {
+      "name": "JZ3",
+      "reported_signature": "JZ3(android.content.DialogInterface, int): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Landroid/content/DialogInterface;I)V"
+    },
+    {
+      "name": "Jd",
+      "reported_signature": "Jd(com.alightcreative.app.motion.project.ProjectInfo$mY0, qNi.Gv, java.lang.Boolean): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/project/ProjectInfo$mY0;LqNi/Gv;Ljava/lang/Boolean;)V"
+    },
+    {
+      "name": "Jr4",
+      "reported_signature": "Jr4(): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()V"
+    },
+    {
+      "name": "Jv",
+      "reported_signature": "Jv(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "K",
+      "reported_signature": "K(com.alightcreative.app.motion.activities.EditActivity, android.content.DialogInterface, int): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/content/DialogInterface;I)V"
+    },
+    {
+      "name": "K0",
+      "reported_signature": "K0(): VeZ.Bb",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()LVeZ/Bb;"
+    },
+    {
+      "name": "Kc",
+      "reported_signature": "Kc(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "Kx",
+      "reported_signature": "Kx(com.alightcreative.app.motion.activities.EditActivity): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;)V"
+    },
+    {
+      "name": "KxZ",
+      "reported_signature": "KxZ(com.alightcreative.app.motion.activities.EditActivity): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;)V"
+    },
+    {
+      "name": "Kxz",
+      "reported_signature": "Kxz(com.alightcreative.app.motion.activities.EditActivity, kotlin.coroutines.Continuation): java.lang.Object",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;"
+    },
+    {
+      "name": "L",
+      "reported_signature": "L(): Mm.sK",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()LMm/sK;"
+    },
+    {
+      "name": "L7",
+      "reported_signature": "L7(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "L7W",
+      "reported_signature": "L7W(com.alightcreative.app.motion.activities.EditActivity): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;)V"
+    },
+    {
+      "name": "LK",
+      "reported_signature": "LK(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "LP",
+      "reported_signature": "LP(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "LRs",
+      "reported_signature": "LRs(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "LU",
+      "reported_signature": "LU(com.alightcreative.app.motion.activities.EditActivity): com.alightcreative.app.motion.scene.SceneHolder",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;)Lcom/alightcreative/app/motion/scene/SceneHolder;"
+    },
+    {
+      "name": "La",
+      "reported_signature": "La(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "LbL",
+      "reported_signature": "LbL(com.alightcreative.app.motion.activities.EditActivity): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;)V"
+    },
+    {
+      "name": "Lv",
+      "reported_signature": "Lv(com.alightcreative.app.motion.activities.EditActivity): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;)V"
+    },
+    {
+      "name": "Lw",
+      "reported_signature": "Lw(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "M",
+      "reported_signature": "M(): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Z"
+    },
+    {
+      "name": "M2t",
+      "reported_signature": "M2t(com.alightcreative.app.motion.activities.EditActivity): com.alightcreative.app.motion.scene.SceneThumbnailMaker",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;)Lcom/alightcreative/app/motion/scene/SceneThumbnailMaker;"
+    },
+    {
+      "name": "MH",
+      "reported_signature": "MH(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "MH3",
+      "reported_signature": "MH3(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "MN",
+      "reported_signature": "MN(com.alightcreative.app.motion.activities.EditActivity, com.alightcreative.app.motion.project.ProjectInfo$mY0, qNi.Gv, java.lang.Boolean, int, java.lang.Object): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Lcom/alightcreative/app/motion/project/ProjectInfo$mY0;LqNi/Gv;Ljava/lang/Boolean;ILjava/lang/Object;)V"
+    },
+    {
+      "name": "MY",
+      "reported_signature": "MY(com.alightcreative.app.motion.activities.EditActivity): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;)V"
+    },
+    {
+      "name": "Mp8",
+      "reported_signature": "Mp8(androidx.appcompat.app.mY0, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Landroidx/appcompat/app/mY0;Landroid/view/View;)V"
+    },
+    {
+      "name": "Mt",
+      "reported_signature": "Mt(): com.alightcreative.app.motion.activities.edit.widgets.TimelineLayoutManager",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/activities/edit/widgets/TimelineLayoutManager;"
+    },
+    {
+      "name": "N",
+      "reported_signature": "N(com.alightcreative.app.motion.activities.EditActivity, android.view.View, android.view.MotionEvent): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;Landroid/view/MotionEvent;)Z"
+    },
+    {
+      "name": "N7N",
+      "reported_signature": "N7N(android.content.DialogInterface, int): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Landroid/content/DialogInterface;I)V"
+    },
+    {
+      "name": "Nr",
+      "reported_signature": "Nr(com.alightcreative.app.motion.activities.EditActivity): fi.vQ",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;)Lfi/vQ;"
+    },
+    {
+      "name": "O",
+      "reported_signature": "O(Xa.rs, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(LXa/rs;Landroid/view/View;)V"
+    },
+    {
+      "name": "O4",
+      "reported_signature": "O4(com.alightcreative.app.motion.activities.EditActivity): com.alightcreative.backup.CloudBackupViewModel",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;)Lcom/alightcreative/backup/CloudBackupViewModel;"
+    },
+    {
+      "name": "OJ",
+      "reported_signature": "OJ(android.media.MediaPlayer): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Landroid/media/MediaPlayer;)V"
+    },
+    {
+      "name": "OQ",
+      "reported_signature": "OQ(): Qaq.Bb",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()LQaq/Bb;"
+    },
+    {
+      "name": "Ov8",
+      "reported_signature": "Ov8(): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()V"
+    },
+    {
+      "name": "Oy",
+      "reported_signature": "Oy(android.content.DialogInterface, int): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Landroid/content/DialogInterface;I)V"
+    },
+    {
+      "name": "P",
+      "reported_signature": "P(com.alightcreative.app.motion.activities.EditActivity): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;)V"
+    },
+    {
+      "name": "PI",
+      "reported_signature": "PI(com.alightcreative.app.motion.activities.EditActivity): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;)V"
+    },
+    {
+      "name": "PO5",
+      "reported_signature": "PO5(androidx.appcompat.app.mY0, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Landroidx/appcompat/app/mY0;Landroid/view/View;)V"
+    },
+    {
+      "name": "PT",
+      "reported_signature": "PT(java.util.Set): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Ljava/util/Set;)V"
+    },
+    {
+      "name": "PW",
+      "reported_signature": "PW(): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()V"
+    },
+    {
+      "name": "PaG",
+      "reported_signature": "PaG(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "Pj",
+      "reported_signature": "Pj(com.alightcreative.app.motion.activities.EditActivity, boolean, int, java.lang.Object): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;ZILjava/lang/Object;)V"
+    },
+    {
+      "name": "Pk",
+      "reported_signature": "Pk(com.alightcreative.app.motion.activities.EditActivity, boolean, int, java.lang.Object): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;ZILjava/lang/Object;)V"
+    },
+    {
+      "name": "Pl3",
+      "reported_signature": "Pl3(): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()V"
+    },
+    {
+      "name": "Pq",
+      "reported_signature": "Pq(com.alightcreative.app.motion.activities.EditActivity, android.content.DialogInterface): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/content/DialogInterface;)V"
+    },
+    {
+      "name": "Q",
+      "reported_signature": "Q(com.alightcreative.app.motion.activities.EditActivity, android.content.DialogInterface, int): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/content/DialogInterface;I)V"
+    },
+    {
+      "name": "Q3",
+      "reported_signature": "Q3(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "QF",
+      "reported_signature": "QF(boolean): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Z)V"
+    },
+    {
+      "name": "QS",
+      "reported_signature": "QS(Xa.rs, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(LXa/rs;Landroid/view/View;)V"
+    },
+    {
+      "name": "Qgn",
+      "reported_signature": "Qgn(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "QjU",
+      "reported_signature": "QjU(com.alightcreative.app.motion.activities.EditActivity, android.animation.ValueAnimator): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/animation/ValueAnimator;)V"
+    },
+    {
+      "name": "Qq",
+      "reported_signature": "Qq(com.alightcreative.app.motion.activities.EditActivity): long",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;)J"
+    },
+    {
+      "name": "Qsz",
+      "reported_signature": "Qsz(): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()V"
+    },
+    {
+      "name": "R",
+      "reported_signature": "R(com.alightcreative.app.motion.activities.EditActivity): IJ.mY0",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;)LIJ/mY0;"
+    },
+    {
+      "name": "R4",
+      "reported_signature": "R4(com.alightcreative.app.motion.activities.EditActivity): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;)V"
+    },
+    {
+      "name": "R83",
+      "reported_signature": "R83(java.lang.Class): androidx.fragment.app.Fragment",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Ljava/lang/Class;)Landroidx/fragment/app/Fragment;"
+    },
+    {
+      "name": "RCt",
+      "reported_signature": "RCt(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "Ras",
+      "reported_signature": "Ras(): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()V"
+    },
+    {
+      "name": "RgR",
+      "reported_signature": "RgR(com.alightcreative.app.motion.activities.EditActivity): float",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;)F"
+    },
+    {
+      "name": "RkF",
+      "reported_signature": "RkF(com.alightcreative.app.motion.activities.EditActivity, int): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;I)V"
+    },
+    {
+      "name": "S",
+      "reported_signature": "S(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "S6",
+      "reported_signature": "S6(com.alightcreative.app.motion.activities.EditActivity): fi.vQ",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;)Lfi/vQ;"
+    },
+    {
+      "name": "S8z",
+      "reported_signature": "S8z(com.alightcreative.app.motion.activities.EditActivity): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;)Z"
+    },
+    {
+      "name": "S9",
+      "reported_signature": "S9(): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()V"
+    },
+    {
+      "name": "SMX",
+      "reported_signature": "SMX(com.alightcreative.app.motion.activities.EditActivity, android.animation.AnimatorSet): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/animation/AnimatorSet;)V"
+    },
+    {
+      "name": "SO",
+      "reported_signature": "SO(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "SWI",
+      "reported_signature": "SWI(): bT.SfT",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()LbT/SfT;"
+    },
+    {
+      "name": "Sc",
+      "reported_signature": "Sc(): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()V"
+    },
+    {
+      "name": "Sd",
+      "reported_signature": "Sd(kotlin.jvm.functions.Function0): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lkotlin/jvm/functions/Function0;)V"
+    },
+    {
+      "name": "SmL",
+      "reported_signature": "SmL(com.alightcreative.app.motion.scene.SceneElement, boolean): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneElement;Z)V"
+    },
+    {
+      "name": "T",
+      "reported_signature": "T(com.alightcreative.app.motion.activities.EditActivity): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;)V"
+    },
+    {
+      "name": "T2d",
+      "reported_signature": "T2d(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "T3",
+      "reported_signature": "T3(): fi.FnA",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lfi/FnA;"
+    },
+    {
+      "name": "TA",
+      "reported_signature": "TA(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "TB",
+      "reported_signature": "TB(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "TCV",
+      "reported_signature": "TCV(): kotlin.jvm.functions.Function2",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lkotlin/jvm/functions/Function2;"
+    },
+    {
+      "name": "TF",
+      "reported_signature": "TF(bT.Lw, kotlin.jvm.functions.Function1): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(LbT/Lw;Lkotlin/jvm/functions/Function1;)V"
+    },
+    {
+      "name": "TH",
+      "reported_signature": "TH(com.alightcreative.app.motion.activities.EditActivity): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;)I"
+    },
+    {
+      "name": "TI",
+      "reported_signature": "TI(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "TLR",
+      "reported_signature": "TLR(com.alightcreative.app.motion.activities.EditActivity): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;)V"
+    },
+    {
+      "name": "TXx",
+      "reported_signature": "TXx(com.alightcreative.app.motion.activities.EditActivity, com.alightcreative.account.B8K): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Lcom/alightcreative/account/B8K;)V"
+    },
+    {
+      "name": "Tg",
+      "reported_signature": "Tg(android.view.MotionEvent): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Landroid/view/MotionEvent;)Z"
+    },
+    {
+      "name": "Tk",
+      "reported_signature": "Tk(fi.m): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lfi/m;)V"
+    },
+    {
+      "name": "Tl",
+      "reported_signature": "Tl(com.alightcreative.app.motion.activities.EditActivity, android.view.Surface): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/Surface;)V"
+    },
+    {
+      "name": "Tr",
+      "reported_signature": "Tr(com.alightcreative.app.motion.activities.EditActivity, androidx.activity.result.fs): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroidx/activity/result/fs;)V"
+    },
+    {
+      "name": "Tx",
+      "reported_signature": "Tx(com.alightcreative.app.motion.activities.EditActivity, long): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;J)V"
+    },
+    {
+      "name": "TyY",
+      "reported_signature": "TyY(com.alightcreative.app.motion.activities.EditActivity, android.content.DialogInterface, int): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/content/DialogInterface;I)V"
+    },
+    {
+      "name": "U",
+      "reported_signature": "U(com.alightcreative.app.motion.activities.EditActivity): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;)V"
+    },
+    {
+      "name": "U6m",
+      "reported_signature": "U6m(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "UK",
+      "reported_signature": "UK(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "Ua",
+      "reported_signature": "Ua(com.alightcreative.app.motion.activities.EditActivity): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;)V"
+    },
+    {
+      "name": "Ub",
+      "reported_signature": "Ub(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "Uef",
+      "reported_signature": "Uef(): Vyg.fs",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()LVyg/fs;"
+    },
+    {
+      "name": "Uu",
+      "reported_signature": "Uu(): Cd.Bb",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()LCd/Bb;"
+    },
+    {
+      "name": "V",
+      "reported_signature": "V(com.alightcreative.app.motion.activities.EditActivity, android.content.DialogInterface): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/content/DialogInterface;)V"
+    },
+    {
+      "name": "VQD",
+      "reported_signature": "VQD(com.alightcreative.app.motion.activities.EditActivity): Mm.sK",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;)LMm/sK;"
+    },
+    {
+      "name": "VR",
+      "reported_signature": "VR(): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()V"
+    },
+    {
+      "name": "VZq",
+      "reported_signature": "VZq(com.alightcreative.app.motion.activities.EditActivity, android.content.DialogInterface): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/content/DialogInterface;)V"
+    },
+    {
+      "name": "VhY",
+      "reported_signature": "VhY(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "Vo",
+      "reported_signature": "Vo(com.alightcreative.app.motion.activities.EditActivity$fs): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity$fs;)V"
+    },
+    {
+      "name": "VpA",
+      "reported_signature": "VpA(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "W",
+      "reported_signature": "W(com.alightcreative.app.motion.activities.EditActivity, android.view.View, android.view.MotionEvent): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;Landroid/view/MotionEvent;)Z"
+    },
+    {
+      "name": "W6A",
+      "reported_signature": "W6A(com.alightcreative.app.motion.activities.EditActivity, int, boolean, int, java.lang.Object): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;IZILjava/lang/Object;)V"
+    },
+    {
+      "name": "WeC",
+      "reported_signature": "WeC(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "Wmc",
+      "reported_signature": "Wmc(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "Wo9",
+      "reported_signature": "Wo9(kotlin.jvm.functions.Function0, android.content.DialogInterface): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lkotlin/jvm/functions/Function0;Landroid/content/DialogInterface;)V"
+    },
+    {
+      "name": "Wso",
+      "reported_signature": "Wso(com.alightcreative.app.motion.activities.EditActivity, int): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;I)V"
+    },
+    {
+      "name": "Ww",
+      "reported_signature": "Ww(): com.alightcreative.app.motion.activities.JIk",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/activities/JIk;"
+    },
+    {
+      "name": "Wxo",
+      "reported_signature": "Wxo(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "X3",
+      "reported_signature": "X3(com.alightcreative.app.motion.activities.EditActivity): com.alightcreative.app.motion.scene.SceneThumbnailMaker",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;)Lcom/alightcreative/app/motion/scene/SceneThumbnailMaker;"
+    },
+    {
+      "name": "X7",
+      "reported_signature": "X7(): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()V"
+    },
+    {
+      "name": "XK",
+      "reported_signature": "XK(com.alightcreative.app.motion.activities.EditActivity): java.lang.Runnable",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;)Ljava/lang/Runnable;"
+    },
+    {
+      "name": "XTU",
+      "reported_signature": "XTU(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "XU",
+      "reported_signature": "XU(com.alightcreative.app.motion.activities.EditActivity, android.view.Surface): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/Surface;)V"
+    },
+    {
+      "name": "XW",
+      "reported_signature": "XW(com.alightcreative.app.motion.activities.EditActivity): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;)V"
+    },
+    {
+      "name": "Xan",
+      "reported_signature": "Xan(com.alightcreative.app.motion.activities.EditActivity, android.widget.TextView, int, android.view.KeyEvent): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/widget/TextView;ILandroid/view/KeyEvent;)Z"
+    },
+    {
+      "name": "Xc",
+      "reported_signature": "Xc(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "Xc2",
+      "reported_signature": "Xc2(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "Xh",
+      "reported_signature": "Xh(): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()V"
+    },
+    {
+      "name": "Xk",
+      "reported_signature": "Xk(java.util.Set): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Ljava/util/Set;)V"
+    },
+    {
+      "name": "Xl",
+      "reported_signature": "Xl(Xa.rs, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(LXa/rs;Landroid/view/View;)V"
+    },
+    {
+      "name": "XmV",
+      "reported_signature": "XmV(java.lang.String): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Ljava/lang/String;)V"
+    },
+    {
+      "name": "XnR",
+      "reported_signature": "XnR(com.alightcreative.app.motion.project.ProjectInfo$mY0, qNi.Gv): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/project/ProjectInfo$mY0;LqNi/Gv;)V"
+    },
+    {
+      "name": "Xqw",
+      "reported_signature": "Xqw(kotlin.jvm.functions.Function0, android.content.DialogInterface): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lkotlin/jvm/functions/Function0;Landroid/content/DialogInterface;)V"
+    },
+    {
+      "name": "XuF",
+      "reported_signature": "XuF(): BQ.Bb",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()LBQ/Bb;"
+    },
+    {
+      "name": "Xx",
+      "reported_signature": "Xx(com.alightcreative.app.motion.activities.EditActivity): fi.LJP",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;)Lfi/LJP;"
+    },
+    {
+      "name": "YVW",
+      "reported_signature": "YVW(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "Ygo",
+      "reported_signature": "Ygo(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "Ynr",
+      "reported_signature": "Ynr(com.alightcreative.app.motion.activities.EditActivity, java.util.List): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Ljava/util/List;)V"
+    },
+    {
+      "name": "Yw",
+      "reported_signature": "Yw(com.alightcreative.app.motion.activities.EditActivity): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;)V"
+    },
+    {
+      "name": "Z",
+      "reported_signature": "Z(): FPM.mY0",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()LFPM/mY0;"
+    },
+    {
+      "name": "Z2U",
+      "reported_signature": "Z2U(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "Z5",
+      "reported_signature": "Z5(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "ZBZ",
+      "reported_signature": "ZBZ(com.alightcreative.app.motion.activities.EditActivity, java.util.List): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Ljava/util/List;)V"
+    },
+    {
+      "name": "Zh",
+      "reported_signature": "Zh(android.content.DialogInterface, int): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Landroid/content/DialogInterface;I)V"
+    },
+    {
+      "name": "Zo",
+      "reported_signature": "Zo(Xa.rs, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(LXa/rs;Landroid/view/View;)V"
+    },
+    {
+      "name": "Zvu",
+      "reported_signature": "Zvu(boolean): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Z)V"
+    },
+    {
+      "name": "a8Q",
+      "reported_signature": "a8Q(): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()V"
+    },
+    {
+      "name": "aW",
+      "reported_signature": "aW(com.alightcreative.app.motion.activities.EditActivity): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;)V"
+    },
+    {
+      "name": "aYY",
+      "reported_signature": "aYY(com.alightcreative.app.motion.activities.EditActivity): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;)V"
+    },
+    {
+      "name": "abT",
+      "reported_signature": "abT(): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()I"
+    },
+    {
+      "name": "as",
+      "reported_signature": "as(int, iV.B8K, boolean, kotlin.jvm.functions.Function1): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(ILiV/B8K;ZLkotlin/jvm/functions/Function1;)V"
+    },
+    {
+      "name": "b",
+      "reported_signature": "b(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "b3",
+      "reported_signature": "b3(kotlin.coroutines.Continuation): java.lang.Object",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lkotlin/coroutines/Continuation;)Ljava/lang/Object;"
+    },
+    {
+      "name": "bE",
+      "reported_signature": "bE(com.alightcreative.app.motion.activities.EditActivity): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;)Z"
+    },
+    {
+      "name": "bL",
+      "reported_signature": "bL(java.lang.String, com.alightcreative.app.motion.activities.EditActivity$SfT): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Ljava/lang/String;Lcom/alightcreative/app/motion/activities/EditActivity$SfT;)V"
+    },
+    {
+      "name": "bOk",
+      "reported_signature": "bOk(com.alightcreative.app.motion.activities.EditActivity, android.content.DialogInterface): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/content/DialogInterface;)V"
+    },
+    {
+      "name": "bV",
+      "reported_signature": "bV(java.lang.String, java.lang.String): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Ljava/lang/String;Ljava/lang/String;)V"
+    },
+    {
+      "name": "c",
+      "reported_signature": "c(): wao.fs",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lwao/fs;"
+    },
+    {
+      "name": "c1u",
+      "reported_signature": "c1u(): java.lang.String",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/lang/String;"
+    },
+    {
+      "name": "c8",
+      "reported_signature": "c8(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "cB",
+      "reported_signature": "cB(): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()V"
+    },
+    {
+      "name": "cBs",
+      "reported_signature": "cBs(com.alightcreative.app.motion.activities.EditActivity): qNi.mY0",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;)LqNi/mY0;"
+    },
+    {
+      "name": "cG",
+      "reported_signature": "cG(com.alightcreative.app.motion.activities.EditActivity, kotlin.jvm.functions.Function0): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Lkotlin/jvm/functions/Function0;)V"
+    },
+    {
+      "name": "cL3",
+      "reported_signature": "cL3(com.alightcreative.app.motion.activities.EditActivity): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;)Z"
+    },
+    {
+      "name": "cM",
+      "reported_signature": "cM(android.view.MotionEvent): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Landroid/view/MotionEvent;)Z"
+    },
+    {
+      "name": "cd5",
+      "reported_signature": "cd5(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "czE",
+      "reported_signature": "czE(com.alightcreative.app.motion.activities.EditActivity, android.content.DialogInterface, int): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/content/DialogInterface;I)V"
+    },
+    {
+      "name": "d",
+      "reported_signature": "d(com.alightcreative.app.motion.activities.EditActivity): long",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;)J"
+    },
+    {
+      "name": "d0M",
+      "reported_signature": "d0M(com.alightcreative.app.motion.activities.EditActivity, java.lang.String, java.lang.String, android.content.DialogInterface, int): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Ljava/lang/String;Ljava/lang/String;Landroid/content/DialogInterface;I)V"
+    },
+    {
+      "name": "d2",
+      "reported_signature": "d2(com.alightcreative.app.motion.activities.EditActivity): java.util.List",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;)Ljava/util/List;"
+    },
+    {
+      "name": "dC",
+      "reported_signature": "dC(com.alightcreative.app.motion.activities.EditActivity, com.alightcreative.app.motion.project.ProjectInfo$mY0, qNi.Gv, java.lang.Boolean): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Lcom/alightcreative/app/motion/project/ProjectInfo$mY0;LqNi/Gv;Ljava/lang/Boolean;)V"
+    },
+    {
+      "name": "dMq",
+      "reported_signature": "dMq(): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()V"
+    },
+    {
+      "name": "dZ",
+      "reported_signature": "dZ(): com.alightcreative.app.motion.scene.SceneHolder",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/SceneHolder;"
+    },
+    {
+      "name": "dd",
+      "reported_signature": "dd(com.alightcreative.app.motion.activities.EditActivity): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;)Z"
+    },
+    {
+      "name": "dispatchTouchEvent",
+      "reported_signature": "dispatchTouchEvent(android.view.MotionEvent): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Landroid/view/MotionEvent;)Z"
+    },
+    {
+      "name": "dl",
+      "reported_signature": "dl(com.alightcreative.app.motion.activities.EditActivity, boolean, int, java.lang.Object): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;ZILjava/lang/Object;)V"
+    },
+    {
+      "name": "dqw",
+      "reported_signature": "dqw(com.alightcreative.app.motion.activities.EditActivity, android.content.DialogInterface, int): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/content/DialogInterface;I)V"
+    },
+    {
+      "name": "dw",
+      "reported_signature": "dw(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "e",
+      "reported_signature": "e(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "e4",
+      "reported_signature": "e4(com.alightcreative.app.motion.activities.EditActivity, IJ.mY0$fs): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;LIJ/mY0$fs;)V"
+    },
+    {
+      "name": "e9U",
+      "reported_signature": "e9U(com.alightcreative.app.motion.activities.EditActivity): long",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;)J"
+    },
+    {
+      "name": "eJ",
+      "reported_signature": "eJ(com.alightcreative.app.motion.activities.EditActivity, android.content.DialogInterface, int): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/content/DialogInterface;I)V"
+    },
+    {
+      "name": "eLy",
+      "reported_signature": "eLy(): D4S.euv",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()LD4S/euv;"
+    },
+    {
+      "name": "eOc",
+      "reported_signature": "eOc(com.alightcreative.app.motion.activities.EditActivity, float): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;F)V"
+    },
+    {
+      "name": "ee",
+      "reported_signature": "ee(com.alightcreative.app.motion.activities.EditActivity): IJ.mY0$fs",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;)LIJ/mY0$fs;"
+    },
+    {
+      "name": "eyJ",
+      "reported_signature": "eyJ(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "f2g",
+      "reported_signature": "f2g(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "fMR",
+      "reported_signature": "fMR(android.content.DialogInterface, int): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Landroid/content/DialogInterface;I)V"
+    },
+    {
+      "name": "fMW",
+      "reported_signature": "fMW(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "fUQ",
+      "reported_signature": "fUQ(): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Z"
+    },
+    {
+      "name": "fab",
+      "reported_signature": "fab(com.alightcreative.app.motion.activities.EditActivity): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;)V"
+    },
+    {
+      "name": "fg",
+      "reported_signature": "fg(android.content.DialogInterface, int): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Landroid/content/DialogInterface;I)V"
+    },
+    {
+      "name": "fj",
+      "reported_signature": "fj(com.alightcreative.app.motion.activities.EditActivity, java.util.Set): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Ljava/util/Set;)V"
+    },
+    {
+      "name": "fp",
+      "reported_signature": "fp(int): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(I)V"
+    },
+    {
+      "name": "fz",
+      "reported_signature": "fz(): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()V"
+    },
+    {
+      "name": "g0",
+      "reported_signature": "g0(): rmJ.Bb",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()LrmJ/Bb;"
+    },
+    {
+      "name": "gQ",
+      "reported_signature": "gQ(): wao.fs",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lwao/fs;"
+    },
+    {
+      "name": "gWb",
+      "reported_signature": "gWb(): java.util.List",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/util/List;"
+    },
+    {
+      "name": "gWi",
+      "reported_signature": "gWi(com.alightcreative.app.motion.activities.EditActivity, androidx.activity.result.fs): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroidx/activity/result/fs;)V"
+    },
+    {
+      "name": "gc2",
+      "reported_signature": "gc2(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "getSelection",
+      "reported_signature": "getSelection(): com.alightcreative.app.motion.scene.SceneSelection",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/SceneSelection;"
+    },
+    {
+      "name": "gj",
+      "reported_signature": "gj(com.alightcreative.app.motion.activities.EditActivity): qNi.mY0",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;)LqNi/mY0;"
+    },
+    {
+      "name": "guj",
+      "reported_signature": "guj(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "h7",
+      "reported_signature": "h7(androidx.appcompat.app.mY0, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Landroidx/appcompat/app/mY0;Landroid/view/View;)V"
+    },
+    {
+      "name": "hD",
+      "reported_signature": "hD(com.alightcreative.app.motion.activities.EditActivity): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;)V"
+    },
+    {
+      "name": "hLa",
+      "reported_signature": "hLa(FPM.mY0): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(LFPM/mY0;)V"
+    },
+    {
+      "name": "hQ",
+      "reported_signature": "hQ(kotlin.jvm.functions.Function0, android.content.DialogInterface): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lkotlin/jvm/functions/Function0;Landroid/content/DialogInterface;)V"
+    },
+    {
+      "name": "hWt",
+      "reported_signature": "hWt(com.alightcreative.app.motion.activities.EditActivity): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;)V"
+    },
+    {
+      "name": "haI",
+      "reported_signature": "haI(): com.alightcreative.maineditor.EditViewModel",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/maineditor/EditViewModel;"
+    },
+    {
+      "name": "hda",
+      "reported_signature": "hda(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "hww",
+      "reported_signature": "hww(com.alightcreative.app.motion.activities.EditActivity): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;)Z"
+    },
+    {
+      "name": "hy1",
+      "reported_signature": "hy1(com.alightcreative.app.motion.activities.EditActivity, android.content.DialogInterface): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/content/DialogInterface;)V"
+    },
+    {
+      "name": "iE",
+      "reported_signature": "iE(): java.util.List",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/util/List;"
+    },
+    {
+      "name": "iF",
+      "reported_signature": "iF(com.alightcreative.app.motion.activities.EditActivity): com.alightcreative.app.motion.scene.BitmapLruCache",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;)Lcom/alightcreative/app/motion/scene/BitmapLruCache;"
+    },
+    {
+      "name": "iN",
+      "reported_signature": "iN(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "iac",
+      "reported_signature": "iac(com.alightcreative.app.motion.activities.EditActivity, boolean): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Z)V"
+    },
+    {
+      "name": "ij",
+      "reported_signature": "ij(com.alightcreative.app.motion.activities.EditActivity): float",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;)F"
+    },
+    {
+      "name": "ipg",
+      "reported_signature": "ipg(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "j",
+      "reported_signature": "j(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "j1",
+      "reported_signature": "j1(kotlin.jvm.functions.Function0): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lkotlin/jvm/functions/Function0;)V"
+    },
+    {
+      "name": "j7A",
+      "reported_signature": "j7A(com.alightcreative.app.motion.activities.EditActivity): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;)V"
+    },
+    {
+      "name": "jG",
+      "reported_signature": "jG(): com.alightcreative.backup.CloudBackupViewModel",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/backup/CloudBackupViewModel;"
+    },
+    {
+      "name": "jWL",
+      "reported_signature": "jWL(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "jw",
+      "reported_signature": "jw(com.alightcreative.app.motion.activities.EditActivity$fs, com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity$fs;Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "jy",
+      "reported_signature": "jy(com.alightcreative.app.motion.activities.EditActivity): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;)V"
+    },
+    {
+      "name": "k1d",
+      "reported_signature": "k1d(): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()V"
+    },
+    {
+      "name": "kJS",
+      "reported_signature": "kJS(com.alightcreative.app.motion.activities.EditActivity, android.view.View): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)Z"
+    },
+    {
+      "name": "kKw",
+      "reported_signature": "kKw(int): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(I)V"
+    },
+    {
+      "name": "ki",
+      "reported_signature": "ki(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "kx",
+      "reported_signature": "kx(com.alightcreative.app.motion.activities.EditActivity, android.view.View): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)Z"
+    },
+    {
+      "name": "l",
+      "reported_signature": "l(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "l18",
+      "reported_signature": "l18(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "lCX",
+      "reported_signature": "lCX(android.content.Intent): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Landroid/content/Intent;)V"
+    },
+    {
+      "name": "lLZ",
+      "reported_signature": "lLZ(com.alightcreative.app.motion.activities.EditActivity, boolean): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Z)V"
+    },
+    {
+      "name": "lO",
+      "reported_signature": "lO(): java.util.Set",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/util/Set;"
+    },
+    {
+      "name": "lRi",
+      "reported_signature": "lRi(java.lang.String): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Ljava/lang/String;)V"
+    },
+    {
+      "name": "lT",
+      "reported_signature": "lT(): IJ.mY0$fs",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()LIJ/mY0$fs;"
+    },
+    {
+      "name": "lW7",
+      "reported_signature": "lW7(kotlin.jvm.internal.Ref$ObjectRef, com.alightcreative.app.motion.activities.EditActivity, java.lang.String, java.lang.String, android.content.DialogInterface, int): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lkotlin/jvm/internal/Ref$ObjectRef;Lcom/alightcreative/app/motion/activities/EditActivity;Ljava/lang/String;Ljava/lang/String;Landroid/content/DialogInterface;I)V"
+    },
+    {
+      "name": "laD",
+      "reported_signature": "laD(): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()V"
+    },
+    {
+      "name": "lg1",
+      "reported_signature": "lg1(): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()V"
+    },
+    {
+      "name": "lv",
+      "reported_signature": "lv(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "m",
+      "reported_signature": "m(com.alightcreative.app.motion.activities.EditActivity, kotlin.jvm.internal.Ref$IntRef, kotlin.jvm.functions.Function0, android.content.DialogInterface): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Lkotlin/jvm/internal/Ref$IntRef;Lkotlin/jvm/functions/Function0;Landroid/content/DialogInterface;)V"
+    },
+    {
+      "name": "mI",
+      "reported_signature": "mI(com.alightcreative.app.motion.activities.EditActivity): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;)V"
+    },
+    {
+      "name": "mJc",
+      "reported_signature": "mJc(com.alightcreative.app.motion.activities.EditActivity): androidx.activity.result.B8K",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;)Landroidx/activity/result/B8K;"
+    },
+    {
+      "name": "mK",
+      "reported_signature": "mK(com.alightcreative.app.motion.activities.EditActivity$fs): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity$fs;)V"
+    },
+    {
+      "name": "mXC",
+      "reported_signature": "mXC(kotlin.jvm.internal.Ref$FloatRef, kotlin.jvm.internal.Ref$FloatRef, com.alightcreative.app.motion.activities.EditActivity, android.view.View, android.view.MotionEvent): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lkotlin/jvm/internal/Ref$FloatRef;Lkotlin/jvm/internal/Ref$FloatRef;Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;Landroid/view/MotionEvent;)Z"
+    },
+    {
+      "name": "md",
+      "reported_signature": "md(java.util.List): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Ljava/util/List;)V"
+    },
+    {
+      "name": "mg",
+      "reported_signature": "mg(com.alightcreative.app.motion.activities.EditActivity, kotlin.jvm.internal.Ref$BooleanRef, kotlin.jvm.internal.Ref$BooleanRef, android.view.View, android.view.MotionEvent): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Lkotlin/jvm/internal/Ref$BooleanRef;Lkotlin/jvm/internal/Ref$BooleanRef;Landroid/view/View;Landroid/view/MotionEvent;)Z"
+    },
+    {
+      "name": "mpF",
+      "reported_signature": "mpF(com.alightcreative.app.motion.activities.EditActivity, android.animation.ValueAnimator): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/animation/ValueAnimator;)V"
+    },
+    {
+      "name": "n3",
+      "reported_signature": "n3(): float",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()F"
+    },
+    {
+      "name": "nQ",
+      "reported_signature": "nQ(com.alightcreative.app.motion.activities.EditActivity, float): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;F)V"
+    },
+    {
+      "name": "nb",
+      "reported_signature": "nb(android.content.DialogInterface, int): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Landroid/content/DialogInterface;I)V"
+    },
+    {
+      "name": "nn",
+      "reported_signature": "nn(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "o",
+      "reported_signature": "o(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "o2",
+      "reported_signature": "o2(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "o3",
+      "reported_signature": "o3(com.alightcreative.app.motion.activities.EditActivity, long): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;J)V"
+    },
+    {
+      "name": "oO",
+      "reported_signature": "oO(C3A.sK): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(LC3A/sK;)V"
+    },
+    {
+      "name": "oar",
+      "reported_signature": "oar(com.alightcreative.app.motion.activities.EditActivity, java.util.Set): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Ljava/util/Set;)V"
+    },
+    {
+      "name": "of",
+      "reported_signature": "of(kotlin.jvm.functions.Function0, android.content.DialogInterface): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lkotlin/jvm/functions/Function0;Landroid/content/DialogInterface;)V"
+    },
+    {
+      "name": "ofE",
+      "reported_signature": "ofE(com.alightcreative.app.motion.activities.EditActivity, kotlin.jvm.internal.Ref$BooleanRef, kotlin.jvm.internal.Ref$BooleanRef, android.view.View, android.view.MotionEvent): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Lkotlin/jvm/internal/Ref$BooleanRef;Lkotlin/jvm/internal/Ref$BooleanRef;Landroid/view/View;Landroid/view/MotionEvent;)Z"
+    },
+    {
+      "name": "onActivityResult",
+      "reported_signature": "onActivityResult(int, int, android.content.Intent): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(IILandroid/content/Intent;)V"
+    },
+    {
+      "name": "onBackPressed",
+      "reported_signature": "onBackPressed(): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()V"
+    },
+    {
+      "name": "onCreate",
+      "reported_signature": "onCreate(android.os.Bundle): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Landroid/os/Bundle;)V"
+    },
+    {
+      "name": "onDestroy",
+      "reported_signature": "onDestroy(): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()V"
+    },
+    {
+      "name": "onNewIntent",
+      "reported_signature": "onNewIntent(android.content.Intent): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Landroid/content/Intent;)V"
+    },
+    {
+      "name": "onPause",
+      "reported_signature": "onPause(): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()V"
+    },
+    {
+      "name": "onRequestPermissionsResult",
+      "reported_signature": "onRequestPermissionsResult(int, java.lang.String[], int[]): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(I[Ljava/lang/String;[I)V"
+    },
+    {
+      "name": "onResume",
+      "reported_signature": "onResume(): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()V"
+    },
+    {
+      "name": "onSaveInstanceState",
+      "reported_signature": "onSaveInstanceState(android.os.Bundle): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Landroid/os/Bundle;)V"
+    },
+    {
+      "name": "onStart",
+      "reported_signature": "onStart(): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()V"
+    },
+    {
+      "name": "onStop",
+      "reported_signature": "onStop(): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()V"
+    },
+    {
+      "name": "op5",
+      "reported_signature": "op5(): java.util.List",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/util/List;"
+    },
+    {
+      "name": "osi",
+      "reported_signature": "osi(java.lang.String, java.lang.String): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Ljava/lang/String;Ljava/lang/String;)V"
+    },
+    {
+      "name": "p",
+      "reported_signature": "p(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "pQ",
+      "reported_signature": "pQ(int): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(I)V"
+    },
+    {
+      "name": "pZM",
+      "reported_signature": "pZM(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "pe7",
+      "reported_signature": "pe7(fi.FnA): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lfi/FnA;)V"
+    },
+    {
+      "name": "q",
+      "reported_signature": "q(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "q2G",
+      "reported_signature": "q2G(java.lang.String): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Ljava/lang/String;)V"
+    },
+    {
+      "name": "q4u",
+      "reported_signature": "q4u(com.alightcreative.app.motion.activities.EditActivity): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;)V"
+    },
+    {
+      "name": "qL",
+      "reported_signature": "qL(com.alightcreative.app.motion.activities.EditActivity): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;)V"
+    },
+    {
+      "name": "qTn",
+      "reported_signature": "qTn(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "qev",
+      "reported_signature": "qev(android.view.View, android.view.MotionEvent): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Landroid/view/View;Landroid/view/MotionEvent;)Z"
+    },
+    {
+      "name": "qrK",
+      "reported_signature": "qrK(): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Z"
+    },
+    {
+      "name": "qz",
+      "reported_signature": "qz(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "r",
+      "reported_signature": "r(): fi.LJP",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lfi/LJP;"
+    },
+    {
+      "name": "rIw",
+      "reported_signature": "rIw(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "rLh",
+      "reported_signature": "rLh(com.alightcreative.app.motion.activities.EditActivity, android.widget.TextView, int, android.view.KeyEvent): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/widget/TextView;ILandroid/view/KeyEvent;)Z"
+    },
+    {
+      "name": "rM5",
+      "reported_signature": "rM5(com.alightcreative.app.motion.activities.EditActivity, androidx.activity.result.fs): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroidx/activity/result/fs;)V"
+    },
+    {
+      "name": "rY",
+      "reported_signature": "rY(): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()V"
+    },
+    {
+      "name": "rZ",
+      "reported_signature": "rZ(kotlin.jvm.internal.Ref$FloatRef, kotlin.jvm.internal.Ref$FloatRef, com.alightcreative.app.motion.activities.EditActivity, android.view.View, android.view.MotionEvent): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lkotlin/jvm/internal/Ref$FloatRef;Lkotlin/jvm/internal/Ref$FloatRef;Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;Landroid/view/MotionEvent;)Z"
+    },
+    {
+      "name": "rcA",
+      "reported_signature": "rcA(android.net.Uri): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Landroid/net/Uri;)V"
+    },
+    {
+      "name": "rq",
+      "reported_signature": "rq(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "ry",
+      "reported_signature": "ry(com.alightcreative.app.motion.activities.EditActivity, kotlin.jvm.internal.Ref$IntRef, kotlin.jvm.functions.Function0, android.content.DialogInterface): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Lkotlin/jvm/internal/Ref$IntRef;Lkotlin/jvm/functions/Function0;Landroid/content/DialogInterface;)V"
+    },
+    {
+      "name": "s",
+      "reported_signature": "s(): java.lang.String",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/lang/String;"
+    },
+    {
+      "name": "s0",
+      "reported_signature": "s0(com.alightcreative.app.motion.activities.EditActivity, androidx.fragment.app.FragmentManager, androidx.fragment.app.Fragment): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroidx/fragment/app/FragmentManager;Landroidx/fragment/app/Fragment;)V"
+    },
+    {
+      "name": "s7",
+      "reported_signature": "s7(): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()V"
+    },
+    {
+      "name": "sJj",
+      "reported_signature": "sJj(): gRf.xUY$B8K",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()LgRf/xUY$B8K;"
+    },
+    {
+      "name": "sK",
+      "reported_signature": "sK(): psA.kfX",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()LpsA/kfX;"
+    },
+    {
+      "name": "sPA",
+      "reported_signature": "sPA(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "sZR",
+      "reported_signature": "sZR(kotlin.jvm.functions.Function0, android.content.DialogInterface): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lkotlin/jvm/functions/Function0;Landroid/content/DialogInterface;)V"
+    },
+    {
+      "name": "sf",
+      "reported_signature": "sf(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "sgJ",
+      "reported_signature": "sgJ(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "so",
+      "reported_signature": "so(boolean): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Z)V"
+    },
+    {
+      "name": "t",
+      "reported_signature": "t(com.alightcreative.app.motion.activities.EditActivity, android.view.View): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)Z"
+    },
+    {
+      "name": "t4Q",
+      "reported_signature": "t4Q(boolean): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Z)V"
+    },
+    {
+      "name": "tC6",
+      "reported_signature": "tC6(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "tT",
+      "reported_signature": "tT(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "tU",
+      "reported_signature": "tU(com.alightcreative.app.motion.activities.EditActivity, int): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;I)V"
+    },
+    {
+      "name": "tn",
+      "reported_signature": "tn(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "ttq",
+      "reported_signature": "ttq(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "u0c",
+      "reported_signature": "u0c(com.alightcreative.app.motion.activities.EditActivity, long): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;J)V"
+    },
+    {
+      "name": "uBv",
+      "reported_signature": "uBv(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "uP",
+      "reported_signature": "uP(long): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(J)V"
+    },
+    {
+      "name": "uS",
+      "reported_signature": "uS(android.content.DialogInterface, int): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Landroid/content/DialogInterface;I)V"
+    },
+    {
+      "name": "uco",
+      "reported_signature": "uco(): r1L.B8K",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lr1L/B8K;"
+    },
+    {
+      "name": "ut",
+      "reported_signature": "ut(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "uug",
+      "reported_signature": "uug(com.alightcreative.app.motion.activities.EditActivity$fs, com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity$fs;Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "v3",
+      "reported_signature": "v3(com.alightcreative.app.motion.activities.EditActivity): Xa.sK",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;)LXa/sK;"
+    },
+    {
+      "name": "v6",
+      "reported_signature": "v6(com.alightcreative.app.motion.activities.EditActivity): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;)V"
+    },
+    {
+      "name": "v7",
+      "reported_signature": "v7(): bxG.B8K",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()LbxG/B8K;"
+    },
+    {
+      "name": "vAF",
+      "reported_signature": "vAF(boolean): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Z)V"
+    },
+    {
+      "name": "vJ",
+      "reported_signature": "vJ(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "vNZ",
+      "reported_signature": "vNZ(com.alightcreative.app.motion.activities.EditActivity): com.alightcreative.app.motion.activities.oMf",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;)Lcom/alightcreative/app/motion/activities/oMf;"
+    },
+    {
+      "name": "vX1",
+      "reported_signature": "vX1(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "vXY",
+      "reported_signature": "vXY(com.alightcreative.app.motion.activities.EditActivity, android.view.View, boolean): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;Z)V"
+    },
+    {
+      "name": "vev",
+      "reported_signature": "vev(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "vk",
+      "reported_signature": "vk(com.alightcreative.app.motion.activities.EditActivity): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;)V"
+    },
+    {
+      "name": "vm",
+      "reported_signature": "vm(kotlin.jvm.functions.Function0, android.content.DialogInterface): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lkotlin/jvm/functions/Function0;Landroid/content/DialogInterface;)V"
+    },
+    {
+      "name": "w",
+      "reported_signature": "w(com.alightcreative.app.motion.activities.EditActivity): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;)V"
+    },
+    {
+      "name": "wHL",
+      "reported_signature": "wHL(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "wJ",
+      "reported_signature": "wJ(com.alightcreative.app.motion.activities.EditActivity, android.content.DialogInterface, int): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/content/DialogInterface;I)V"
+    },
+    {
+      "name": "wM",
+      "reported_signature": "wM(): com.alightcreative.app.motion.activities.EditActivity$fs",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/activities/EditActivity$fs;"
+    },
+    {
+      "name": "wZm",
+      "reported_signature": "wZm(com.alightcreative.app.motion.activities.EditActivity, androidx.fragment.app.FragmentManager, androidx.fragment.app.Fragment): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroidx/fragment/app/FragmentManager;Landroidx/fragment/app/Fragment;)V"
+    },
+    {
+      "name": "wi",
+      "reported_signature": "wi(com.alightcreative.app.motion.activities.EditActivity, boolean, int, java.lang.Object): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;ZILjava/lang/Object;)V"
+    },
+    {
+      "name": "wj",
+      "reported_signature": "wj(android.view.View, android.view.MotionEvent): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Landroid/view/View;Landroid/view/MotionEvent;)Z"
+    },
+    {
+      "name": "ws",
+      "reported_signature": "ws(com.alightcreative.app.motion.scene.SceneElement): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneElement;)V"
+    },
+    {
+      "name": "wzn",
+      "reported_signature": "wzn(com.alightcreative.app.motion.activities.EditActivity, android.view.View): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)Z"
+    },
+    {
+      "name": "x",
+      "reported_signature": "x(com.alightcreative.app.motion.activities.EditActivity, java.lang.String, java.lang.String, android.content.DialogInterface, int): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Ljava/lang/String;Ljava/lang/String;Landroid/content/DialogInterface;I)V"
+    },
+    {
+      "name": "x7",
+      "reported_signature": "x7(com.alightcreative.app.motion.activities.EditActivity, boolean): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Z)V"
+    },
+    {
+      "name": "x7d",
+      "reported_signature": "x7d(com.alightcreative.app.motion.activities.EditActivity): com.alightcreative.maineditor.EditViewModel",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;)Lcom/alightcreative/maineditor/EditViewModel;"
+    },
+    {
+      "name": "x9",
+      "reported_signature": "x9(com.alightcreative.app.motion.activities.EditActivity, com.alightcreative.app.motion.project.ProjectInfo$mY0, qNi.Gv): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Lcom/alightcreative/app/motion/project/ProjectInfo$mY0;LqNi/Gv;)V"
+    },
+    {
+      "name": "xBS",
+      "reported_signature": "xBS(): java.util.List",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/util/List;"
+    },
+    {
+      "name": "xG",
+      "reported_signature": "xG(com.alightcreative.app.motion.activities.EditActivity): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;)V"
+    },
+    {
+      "name": "xR",
+      "reported_signature": "xR(com.alightcreative.app.motion.activities.EditActivity): com.alightcreative.app.motion.activities.edit.widgets.TimelineLayoutManager",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;)Lcom/alightcreative/app/motion/activities/edit/widgets/TimelineLayoutManager;"
+    },
+    {
+      "name": "xp",
+      "reported_signature": "xp(): vyF.RxB",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()LvyF/RxB;"
+    },
+    {
+      "name": "xw",
+      "reported_signature": "xw(com.alightcreative.app.motion.activities.EditActivity, float): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;F)V"
+    },
+    {
+      "name": "y",
+      "reported_signature": "y(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "y0v",
+      "reported_signature": "y0v(com.alightcreative.app.motion.activities.EditActivity): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;)V"
+    },
+    {
+      "name": "yie",
+      "reported_signature": "yie(com.alightcreative.app.motion.activities.EditActivity): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;)V"
+    },
+    {
+      "name": "yja",
+      "reported_signature": "yja(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "yje",
+      "reported_signature": "yje(java.lang.String, java.lang.String): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Ljava/lang/String;Ljava/lang/String;)V"
+    },
+    {
+      "name": "ys",
+      "reported_signature": "ys(com.alightcreative.app.motion.activities.EditActivity): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;)V"
+    },
+    {
+      "name": "ywo",
+      "reported_signature": "ywo(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "z",
+      "reported_signature": "z(com.alightcreative.app.motion.activities.EditActivity, android.content.DialogInterface, int): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/content/DialogInterface;I)V"
+    },
+    {
+      "name": "z0X",
+      "reported_signature": "z0X(com.alightcreative.app.motion.activities.EditActivity, android.view.View, boolean): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;Z)V"
+    },
+    {
+      "name": "z3",
+      "reported_signature": "z3(com.alightcreative.app.motion.activities.EditActivity, com.alightcreative.app.motion.scene.SceneElement): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Lcom/alightcreative/app/motion/scene/SceneElement;)V"
+    },
+    {
+      "name": "zGP",
+      "reported_signature": "zGP(int, boolean): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(IZ)V"
+    },
+    {
+      "name": "zH",
+      "reported_signature": "zH(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "zH9",
+      "reported_signature": "zH9(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "zLK",
+      "reported_signature": "zLK(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "zX",
+      "reported_signature": "zX(com.alightcreative.app.motion.activities.EditActivity, androidx.appcompat.app.mY0, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroidx/appcompat/app/mY0;Landroid/view/View;)V"
+    },
+    {
+      "name": "za",
+      "reported_signature": "za(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "zci",
+      "reported_signature": "zci(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "zf",
+      "reported_signature": "zf(com.alightcreative.app.motion.activities.EditActivity): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;)V"
+    },
+    {
+      "name": "zhF",
+      "reported_signature": "zhF(): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()I"
+    },
+    {
+      "name": "zx",
+      "reported_signature": "zx(com.alightcreative.app.motion.activities.EditActivity, android.view.View): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;Landroid/view/View;)V"
+    },
+    {
+      "name": "zxv",
+      "reported_signature": "zxv(com.alightcreative.app.motion.activities.EditActivity): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/activities/EditActivity;)I"
+    }
+  ],
+  "fields": [
+    {
+      "name": "A2o",
+      "reported_type": "float",
+      "dex_static_value": null
+    },
+    {
+      "name": "B7B",
+      "reported_type": "kotlin.Lazy",
+      "dex_static_value": null
+    },
+    {
+      "name": "C12",
+      "reported_type": "kotlin.jvm.functions.Function2",
+      "dex_static_value": null
+    },
+    {
+      "name": "C4b",
+      "reported_type": "boolean",
+      "dex_static_value": null
+    },
+    {
+      "name": "DB",
+      "reported_type": "long",
+      "dex_static_value": null
+    },
+    {
+      "name": "ELg",
+      "reported_type": "kotlin.Lazy",
+      "dex_static_value": null
+    },
+    {
+      "name": "FCL",
+      "reported_type": "long",
+      "dex_static_value": null
+    },
+    {
+      "name": "Gva",
+      "reported_type": "com.alightcreative.app.motion.scene.BitmapLruCache",
+      "dex_static_value": null
+    },
+    {
+      "name": "IW",
+      "reported_type": "float",
+      "dex_static_value": null
+    },
+    {
+      "name": "Ikm",
+      "reported_type": "int",
+      "dex_static_value": null
+    },
+    {
+      "name": "J1",
+      "reported_type": "com.alightcreative.app.motion.activities.EditActivity$fs",
+      "dex_static_value": null
+    },
+    {
+      "name": "J5",
+      "reported_type": "com.alightcreative.app.motion.scene.SceneThumbnailMaker",
+      "dex_static_value": null
+    },
+    {
+      "name": "J8c",
+      "reported_type": "qNi.mY0",
+      "dex_static_value": null
+    },
+    {
+      "name": "KxZ",
+      "reported_type": "Qaq.c",
+      "dex_static_value": null
+    },
+    {
+      "name": "L7",
+      "reported_type": "int",
+      "dex_static_value": null
+    },
+    {
+      "name": "Lw",
+      "reported_type": "boolean",
+      "dex_static_value": null
+    },
+    {
+      "name": "N7N",
+      "reported_type": "int",
+      "dex_static_value": null
+    },
+    {
+      "name": "Oy",
+      "reported_type": "int",
+      "dex_static_value": null
+    },
+    {
+      "name": "PW",
+      "reported_type": "vyF.RxB",
+      "dex_static_value": null
+    },
+    {
+      "name": "QS",
+      "reported_type": "java.lang.String",
+      "dex_static_value": null
+    },
+    {
+      "name": "R4",
+      "reported_type": "java.lang.Runnable",
+      "dex_static_value": null
+    },
+    {
+      "name": "R5h",
+      "reported_type": "FPM.mY0",
+      "dex_static_value": null
+    },
+    {
+      "name": "RCt",
+      "reported_type": "int",
+      "dex_static_value": null
+    },
+    {
+      "name": "REG",
+      "reported_type": "android.os.Handler",
+      "dex_static_value": null
+    },
+    {
+      "name": "SO",
+      "reported_type": "int",
+      "dex_static_value": null
+    },
+    {
+      "name": "SmL",
+      "reported_type": "gRf.xUY$B8K",
+      "dex_static_value": null
+    },
+    {
+      "name": "StB",
+      "reported_type": "MG.Bb",
+      "dex_static_value": null
+    },
+    {
+      "name": "TG",
+      "reported_type": "Cd.Bb",
+      "dex_static_value": null
+    },
+    {
+      "name": "TXx",
+      "reported_type": "boolean",
+      "dex_static_value": null
+    },
+    {
+      "name": "U6m",
+      "reported_type": "kotlin.jvm.functions.Function2",
+      "dex_static_value": null
+    },
+    {
+      "name": "UK",
+      "reported_type": "long",
+      "dex_static_value": null
+    },
+    {
+      "name": "WeC",
+      "reported_type": "kotlin.jvm.functions.Function1",
+      "dex_static_value": null
+    },
+    {
+      "name": "Xc",
+      "reported_type": "kotlin.Lazy",
+      "dex_static_value": null
+    },
+    {
+      "name": "Xqw",
+      "reported_type": "java.util.List",
+      "dex_static_value": null
+    },
+    {
+      "name": "YVW",
+      "reported_type": "boolean",
+      "dex_static_value": null
+    },
+    {
+      "name": "as",
+      "reported_type": "r1L.B8K",
+      "dex_static_value": null
+    },
+    {
+      "name": "bG",
+      "reported_type": "Qaq.Bb",
+      "dex_static_value": null
+    },
+    {
+      "name": "bdS",
+      "reported_type": "boolean",
+      "dex_static_value": null
+    },
+    {
+      "name": "bka",
+      "reported_type": "BQ.Bb",
+      "dex_static_value": null
+    },
+    {
+      "name": "cip",
+      "reported_type": "fi.m",
+      "dex_static_value": null
+    },
+    {
+      "name": "czE",
+      "reported_type": "long",
+      "dex_static_value": null
+    },
+    {
+      "name": "eyJ",
+      "reported_type": "java.util.List",
+      "dex_static_value": null
+    },
+    {
+      "name": "f17613A",
+      "reported_type": "boolean",
+      "dex_static_value": null
+    },
+    {
+      "name": "f17614A8",
+      "reported_type": "long",
+      "dex_static_value": null
+    },
+    {
+      "name": "f17615C",
+      "reported_type": "bT.K",
+      "dex_static_value": null
+    },
+    {
+      "name": "f17616CI",
+      "reported_type": "boolean",
+      "dex_static_value": null
+    },
+    {
+      "name": "f17617H",
+      "reported_type": "r1L.euv",
+      "dex_static_value": null
+    },
+    {
+      "name": "f17618J",
+      "reported_type": "android.view.Surface",
+      "dex_static_value": null
+    },
+    {
+      "name": "f17619L",
+      "reported_type": "rmJ.Bb",
+      "dex_static_value": null
+    },
+    {
+      "name": "f17620N",
+      "reported_type": "float",
+      "dex_static_value": null
+    },
+    {
+      "name": "f17621O",
+      "reported_type": "int",
+      "dex_static_value": null
+    },
+    {
+      "name": "f17622P",
+      "reported_type": "kotlin.Lazy",
+      "dex_static_value": null
+    },
+    {
+      "name": "f17623T",
+      "reported_type": "java.util.List",
+      "dex_static_value": null
+    },
+    {
+      "name": "f17624U",
+      "reported_type": "kotlin.Lazy",
+      "dex_static_value": null
+    },
+    {
+      "name": "f17625X",
+      "reported_type": "com.alightcreative.app.motion.activities.oMf",
+      "dex_static_value": null
+    },
+    {
+      "name": "f17626Y",
+      "reported_type": "qNi.mY0",
+      "dex_static_value": null
+    },
+    {
+      "name": "f17627Z",
+      "reported_type": "bxG.B8K",
+      "dex_static_value": null
+    },
+    {
+      "name": "f17628b",
+      "reported_type": "android.view.Surface",
+      "dex_static_value": null
+    },
+    {
+      "name": "f17629c8",
+      "reported_type": "com.alightcreative.account.B8K",
+      "dex_static_value": null
+    },
+    {
+      "name": "f17630d3",
+      "reported_type": "kotlin.Lazy",
+      "dex_static_value": null
+    },
+    {
+      "name": "f17631e",
+      "reported_type": "androidx.activity.result.B8K",
+      "dex_static_value": null
+    },
+    {
+      "name": "f17632f",
+      "reported_type": "long",
+      "dex_static_value": null
+    },
+    {
+      "name": "f17633g",
+      "reported_type": "Xa.sK",
+      "dex_static_value": null
+    },
+    {
+      "name": "f17634k",
+      "reported_type": "C3A.sK",
+      "dex_static_value": null
+    },
+    {
+      "name": "f17635l",
+      "reported_type": "psA.kfX",
+      "dex_static_value": null
+    },
+    {
+      "name": "f17636m",
+      "reported_type": "boolean",
+      "dex_static_value": null
+    },
+    {
+      "name": "f17637o",
+      "reported_type": "boolean",
+      "dex_static_value": null
+    },
+    {
+      "name": "f17638q",
+      "reported_type": "float",
+      "dex_static_value": null
+    },
+    {
+      "name": "f17639rZ",
+      "reported_type": "boolean",
+      "dex_static_value": null
+    },
+    {
+      "name": "f17640tT",
+      "reported_type": "long",
+      "dex_static_value": null
+    },
+    {
+      "name": "f17641v",
+      "reported_type": "fi.FnA",
+      "dex_static_value": null
+    },
+    {
+      "name": "f17642vk",
+      "reported_type": "long",
+      "dex_static_value": null
+    },
+    {
+      "name": "f17643w",
+      "reported_type": "java.lang.Runnable",
+      "dex_static_value": null
+    },
+    {
+      "name": "f17644x",
+      "reported_type": "java.util.List",
+      "dex_static_value": null
+    },
+    {
+      "name": "f17645y",
+      "reported_type": "float",
+      "dex_static_value": null
+    },
+    {
+      "name": "f17646zf",
+      "reported_type": "boolean",
+      "dex_static_value": null
+    },
+    {
+      "name": "f1k",
+      "reported_type": "kotlin.Lazy",
+      "dex_static_value": null
+    },
+    {
+      "name": "fMW",
+      "reported_type": "long",
+      "dex_static_value": null
+    },
+    {
+      "name": "fg",
+      "reported_type": "java.lang.Runnable",
+      "dex_static_value": null
+    },
+    {
+      "name": "gOC",
+      "reported_type": "VeZ.Bb",
+      "dex_static_value": null
+    },
+    {
+      "name": "gc2",
+      "reported_type": "boolean",
+      "dex_static_value": null
+    },
+    {
+      "name": "hW",
+      "reported_type": "android.media.MediaPlayer",
+      "dex_static_value": null
+    },
+    {
+      "name": "hda",
+      "reported_type": "com.alightcreative.app.motion.activities.EditActivity$B8K",
+      "dex_static_value": null
+    },
+    {
+      "name": "hfJ",
+      "reported_type": "Mm.sK",
+      "dex_static_value": null
+    },
+    {
+      "name": "hs",
+      "reported_type": "kotlin.Lazy",
+      "dex_static_value": null
+    },
+    {
+      "name": "iN",
+      "reported_type": "java.util.Map",
+      "dex_static_value": null
+    },
+    {
+      "name": "jCs",
+      "reported_type": "T9p.z",
+      "dex_static_value": null
+    },
+    {
+      "name": "jy",
+      "reported_type": "android.net.Uri",
+      "dex_static_value": null
+    },
+    {
+      "name": "kKw",
+      "reported_type": "Vyg.fs",
+      "dex_static_value": null
+    },
+    {
+      "name": "kx",
+      "reported_type": "androidx.activity.result.B8K",
+      "dex_static_value": null
+    },
+    {
+      "name": "lTc",
+      "reported_type": "IJ.mY0",
+      "dex_static_value": null
+    },
+    {
+      "name": "lW7",
+      "reported_type": "boolean",
+      "dex_static_value": null
+    },
+    {
+      "name": "lv",
+      "reported_type": "float",
+      "dex_static_value": null
+    },
+    {
+      "name": "lx1",
+      "reported_type": "IJ.mY0$fs",
+      "dex_static_value": null
+    },
+    {
+      "name": "mg",
+      "reported_type": "android.animation.AnimatorSet",
+      "dex_static_value": null
+    },
+    {
+      "name": "mpF",
+      "reported_type": "boolean",
+      "dex_static_value": null
+    },
+    {
+      "name": "n3",
+      "reported_type": "kotlin.Lazy",
+      "dex_static_value": null
+    },
+    {
+      "name": "n7J",
+      "reported_type": "int",
+      "dex_static_value": null
+    },
+    {
+      "name": "o2",
+      "reported_type": "java.lang.String",
+      "dex_static_value": null
+    },
+    {
+      "name": "of",
+      "reported_type": "IJ.mY0$fs",
+      "dex_static_value": null
+    },
+    {
+      "name": "pQ",
+      "reported_type": "com.alightcreative.app.motion.scene.SceneThumbnailMaker",
+      "dex_static_value": null
+    },
+    {
+      "name": "q4u",
+      "reported_type": "float",
+      "dex_static_value": null
+    },
+    {
+      "name": "qLL",
+      "reported_type": "com.alightcreative.app.motion.scene.SceneHolder",
+      "dex_static_value": null
+    },
+    {
+      "name": "qev",
+      "reported_type": "kotlin.Lazy",
+      "dex_static_value": null
+    },
+    {
+      "name": "qsB",
+      "reported_type": "com.alightcreative.app.motion.scene.SceneThumbnailMaker",
+      "dex_static_value": null
+    },
+    {
+      "name": "rLh",
+      "reported_type": "java.util.List",
+      "dex_static_value": null
+    },
+    {
+      "name": "rM5",
+      "reported_type": "androidx.fragment.app.FragmentManager$c",
+      "dex_static_value": null
+    },
+    {
+      "name": "sZR",
+      "reported_type": "long",
+      "dex_static_value": null
+    },
+    {
+      "name": "sf",
+      "reported_type": "boolean",
+      "dex_static_value": null
+    },
+    {
+      "name": "u0c",
+      "reported_type": "float",
+      "dex_static_value": null
+    },
+    {
+      "name": "uS",
+      "reported_type": "kotlin.Lazy",
+      "dex_static_value": null
+    },
+    {
+      "name": "vXY",
+      "reported_type": "java.lang.Runnable",
+      "dex_static_value": null
+    },
+    {
+      "name": "ys",
+      "reported_type": "int",
+      "dex_static_value": null
+    },
+    {
+      "name": "ywo",
+      "reported_type": "boolean",
+      "dex_static_value": null
+    },
+    {
+      "name": "zH",
+      "reported_type": "float",
+      "dex_static_value": null
+    },
+    {
+      "name": "zLK",
+      "reported_type": "D4S.euv",
+      "dex_static_value": null
+    },
+    {
+      "name": "zhF",
+      "reported_type": "bT.SfT",
+      "dex_static_value": null
+    }
+  ],
+  "inner_classes": [
+    "com.alightcreative.app.motion.activities.EditActivity.A",
+    "com.alightcreative.app.motion.activities.EditActivity.A0W",
+    "com.alightcreative.app.motion.activities.EditActivity.AVn",
+    "com.alightcreative.app.motion.activities.EditActivity.Ai",
+    "com.alightcreative.app.motion.activities.EditActivity.Ak",
+    "com.alightcreative.app.motion.activities.EditActivity.B",
+    "com.alightcreative.app.motion.activities.EditActivity.B8K",
+    "com.alightcreative.app.motion.activities.EditActivity.BAQ",
+    "com.alightcreative.app.motion.activities.EditActivity.Bb",
+    "com.alightcreative.app.motion.activities.EditActivity.CZU",
+    "com.alightcreative.app.motion.activities.EditActivity.Clo",
+    "com.alightcreative.app.motion.activities.EditActivity.CzH",
+    "com.alightcreative.app.motion.activities.EditActivity.D5l",
+    "com.alightcreative.app.motion.activities.EditActivity.DR",
+    "com.alightcreative.app.motion.activities.EditActivity.Do",
+    "com.alightcreative.app.motion.activities.EditActivity.E",
+    "com.alightcreative.app.motion.activities.EditActivity.EIS",
+    "com.alightcreative.app.motion.activities.EditActivity.F7",
+    "com.alightcreative.app.motion.activities.EditActivity.FnA",
+    "com.alightcreative.app.motion.activities.EditActivity.GJY",
+    "com.alightcreative.app.motion.activities.EditActivity.Gu5",
+    "com.alightcreative.app.motion.activities.EditActivity.Gv",
+    "com.alightcreative.app.motion.activities.EditActivity.HT",
+    "com.alightcreative.app.motion.activities.EditActivity.Hdx",
+    "com.alightcreative.app.motion.activities.EditActivity.IHd",
+    "com.alightcreative.app.motion.activities.EditActivity.Ihb",
+    "com.alightcreative.app.motion.activities.EditActivity.JIk",
+    "com.alightcreative.app.motion.activities.EditActivity.Jb",
+    "com.alightcreative.app.motion.activities.EditActivity.K",
+    "com.alightcreative.app.motion.activities.EditActivity.K52",
+    "com.alightcreative.app.motion.activities.EditActivity.Kln",
+    "com.alightcreative.app.motion.activities.EditActivity.LJP",
+    "com.alightcreative.app.motion.activities.EditActivity.Lw",
+    "com.alightcreative.app.motion.activities.EditActivity.Nta",
+    "com.alightcreative.app.motion.activities.EditActivity.OU",
+    "com.alightcreative.app.motion.activities.EditActivity.Ok",
+    "com.alightcreative.app.motion.activities.EditActivity.P",
+    "com.alightcreative.app.motion.activities.EditActivity.Q",
+    "com.alightcreative.app.motion.activities.EditActivity.R",
+    "com.alightcreative.app.motion.activities.EditActivity.R9l",
+    "com.alightcreative.app.motion.activities.EditActivity.RxB",
+    "com.alightcreative.app.motion.activities.EditActivity.SfT",
+    "com.alightcreative.app.motion.activities.EditActivity.TXA",
+    "com.alightcreative.app.motion.activities.EditActivity.Ub",
+    "com.alightcreative.app.motion.activities.EditActivity.Uf",
+    "com.alightcreative.app.motion.activities.EditActivity.Vlp",
+    "com.alightcreative.app.motion.activities.EditActivity.W",
+    "com.alightcreative.app.motion.activities.EditActivity.Wl",
+    "com.alightcreative.app.motion.activities.EditActivity.X",
+    "com.alightcreative.app.motion.activities.EditActivity.YG",
+    "com.alightcreative.app.motion.activities.EditActivity.Zgm",
+    "com.alightcreative.app.motion.activities.EditActivity.Zx",
+    "com.alightcreative.app.motion.activities.EditActivity.bN",
+    "com.alightcreative.app.motion.activities.EditActivity.bR",
+    "com.alightcreative.app.motion.activities.EditActivity.c",
+    "com.alightcreative.app.motion.activities.EditActivity.d",
+    "com.alightcreative.app.motion.activities.EditActivity.e8D",
+    "com.alightcreative.app.motion.activities.EditActivity.euv",
+    "com.alightcreative.app.motion.activities.EditActivity.f",
+    "com.alightcreative.app.motion.activities.EditActivity.f6l",
+    "com.alightcreative.app.motion.activities.EditActivity.fs",
+    "com.alightcreative.app.motion.activities.EditActivity.gj",
+    "com.alightcreative.app.motion.activities.EditActivity.h",
+    "com.alightcreative.app.motion.activities.EditActivity.hg",
+    "com.alightcreative.app.motion.activities.EditActivity.hl",
+    "com.alightcreative.app.motion.activities.EditActivity.jY8",
+    "com.alightcreative.app.motion.activities.EditActivity.jd",
+    "com.alightcreative.app.motion.activities.EditActivity.k6",
+    "com.alightcreative.app.motion.activities.EditActivity.kfX",
+    "com.alightcreative.app.motion.activities.EditActivity.l",
+    "com.alightcreative.app.motion.activities.EditActivity.lG",
+    "com.alightcreative.app.motion.activities.EditActivity.lY",
+    "com.alightcreative.app.motion.activities.EditActivity.m",
+    "com.alightcreative.app.motion.activities.EditActivity.mI",
+    "com.alightcreative.app.motion.activities.EditActivity.mY0",
+    "com.alightcreative.app.motion.activities.EditActivity.mpd",
+    "com.alightcreative.app.motion.activities.EditActivity.my",
+    "com.alightcreative.app.motion.activities.EditActivity.n8I",
+    "com.alightcreative.app.motion.activities.EditActivity.nKd",
+    "com.alightcreative.app.motion.activities.EditActivity.np",
+    "com.alightcreative.app.motion.activities.EditActivity.ny6",
+    "com.alightcreative.app.motion.activities.EditActivity.o",
+    "com.alightcreative.app.motion.activities.EditActivity.oC",
+    "com.alightcreative.app.motion.activities.EditActivity.pN",
+    "com.alightcreative.app.motion.activities.EditActivity.pQm",
+    "com.alightcreative.app.motion.activities.EditActivity.pm",
+    "com.alightcreative.app.motion.activities.EditActivity.qP",
+    "com.alightcreative.app.motion.activities.EditActivity.qUf",
+    "com.alightcreative.app.motion.activities.EditActivity.rs",
+    "com.alightcreative.app.motion.activities.EditActivity.s",
+    "com.alightcreative.app.motion.activities.EditActivity.s2Y",
+    "com.alightcreative.app.motion.activities.EditActivity.sK",
+    "com.alightcreative.app.motion.activities.EditActivity.sR",
+    "com.alightcreative.app.motion.activities.EditActivity.sWu",
+    "com.alightcreative.app.motion.activities.EditActivity.t",
+    "com.alightcreative.app.motion.activities.EditActivity.tE",
+    "com.alightcreative.app.motion.activities.EditActivity.tX",
+    "com.alightcreative.app.motion.activities.EditActivity.tr",
+    "com.alightcreative.app.motion.activities.EditActivity.v",
+    "com.alightcreative.app.motion.activities.EditActivity.vQ",
+    "com.alightcreative.app.motion.activities.EditActivity.vlE",
+    "com.alightcreative.app.motion.activities.EditActivity.vt",
+    "com.alightcreative.app.motion.activities.EditActivity.wW",
+    "com.alightcreative.app.motion.activities.EditActivity.wuY",
+    "com.alightcreative.app.motion.activities.EditActivity.xR6",
+    "com.alightcreative.app.motion.activities.EditActivity.xUY",
+    "com.alightcreative.app.motion.activities.EditActivity.xiz",
+    "com.alightcreative.app.motion.activities.EditActivity.xv",
+    "com.alightcreative.app.motion.activities.EditActivity.y6",
+    "com.alightcreative.app.motion.activities.EditActivity.y9",
+    "com.alightcreative.app.motion.activities.EditActivity.y9H",
+    "com.alightcreative.app.motion.activities.EditActivity.z"
+  ]
+}

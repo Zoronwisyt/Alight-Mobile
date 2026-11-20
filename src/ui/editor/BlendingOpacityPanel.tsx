@@ -2,68 +2,28 @@ import React, { useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { useEditorStore } from '../../store/useEditorStore';
 import type { BlendModeId } from '../../types/project';
+import { BLEND_MODE_TABLE, canonicalizeBlendMode, type BlendGroupName } from '../../engine/blendModes';
 import { SpinnerControl } from '../components/SpinnerControl';
 import { useSelectedLayer } from './useSelectedLayer';
 
-const BLEND_GROUPS: { group: string; items: { id: BlendModeId; label: string }[] }[] = [
-  {
-    group: 'Normal & Masking',
-    items: [
-      { id: 'normal', label: 'Normal' },
-      { id: 'mask', label: 'Mask' },
-      { id: 'exclude', label: 'Exclude' },
-    ],
-  },
-  {
-    group: 'Darken',
-    items: [
-      { id: 'com.alightcreative.blend.darken', label: 'Darken' },
-      { id: 'com.alightcreative.blend.multiply', label: 'Multiply' },
-      { id: 'com.alightcreative.blend.colorburn', label: 'Color Burn' },
-      { id: 'com.alightcreative.blend.linearburn', label: 'Linear Burn' },
-      { id: 'com.alightcreative.blend.darkercolor', label: 'Darker Color' },
-    ],
-  },
-  {
-    group: 'Lighten',
-    items: [
-      { id: 'com.alightcreative.blend.lighten', label: 'Lighten' },
-      { id: 'com.alightcreative.blend.screen', label: 'Screen' },
-      { id: 'com.alightcreative.blend.colordodge', label: 'Color Dodge' },
-      { id: 'com.alightcreative.blend.lineardodge', label: 'Linear Dodge (Add)' },
-      { id: 'com.alightcreative.blend.lightercolor', label: 'Lighter Color' },
-    ],
-  },
-  {
-    group: 'Contrast',
-    items: [
-      { id: 'com.alightcreative.blend.overlay', label: 'Overlay' },
-      { id: 'com.alightcreative.blend.softlight', label: 'Soft Light' },
-      { id: 'com.alightcreative.blend.hardlight', label: 'Hard Light' },
-      { id: 'com.alightcreative.blend.vividlight', label: 'Vivid Light' },
-      { id: 'com.alightcreative.blend.linearlight', label: 'Linear Light' },
-      { id: 'com.alightcreative.blend.pinlight', label: 'Pin Light' },
-    ],
-  },
-  {
-    group: 'Difference',
-    items: [
-      { id: 'com.alightcreative.blend.difference', label: 'Difference' },
-      { id: 'com.alightcreative.blend.exclusion', label: 'Exclusion' },
-      { id: 'com.alightcreative.blend.subtract', label: 'Subtract' },
-      { id: 'com.alightcreative.blend.divide', label: 'Divide' },
-    ],
-  },
-  {
-    group: 'Color',
-    items: [
-      { id: 'com.alightcreative.blend.hue', label: 'Hue' },
-      { id: 'com.alightcreative.blend.saturation', label: 'Saturation' },
-      { id: 'com.alightcreative.blend.color', label: 'Color' },
-      { id: 'com.alightcreative.blend.luminosity', label: 'Luminosity' },
-    ],
-  },
+const GROUP_ORDER: BlendGroupName[] = [
+  'Normal & Masking',
+  'Darken',
+  'Lighten',
+  'Contrast',
+  'Difference',
+  'Color',
 ];
+
+// Built from the APK's own BlendingMode table so the UI can never drift from the renderer.
+const BLEND_GROUPS: { group: BlendGroupName; items: { id: BlendModeId; label: string }[] }[] =
+  GROUP_ORDER.map((group) => ({
+    group,
+    items: BLEND_MODE_TABLE.filter((d) => d.group === group).map((d) => ({
+      id: d.effectId ?? (d.xmlId as BlendModeId),
+      label: d.label,
+    })),
+  }));
 
 export const BlendingOpacityPanel: React.FC = () => {
   const { toggleKeyframeOnProp, stepKeyframe, setCurveTarget } = useEditorStore(
@@ -103,7 +63,8 @@ export const BlendingOpacityPanel: React.FC = () => {
       </div>
 
       {BLEND_GROUPS.map((grp) => {
-        const isOpen = openGroup === grp.group || grp.items.some((i) => i.id === layer.blendMode);
+        const isOpen =
+          openGroup === grp.group || grp.items.some((i) => i.id === canonicalizeBlendMode(layer.blendMode));
         return (
           <div key={grp.group} style={{ background: 'var(--am-a1)', borderRadius: 10, border: '1px solid var(--am-border)', overflow: 'hidden' }}>
             <button
@@ -127,7 +88,7 @@ export const BlendingOpacityPanel: React.FC = () => {
                   <button
                     key={item.id}
                     type="button"
-                    className={`am-pill ${layer.blendMode === item.id ? 'active' : ''}`}
+                    className={`am-pill ${canonicalizeBlendMode(layer.blendMode) === item.id ? 'active' : ''}`}
                     onClick={() => updateLayer((l) => { l.blendMode = item.id; })}
                   >
                     {item.label}

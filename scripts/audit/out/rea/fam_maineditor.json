@@ -1,0 +1,16 @@
+{
+  "query": "com.alightcreative.maineditor",
+  "total_classes": 24194,
+  "count": 9,
+  "matches": [
+    "com.alightcreative.maineditor.EditViewModel",
+    "com.alightcreative.maineditor.fs",
+    "com.alightcreative.maineditor.presetpreview.ui.B8K",
+    "com.alightcreative.maineditor.presetpreview.ui.Bb",
+    "com.alightcreative.maineditor.presetpreview.ui.PresetPreviewActivity",
+    "com.alightcreative.maineditor.presetpreview.ui.SfT",
+    "com.alightcreative.maineditor.presetpreview.ui.euv",
+    "com.alightcreative.maineditor.presetpreview.ui.fs",
+    "com.alightcreative.maineditor.presetpreview.ui.mY0"
+  ]
+}

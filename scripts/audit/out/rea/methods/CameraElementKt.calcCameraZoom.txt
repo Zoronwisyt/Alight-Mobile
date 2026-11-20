@@ -1,0 +1,4 @@
+    public static final float calcCameraZoom(Scene scene, float f2) {
+        Intrinsics.checkNotNullParameter(scene, "<this>");
+        return (Math.max(scene.getWidth(), scene.getHeight()) / ((float) Math.tan(((f2 / 2.0f) * pi) / 180.0f))) / 2.0f;
+    }

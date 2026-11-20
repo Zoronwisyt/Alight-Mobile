@@ -1,0 +1,17 @@
+{
+  "query": "Frame",
+  "total_classes": 24194,
+  "count": 10,
+  "matches": [
+    "androidx.appcompat.widget.ContentFrameLayout",
+    "androidx.appcompat.widget.FitWindowsFrameLayout",
+    "androidx.media3.common.VideoFrameProcessingException",
+    "com.alightcreative.app.motion.scene.FrameStats",
+    "com.applovin.exoplayer2.ui.AspectRatioFrameLayout",
+    "com.facebook.animated.gif.GifFrame",
+    "com.facebook.animated.webp.WebPFrame",
+    "com.google.android.exoplayer2.ui.AspectRatioFrameLayout",
+    "com.google.android.material.internal.TouchObserverFrameLayout",
+    "kotlin.coroutines.jvm.internal.CoroutineStackFrame"
+  ]
+}

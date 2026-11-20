@@ -1,0 +1,857 @@
+{
+  "engine": {
+    "name": "jadx-headless-mcp",
+    "version": "0.7.1",
+    "artifact_sha256": "6e5eacf500b64292bfb73c49797c1958f6ee44646e43e868039ae7feb573ff75",
+    "source_revision": "5844800a486d2248fa949b74c9896285f5b54de2",
+    "worker_count": 1,
+    "heap_limit_mib": 8192
+  },
+  "class_name": "com.alightcreative.app.motion.scene.SceneElement",
+  "methods": [
+    {
+      "name": "<clinit>",
+      "reported_signature": "<clinit>(): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()V"
+    },
+    {
+      "name": "<init>",
+      "reported_signature": "<init>(com.alightcreative.app.motion.scene.SceneElementType, int, int, long, com.alightcreative.app.motion.scene.EngineState, java.lang.String, com.alightcreative.app.motion.scene.KeyableTransform, com.alightcreative.app.motion.scene.Keyable<com.alightcreative.app.motion.scene.SolidColor>, android.net.Uri, android.net.Uri, com.alightcreative.app.motion.scene.GradientFill, com.alightcreative.app.motion.scene.FillType, com.alightcreative.app.motion.scene.rendering.TextureCropMode, com.alightcreative.app.motion.scene.KeyableCompoundCubicBSpline, android.net.Uri, com.alightcreative.app.motion.scene.Keyable<java.lang.Float>, com.alightcreative.app.motion.scene.liveshape.LiveShapeRef, int, int, boolean, com.alightcreative.app.motion.scene.Keyable<java.lang.Float>, com.alightcreative.app.motion.scene.StyledText, com.alightcreative.app.motion.scene.BlendingMode, com.alightcreative.app.motion.scene.Scene, java.util.UUID, java.util.Map<java.lang.Long, com.alightcreative.app.motion.scene.visualeffect.KeyableVisualEffectRef>, java.util.List<java.lang.Long>, com.alightcreative.app.motion.scene.ElementTag, com.alightcreative.app.motion.scene.Drawing, java.util.Map<java.lang.String, com.alightcreative.app.motion.scene.userparam.KeyableUserParameterValue>, com.alightcreative.app.motion.scene.KeyableEdgeDecoration, java.util.List<com.alightcreative.app.motion.scene.KeyableEdgeDecoration>, com.alightcreative.app.motion.scene.KeyableEdgeDecoration, boolean, com.alightcreative.app.motion.scene.CameraProperties, java.lang.Long, boolean, java.lang.String, java.lang.String): void",
+      "overload_index": 0,
+      "is_constructor": true,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneElementType;IIJLcom/alightcreative/app/motion/scene/EngineState;Ljava/lang/String;Lcom/alightcreative/app/motion/scene/KeyableTransform;Lcom/alightcreative/app/motion/scene/Keyable;Landroid/net/Uri;Landroid/net/Uri;Lcom/alightcreative/app/motion/scene/GradientFill;Lcom/alightcreative/app/motion/scene/FillType;Lcom/alightcreative/app/motion/scene/rendering/TextureCropMode;Lcom/alightcreative/app/motion/scene/KeyableCompoundCubicBSpline;Landroid/net/Uri;Lcom/alightcreative/app/motion/scene/Keyable;Lcom/alightcreative/app/motion/scene/liveshape/LiveShapeRef;IIZLcom/alightcreative/app/motion/scene/Keyable;Lcom/alightcreative/app/motion/scene/StyledText;Lcom/alightcreative/app/motion/scene/BlendingMode;Lcom/alightcreative/app/motion/scene/Scene;Ljava/util/UUID;Ljava/util/Map;Ljava/util/List;Lcom/alightcreative/app/motion/scene/ElementTag;Lcom/alightcreative/app/motion/scene/Drawing;Ljava/util/Map;Lcom/alightcreative/app/motion/scene/KeyableEdgeDecoration;Ljava/util/List;Lcom/alightcreative/app/motion/scene/KeyableEdgeDecoration;ZLcom/alightcreative/app/motion/scene/CameraProperties;Ljava/lang/Long;ZLjava/lang/String;Ljava/lang/String;)V"
+    },
+    {
+      "name": "<init>",
+      "reported_signature": "<init>(com.alightcreative.app.motion.scene.SceneElementType, int, int, long, com.alightcreative.app.motion.scene.EngineState, java.lang.String, com.alightcreative.app.motion.scene.KeyableTransform, com.alightcreative.app.motion.scene.Keyable, android.net.Uri, android.net.Uri, com.alightcreative.app.motion.scene.GradientFill, com.alightcreative.app.motion.scene.FillType, com.alightcreative.app.motion.scene.rendering.TextureCropMode, com.alightcreative.app.motion.scene.KeyableCompoundCubicBSpline, android.net.Uri, com.alightcreative.app.motion.scene.Keyable, com.alightcreative.app.motion.scene.liveshape.LiveShapeRef, int, int, boolean, com.alightcreative.app.motion.scene.Keyable, com.alightcreative.app.motion.scene.StyledText, com.alightcreative.app.motion.scene.BlendingMode, com.alightcreative.app.motion.scene.Scene, java.util.UUID, java.util.Map, java.util.List, com.alightcreative.app.motion.scene.ElementTag, com.alightcreative.app.motion.scene.Drawing, java.util.Map, com.alightcreative.app.motion.scene.KeyableEdgeDecoration, java.util.List, com.alightcreative.app.motion.scene.KeyableEdgeDecoration, boolean, com.alightcreative.app.motion.scene.CameraProperties, java.lang.Long, boolean, java.lang.String, java.lang.String, int, int, kotlin.jvm.internal.DefaultConstructorMarker): void",
+      "overload_index": 1,
+      "is_constructor": true,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneElementType;IIJLcom/alightcreative/app/motion/scene/EngineState;Ljava/lang/String;Lcom/alightcreative/app/motion/scene/KeyableTransform;Lcom/alightcreative/app/motion/scene/Keyable;Landroid/net/Uri;Landroid/net/Uri;Lcom/alightcreative/app/motion/scene/GradientFill;Lcom/alightcreative/app/motion/scene/FillType;Lcom/alightcreative/app/motion/scene/rendering/TextureCropMode;Lcom/alightcreative/app/motion/scene/KeyableCompoundCubicBSpline;Landroid/net/Uri;Lcom/alightcreative/app/motion/scene/Keyable;Lcom/alightcreative/app/motion/scene/liveshape/LiveShapeRef;IIZLcom/alightcreative/app/motion/scene/Keyable;Lcom/alightcreative/app/motion/scene/StyledText;Lcom/alightcreative/app/motion/scene/BlendingMode;Lcom/alightcreative/app/motion/scene/Scene;Ljava/util/UUID;Ljava/util/Map;Ljava/util/List;Lcom/alightcreative/app/motion/scene/ElementTag;Lcom/alightcreative/app/motion/scene/Drawing;Ljava/util/Map;Lcom/alightcreative/app/motion/scene/KeyableEdgeDecoration;Ljava/util/List;Lcom/alightcreative/app/motion/scene/KeyableEdgeDecoration;ZLcom/alightcreative/app/motion/scene/CameraProperties;Ljava/lang/Long;ZLjava/lang/String;Ljava/lang/String;IILkotlin/jvm/internal/DefaultConstructorMarker;)V"
+    },
+    {
+      "name": "component1",
+      "reported_signature": "component1(): com.alightcreative.app.motion.scene.SceneElementType",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/SceneElementType;"
+    },
+    {
+      "name": "component10",
+      "reported_signature": "component10(): android.net.Uri",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Landroid/net/Uri;"
+    },
+    {
+      "name": "component11",
+      "reported_signature": "component11(): com.alightcreative.app.motion.scene.GradientFill",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/GradientFill;"
+    },
+    {
+      "name": "component12",
+      "reported_signature": "component12(): com.alightcreative.app.motion.scene.FillType",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/FillType;"
+    },
+    {
+      "name": "component13",
+      "reported_signature": "component13(): com.alightcreative.app.motion.scene.rendering.TextureCropMode",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/rendering/TextureCropMode;"
+    },
+    {
+      "name": "component14",
+      "reported_signature": "component14(): com.alightcreative.app.motion.scene.KeyableCompoundCubicBSpline",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/KeyableCompoundCubicBSpline;"
+    },
+    {
+      "name": "component15",
+      "reported_signature": "component15(): android.net.Uri",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Landroid/net/Uri;"
+    },
+    {
+      "name": "component16",
+      "reported_signature": "component16(): com.alightcreative.app.motion.scene.Keyable<java.lang.Float>",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/Keyable;"
+    },
+    {
+      "name": "component17",
+      "reported_signature": "component17(): com.alightcreative.app.motion.scene.liveshape.LiveShapeRef",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/liveshape/LiveShapeRef;"
+    },
+    {
+      "name": "component18",
+      "reported_signature": "component18(): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()I"
+    },
+    {
+      "name": "component19",
+      "reported_signature": "component19(): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()I"
+    },
+    {
+      "name": "component2",
+      "reported_signature": "component2(): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()I"
+    },
+    {
+      "name": "component20",
+      "reported_signature": "component20(): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Z"
+    },
+    {
+      "name": "component21",
+      "reported_signature": "component21(): com.alightcreative.app.motion.scene.Keyable<java.lang.Float>",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/Keyable;"
+    },
+    {
+      "name": "component22",
+      "reported_signature": "component22(): com.alightcreative.app.motion.scene.StyledText",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/StyledText;"
+    },
+    {
+      "name": "component23",
+      "reported_signature": "component23(): com.alightcreative.app.motion.scene.BlendingMode",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/BlendingMode;"
+    },
+    {
+      "name": "component24",
+      "reported_signature": "component24(): com.alightcreative.app.motion.scene.Scene",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/Scene;"
+    },
+    {
+      "name": "component25",
+      "reported_signature": "component25(): java.util.UUID",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/util/UUID;"
+    },
+    {
+      "name": "component26",
+      "reported_signature": "component26(): java.util.Map<java.lang.Long, com.alightcreative.app.motion.scene.visualeffect.KeyableVisualEffectRef>",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/util/Map;"
+    },
+    {
+      "name": "component27",
+      "reported_signature": "component27(): java.util.List<java.lang.Long>",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/util/List;"
+    },
+    {
+      "name": "component28",
+      "reported_signature": "component28(): com.alightcreative.app.motion.scene.ElementTag",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/ElementTag;"
+    },
+    {
+      "name": "component29",
+      "reported_signature": "component29(): com.alightcreative.app.motion.scene.Drawing",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/Drawing;"
+    },
+    {
+      "name": "component3",
+      "reported_signature": "component3(): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()I"
+    },
+    {
+      "name": "component30",
+      "reported_signature": "component30(): java.util.Map<java.lang.String, com.alightcreative.app.motion.scene.userparam.KeyableUserParameterValue>",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/util/Map;"
+    },
+    {
+      "name": "component31",
+      "reported_signature": "component31(): com.alightcreative.app.motion.scene.KeyableEdgeDecoration",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/KeyableEdgeDecoration;"
+    },
+    {
+      "name": "component32",
+      "reported_signature": "component32(): java.util.List<com.alightcreative.app.motion.scene.KeyableEdgeDecoration>",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/util/List;"
+    },
+    {
+      "name": "component33",
+      "reported_signature": "component33(): com.alightcreative.app.motion.scene.KeyableEdgeDecoration",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/KeyableEdgeDecoration;"
+    },
+    {
+      "name": "component34",
+      "reported_signature": "component34(): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Z"
+    },
+    {
+      "name": "component35",
+      "reported_signature": "component35(): com.alightcreative.app.motion.scene.CameraProperties",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/CameraProperties;"
+    },
+    {
+      "name": "component36",
+      "reported_signature": "component36(): java.lang.Long",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/lang/Long;"
+    },
+    {
+      "name": "component37",
+      "reported_signature": "component37(): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Z"
+    },
+    {
+      "name": "component38",
+      "reported_signature": "component38(): java.lang.String",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/lang/String;"
+    },
+    {
+      "name": "component39",
+      "reported_signature": "component39(): java.lang.String",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/lang/String;"
+    },
+    {
+      "name": "component4",
+      "reported_signature": "component4(): long",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()J"
+    },
+    {
+      "name": "component5",
+      "reported_signature": "component5(): com.alightcreative.app.motion.scene.EngineState",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/EngineState;"
+    },
+    {
+      "name": "component6",
+      "reported_signature": "component6(): java.lang.String",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/lang/String;"
+    },
+    {
+      "name": "component7",
+      "reported_signature": "component7(): com.alightcreative.app.motion.scene.KeyableTransform",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/KeyableTransform;"
+    },
+    {
+      "name": "component8",
+      "reported_signature": "component8(): com.alightcreative.app.motion.scene.Keyable<com.alightcreative.app.motion.scene.SolidColor>",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/Keyable;"
+    },
+    {
+      "name": "component9",
+      "reported_signature": "component9(): android.net.Uri",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Landroid/net/Uri;"
+    },
+    {
+      "name": "copy",
+      "reported_signature": "copy(com.alightcreative.app.motion.scene.SceneElementType, int, int, long, com.alightcreative.app.motion.scene.EngineState, java.lang.String, com.alightcreative.app.motion.scene.KeyableTransform, com.alightcreative.app.motion.scene.Keyable<com.alightcreative.app.motion.scene.SolidColor>, android.net.Uri, android.net.Uri, com.alightcreative.app.motion.scene.GradientFill, com.alightcreative.app.motion.scene.FillType, com.alightcreative.app.motion.scene.rendering.TextureCropMode, com.alightcreative.app.motion.scene.KeyableCompoundCubicBSpline, android.net.Uri, com.alightcreative.app.motion.scene.Keyable<java.lang.Float>, com.alightcreative.app.motion.scene.liveshape.LiveShapeRef, int, int, boolean, com.alightcreative.app.motion.scene.Keyable<java.lang.Float>, com.alightcreative.app.motion.scene.StyledText, com.alightcreative.app.motion.scene.BlendingMode, com.alightcreative.app.motion.scene.Scene, java.util.UUID, java.util.Map<java.lang.Long, com.alightcreative.app.motion.scene.visualeffect.KeyableVisualEffectRef>, java.util.List<java.lang.Long>, com.alightcreative.app.motion.scene.ElementTag, com.alightcreative.app.motion.scene.Drawing, java.util.Map<java.lang.String, com.alightcreative.app.motion.scene.userparam.KeyableUserParameterValue>, com.alightcreative.app.motion.scene.KeyableEdgeDecoration, java.util.List<com.alightcreative.app.motion.scene.KeyableEdgeDecoration>, com.alightcreative.app.motion.scene.KeyableEdgeDecoration, boolean, com.alightcreative.app.motion.scene.CameraProperties, java.lang.Long, boolean, java.lang.String, java.lang.String): com.alightcreative.app.motion.scene.SceneElement",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneElementType;IIJLcom/alightcreative/app/motion/scene/EngineState;Ljava/lang/String;Lcom/alightcreative/app/motion/scene/KeyableTransform;Lcom/alightcreative/app/motion/scene/Keyable;Landroid/net/Uri;Landroid/net/Uri;Lcom/alightcreative/app/motion/scene/GradientFill;Lcom/alightcreative/app/motion/scene/FillType;Lcom/alightcreative/app/motion/scene/rendering/TextureCropMode;Lcom/alightcreative/app/motion/scene/KeyableCompoundCubicBSpline;Landroid/net/Uri;Lcom/alightcreative/app/motion/scene/Keyable;Lcom/alightcreative/app/motion/scene/liveshape/LiveShapeRef;IIZLcom/alightcreative/app/motion/scene/Keyable;Lcom/alightcreative/app/motion/scene/StyledText;Lcom/alightcreative/app/motion/scene/BlendingMode;Lcom/alightcreative/app/motion/scene/Scene;Ljava/util/UUID;Ljava/util/Map;Ljava/util/List;Lcom/alightcreative/app/motion/scene/ElementTag;Lcom/alightcreative/app/motion/scene/Drawing;Ljava/util/Map;Lcom/alightcreative/app/motion/scene/KeyableEdgeDecoration;Ljava/util/List;Lcom/alightcreative/app/motion/scene/KeyableEdgeDecoration;ZLcom/alightcreative/app/motion/scene/CameraProperties;Ljava/lang/Long;ZLjava/lang/String;Ljava/lang/String;)Lcom/alightcreative/app/motion/scene/SceneElement;"
+    },
+    {
+      "name": "copy$default",
+      "reported_signature": "copy$default(com.alightcreative.app.motion.scene.SceneElement, com.alightcreative.app.motion.scene.SceneElementType, int, int, long, com.alightcreative.app.motion.scene.EngineState, java.lang.String, com.alightcreative.app.motion.scene.KeyableTransform, com.alightcreative.app.motion.scene.Keyable, android.net.Uri, android.net.Uri, com.alightcreative.app.motion.scene.GradientFill, com.alightcreative.app.motion.scene.FillType, com.alightcreative.app.motion.scene.rendering.TextureCropMode, com.alightcreative.app.motion.scene.KeyableCompoundCubicBSpline, android.net.Uri, com.alightcreative.app.motion.scene.Keyable, com.alightcreative.app.motion.scene.liveshape.LiveShapeRef, int, int, boolean, com.alightcreative.app.motion.scene.Keyable, com.alightcreative.app.motion.scene.StyledText, com.alightcreative.app.motion.scene.BlendingMode, com.alightcreative.app.motion.scene.Scene, java.util.UUID, java.util.Map, java.util.List, com.alightcreative.app.motion.scene.ElementTag, com.alightcreative.app.motion.scene.Drawing, java.util.Map, com.alightcreative.app.motion.scene.KeyableEdgeDecoration, java.util.List, com.alightcreative.app.motion.scene.KeyableEdgeDecoration, boolean, com.alightcreative.app.motion.scene.CameraProperties, java.lang.Long, boolean, java.lang.String, java.lang.String, int, int, java.lang.Object): com.alightcreative.app.motion.scene.SceneElement",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneElement;Lcom/alightcreative/app/motion/scene/SceneElementType;IIJLcom/alightcreative/app/motion/scene/EngineState;Ljava/lang/String;Lcom/alightcreative/app/motion/scene/KeyableTransform;Lcom/alightcreative/app/motion/scene/Keyable;Landroid/net/Uri;Landroid/net/Uri;Lcom/alightcreative/app/motion/scene/GradientFill;Lcom/alightcreative/app/motion/scene/FillType;Lcom/alightcreative/app/motion/scene/rendering/TextureCropMode;Lcom/alightcreative/app/motion/scene/KeyableCompoundCubicBSpline;Landroid/net/Uri;Lcom/alightcreative/app/motion/scene/Keyable;Lcom/alightcreative/app/motion/scene/liveshape/LiveShapeRef;IIZLcom/alightcreative/app/motion/scene/Keyable;Lcom/alightcreative/app/motion/scene/StyledText;Lcom/alightcreative/app/motion/scene/BlendingMode;Lcom/alightcreative/app/motion/scene/Scene;Ljava/util/UUID;Ljava/util/Map;Ljava/util/List;Lcom/alightcreative/app/motion/scene/ElementTag;Lcom/alightcreative/app/motion/scene/Drawing;Ljava/util/Map;Lcom/alightcreative/app/motion/scene/KeyableEdgeDecoration;Ljava/util/List;Lcom/alightcreative/app/motion/scene/KeyableEdgeDecoration;ZLcom/alightcreative/app/motion/scene/CameraProperties;Ljava/lang/Long;ZLjava/lang/String;Ljava/lang/String;IILjava/lang/Object;)Lcom/alightcreative/app/motion/scene/SceneElement;"
+    },
+    {
+      "name": "equals",
+      "reported_signature": "equals(java.lang.Object): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Ljava/lang/Object;)Z"
+    },
+    {
+      "name": "getBlendingMode",
+      "reported_signature": "getBlendingMode(): com.alightcreative.app.motion.scene.BlendingMode",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/BlendingMode;"
+    },
+    {
+      "name": "getBorders",
+      "reported_signature": "getBorders(): java.util.List<com.alightcreative.app.motion.scene.KeyableEdgeDecoration>",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/util/List;"
+    },
+    {
+      "name": "getCameraProperties",
+      "reported_signature": "getCameraProperties(): com.alightcreative.app.motion.scene.CameraProperties",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/CameraProperties;"
+    },
+    {
+      "name": "getClippingMask",
+      "reported_signature": "getClippingMask(): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Z"
+    },
+    {
+      "name": "getDrawing",
+      "reported_signature": "getDrawing(): com.alightcreative.app.motion.scene.Drawing",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/Drawing;"
+    },
+    {
+      "name": "getDropShadow",
+      "reported_signature": "getDropShadow(): com.alightcreative.app.motion.scene.KeyableEdgeDecoration",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/KeyableEdgeDecoration;"
+    },
+    {
+      "name": "getEndTime",
+      "reported_signature": "getEndTime(): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()I"
+    },
+    {
+      "name": "getEngineState",
+      "reported_signature": "getEngineState(): com.alightcreative.app.motion.scene.EngineState",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/EngineState;"
+    },
+    {
+      "name": "getFillColor",
+      "reported_signature": "getFillColor(): com.alightcreative.app.motion.scene.Keyable<com.alightcreative.app.motion.scene.SolidColor>",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/Keyable;"
+    },
+    {
+      "name": "getFillGradient",
+      "reported_signature": "getFillGradient(): com.alightcreative.app.motion.scene.GradientFill",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/GradientFill;"
+    },
+    {
+      "name": "getFillImage",
+      "reported_signature": "getFillImage(): android.net.Uri",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Landroid/net/Uri;"
+    },
+    {
+      "name": "getFillType",
+      "reported_signature": "getFillType(): com.alightcreative.app.motion.scene.FillType",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/FillType;"
+    },
+    {
+      "name": "getFillVideo",
+      "reported_signature": "getFillVideo(): android.net.Uri",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Landroid/net/Uri;"
+    },
+    {
+      "name": "getGain",
+      "reported_signature": "getGain(): com.alightcreative.app.motion.scene.Keyable<java.lang.Float>",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/Keyable;"
+    },
+    {
+      "name": "getHidden",
+      "reported_signature": "getHidden(): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Z"
+    },
+    {
+      "name": "getId",
+      "reported_signature": "getId(): long",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()J"
+    },
+    {
+      "name": "getInTime",
+      "reported_signature": "getInTime(): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()I"
+    },
+    {
+      "name": "getLabel",
+      "reported_signature": "getLabel(): java.lang.String",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/lang/String;"
+    },
+    {
+      "name": "getLinkedSceneUUID",
+      "reported_signature": "getLinkedSceneUUID(): java.util.UUID",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/util/UUID;"
+    },
+    {
+      "name": "getLiveShape",
+      "reported_signature": "getLiveShape(): com.alightcreative.app.motion.scene.liveshape.LiveShapeRef",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/liveshape/LiveShapeRef;"
+    },
+    {
+      "name": "getLoop",
+      "reported_signature": "getLoop(): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Z"
+    },
+    {
+      "name": "getMediaFillMode",
+      "reported_signature": "getMediaFillMode(): com.alightcreative.app.motion.scene.rendering.TextureCropMode",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/rendering/TextureCropMode;"
+    },
+    {
+      "name": "getNestedScene",
+      "reported_signature": "getNestedScene(): com.alightcreative.app.motion.scene.Scene",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/Scene;"
+    },
+    {
+      "name": "getNestedSceneSpeedFactor",
+      "reported_signature": "getNestedSceneSpeedFactor(): float",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()F"
+    },
+    {
+      "name": "getOutTime",
+      "reported_signature": "getOutTime(): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()I"
+    },
+    {
+      "name": "getOutline",
+      "reported_signature": "getOutline(): com.alightcreative.app.motion.scene.KeyableCompoundCubicBSpline",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/KeyableCompoundCubicBSpline;"
+    },
+    {
+      "name": "getParent",
+      "reported_signature": "getParent(): java.lang.Long",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/lang/Long;"
+    },
+    {
+      "name": "getPresetId",
+      "reported_signature": "getPresetId(): java.lang.String",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/lang/String;"
+    },
+    {
+      "name": "getSpeedMap",
+      "reported_signature": "getSpeedMap(): com.alightcreative.app.motion.scene.Keyable<java.lang.Float>",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/Keyable;"
+    },
+    {
+      "name": "getSrc",
+      "reported_signature": "getSrc(): android.net.Uri",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Landroid/net/Uri;"
+    },
+    {
+      "name": "getStartTime",
+      "reported_signature": "getStartTime(): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()I"
+    },
+    {
+      "name": "getStroke",
+      "reported_signature": "getStroke(): com.alightcreative.app.motion.scene.KeyableEdgeDecoration",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/KeyableEdgeDecoration;"
+    },
+    {
+      "name": "getTag",
+      "reported_signature": "getTag(): com.alightcreative.app.motion.scene.ElementTag",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/ElementTag;"
+    },
+    {
+      "name": "getTemplatePPId",
+      "reported_signature": "getTemplatePPId(): java.lang.String",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/lang/String;"
+    },
+    {
+      "name": "getText",
+      "reported_signature": "getText(): com.alightcreative.app.motion.scene.StyledText",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/StyledText;"
+    },
+    {
+      "name": "getTimeKeyframes",
+      "reported_signature": "getTimeKeyframes(): com.alightcreative.app.motion.scene.Keyable<java.lang.Float>",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/Keyable;"
+    },
+    {
+      "name": "getTimeMapping",
+      "reported_signature": "getTimeMapping(): com.alightcreative.app.motion.scene.timemapping.TimeMapping",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/timemapping/TimeMapping;"
+    },
+    {
+      "name": "getTransform",
+      "reported_signature": "getTransform(): com.alightcreative.app.motion.scene.KeyableTransform",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/KeyableTransform;"
+    },
+    {
+      "name": "getType",
+      "reported_signature": "getType(): com.alightcreative.app.motion.scene.SceneElementType",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/SceneElementType;"
+    },
+    {
+      "name": "getUserElementParamValues",
+      "reported_signature": "getUserElementParamValues(): java.util.Map<java.lang.String, com.alightcreative.app.motion.scene.userparam.KeyableUserParameterValue>",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/util/Map;"
+    },
+    {
+      "name": "getVisualEffectOrder",
+      "reported_signature": "getVisualEffectOrder(): java.util.List<java.lang.Long>",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/util/List;"
+    },
+    {
+      "name": "getVisualEffects",
+      "reported_signature": "getVisualEffects(): java.util.Map<java.lang.Long, com.alightcreative.app.motion.scene.visualeffect.KeyableVisualEffectRef>",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/util/Map;"
+    },
+    {
+      "name": "hashCode",
+      "reported_signature": "hashCode(): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()I"
+    },
+    {
+      "name": "toString",
+      "reported_signature": "toString(): java.lang.String",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/lang/String;"
+    }
+  ],
+  "fields": [
+    {
+      "name": "$stable",
+      "reported_type": "int",
+      "dex_static_value": {
+        "type": "int",
+        "value": 8
+      }
+    },
+    {
+      "name": "_hashCode",
+      "reported_type": "int",
+      "dex_static_value": null
+    },
+    {
+      "name": "blendingMode",
+      "reported_type": "com.alightcreative.app.motion.scene.BlendingMode",
+      "dex_static_value": null
+    },
+    {
+      "name": "borders",
+      "reported_type": "java.util.List<com.alightcreative.app.motion.scene.KeyableEdgeDecoration>",
+      "dex_static_value": null
+    },
+    {
+      "name": "cameraProperties",
+      "reported_type": "com.alightcreative.app.motion.scene.CameraProperties",
+      "dex_static_value": null
+    },
+    {
+      "name": "clippingMask",
+      "reported_type": "boolean",
+      "dex_static_value": null
+    },
+    {
+      "name": "drawing",
+      "reported_type": "com.alightcreative.app.motion.scene.Drawing",
+      "dex_static_value": null
+    },
+    {
+      "name": "dropShadow",
+      "reported_type": "com.alightcreative.app.motion.scene.KeyableEdgeDecoration",
+      "dex_static_value": null
+    },
+    {
+      "name": "endTime",
+      "reported_type": "int",
+      "dex_static_value": null
+    },
+    {
+      "name": "engineState",
+      "reported_type": "com.alightcreative.app.motion.scene.EngineState",
+      "dex_static_value": null
+    },
+    {
+      "name": "fillColor",
+      "reported_type": "com.alightcreative.app.motion.scene.Keyable<com.alightcreative.app.motion.scene.SolidColor>",
+      "dex_static_value": null
+    },
+    {
+      "name": "fillGradient",
+      "reported_type": "com.alightcreative.app.motion.scene.GradientFill",
+      "dex_static_value": null
+    },
+    {
+      "name": "fillImage",
+      "reported_type": "android.net.Uri",
+      "dex_static_value": null
+    },
+    {
+      "name": "fillType",
+      "reported_type": "com.alightcreative.app.motion.scene.FillType",
+      "dex_static_value": null
+    },
+    {
+      "name": "fillVideo",
+      "reported_type": "android.net.Uri",
+      "dex_static_value": null
+    },
+    {
+      "name": "gain",
+      "reported_type": "com.alightcreative.app.motion.scene.Keyable<java.lang.Float>",
+      "dex_static_value": null
+    },
+    {
+      "name": "hidden",
+      "reported_type": "boolean",
+      "dex_static_value": null
+    },
+    {
+      "name": "id",
+      "reported_type": "long",
+      "dex_static_value": null
+    },
+    {
+      "name": "inTime",
+      "reported_type": "int",
+      "dex_static_value": null
+    },
+    {
+      "name": "label",
+      "reported_type": "java.lang.String",
+      "dex_static_value": null
+    },
+    {
+      "name": "linkedSceneUUID",
+      "reported_type": "java.util.UUID",
+      "dex_static_value": null
+    },
+    {
+      "name": "liveShape",
+      "reported_type": "com.alightcreative.app.motion.scene.liveshape.LiveShapeRef",
+      "dex_static_value": null
+    },
+    {
+      "name": "loop",
+      "reported_type": "boolean",
+      "dex_static_value": null
+    },
+    {
+      "name": "mediaFillMode",
+      "reported_type": "com.alightcreative.app.motion.scene.rendering.TextureCropMode",
+      "dex_static_value": null
+    },
+    {
+      "name": "nestedScene",
+      "reported_type": "com.alightcreative.app.motion.scene.Scene",
+      "dex_static_value": null
+    },
+    {
+      "name": "nestedSceneSpeedFactor$delegate",
+      "reported_type": "kotlin.Lazy",
+      "dex_static_value": null
+    },
+    {
+      "name": "outTime",
+      "reported_type": "int",
+      "dex_static_value": null
+    },
+    {
+      "name": "outline",
+      "reported_type": "com.alightcreative.app.motion.scene.KeyableCompoundCubicBSpline",
+      "dex_static_value": null
+    },
+    {
+      "name": "parent",
+      "reported_type": "java.lang.Long",
+      "dex_static_value": null
+    },
+    {
+      "name": "presetId",
+      "reported_type": "java.lang.String",
+      "dex_static_value": null
+    },
+    {
+      "name": "speedMap",
+      "reported_type": "com.alightcreative.app.motion.scene.Keyable<java.lang.Float>",
+      "dex_static_value": null
+    },
+    {
+      "name": "src",
+      "reported_type": "android.net.Uri",
+      "dex_static_value": null
+    },
+    {
+      "name": "startTime",
+      "reported_type": "int",
+      "dex_static_value": null
+    },
+    {
+      "name": "stroke",
+      "reported_type": "com.alightcreative.app.motion.scene.KeyableEdgeDecoration",
+      "dex_static_value": null
+    },
+    {
+      "name": "tag",
+      "reported_type": "com.alightcreative.app.motion.scene.ElementTag",
+      "dex_static_value": null
+    },
+    {
+      "name": "templatePPId",
+      "reported_type": "java.lang.String",
+      "dex_static_value": null
+    },
+    {
+      "name": "text",
+      "reported_type": "com.alightcreative.app.motion.scene.StyledText",
+      "dex_static_value": null
+    },
+    {
+      "name": "timeMapping$delegate",
+      "reported_type": "kotlin.Lazy",
+      "dex_static_value": null
+    },
+    {
+      "name": "transform",
+      "reported_type": "com.alightcreative.app.motion.scene.KeyableTransform",
+      "dex_static_value": null
+    },
+    {
+      "name": "type",
+      "reported_type": "com.alightcreative.app.motion.scene.SceneElementType",
+      "dex_static_value": null
+    },
+    {
+      "name": "userElementParamValues",
+      "reported_type": "java.util.Map<java.lang.String, com.alightcreative.app.motion.scene.userparam.KeyableUserParameterValue>",
+      "dex_static_value": null
+    },
+    {
+      "name": "visualEffectOrder",
+      "reported_type": "java.util.List<java.lang.Long>",
+      "dex_static_value": null
+    },
+    {
+      "name": "visualEffects",
+      "reported_type": "java.util.Map<java.lang.Long, com.alightcreative.app.motion.scene.visualeffect.KeyableVisualEffectRef>",
+      "dex_static_value": null
+    }
+  ],
+  "inner_classes": []
+}

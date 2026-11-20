@@ -1,0 +1,67 @@
+[
+  {
+    "label": "SceneRenderingKt.getRenderEnvFromCache",
+    "bytes": 0,
+    "status": "available"
+  },
+  {
+    "label": "SceneRenderingKt.returnRenderEnvToCache",
+    "bytes": 0,
+    "status": "available"
+  },
+  {
+    "label": "SceneRenderingKt.renderWithGpu",
+    "bytes": 0,
+    "status": "available"
+  },
+  {
+    "label": "SceneRenderingKt.renderWithGpu$lambda$29$sortByZ",
+    "bytes": 0,
+    "status": "available"
+  },
+  {
+    "label": "SceneRenderingKt.renderWithGpu$lambda$29$adjustMatrix",
+    "bytes": 0,
+    "status": "available"
+  },
+  {
+    "label": "SceneRenderingKt.renderWithGpu$lambda$29$clearBackground",
+    "bytes": 0,
+    "status": "available"
+  },
+  {
+    "label": "SceneElementRenderingKt.renderInternal",
+    "bytes": 0,
+    "status": "available"
+  },
+  {
+    "label": "SceneElementRenderingKt.renderWithEffects",
+    "bytes": 0,
+    "status": "available"
+  },
+  {
+    "label": "SceneElementRenderingKt.renderWithRepeat",
+    "bytes": 0,
+    "status": "available"
+  },
+  {
+    "label": "RenderEnvironmentTimeQuant.getTime",
+    "bytes": 0,
+    "status": "available"
+  },
+  {
+    "label": "GlobalSceneRenderLock.<clinit>",
+    "bytes": 0,
+    "status": "available"
+  },
+  {
+    "label": "RenderEnvironmentKt.withMode",
+    "bytes": 0,
+    "status": "available"
+  },
+  {
+    "label": "RenderEnvironmentKt.withTimingForElement",
+    "bytes": 0,
+    "status": "available"
+  }
+]

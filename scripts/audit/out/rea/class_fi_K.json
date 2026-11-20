@@ -1,0 +1,76 @@
+{
+  "engine": {
+    "name": "jadx-headless-mcp",
+    "version": "0.7.1",
+    "artifact_sha256": "6e5eacf500b64292bfb73c49797c1958f6ee44646e43e868039ae7feb573ff75",
+    "source_revision": "5844800a486d2248fa949b74c9896285f5b54de2",
+    "worker_count": 1,
+    "heap_limit_mib": 8192
+  },
+  "class_name": "fi.K",
+  "methods": [
+    {
+      "name": "<clinit>",
+      "reported_signature": "<clinit>(): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()V"
+    },
+    {
+      "name": "<init>",
+      "reported_signature": "<init>(java.lang.String, int): void",
+      "overload_index": 0,
+      "is_constructor": true,
+      "dex_descriptor": "(Ljava/lang/String;I)V"
+    },
+    {
+      "name": "Rw",
+      "reported_signature": "Rw(): fi.K[]",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()[Lfi/K;"
+    },
+    {
+      "name": "valueOf",
+      "reported_signature": "valueOf(java.lang.String): fi.K",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Ljava/lang/String;)Lfi/K;"
+    },
+    {
+      "name": "values",
+      "reported_signature": "values(): fi.K[]",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()[Lfi/K;"
+    }
+  ],
+  "fields": [
+    {
+      "name": "bG",
+      "reported_type": "kotlin.enums.EnumEntries",
+      "dex_static_value": null
+    },
+    {
+      "name": "dZ",
+      "reported_type": "fi.K",
+      "dex_static_value": null
+    },
+    {
+      "name": "f33102g",
+      "reported_type": "fi.K[]",
+      "dex_static_value": null
+    },
+    {
+      "name": "f33103s",
+      "reported_type": "fi.K",
+      "dex_static_value": null
+    },
+    {
+      "name": "f33104u",
+      "reported_type": "fi.K",
+      "dex_static_value": null
+    }
+  ],
+  "inner_classes": []
+}

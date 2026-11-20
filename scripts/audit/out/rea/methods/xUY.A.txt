@@ -1,0 +1,6 @@
+    public void A(Matrix matrix) {
+        Intrinsics.checkNotNullParameter(matrix, "matrix");
+        fs fsVar = this.gOC;
+        fsVar.pY(GeometryKt.times(fsVar.nDH(), matrix));
+        bdS();
+    }

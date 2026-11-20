@@ -1,0 +1,132 @@
+{
+  "query": "Play",
+  "raw": {
+    "evidence_id": "ev_3ea34198d6d79c47197b6ddfb8d94d9f994744b452567a41274f0a620dea1179",
+    "evidence_format": 2,
+    "subject": {
+      "identity": {
+        "kind": "file",
+        "sha256": "c0543658c3252fe9fc4c1852aa02cc5e8af746c781bf9dfd1a7a25e118d2af0e",
+        "selection": null,
+        "format": "apk",
+        "architecture": null
+      },
+      "name": "AlightMotion-5.0.280-raw.apk",
+      "local_path": "C:\\Users\\jeduc\\AppData\\Local\\Temp\\opencode\\AlightMotion-5.0.280-raw.apk"
+    },
+    "provider": {
+      "id": "jadx",
+      "name": "JADX headless",
+      "version": "0.7.1"
+    },
+    "analysis_profile": null,
+    "predicate_type": "rea.analysis",
+    "operation": "search_android_classes",
+    "parameters": {
+      "path": "C:\\Users\\jeduc\\AppData\\Local\\Temp\\opencode\\AlightMotion-5.0.280-raw.apk",
+      "query": "Play"
+    },
+    "raw_result": {
+      "server": {
+        "name": "rea-jadx-bridge",
+        "version": "11"
+      },
+      "bridge_sha256": "08de17c12c68adf077aaccba84c6d53b6c9ac86ff2d2e581e35b9b03618003f2",
+      "jar_sha256": "6e5eacf500b64292bfb73c49797c1958f6ee44646e43e868039ae7feb573ff75",
+      "loaded": {
+        "state": "LOADED",
+        "apk_path": "C:\\Users\\jeduc\\AppData\\Local\\Temp\\rea-android-9be559803b347cd5022c9e1c34856dc2\\target.apk",
+        "class_count": 24194,
+        "resource_count": 4432,
+        "threads": 1,
+        "resources": "full"
+      },
+      "calls": [
+        {
+          "operation": "rea_jvm_status",
+          "input": {},
+          "response": {
+            "content": [
+              {
+                "type": "text",
+                "text": "{\"java_version\":\"17.0.9\",\"available_processors\":32,\"engine_reported_version\":\"0.7.1\",\"metadata_scope\":\"parsed_members\",\"max_heap_bytes\":8589934592}"
+              }
+            ],
+            "isError": false
+          }
+        },
+        {
+          "operation": "list_classes",
+          "input": {
+            "query": "Play",
+            "offset": 0,
+            "limit": 4096
+          },
+          "response": {
+            "content": [
+              {
+                "type": "text",
+                "text": "{\"offset\":0,\"next_offset\":24194,\"limit\":4096,\"scope\":\"top_level\",\"total_classes\":24194,\"items_omitted\":21}"
+              }
+            ],
+            "isError": false
+          },
+          "inventory_elided": true
+        }
+      ],
+      "complete_evidence_id": "ev_2cc5855a2feba1c7e6a11197d997ea4442d9c896c7a6df230a2ef8f896ed138f"
+    },
+    "normalized_result": {
+      "engine": {
+        "name": "jadx-headless-mcp",
+        "version": "0.7.1",
+        "artifact_sha256": "6e5eacf500b64292bfb73c49797c1958f6ee44646e43e868039ae7feb573ff75",
+        "source_revision": "5844800a486d2248fa949b74c9896285f5b54de2",
+        "worker_count": 1,
+        "heap_limit_mib": 8192
+      },
+      "query": "Play",
+      "total_classes": 24194,
+      "matches": [
+        "android.support.v4.media.session.PlaybackStateCompat",
+        "androidx.media3.common.PlaybackException",
+        "androidx.media3.exoplayer.ExoPlaybackException",
+        "com.alightcreative.app.motion.activities.MediaPlayerCreateFailed",
+        "com.alightcreative.app.motion.activities.audiobrowser.AudioPlayCircleProgressBar",
+        "com.alightcreative.monorepo.settings.PlayfulUnlockStyle",
+        "com.applovin.sdk.AppLovinAdVideoPlaybackListener",
+        "com.google.android.exoplayer2.ExoPlaybackException",
+        "com.google.android.exoplayer2.PlaybackException",
+        "com.google.android.exoplayer2.source.hls.playlist.HlsPlaylistParser",
+        "com.google.android.exoplayer2.source.hls.playlist.HlsPlaylistTracker",
+        "com.google.android.exoplayer2.ui.PlayerView",
+        "com.google.android.gms.auth.GooglePlayServicesAvailabilityException",
+        "com.google.android.gms.common.GooglePlayServicesIncorrectManifestValueException",
+        "com.google.android.gms.common.GooglePlayServicesManifestException",
+        "com.google.android.gms.common.GooglePlayServicesMissingManifestValueException",
+        "com.google.android.gms.common.GooglePlayServicesNotAvailableException",
+        "com.google.android.gms.common.GooglePlayServicesRepairableException",
+        "com.google.android.play.core.common.PlayCoreDialogWrapperActivity",
+        "com.google.firebase.appcheck.playintegrity.FirebaseAppCheckPlayIntegrityRegistrar",
+        "com.iab.omid.library.applovin.adsession.media.PlayerState"
+      ],
+      "duplicate_names": [],
+      "coverage": "complete"
+    },
+    "confidence": "observed",
+    "authority": "shipped-artifact",
+    "environment": null,
+    "limitations": [
+      "Static decompiler observations do not establish runtime behavior; the APK is never executed.",
+      "Method signatures use provider display types; DEX prototypes come from frozen JADX metadata. Display names may be aliases, and overload indices are local to this engine and artifact.",
+      "Class inventories use parsed metadata before code generation, including synthetic members that may be omitted from decompiled source. Source positions remain unknown.",
+      "Incoming reference totals count JADX using nodes. Direct invoke entries within a using method report raw DEX code-unit offsets and method indexes, but coverage is limited to those nodes and directly matched invokes; it does not establish every possible dynamic or reflective call site.",
+      "Manifest summaries are parsed once by REA's bridge from the exact root AndroidManifest.xml resource, using namespace-aware XML attributes; decoded XML is retained. These summaries do not verify APK signatures, split APKs or Android runtime capture."
+    ],
+    "relationship_coverage": null,
+    "locations": [],
+    "evidence_links": [
+      "ev_2cc5855a2feba1c7e6a11197d997ea4442d9c896c7a6df230a2ef8f896ed138f"
+    ]
+  }
+}

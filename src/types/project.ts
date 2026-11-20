@@ -58,33 +58,48 @@ export type LayerType =
   | 'vector'
   | 'freehand';
 
+/**
+ * APK 5.0.280 `com.alightcreative.app.motion.scene.BlendingMode` carries 29 enum constants
+ * (see PLAYBACK_PREVIEW_DECOMPILED.md §10). `mask` and `clipping-mask` are blend modes in their
+ * own right, independent of the `clippingMask` element boolean.
+ *
+ * Effect ids are NOT the CSS spelling: `multiply` -> `colormultiply`, `diff` (not `difference`),
+ * `luminance` (not `luminosity`), `soft-overlay` -> `softoverlay`.
+ */
 export type BlendModeId =
   | 'normal'
   | 'mask'
+  | 'clipping-mask'
   | 'exclude'
+  | 'com.alightcreative.blend.colormultiply'
+  | 'com.alightcreative.blend.screen'
+  | 'com.alightcreative.blend.diff'
+  | 'com.alightcreative.blend.exclusion'
+  | 'com.alightcreative.blend.lighten'
   | 'com.alightcreative.blend.darken'
-  | 'com.alightcreative.blend.multiply'
+  | 'com.alightcreative.blend.lightercolor'
+  | 'com.alightcreative.blend.darkercolor'
   | 'com.alightcreative.blend.colorburn'
   | 'com.alightcreative.blend.linearburn'
-  | 'com.alightcreative.blend.darkercolor'
-  | 'com.alightcreative.blend.lighten'
-  | 'com.alightcreative.blend.screen'
   | 'com.alightcreative.blend.colordodge'
   | 'com.alightcreative.blend.lineardodge'
-  | 'com.alightcreative.blend.lightercolor'
   | 'com.alightcreative.blend.overlay'
   | 'com.alightcreative.blend.softlight'
   | 'com.alightcreative.blend.hardlight'
+  | 'com.alightcreative.blend.softoverlay'
   | 'com.alightcreative.blend.vividlight'
   | 'com.alightcreative.blend.linearlight'
   | 'com.alightcreative.blend.pinlight'
-  | 'com.alightcreative.blend.difference'
-  | 'com.alightcreative.blend.exclusion'
-  | 'com.alightcreative.blend.subtract'
-  | 'com.alightcreative.blend.divide'
   | 'com.alightcreative.blend.hue'
   | 'com.alightcreative.blend.saturation'
   | 'com.alightcreative.blend.color'
+  | 'com.alightcreative.blend.luminance'
+  | 'com.alightcreative.blend.subtract'
+  | 'com.alightcreative.blend.divide'
+  // Legacy spellings emitted by web builds before the 5.0.280 blend audit. Import-only:
+  // normalised away on load, never written back out.
+  | 'com.alightcreative.blend.multiply'
+  | 'com.alightcreative.blend.difference'
   | 'com.alightcreative.blend.luminosity';
 
 export interface LayerTransform {

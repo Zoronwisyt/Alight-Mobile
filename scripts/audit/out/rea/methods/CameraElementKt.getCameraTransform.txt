@@ -1,0 +1,12 @@
+    public static final Transform getCameraTransform(SceneElement sceneElement, Scene scene, int i2, float f2) {
+        Intrinsics.checkNotNullParameter(sceneElement, "<this>");
+        Intrinsics.checkNotNullParameter(scene, "scene");
+        if (!(sceneElement.getType() == SceneElementType.Camera)) {
+            throw new IllegalStateException("Check failed.".toString());
+        }
+        Vector2D center = SceneElementKt.getCenter(scene);
+        float fFractionalTime = SceneElementKt.fractionalTime(sceneElement, i2);
+        Transform transformValueAtTime = TransformKt.translatedBy(LayerParentingKt.applyLayerParenting(ScriptExecutorKt.runScripts$default(sceneElement, fFractionalTime, scene, null, null, false, null, 60, null), scene, fFractionalTime).getTransform(), GeometryKt.unaryMinus(center)).valueAtTime(fFractionalTime);
+        float z2 = sceneElement.getCameraProperties().getType() == CameraType.Perspective ? (f2 - transformValueAtTime.getLocation().getZ()) / calcCameraZoom(scene, ((Number) KeyableKt.valueAtTime(sceneElement.getCameraProperties().getFov(), fFractionalTime)).floatValue()) : 1.0f;
+        return transformValueAtTime.copy((447 & 1) != 0 ? transformValueAtTime.location : null, (447 & 2) != 0 ? transformValueAtTime.pivot : null, (447 & 4) != 0 ? transformValueAtTime.scale : new Vector2D(z2, z2), (447 & 8) != 0 ? transformValueAtTime.orientation : 0.0f, (447 & 16) != 0 ? transformValueAtTime.size : 0.0f, (447 & 32) != 0 ? transformValueAtTime.rotation : 0.0f, (447 & 64) != 0 ? transformValueAtTime.opacity : 0.0f, (447 & 128) != 0 ? transformValueAtTime.skew : null, (447 & 256) != 0 ? transformValueAtTime.parentTransform : null);
+    }

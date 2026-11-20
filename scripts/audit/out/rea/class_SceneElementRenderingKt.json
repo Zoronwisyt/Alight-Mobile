@@ -1,0 +1,174 @@
+{
+  "engine": {
+    "name": "jadx-headless-mcp",
+    "version": "0.7.1",
+    "artifact_sha256": "6e5eacf500b64292bfb73c49797c1958f6ee44646e43e868039ae7feb573ff75",
+    "source_revision": "5844800a486d2248fa949b74c9896285f5b54de2",
+    "worker_count": 1,
+    "heap_limit_mib": 8192
+  },
+  "class_name": "com.alightcreative.app.motion.scene.rendering.SceneElementRenderingKt",
+  "methods": [
+    {
+      "name": "<clinit>",
+      "reported_signature": "<clinit>(): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()V"
+    },
+    {
+      "name": "access$renderWithRepeat",
+      "reported_signature": "access$renderWithRepeat(com.alightcreative.app.motion.scene.SceneElement, java.util.List, jD.SfT, com.alightcreative.app.motion.scene.rendering.RenderEnvironment, com.alightcreative.app.motion.scene.SceneSelection, com.alightcreative.app.motion.scene.Rectangle): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneElement;Ljava/util/List;LjD/SfT;Lcom/alightcreative/app/motion/scene/rendering/RenderEnvironment;Lcom/alightcreative/app/motion/scene/SceneSelection;Lcom/alightcreative/app/motion/scene/Rectangle;)V"
+    },
+    {
+      "name": "getHasEdgeDecorations",
+      "reported_signature": "getHasEdgeDecorations(com.alightcreative.app.motion.scene.SceneElement): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneElement;)Z"
+    },
+    {
+      "name": "getNeedsSpecialCaseRender",
+      "reported_signature": "getNeedsSpecialCaseRender(com.alightcreative.app.motion.scene.visualeffect.KeyableVisualEffectRef): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/visualeffect/KeyableVisualEffectRef;)Z"
+    },
+    {
+      "name": "includesScriptEffects",
+      "reported_signature": "includesScriptEffects(java.util.Map<?, com.alightcreative.app.motion.scene.visualeffect.KeyableVisualEffectRef>): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Ljava/util/Map;)Z"
+    },
+    {
+      "name": "includesShaderEffects",
+      "reported_signature": "includesShaderEffects(java.util.Map<?, com.alightcreative.app.motion.scene.visualeffect.KeyableVisualEffectRef>): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Ljava/util/Map;)Z"
+    },
+    {
+      "name": "renderGeneralElementSelectionAndEditMode",
+      "reported_signature": "renderGeneralElementSelectionAndEditMode(com.alightcreative.app.motion.scene.SceneElement, jD.SfT, com.alightcreative.app.motion.scene.rendering.RenderEnvironment, com.alightcreative.app.motion.scene.SceneSelection, com.alightcreative.app.motion.scene.Rectangle): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneElement;LjD/SfT;Lcom/alightcreative/app/motion/scene/rendering/RenderEnvironment;Lcom/alightcreative/app/motion/scene/SceneSelection;Lcom/alightcreative/app/motion/scene/Rectangle;)Z"
+    },
+    {
+      "name": "renderGeneralElementSelectionAndEditMode$addPoints",
+      "reported_signature": "renderGeneralElementSelectionAndEditMode$addPoints(com.alightcreative.app.motion.scene.SceneElement, com.alightcreative.app.motion.scene.rendering.RenderEnvironment, float, float, com.alightcreative.app.motion.scene.Vector2D, com.alightcreative.app.motion.scene.Vector2D, int): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneElement;Lcom/alightcreative/app/motion/scene/rendering/RenderEnvironment;FFLcom/alightcreative/app/motion/scene/Vector2D;Lcom/alightcreative/app/motion/scene/Vector2D;I)V"
+    },
+    {
+      "name": "renderGeneralElementSelectionAndEditMode$addPoints$6",
+      "reported_signature": "renderGeneralElementSelectionAndEditMode$addPoints$6(com.alightcreative.app.motion.scene.SceneElement, com.alightcreative.app.motion.scene.rendering.RenderEnvironment, float, float, com.alightcreative.app.motion.scene.Vector2D, com.alightcreative.app.motion.scene.Vector2D, int): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneElement;Lcom/alightcreative/app/motion/scene/rendering/RenderEnvironment;FFLcom/alightcreative/app/motion/scene/Vector2D;Lcom/alightcreative/app/motion/scene/Vector2D;I)V"
+    },
+    {
+      "name": "renderGeneralElementSelectionAndEditMode$posForTime",
+      "reported_signature": "renderGeneralElementSelectionAndEditMode$posForTime(com.alightcreative.app.motion.scene.SceneElement, com.alightcreative.app.motion.scene.rendering.RenderEnvironment, float): com.alightcreative.app.motion.scene.Vector3D",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneElement;Lcom/alightcreative/app/motion/scene/rendering/RenderEnvironment;F)Lcom/alightcreative/app/motion/scene/Vector3D;"
+    },
+    {
+      "name": "renderGeneralElementSelectionAndEditMode$posForTime$3",
+      "reported_signature": "renderGeneralElementSelectionAndEditMode$posForTime$3(com.alightcreative.app.motion.scene.SceneElement, com.alightcreative.app.motion.scene.rendering.RenderEnvironment, float): com.alightcreative.app.motion.scene.Vector3D",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneElement;Lcom/alightcreative/app/motion/scene/rendering/RenderEnvironment;F)Lcom/alightcreative/app/motion/scene/Vector3D;"
+    },
+    {
+      "name": "renderInternal",
+      "reported_signature": "renderInternal(com.alightcreative.app.motion.scene.SceneElement, jD.SfT, com.alightcreative.app.motion.scene.rendering.RenderEnvironment, com.alightcreative.app.motion.scene.SceneSelection, com.alightcreative.app.motion.scene.Rectangle): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneElement;LjD/SfT;Lcom/alightcreative/app/motion/scene/rendering/RenderEnvironment;Lcom/alightcreative/app/motion/scene/SceneSelection;Lcom/alightcreative/app/motion/scene/Rectangle;)V"
+    },
+    {
+      "name": "renderSelection",
+      "reported_signature": "renderSelection(com.alightcreative.app.motion.scene.SceneElement, jD.SfT, com.alightcreative.app.motion.scene.rendering.RenderEnvironment, com.alightcreative.app.motion.scene.SceneSelection, com.alightcreative.app.motion.scene.Rectangle): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneElement;LjD/SfT;Lcom/alightcreative/app/motion/scene/rendering/RenderEnvironment;Lcom/alightcreative/app/motion/scene/SceneSelection;Lcom/alightcreative/app/motion/scene/Rectangle;)V"
+    },
+    {
+      "name": "renderWithEffects",
+      "reported_signature": "renderWithEffects(com.alightcreative.app.motion.scene.SceneElement, jD.SfT, com.alightcreative.app.motion.scene.rendering.RenderEnvironment, com.alightcreative.app.motion.scene.SceneSelection, com.alightcreative.app.motion.scene.Rectangle): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneElement;LjD/SfT;Lcom/alightcreative/app/motion/scene/rendering/RenderEnvironment;Lcom/alightcreative/app/motion/scene/SceneSelection;Lcom/alightcreative/app/motion/scene/Rectangle;)V"
+    },
+    {
+      "name": "renderWithEffectsInternal",
+      "reported_signature": "renderWithEffectsInternal(com.alightcreative.app.motion.scene.SceneElement, jD.SfT, com.alightcreative.app.motion.scene.rendering.RenderEnvironment, com.alightcreative.app.motion.scene.SceneSelection, com.alightcreative.app.motion.scene.Transform, com.alightcreative.app.motion.scene.Rectangle): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneElement;LjD/SfT;Lcom/alightcreative/app/motion/scene/rendering/RenderEnvironment;Lcom/alightcreative/app/motion/scene/SceneSelection;Lcom/alightcreative/app/motion/scene/Transform;Lcom/alightcreative/app/motion/scene/Rectangle;)V"
+    },
+    {
+      "name": "renderWithEffectsNoReverseInterpolation",
+      "reported_signature": "renderWithEffectsNoReverseInterpolation(com.alightcreative.app.motion.scene.SceneElement, jD.SfT, com.alightcreative.app.motion.scene.rendering.RenderEnvironment, com.alightcreative.app.motion.scene.SceneSelection, com.alightcreative.app.motion.scene.Rectangle): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneElement;LjD/SfT;Lcom/alightcreative/app/motion/scene/rendering/RenderEnvironment;Lcom/alightcreative/app/motion/scene/SceneSelection;Lcom/alightcreative/app/motion/scene/Rectangle;)V"
+    },
+    {
+      "name": "renderWithPostRepeatScripts",
+      "reported_signature": "renderWithPostRepeatScripts(com.alightcreative.app.motion.scene.SceneElement, jD.SfT, com.alightcreative.app.motion.scene.rendering.RenderEnvironment, com.alightcreative.app.motion.scene.SceneSelection, com.alightcreative.app.motion.scene.Rectangle): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneElement;LjD/SfT;Lcom/alightcreative/app/motion/scene/rendering/RenderEnvironment;Lcom/alightcreative/app/motion/scene/SceneSelection;Lcom/alightcreative/app/motion/scene/Rectangle;)V"
+    },
+    {
+      "name": "renderWithRepeat",
+      "reported_signature": "renderWithRepeat(com.alightcreative.app.motion.scene.SceneElement, jD.SfT, com.alightcreative.app.motion.scene.rendering.RenderEnvironment, com.alightcreative.app.motion.scene.SceneSelection, com.alightcreative.app.motion.scene.Rectangle): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneElement;LjD/SfT;Lcom/alightcreative/app/motion/scene/rendering/RenderEnvironment;Lcom/alightcreative/app/motion/scene/SceneSelection;Lcom/alightcreative/app/motion/scene/Rectangle;)V"
+    },
+    {
+      "name": "renderWithRepeat",
+      "reported_signature": "renderWithRepeat(com.alightcreative.app.motion.scene.SceneElement, java.util.List<com.alightcreative.app.motion.scene.visualeffect.KeyableVisualEffectRef>, jD.SfT, com.alightcreative.app.motion.scene.rendering.RenderEnvironment, com.alightcreative.app.motion.scene.SceneSelection, com.alightcreative.app.motion.scene.Rectangle): void",
+      "overload_index": 1,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneElement;Ljava/util/List;LjD/SfT;Lcom/alightcreative/app/motion/scene/rendering/RenderEnvironment;Lcom/alightcreative/app/motion/scene/SceneSelection;Lcom/alightcreative/app/motion/scene/Rectangle;)V"
+    },
+    {
+      "name": "reverseInterpolateFirstFrame",
+      "reported_signature": "reverseInterpolateFirstFrame(com.alightcreative.app.motion.scene.SceneElement, float): com.alightcreative.app.motion.scene.SceneElement",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneElement;F)Lcom/alightcreative/app/motion/scene/SceneElement;"
+    }
+  ],
+  "fields": [
+    {
+      "name": "scratchPaint",
+      "reported_type": "jD.Jb",
+      "dex_static_value": null
+    },
+    {
+      "name": "scratchPath",
+      "reported_type": "jD.mY0",
+      "dex_static_value": null
+    }
+  ],
+  "inner_classes": [
+    "com.alightcreative.app.motion.scene.rendering.SceneElementRenderingKt.AnonymousClass1",
+    "com.alightcreative.app.motion.scene.rendering.SceneElementRenderingKt.AnonymousClass2",
+    "com.alightcreative.app.motion.scene.rendering.SceneElementRenderingKt.AnonymousClass2",
+    "com.alightcreative.app.motion.scene.rendering.SceneElementRenderingKt.AnonymousClass3",
+    "com.alightcreative.app.motion.scene.rendering.SceneElementRenderingKt.AnonymousClass4",
+    "com.alightcreative.app.motion.scene.rendering.SceneElementRenderingKt.AnonymousClass5",
+    "com.alightcreative.app.motion.scene.rendering.SceneElementRenderingKt.AnonymousClass6"
+  ]
+}

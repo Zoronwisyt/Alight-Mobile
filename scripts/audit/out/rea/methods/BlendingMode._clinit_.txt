@@ -1,0 +1,503 @@
+.method static constructor <clinit>()V
+    .registers 17
+
+    new-instance v8, Lcom/alightcreative/app/motion/scene/BlendingMode;
+
+    const-string v1, "NORMAL"
+
+    const/4 v2, 0x0
+
+    const-string v3, "normal"
+
+    const/4 v4, 0x0
+
+    const/4 v5, 0x0
+
+    const/4 v6, 0x6
+
+    const/4 v7, 0x0
+
+    move-object v0, v8
+
+    invoke-direct/range {v0 .. v7}, Lcom/alightcreative/app/motion/scene/BlendingMode;-><init>(Ljava/lang/String;ILjava/lang/String;ZLjava/lang/String;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+
+    sput-object v8, Lcom/alightcreative/app/motion/scene/BlendingMode;->NORMAL:Lcom/alightcreative/app/motion/scene/BlendingMode;
+
+    new-instance v0, Lcom/alightcreative/app/motion/scene/BlendingMode;
+
+    const-string v10, "MULTIPLY"
+
+    const/4 v11, 0x1
+
+    const-string v12, "multiply"
+
+    const/4 v13, 0x1
+
+    const-string v14, "com.alightcreative.blend.colormultiply"
+
+    move-object v9, v0
+
+    invoke-direct/range {v9 .. v14}, Lcom/alightcreative/app/motion/scene/BlendingMode;-><init>(Ljava/lang/String;ILjava/lang/String;ZLjava/lang/String;)V
+
+    sput-object v0, Lcom/alightcreative/app/motion/scene/BlendingMode;->MULTIPLY:Lcom/alightcreative/app/motion/scene/BlendingMode;
+
+    new-instance v0, Lcom/alightcreative/app/motion/scene/BlendingMode;
+
+    const-string v2, "SCREEN"
+
+    const/4 v3, 0x2
+
+    const-string v4, "screen"
+
+    const/4 v5, 0x0
+
+    const/4 v6, 0x0
+
+    const/4 v7, 0x6
+
+    const/4 v8, 0x0
+
+    move-object v1, v0
+
+    invoke-direct/range {v1 .. v8}, Lcom/alightcreative/app/motion/scene/BlendingMode;-><init>(Ljava/lang/String;ILjava/lang/String;ZLjava/lang/String;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+
+    sput-object v0, Lcom/alightcreative/app/motion/scene/BlendingMode;->SCREEN:Lcom/alightcreative/app/motion/scene/BlendingMode;
+
+    new-instance v0, Lcom/alightcreative/app/motion/scene/BlendingMode;
+
+    const-string v10, "MASK"
+
+    const/4 v11, 0x3
+
+    const-string v12, "mask"
+
+    const/4 v13, 0x0
+
+    const/4 v14, 0x0
+
+    const/4 v15, 0x6
+
+    const/16 v16, 0x0
+
+    move-object v9, v0
+
+    invoke-direct/range {v9 .. v16}, Lcom/alightcreative/app/motion/scene/BlendingMode;-><init>(Ljava/lang/String;ILjava/lang/String;ZLjava/lang/String;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+
+    sput-object v0, Lcom/alightcreative/app/motion/scene/BlendingMode;->MASK:Lcom/alightcreative/app/motion/scene/BlendingMode;
+
+    new-instance v0, Lcom/alightcreative/app/motion/scene/BlendingMode;
+
+    const-string v2, "CLIPPING_MASK"
+
+    const/4 v3, 0x4
+
+    const-string v4, "clipping-mask"
+
+    move-object v1, v0
+
+    invoke-direct/range {v1 .. v8}, Lcom/alightcreative/app/motion/scene/BlendingMode;-><init>(Ljava/lang/String;ILjava/lang/String;ZLjava/lang/String;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+
+    sput-object v0, Lcom/alightcreative/app/motion/scene/BlendingMode;->CLIPPING_MASK:Lcom/alightcreative/app/motion/scene/BlendingMode;
+
+    new-instance v0, Lcom/alightcreative/app/motion/scene/BlendingMode;
+
+    const-string v10, "EXCLUDE"
+
+    const/4 v11, 0x5
+
+    const-string v12, "exclude"
+
+    move-object v9, v0
+
+    invoke-direct/range {v9 .. v16}, Lcom/alightcreative/app/motion/scene/BlendingMode;-><init>(Ljava/lang/String;ILjava/lang/String;ZLjava/lang/String;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+
+    sput-object v0, Lcom/alightcreative/app/motion/scene/BlendingMode;->EXCLUDE:Lcom/alightcreative/app/motion/scene/BlendingMode;
+
+    new-instance v0, Lcom/alightcreative/app/motion/scene/BlendingMode;
+
+    const-string v2, "DIFF"
+
+    const/4 v3, 0x6
+
+    const-string v4, "diff"
+
+    const/4 v5, 0x1
+
+    const-string v6, "com.alightcreative.blend.diff"
+
+    move-object v1, v0
+
+    invoke-direct/range {v1 .. v6}, Lcom/alightcreative/app/motion/scene/BlendingMode;-><init>(Ljava/lang/String;ILjava/lang/String;ZLjava/lang/String;)V
+
+    sput-object v0, Lcom/alightcreative/app/motion/scene/BlendingMode;->DIFF:Lcom/alightcreative/app/motion/scene/BlendingMode;
+
+    new-instance v0, Lcom/alightcreative/app/motion/scene/BlendingMode;
+
+    const-string v8, "EXCLUSION"
+
+    const/4 v9, 0x7
+
+    const-string v10, "exclusion"
+
+    const/4 v11, 0x1
+
+    const-string v12, "com.alightcreative.blend.exclusion"
+
+    move-object v7, v0
+
+    invoke-direct/range {v7 .. v12}, Lcom/alightcreative/app/motion/scene/BlendingMode;-><init>(Ljava/lang/String;ILjava/lang/String;ZLjava/lang/String;)V
+
+    sput-object v0, Lcom/alightcreative/app/motion/scene/BlendingMode;->EXCLUSION:Lcom/alightcreative/app/motion/scene/BlendingMode;
+
+    new-instance v0, Lcom/alightcreative/app/motion/scene/BlendingMode;
+
+    const-string v2, "LIGHTEN"
+
+    const/16 v3, 0x8
+
+    const-string v4, "lighten"
+
+    const-string v6, "com.alightcreative.blend.lighten"
+
+    move-object v1, v0
+
+    invoke-direct/range {v1 .. v6}, Lcom/alightcreative/app/motion/scene/BlendingMode;-><init>(Ljava/lang/String;ILjava/lang/String;ZLjava/lang/String;)V
+
+    sput-object v0, Lcom/alightcreative/app/motion/scene/BlendingMode;->LIGHTEN:Lcom/alightcreative/app/motion/scene/BlendingMode;
+
+    new-instance v0, Lcom/alightcreative/app/motion/scene/BlendingMode;
+
+    const-string v8, "DARKEN"
+
+    const/16 v9, 0x9
+
+    const-string v10, "darken"
+
+    const-string v12, "com.alightcreative.blend.darken"
+
+    move-object v7, v0
+
+    invoke-direct/range {v7 .. v12}, Lcom/alightcreative/app/motion/scene/BlendingMode;-><init>(Ljava/lang/String;ILjava/lang/String;ZLjava/lang/String;)V
+
+    sput-object v0, Lcom/alightcreative/app/motion/scene/BlendingMode;->DARKEN:Lcom/alightcreative/app/motion/scene/BlendingMode;
+
+    new-instance v0, Lcom/alightcreative/app/motion/scene/BlendingMode;
+
+    const-string v2, "LIGHTER_COLOR"
+
+    const/16 v3, 0xa
+
+    const-string v4, "lighter-color"
+
+    const-string v6, "com.alightcreative.blend.lightercolor"
+
+    move-object v1, v0
+
+    invoke-direct/range {v1 .. v6}, Lcom/alightcreative/app/motion/scene/BlendingMode;-><init>(Ljava/lang/String;ILjava/lang/String;ZLjava/lang/String;)V
+
+    sput-object v0, Lcom/alightcreative/app/motion/scene/BlendingMode;->LIGHTER_COLOR:Lcom/alightcreative/app/motion/scene/BlendingMode;
+
+    new-instance v0, Lcom/alightcreative/app/motion/scene/BlendingMode;
+
+    const-string v8, "DARKER_COLOR"
+
+    const/16 v9, 0xb
+
+    const-string v10, "darker-color"
+
+    const-string v12, "com.alightcreative.blend.darkercolor"
+
+    move-object v7, v0
+
+    invoke-direct/range {v7 .. v12}, Lcom/alightcreative/app/motion/scene/BlendingMode;-><init>(Ljava/lang/String;ILjava/lang/String;ZLjava/lang/String;)V
+
+    sput-object v0, Lcom/alightcreative/app/motion/scene/BlendingMode;->DARKER_COLOR:Lcom/alightcreative/app/motion/scene/BlendingMode;
+
+    new-instance v0, Lcom/alightcreative/app/motion/scene/BlendingMode;
+
+    const-string v2, "COLOR_BURN"
+
+    const/16 v3, 0xc
+
+    const-string v4, "color-burn"
+
+    const-string v6, "com.alightcreative.blend.colorburn"
+
+    move-object v1, v0
+
+    invoke-direct/range {v1 .. v6}, Lcom/alightcreative/app/motion/scene/BlendingMode;-><init>(Ljava/lang/String;ILjava/lang/String;ZLjava/lang/String;)V
+
+    sput-object v0, Lcom/alightcreative/app/motion/scene/BlendingMode;->COLOR_BURN:Lcom/alightcreative/app/motion/scene/BlendingMode;
+
+    new-instance v0, Lcom/alightcreative/app/motion/scene/BlendingMode;
+
+    const-string v8, "LINEAR_BURN"
+
+    const/16 v9, 0xd
+
+    const-string v10, "linear-burn"
+
+    const-string v12, "com.alightcreative.blend.linearburn"
+
+    move-object v7, v0
+
+    invoke-direct/range {v7 .. v12}, Lcom/alightcreative/app/motion/scene/BlendingMode;-><init>(Ljava/lang/String;ILjava/lang/String;ZLjava/lang/String;)V
+
+    sput-object v0, Lcom/alightcreative/app/motion/scene/BlendingMode;->LINEAR_BURN:Lcom/alightcreative/app/motion/scene/BlendingMode;
+
+    new-instance v0, Lcom/alightcreative/app/motion/scene/BlendingMode;
+
+    const-string v2, "COLOR_DODGE"
+
+    const/16 v3, 0xe
+
+    const-string v4, "color-dodge"
+
+    const-string v6, "com.alightcreative.blend.colordodge"
+
+    move-object v1, v0
+
+    invoke-direct/range {v1 .. v6}, Lcom/alightcreative/app/motion/scene/BlendingMode;-><init>(Ljava/lang/String;ILjava/lang/String;ZLjava/lang/String;)V
+
+    sput-object v0, Lcom/alightcreative/app/motion/scene/BlendingMode;->COLOR_DODGE:Lcom/alightcreative/app/motion/scene/BlendingMode;
+
+    new-instance v0, Lcom/alightcreative/app/motion/scene/BlendingMode;
+
+    const-string v8, "LINEAR_DODGE"
+
+    const/16 v9, 0xf
+
+    const-string v10, "linear-dodge"
+
+    const-string v12, "com.alightcreative.blend.lineardodge"
+
+    move-object v7, v0
+
+    invoke-direct/range {v7 .. v12}, Lcom/alightcreative/app/motion/scene/BlendingMode;-><init>(Ljava/lang/String;ILjava/lang/String;ZLjava/lang/String;)V
+
+    sput-object v0, Lcom/alightcreative/app/motion/scene/BlendingMode;->LINEAR_DODGE:Lcom/alightcreative/app/motion/scene/BlendingMode;
+
+    new-instance v0, Lcom/alightcreative/app/motion/scene/BlendingMode;
+
+    const-string v2, "OVERLAY"
+
+    const/16 v3, 0x10
+
+    const-string v4, "overlay"
+
+    const-string v6, "com.alightcreative.blend.overlay"
+
+    move-object v1, v0
+
+    invoke-direct/range {v1 .. v6}, Lcom/alightcreative/app/motion/scene/BlendingMode;-><init>(Ljava/lang/String;ILjava/lang/String;ZLjava/lang/String;)V
+
+    sput-object v0, Lcom/alightcreative/app/motion/scene/BlendingMode;->OVERLAY:Lcom/alightcreative/app/motion/scene/BlendingMode;
+
+    new-instance v0, Lcom/alightcreative/app/motion/scene/BlendingMode;
+
+    const-string v8, "SOFT_LIGHT"
+
+    const/16 v9, 0x11
+
+    const-string v10, "soft-light"
+
+    const-string v12, "com.alightcreative.blend.softlight"
+
+    move-object v7, v0
+
+    invoke-direct/range {v7 .. v12}, Lcom/alightcreative/app/motion/scene/BlendingMode;-><init>(Ljava/lang/String;ILjava/lang/String;ZLjava/lang/String;)V
+
+    sput-object v0, Lcom/alightcreative/app/motion/scene/BlendingMode;->SOFT_LIGHT:Lcom/alightcreative/app/motion/scene/BlendingMode;
+
+    new-instance v0, Lcom/alightcreative/app/motion/scene/BlendingMode;
+
+    const-string v2, "HARD_LIGHT"
+
+    const/16 v3, 0x12
+
+    const-string v4, "hard-light"
+
+    const-string v6, "com.alightcreative.blend.hardlight"
+
+    move-object v1, v0
+
+    invoke-direct/range {v1 .. v6}, Lcom/alightcreative/app/motion/scene/BlendingMode;-><init>(Ljava/lang/String;ILjava/lang/String;ZLjava/lang/String;)V
+
+    sput-object v0, Lcom/alightcreative/app/motion/scene/BlendingMode;->HARD_LIGHT:Lcom/alightcreative/app/motion/scene/BlendingMode;
+
+    new-instance v0, Lcom/alightcreative/app/motion/scene/BlendingMode;
+
+    const-string v8, "SOFT_OVERLAY"
+
+    const/16 v9, 0x13
+
+    const-string v10, "soft-overlay"
+
+    const-string v12, "com.alightcreative.blend.softoverlay"
+
+    move-object v7, v0
+
+    invoke-direct/range {v7 .. v12}, Lcom/alightcreative/app/motion/scene/BlendingMode;-><init>(Ljava/lang/String;ILjava/lang/String;ZLjava/lang/String;)V
+
+    sput-object v0, Lcom/alightcreative/app/motion/scene/BlendingMode;->SOFT_OVERLAY:Lcom/alightcreative/app/motion/scene/BlendingMode;
+
+    new-instance v0, Lcom/alightcreative/app/motion/scene/BlendingMode;
+
+    const-string v2, "VIVID_LIGHT"
+
+    const/16 v3, 0x14
+
+    const-string v4, "vivid-light"
+
+    const-string v6, "com.alightcreative.blend.vividlight"
+
+    move-object v1, v0
+
+    invoke-direct/range {v1 .. v6}, Lcom/alightcreative/app/motion/scene/BlendingMode;-><init>(Ljava/lang/String;ILjava/lang/String;ZLjava/lang/String;)V
+
+    sput-object v0, Lcom/alightcreative/app/motion/scene/BlendingMode;->VIVID_LIGHT:Lcom/alightcreative/app/motion/scene/BlendingMode;
+
+    new-instance v0, Lcom/alightcreative/app/motion/scene/BlendingMode;
+
+    const-string v8, "LINEAR_LIGHT"
+
+    const/16 v9, 0x15
+
+    const-string v10, "linear-light"
+
+    const-string v12, "com.alightcreative.blend.linearlight"
+
+    move-object v7, v0
+
+    invoke-direct/range {v7 .. v12}, Lcom/alightcreative/app/motion/scene/BlendingMode;-><init>(Ljava/lang/String;ILjava/lang/String;ZLjava/lang/String;)V
+
+    sput-object v0, Lcom/alightcreative/app/motion/scene/BlendingMode;->LINEAR_LIGHT:Lcom/alightcreative/app/motion/scene/BlendingMode;
+
+    new-instance v0, Lcom/alightcreative/app/motion/scene/BlendingMode;
+
+    const-string v2, "PIN_LIGHT"
+
+    const/16 v3, 0x16
+
+    const-string v4, "pin-light"
+
+    const-string v6, "com.alightcreative.blend.pinlight"
+
+    move-object v1, v0
+
+    invoke-direct/range {v1 .. v6}, Lcom/alightcreative/app/motion/scene/BlendingMode;-><init>(Ljava/lang/String;ILjava/lang/String;ZLjava/lang/String;)V
+
+    sput-object v0, Lcom/alightcreative/app/motion/scene/BlendingMode;->PIN_LIGHT:Lcom/alightcreative/app/motion/scene/BlendingMode;
+
+    new-instance v0, Lcom/alightcreative/app/motion/scene/BlendingMode;
+
+    const-string v8, "HUE"
+
+    const/16 v9, 0x17
+
+    const-string v10, "hue"
+
+    const-string v12, "com.alightcreative.blend.hue"
+
+    move-object v7, v0
+
+    invoke-direct/range {v7 .. v12}, Lcom/alightcreative/app/motion/scene/BlendingMode;-><init>(Ljava/lang/String;ILjava/lang/String;ZLjava/lang/String;)V
+
+    sput-object v0, Lcom/alightcreative/app/motion/scene/BlendingMode;->HUE:Lcom/alightcreative/app/motion/scene/BlendingMode;
+
+    new-instance v0, Lcom/alightcreative/app/motion/scene/BlendingMode;
+
+    const-string v2, "SATURATION"
+
+    const/16 v3, 0x18
+
+    const-string v4, "saturation"
+
+    const-string v6, "com.alightcreative.blend.saturation"
+
+    move-object v1, v0
+
+    invoke-direct/range {v1 .. v6}, Lcom/alightcreative/app/motion/scene/BlendingMode;-><init>(Ljava/lang/String;ILjava/lang/String;ZLjava/lang/String;)V
+
+    sput-object v0, Lcom/alightcreative/app/motion/scene/BlendingMode;->SATURATION:Lcom/alightcreative/app/motion/scene/BlendingMode;
+
+    new-instance v0, Lcom/alightcreative/app/motion/scene/BlendingMode;
+
+    const-string v8, "COLOR"
+
+    const/16 v9, 0x19
+
+    const-string v10, "color"
+
+    const-string v12, "com.alightcreative.blend.color"
+
+    move-object v7, v0
+
+    invoke-direct/range {v7 .. v12}, Lcom/alightcreative/app/motion/scene/BlendingMode;-><init>(Ljava/lang/String;ILjava/lang/String;ZLjava/lang/String;)V
+
+    sput-object v0, Lcom/alightcreative/app/motion/scene/BlendingMode;->COLOR:Lcom/alightcreative/app/motion/scene/BlendingMode;
+
+    new-instance v0, Lcom/alightcreative/app/motion/scene/BlendingMode;
+
+    const-string v2, "LUMINANCE"
+
+    const/16 v3, 0x1a
+
+    const-string v4, "luminance"
+
+    const-string v6, "com.alightcreative.blend.luminance"
+
+    move-object v1, v0
+
+    invoke-direct/range {v1 .. v6}, Lcom/alightcreative/app/motion/scene/BlendingMode;-><init>(Ljava/lang/String;ILjava/lang/String;ZLjava/lang/String;)V
+
+    sput-object v0, Lcom/alightcreative/app/motion/scene/BlendingMode;->LUMINANCE:Lcom/alightcreative/app/motion/scene/BlendingMode;
+
+    new-instance v0, Lcom/alightcreative/app/motion/scene/BlendingMode;
+
+    const-string v8, "SUBTRACT"
+
+    const/16 v9, 0x1b
+
+    const-string v10, "subtract"
+
+    const/4 v12, 0x0
+
+    sget-object v12, Lkotlin/reflect/jvm/internal/impl/load/kotlin/header/mvrG/AwJYQfheLi;->UNDVzbazpBDML:Ljava/lang/String;
+
+    move-object v7, v0
+
+    invoke-direct/range {v7 .. v12}, Lcom/alightcreative/app/motion/scene/BlendingMode;-><init>(Ljava/lang/String;ILjava/lang/String;ZLjava/lang/String;)V
+
+    sput-object v0, Lcom/alightcreative/app/motion/scene/BlendingMode;->SUBTRACT:Lcom/alightcreative/app/motion/scene/BlendingMode;
+
+    new-instance v0, Lcom/alightcreative/app/motion/scene/BlendingMode;
+
+    const-string v2, "DIVIDE"
+
+    const/16 v3, 0x1c
+
+    const-string v4, "divide"
+
+    const-string v6, "com.alightcreative.blend.divide"
+
+    move-object v1, v0
+
+    invoke-direct/range {v1 .. v6}, Lcom/alightcreative/app/motion/scene/BlendingMode;-><init>(Ljava/lang/String;ILjava/lang/String;ZLjava/lang/String;)V
+
+    sput-object v0, Lcom/alightcreative/app/motion/scene/BlendingMode;->DIVIDE:Lcom/alightcreative/app/motion/scene/BlendingMode;
+
+    invoke-static {}, Lcom/alightcreative/app/motion/scene/BlendingMode;->$values()[Lcom/alightcreative/app/motion/scene/BlendingMode;
+
+    move-result-object v0
+
+    sput-object v0, Lcom/alightcreative/app/motion/scene/BlendingMode;->$VALUES:[Lcom/alightcreative/app/motion/scene/BlendingMode;
+
+    invoke-static {v0}, Lkotlin/enums/EnumEntriesKt;->enumEntries([Ljava/lang/Enum;)Lkotlin/enums/EnumEntries;
+
+    move-result-object v0
+
+    sput-object v0, Lcom/alightcreative/app/motion/scene/BlendingMode;->$ENTRIES:Lkotlin/enums/EnumEntries;
+
+    return-void
+.end method

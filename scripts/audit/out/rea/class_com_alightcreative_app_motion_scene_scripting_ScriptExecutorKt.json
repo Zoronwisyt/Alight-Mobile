@@ -1,0 +1,115 @@
+{
+  "engine": {
+    "name": "jadx-headless-mcp",
+    "version": "0.7.1",
+    "artifact_sha256": "6e5eacf500b64292bfb73c49797c1958f6ee44646e43e868039ae7feb573ff75",
+    "source_revision": "5844800a486d2248fa949b74c9896285f5b54de2",
+    "worker_count": 1,
+    "heap_limit_mib": 8192
+  },
+  "class_name": "com.alightcreative.app.motion.scene.scripting.ScriptExecutorKt",
+  "methods": [
+    {
+      "name": "<clinit>",
+      "reported_signature": "<clinit>(): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()V"
+    },
+    {
+      "name": "executeVoidScript",
+      "reported_signature": "executeVoidScript(com.caoccao.javet.interop.V8Runtime, java.lang.String): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/caoccao/javet/interop/V8Runtime;Ljava/lang/String;)V"
+    },
+    {
+      "name": "registerAlightMotionScriptMethods",
+      "reported_signature": "registerAlightMotionScriptMethods(com.caoccao.javet.interop.V8Runtime, com.caoccao.javet.values.reference.V8ValueObject, java.lang.String): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/caoccao/javet/interop/V8Runtime;Lcom/caoccao/javet/values/reference/V8ValueObject;Ljava/lang/String;)V"
+    },
+    {
+      "name": "registerAlightMotionScriptMethods$default",
+      "reported_signature": "registerAlightMotionScriptMethods$default(com.caoccao.javet.interop.V8Runtime, com.caoccao.javet.values.reference.V8ValueObject, java.lang.String, int, java.lang.Object): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/caoccao/javet/interop/V8Runtime;Lcom/caoccao/javet/values/reference/V8ValueObject;Ljava/lang/String;ILjava/lang/Object;)V"
+    },
+    {
+      "name": "runScripts",
+      "reported_signature": "runScripts(com.alightcreative.app.motion.scene.SceneElement, float, int, int, com.alightcreative.app.motion.scene.Scene, com.alightcreative.app.motion.scene.Transform, float, com.alightcreative.app.motion.scene.rendering.RenderMode, java.lang.Integer, boolean, com.alightcreative.app.motion.scene.scripting.ScriptGroup): com.alightcreative.app.motion.scene.SceneElement",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneElement;FIILcom/alightcreative/app/motion/scene/Scene;Lcom/alightcreative/app/motion/scene/Transform;FLcom/alightcreative/app/motion/scene/rendering/RenderMode;Ljava/lang/Integer;ZLcom/alightcreative/app/motion/scene/scripting/ScriptGroup;)Lcom/alightcreative/app/motion/scene/SceneElement;"
+    },
+    {
+      "name": "runScripts",
+      "reported_signature": "runScripts(com.alightcreative.app.motion.scene.SceneElement, float, com.alightcreative.app.motion.scene.Scene, com.alightcreative.app.motion.scene.rendering.RenderMode, java.lang.Integer, boolean, com.alightcreative.app.motion.scene.scripting.ScriptGroup): com.alightcreative.app.motion.scene.SceneElement",
+      "overload_index": 1,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneElement;FLcom/alightcreative/app/motion/scene/Scene;Lcom/alightcreative/app/motion/scene/rendering/RenderMode;Ljava/lang/Integer;ZLcom/alightcreative/app/motion/scene/scripting/ScriptGroup;)Lcom/alightcreative/app/motion/scene/SceneElement;"
+    },
+    {
+      "name": "runScripts$default",
+      "reported_signature": "runScripts$default(com.alightcreative.app.motion.scene.SceneElement, float, int, int, com.alightcreative.app.motion.scene.Scene, com.alightcreative.app.motion.scene.Transform, float, com.alightcreative.app.motion.scene.rendering.RenderMode, java.lang.Integer, boolean, com.alightcreative.app.motion.scene.scripting.ScriptGroup, int, java.lang.Object): com.alightcreative.app.motion.scene.SceneElement",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneElement;FIILcom/alightcreative/app/motion/scene/Scene;Lcom/alightcreative/app/motion/scene/Transform;FLcom/alightcreative/app/motion/scene/rendering/RenderMode;Ljava/lang/Integer;ZLcom/alightcreative/app/motion/scene/scripting/ScriptGroup;ILjava/lang/Object;)Lcom/alightcreative/app/motion/scene/SceneElement;"
+    },
+    {
+      "name": "runScripts$default",
+      "reported_signature": "runScripts$default(com.alightcreative.app.motion.scene.SceneElement, float, com.alightcreative.app.motion.scene.Scene, com.alightcreative.app.motion.scene.rendering.RenderMode, java.lang.Integer, boolean, com.alightcreative.app.motion.scene.scripting.ScriptGroup, int, java.lang.Object): com.alightcreative.app.motion.scene.SceneElement",
+      "overload_index": 1,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneElement;FLcom/alightcreative/app/motion/scene/Scene;Lcom/alightcreative/app/motion/scene/rendering/RenderMode;Ljava/lang/Integer;ZLcom/alightcreative/app/motion/scene/scripting/ScriptGroup;ILjava/lang/Object;)Lcom/alightcreative/app/motion/scene/SceneElement;"
+    },
+    {
+      "name": "runScriptsInternal",
+      "reported_signature": "runScriptsInternal(com.alightcreative.app.motion.scene.SceneElement, float, int, int, com.alightcreative.app.motion.scene.Scene, com.alightcreative.app.motion.scene.Transform, float, com.alightcreative.app.motion.scene.rendering.RenderMode, java.lang.Integer, boolean, com.alightcreative.app.motion.scene.scripting.ScriptGroup): com.alightcreative.app.motion.scene.SceneElement",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneElement;FIILcom/alightcreative/app/motion/scene/Scene;Lcom/alightcreative/app/motion/scene/Transform;FLcom/alightcreative/app/motion/scene/rendering/RenderMode;Ljava/lang/Integer;ZLcom/alightcreative/app/motion/scene/scripting/ScriptGroup;)Lcom/alightcreative/app/motion/scene/SceneElement;"
+    },
+    {
+      "name": "runScriptsInternal$default",
+      "reported_signature": "runScriptsInternal$default(com.alightcreative.app.motion.scene.SceneElement, float, int, int, com.alightcreative.app.motion.scene.Scene, com.alightcreative.app.motion.scene.Transform, float, com.alightcreative.app.motion.scene.rendering.RenderMode, java.lang.Integer, boolean, com.alightcreative.app.motion.scene.scripting.ScriptGroup, int, java.lang.Object): com.alightcreative.app.motion.scene.SceneElement",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneElement;FIILcom/alightcreative/app/motion/scene/Scene;Lcom/alightcreative/app/motion/scene/Transform;FLcom/alightcreative/app/motion/scene/rendering/RenderMode;Ljava/lang/Integer;ZLcom/alightcreative/app/motion/scene/scripting/ScriptGroup;ILjava/lang/Object;)Lcom/alightcreative/app/motion/scene/SceneElement;"
+    },
+    {
+      "name": "userParamsAtTimeForScript",
+      "reported_signature": "userParamsAtTimeForScript(c3.fs, java.util.Map<java.lang.String, com.alightcreative.app.motion.scene.userparam.UserParameterValue>, java.util.Map<java.lang.String, ? extends com.alightcreative.app.motion.scene.userparam.UserParameter>, float): com.caoccao.javet.values.reference.V8ValueObject",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lc3/fs;Ljava/util/Map;Ljava/util/Map;F)Lcom/caoccao/javet/values/reference/V8ValueObject;"
+    }
+  ],
+  "fields": [
+    {
+      "name": "RUN_SCRIPT_CACHE_MAX_SIZE",
+      "reported_type": "int",
+      "dex_static_value": {
+        "type": "int",
+        "value": 5000
+      }
+    },
+    {
+      "name": "runScriptsCache",
+      "reported_type": "java.util.Map<com.alightcreative.app.motion.scene.scripting.ScriptArguments, com.alightcreative.app.motion.scene.SceneElement>",
+      "dex_static_value": null
+    },
+    {
+      "name": "scriptEnvCache",
+      "reported_type": "java.util.Map<java.lang.String, c3.mY0>",
+      "dex_static_value": null
+    }
+  ],
+  "inner_classes": [
+    "com.alightcreative.app.motion.scene.scripting.ScriptExecutorKt.WhenMappings",
+    "com.alightcreative.app.motion.scene.scripting.ScriptExecutorKt.AnonymousClass1",
+    "com.alightcreative.app.motion.scene.scripting.ScriptExecutorKt.AnonymousClass2"
+  ]
+}

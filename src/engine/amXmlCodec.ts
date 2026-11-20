@@ -9,6 +9,7 @@ import type {
   Project,
 } from '../types/project';
 import { animatable, parseEasingString } from './animation';
+import { blendModeToXml, canonicalizeBlendMode, isMaskBlendMode } from './blendModes';
 import { getEffectById, getShapeById, parseDefaultParamValue } from './catalog';
 import { formatAmFontToken, parseAmFontToken } from './fontNames';
 
@@ -78,16 +79,13 @@ function layerToXml(layer: Layer, indent = '  '): string {
           : ` fillType="none"`;
 
   const parentAttr = layer.parentId ? ` parent="${escapeXml(layer.parentId)}"` : '';
-  // B6: Preserve AM's clippingMask="true" dialect on export (never emit non-AM blending="mask")
-  const isMask = layer.blendMode === 'mask' || layer.blendMode === 'exclude';
-  const clipAttr = isMask ? ' clippingMask="true"' : '';
-  const blendAttr = isMask
-    ? layer.blendMode === 'exclude'
-      ? ' blending="exclude"'
-      : ''
-    : layer.blendMode !== 'normal'
-      ? ` blending="${escapeXml(layer.blendMode)}"`
-      : '';
+  // B6: export keeps AM's own dialect — mask/clipping-mask become clippingMask="true",
+  // every colour blend is written with its hyphenated 5.0.280 xml id (never a legacy web id).
+  const canonicalBlend = canonicalizeBlendMode(layer.blendMode);
+  const isMask = isMaskBlendMode(canonicalBlend);
+  const clipAttr = isMask || canonicalBlend === 'exclude' ? ' clippingMask="true"' : '';
+  const blendXmlId = blendModeToXml(canonicalBlend);
+  const blendAttr = blendXmlId ? ` blending="${escapeXml(blendXmlId)}"` : '';
   const retimeAttr =
     layer.retime && layer.retime.method !== 'none'
       ? ` retime="${escapeXml(layer.retime.method)}"`
@@ -580,9 +578,14 @@ function parseXmlLayer(
     : undefined;
 
   const isClippingMask = el.getAttribute('clippingMask') === 'true';
-  const rawBlending = (el.getAttribute('blending') as BlendModeId) || 'normal';
-  const resolvedBlendMode: BlendModeId =
-    isClippingMask && rawBlending !== 'exclude' ? 'mask' : rawBlending;
+  const rawBlending = el.getAttribute('blending');
+  // `blending="clipping-mask"` is a 5.0.280 blend mode, not a wrapper boolean: both spellings
+  // mean "this element clips". See PLAYBACK_PREVIEW_DECOMPILED.md §11.
+  const resolvedBlendMode: BlendModeId = isClippingMask
+    ? canonicalizeBlendMode(rawBlending) === 'exclude'
+      ? 'exclude'
+      : 'mask'
+    : canonicalizeBlendMode(rawBlending);
 
   const parentId = el.getAttribute('parent') || null;
   let cameraData: Layer['cameraData'] = undefined;

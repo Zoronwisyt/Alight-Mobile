@@ -1,0 +1,16 @@
+    public static final boolean checkParent(SceneElement sceneElement, Scene scene, long j2) {
+        Intrinsics.checkNotNullParameter(sceneElement, "<this>");
+        Intrinsics.checkNotNullParameter(scene, "scene");
+        if (sceneElement.getParent() == null) {
+            return false;
+        }
+        Long parent = sceneElement.getParent();
+        if (parent != null && parent.longValue() == j2) {
+            return true;
+        }
+        SceneElement sceneElementElementById = SceneKt.elementById(scene, sceneElement.getParent());
+        if (sceneElementElementById == null) {
+            return false;
+        }
+        return checkParent(sceneElementElementById, scene, j2);
+    }

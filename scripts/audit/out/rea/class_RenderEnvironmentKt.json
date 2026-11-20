@@ -1,0 +1,29 @@
+{
+  "engine": {
+    "name": "jadx-headless-mcp",
+    "version": "0.7.1",
+    "artifact_sha256": "6e5eacf500b64292bfb73c49797c1958f6ee44646e43e868039ae7feb573ff75",
+    "source_revision": "5844800a486d2248fa949b74c9896285f5b54de2",
+    "worker_count": 1,
+    "heap_limit_mib": 8192
+  },
+  "class_name": "com.alightcreative.app.motion.scene.rendering.RenderEnvironmentKt",
+  "methods": [
+    {
+      "name": "withMode",
+      "reported_signature": "withMode(com.alightcreative.app.motion.scene.rendering.RenderEnvironment, int): com.alightcreative.app.motion.scene.rendering.RenderEnvironment",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/rendering/RenderEnvironment;I)Lcom/alightcreative/app/motion/scene/rendering/RenderEnvironment;"
+    },
+    {
+      "name": "withTimingForElement",
+      "reported_signature": "withTimingForElement(com.alightcreative.app.motion.scene.rendering.RenderEnvironment, com.alightcreative.app.motion.scene.SceneElement): com.alightcreative.app.motion.scene.rendering.RenderEnvironmentForElement",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/rendering/RenderEnvironment;Lcom/alightcreative/app/motion/scene/SceneElement;)Lcom/alightcreative/app/motion/scene/rendering/RenderEnvironmentForElement;"
+    }
+  ],
+  "fields": [],
+  "inner_classes": []
+}

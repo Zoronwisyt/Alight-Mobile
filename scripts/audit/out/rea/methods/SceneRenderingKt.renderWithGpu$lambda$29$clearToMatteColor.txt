@@ -1,0 +1,5 @@
+                private static final void renderWithGpu$lambda$29$clearToMatteColor() {
+                    SolidColor solidColor = PREVIEW_BACKGROUND_MATTE_COLOR;
+                    GLES20.glClearColor(solidColor.getR(), solidColor.getG(), solidColor.getB(), solidColor.getA());
+                    GLES20.glClear(17408);
+                }

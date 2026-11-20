@@ -1,0 +1,3 @@
+    public final KeyableFloat getFov() {
+        return this.fov;
+    }

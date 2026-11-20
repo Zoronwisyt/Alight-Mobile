@@ -505,3 +505,17 @@ Expected: 43 `flip3`, 40 `wipe2`, 129 total · 0 hidden · 6 clip · 8 blend · 
 | Status | active |
 
 Carry forward: Flip is the flip3 effect, not a layer attribute; clippingMask binding target is still unconfirmed.
+
+---
+
+## Correction log — blend-mode counts (append-only)
+
+> [!warning] CORRECTION — 2026-11-20 — "23 `com.alightcreative.blend.*` ids" is wrong
+> Row 372 above (and the same figure in `FEATURE_GAPS_APK_VS_WEB.md`) counted dex string literals.
+> `PLAYBACK_PREVIEW_DECOMPILED.md` §10 read `BlendingMode.<clinit>` and found **29 enum constants**,
+> 24 of which carry an effect id. `mask` and `clipping-mask` are ordinals 3 and 4 and are real blend
+> modes with no effect id — so "AM cannot read `blending="mask"`" is right for the wrong reason, and the
+> web's old export of `blending="mask"` was doubly wrong (legacy id *and* wrong dialect). Both are fixed:
+> export emits `clippingMask="true"`, import accepts either spelling.
+> The 8 `blending="."` layers counted on row 326 are unaffected — that is an attribute count in a real
+> file, not a claim about the enum.

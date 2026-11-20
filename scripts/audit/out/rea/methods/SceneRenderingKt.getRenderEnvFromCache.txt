@@ -1,0 +1,5 @@
+{
+  "status": "complete",
+  "text": "    private static final RenderEnvironmentImpl getRenderEnvFromCache() {\r\n        RenderEnvironmentImpl renderEnvironmentImpl;\r\n        List<RenderEnvironmentImpl> list = renderEnvCacheInternal;\r\n        synchronized (list) {\r\n            renderEnvironmentImpl = (RenderEnvironmentImpl) RM.SfT.Xu(list);\r\n        }\r\n        return renderEnvironmentImpl;\r\n    }",
+  "reported_total_bytes": null
+}

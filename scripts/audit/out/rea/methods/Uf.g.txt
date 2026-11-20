@@ -1,0 +1,4 @@
+    public static final float g(lG lGVar) {
+        Intrinsics.checkNotNullParameter(lGVar, "<this>");
+        return lGVar.s() ? lGVar.Xu() : lGVar.Pl3();
+    }

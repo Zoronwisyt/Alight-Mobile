@@ -1,0 +1,5 @@
+{
+  "status": "complete",
+  "text": "    public static final void renderWithEffects(SceneElement sceneElement, SfT canvas, RenderEnvironment env, SceneSelection selection, Rectangle viewport) {\r\n        Intrinsics.checkNotNullParameter(sceneElement, \"<this>\");\r\n        Intrinsics.checkNotNullParameter(canvas, \"canvas\");\r\n        Intrinsics.checkNotNullParameter(env, \"env\");\r\n        Intrinsics.checkNotNullParameter(selection, \"selection\");\r\n        Intrinsics.checkNotNullParameter(viewport, \"viewport\");\r\n        renderWithEffectsNoReverseInterpolation(reverseInterpolateFirstFrame(sceneElement, env.getTime() - env.getPreviousFrameTime()), canvas, env, selection, viewport);\r\n    }",
+  "reported_total_bytes": null
+}

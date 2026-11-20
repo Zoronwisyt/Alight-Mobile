@@ -1,0 +1,5 @@
+{
+  "status": "complete",
+  "text": "                private static final boolean returnRenderEnvToCache(RenderEnvironmentImpl renderEnvironmentImpl) {\r\n                    boolean zAdd;\r\n                    List<RenderEnvironmentImpl> list = renderEnvCacheInternal;\r\n                    synchronized (list) {\r\n                        zAdd = list.add(renderEnvironmentImpl);\r\n                    }\r\n                    return zAdd;\r\n                }",
+  "reported_total_bytes": null
+}

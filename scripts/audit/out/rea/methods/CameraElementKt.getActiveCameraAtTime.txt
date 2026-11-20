@@ -1,0 +1,10 @@
+    public static final SceneElement getActiveCameraAtTime(Scene scene, int i2) {
+        Intrinsics.checkNotNullParameter(scene, "<this>");
+        SceneElement sceneElement = null;
+        for (SceneElement sceneElement2 : scene.getElements()) {
+            if (sceneElement2.getType() == SceneElementType.Camera && !sceneElement2.getHidden() && (sceneElement == null || (i2 >= sceneElement2.getStartTime() && i2 <= sceneElement2.getEndTime()))) {
+                sceneElement = sceneElement2;
+            }
+        }
+        return sceneElement != null ? sceneElement : makeDefaultCamera(scene);
+    }

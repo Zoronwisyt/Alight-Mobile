@@ -1,0 +1,5 @@
+    public static final SceneElement applyLayerParenting(SceneElement sceneElement, Scene scene, float f2) {
+        Intrinsics.checkNotNullParameter(sceneElement, "<this>");
+        Intrinsics.checkNotNullParameter(scene, "scene");
+        return applyParentingInternal(sceneElement, scene, f2, emptyLongArray);
+    }

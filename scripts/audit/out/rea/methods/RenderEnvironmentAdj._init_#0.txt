@@ -1,0 +1,8 @@
+    public RenderEnvironmentAdj(RenderEnvironment env, float f2, float f3, double d2, int i2) {
+        Intrinsics.checkNotNullParameter(env, "env");
+        this.env = env;
+        this.overrideTime = f2;
+        this.overridePreviousFrameTime = f3;
+        this.overrideDurationInSeconds = d2;
+        this.overrideFrame = i2;
+    }

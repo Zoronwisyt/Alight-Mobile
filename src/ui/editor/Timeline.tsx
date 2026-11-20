@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';
+import { canonicalizeBlendMode } from '../../engine/blendModes';
 import { replaceMediaOnLayers } from '../../engine/mediaReplace';
 import { snapTimelineMs } from '../../engine/snapping';
 import type { AlightRenderer } from '../../engine/renderer';
@@ -712,7 +713,9 @@ export const Timeline: React.FC<TimelineProps> = ({
                     </div>
 
                     <div className="am-track-label-wrap">
-                      {(layer.blendMode === 'mask' || layer.blendMode === 'exclude') && (
+                      {(canonicalizeBlendMode(layer.blendMode) === 'mask' ||
+                        canonicalizeBlendMode(layer.blendMode) === 'clipping-mask' ||
+                        layer.blendMode === 'exclude') && (
                         <span className="am-track-mask-icon">↙︎</span>
                       )}
                       <span className="am-track-label">{layer.label}</span>
