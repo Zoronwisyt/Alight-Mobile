@@ -1,0 +1,650 @@
+[
+ {
+  "exported": null,
+  "kind": "activity",
+  "name": "com.alightcreative.app.motion.activities.DeviceMismatchNoticeActivity",
+  "parent": null
+ },
+ {
+  "exported": "true",
+  "kind": "activity",
+  "name": "com.alightcreative.app.motion.activities.main.MainActivity",
+  "parent": null
+ },
+ {
+  "exported": null,
+  "kind": "activity",
+  "name": "com.alightcreative.app.motion.activities.EditActivity",
+  "parent": "com.alightcreative.app.motion.activities.main.MainActivity"
+ },
+ {
+  "exported": null,
+  "kind": "activity",
+  "name": "com.alightcreative.app.motion.activities.AboutActivity",
+  "parent": null
+ },
+ {
+  "exported": null,
+  "kind": "activity",
+  "name": "com.alightcreative.app.motion.activities.SaveToStorageActivity",
+  "parent": null
+ },
+ {
+  "exported": null,
+  "kind": "activity",
+  "name": "com.alightcreative.app.motion.activities.ColorPickerActivity",
+  "parent": null
+ },
+ {
+  "exported": null,
+  "kind": "activity",
+  "name": "com.alightcreative.app.motion.activities.main.newfeature.NewFeaturePagerActivity",
+  "parent": null
+ },
+ {
+  "exported": "false",
+  "kind": "provider",
+  "name": "androidx.core.content.FileProvider",
+  "parent": null
+ },
+ {
+  "exported": null,
+  "kind": "receiver",
+  "name": "com.alightcreative.share.ChooserResultReceiver",
+  "parent": null
+ },
+ {
+  "exported": null,
+  "kind": "activity",
+  "name": "com.facebook.FacebookActivity",
+  "parent": null
+ },
+ {
+  "exported": "true",
+  "kind": "activity",
+  "name": "com.facebook.CustomTabActivity",
+  "parent": null
+ },
+ {
+  "exported": null,
+  "kind": "activity",
+  "name": "com.alightcreative.app.motion.activities.SettingsActivity",
+  "parent": null
+ },
+ {
+  "exported": null,
+  "kind": "activity",
+  "name": "com.alightcreative.app.motion.activities.mediabrowser.MediaBrowser",
+  "parent": null
+ },
+ {
+  "exported": null,
+  "kind": "activity",
+  "name": "com.alightcreative.app.motion.activities.audiobrowser.AudioBrowserActivity",
+  "parent": null
+ },
+ {
+  "exported": "true",
+  "kind": "activity",
+  "name": "com.alightcreative.importer.xml.ui.ImportActivity",
+  "parent": null
+ },
+ {
+  "exported": null,
+  "kind": "activity",
+  "name": "com.alightcreative.app.motion.activities.MyAccountActivity",
+  "parent": null
+ },
+ {
+  "exported": null,
+  "kind": "activity",
+  "name": "com.alightcreative.app.motion.tutorial.TutorialActivity",
+  "parent": null
+ },
+ {
+  "exported": null,
+  "kind": "activity",
+  "name": "com.alightcreative.app.motion.activities.ManageAccountActivity",
+  "parent": null
+ },
+ {
+  "exported": null,
+  "kind": "activity",
+  "name": "com.alightcreative.app.motion.activities.AgreeDeleteAccountActivity",
+  "parent": null
+ },
+ {
+  "exported": null,
+  "kind": "activity",
+  "name": "com.alightcreative.export.preview.ExportPreviewActivity",
+  "parent": null
+ },
+ {
+  "exported": null,
+  "kind": "activity",
+  "name": "com.alightcreative.app.motion.activities.DevSettingsActivity",
+  "parent": null
+ },
+ {
+  "exported": null,
+  "kind": "activity",
+  "name": "com.alightcreative.app.motion.activities.effectbrowser.EffectBrowserActivity",
+  "parent": null
+ },
+ {
+  "exported": null,
+  "kind": "activity",
+  "name": "com.alightcreative.app.motion.activities.FontBrowserActivity",
+  "parent": null
+ },
+ {
+  "exported": null,
+  "kind": "activity",
+  "name": "com.alightcreative.importer.projectpackage.ElementDownloadActivity",
+  "parent": null
+ },
+ {
+  "exported": null,
+  "kind": "activity",
+  "name": "com.alightcreative.monetization.ui.PaywallActivity",
+  "parent": null
+ },
+ {
+  "exported": null,
+  "kind": "activity",
+  "name": "com.alightcreative.app.motion.activities.survey.SurveyActivity",
+  "parent": null
+ },
+ {
+  "exported": null,
+  "kind": "activity",
+  "name": "com.alightcreative.onboarding.ui.OnboardingActivity",
+  "parent": null
+ },
+ {
+  "exported": null,
+  "kind": "activity",
+  "name": "com.alightcreative.template.importpreview.ui.TemplateImportPreviewActivity",
+  "parent": null
+ },
+ {
+  "exported": null,
+  "kind": "activity",
+  "name": "com.alightcreative.maineditor.presetpreview.ui.PresetPreviewActivity",
+  "parent": null
+ },
+ {
+  "exported": null,
+  "kind": "activity",
+  "name": "com.alightcreative.app.motion.activities.creatorprogram.rewardlist.CreatorRewardListActivity",
+  "parent": null
+ },
+ {
+  "exported": null,
+  "kind": "activity",
+  "name": "com.alightcreative.app.motion.activities.creatorprogram.redeem.RedeemTokensActivity",
+  "parent": null
+ },
+ {
+  "exported": null,
+  "kind": "activity",
+  "name": "com.alightcreative.app.motion.activities.creatorprogram.qas.ui.QAsActivity",
+  "parent": null
+ },
+ {
+  "exported": null,
+  "kind": "activity",
+  "name": "com.alightcreative.app.motion.ranking.ui.editprofile.EditProfileActivity",
+  "parent": null
+ },
+ {
+  "exported": "false",
+  "kind": "activity",
+  "name": "com.firebase.ui.auth.KickoffActivity",
+  "parent": null
+ },
+ {
+  "exported": "false",
+  "kind": "activity",
+  "name": "com.firebase.ui.auth.ui.idp.SingleSignInActivity",
+  "parent": null
+ },
+ {
+  "exported": "false",
+  "kind": "activity",
+  "name": "com.firebase.ui.auth.ui.credentials.CredentialSaveActivity",
+  "parent": null
+ },
+ {
+  "exported": "false",
+  "kind": "activity",
+  "name": "com.firebase.ui.auth.ui.email.RecoverPasswordActivity",
+  "parent": null
+ },
+ {
+  "exported": "false",
+  "kind": "activity",
+  "name": "com.firebase.ui.auth.ui.email.EmailActivity",
+  "parent": null
+ },
+ {
+  "exported": "false",
+  "kind": "activity",
+  "name": "com.firebase.ui.auth.ui.phone.PhoneActivity",
+  "parent": null
+ },
+ {
+  "exported": "false",
+  "kind": "activity",
+  "name": "com.firebase.ui.auth.ui.idp.WelcomeBackIdpPrompt",
+  "parent": null
+ },
+ {
+  "exported": "false",
+  "kind": "activity",
+  "name": "com.firebase.ui.auth.ui.email.WelcomeBackPasswordPrompt",
+  "parent": null
+ },
+ {
+  "exported": "false",
+  "kind": "activity",
+  "name": "com.firebase.ui.auth.ui.email.WelcomeBackEmailLinkPrompt",
+  "parent": null
+ },
+ {
+  "exported": "false",
+  "kind": "activity",
+  "name": "com.firebase.ui.auth.ui.email.EmailLinkCatcherActivity",
+  "parent": null
+ },
+ {
+  "exported": "false",
+  "kind": "activity",
+  "name": "com.firebase.ui.auth.ui.email.EmailLinkErrorRecoveryActivity",
+  "parent": null
+ },
+ {
+  "exported": "false",
+  "kind": "activity",
+  "name": "com.firebase.ui.auth.ui.idp.AuthMethodPickerActivity",
+  "parent": null
+ },
+ {
+  "exported": "false",
+  "kind": "provider",
+  "name": "com.firebase.ui.auth.data.client.AuthUiInitProvider",
+  "parent": null
+ },
+ {
+  "exported": "false",
+  "kind": "service",
+  "name": "com.google.firebase.components.ComponentDiscoveryService",
+  "parent": null
+ },
+ {
+  "exported": "false",
+  "kind": "activity",
+  "name": "com.bendingspoons.forceupdater.internal.ForceUpdateActivity",
+  "parent": null
+ },
+ {
+  "exported": "false",
+  "kind": "activity",
+  "name": "com.bendingspoons.adorable.internal.HardcodedAdActivity",
+  "parent": null
+ },
+ {
+  "exported": null,
+  "kind": "activity",
+  "name": "com.bendingspoons.oracle.secretmenu.RedeemGiftCodeActivity",
+  "parent": null
+ },
+ {
+  "exported": null,
+  "kind": "activity",
+  "name": "com.bendingspoons.concierge.ui.secretmenu.IDsActivity",
+  "parent": null
+ },
+ {
+  "exported": "false",
+  "kind": "activity",
+  "name": "com.google.android.gms.auth.api.signin.internal.SignInHubActivity",
+  "parent": null
+ },
+ {
+  "exported": "true",
+  "kind": "service",
+  "name": "com.google.android.gms.auth.api.signin.RevocationBoundService",
+  "parent": null
+ },
+ {
+  "exported": "false",
+  "kind": "activity",
+  "name": "com.bendingspoons.secretmenu.ui.SecretMenuActivity",
+  "parent": null
+ },
+ {
+  "exported": null,
+  "kind": "activity",
+  "name": "com.bendingspoons.secretmenu.ui.items.exit.ExitActivity",
+  "parent": null
+ },
+ {
+  "exported": "false",
+  "kind": "activity",
+  "name": "com.google.android.gms.ads.AdActivity",
+  "parent": null
+ },
+ {
+  "exported": "false",
+  "kind": "provider",
+  "name": "com.google.android.gms.ads.MobileAdsInitProvider",
+  "parent": null
+ },
+ {
+  "exported": "false",
+  "kind": "service",
+  "name": "com.google.android.gms.ads.AdService",
+  "parent": null
+ },
+ {
+  "exported": "false",
+  "kind": "activity",
+  "name": "com.google.android.gms.ads.OutOfContextTestingActivity",
+  "parent": null
+ },
+ {
+  "exported": "false",
+  "kind": "provider",
+  "name": "androidx.startup.InitializationProvider",
+  "parent": null
+ },
+ {
+  "exported": "false",
+  "kind": "service",
+  "name": "androidx.work.impl.background.systemalarm.SystemAlarmService",
+  "parent": null
+ },
+ {
+  "exported": "true",
+  "kind": "service",
+  "name": "androidx.work.impl.background.systemjob.SystemJobService",
+  "parent": null
+ },
+ {
+  "exported": "false",
+  "kind": "service",
+  "name": "androidx.work.impl.foreground.SystemForegroundService",
+  "parent": null
+ },
+ {
+  "exported": "false",
+  "kind": "receiver",
+  "name": "androidx.work.impl.utils.ForceStopRunnable$BroadcastReceiver",
+  "parent": null
+ },
+ {
+  "exported": "false",
+  "kind": "receiver",
+  "name": "androidx.work.impl.background.systemalarm.ConstraintProxy$BatteryChargingProxy",
+  "parent": null
+ },
+ {
+  "exported": "false",
+  "kind": "receiver",
+  "name": "androidx.work.impl.background.systemalarm.ConstraintProxy$BatteryNotLowProxy",
+  "parent": null
+ },
+ {
+  "exported": "false",
+  "kind": "receiver",
+  "name": "androidx.work.impl.background.systemalarm.ConstraintProxy$StorageNotLowProxy",
+  "parent": null
+ },
+ {
+  "exported": "false",
+  "kind": "receiver",
+  "name": "androidx.work.impl.background.systemalarm.ConstraintProxy$NetworkStateProxy",
+  "parent": null
+ },
+ {
+  "exported": "false",
+  "kind": "receiver",
+  "name": "androidx.work.impl.background.systemalarm.RescheduleReceiver",
+  "parent": null
+ },
+ {
+  "exported": "false",
+  "kind": "receiver",
+  "name": "androidx.work.impl.background.systemalarm.ConstraintProxyUpdateReceiver",
+  "parent": null
+ },
+ {
+  "exported": "true",
+  "kind": "receiver",
+  "name": "androidx.work.impl.diagnostics.DiagnosticsReceiver",
+  "parent": null
+ },
+ {
+  "exported": "false",
+  "kind": "service",
+  "name": "androidx.room.MultiInstanceInvalidationService",
+  "parent": null
+ },
+ {
+  "exported": null,
+  "kind": "activity",
+  "name": "com.facebook.CustomTabMainActivity",
+  "parent": null
+ },
+ {
+  "exported": "true",
+  "kind": "activity",
+  "name": "com.google.firebase.auth.internal.GenericIdpActivity",
+  "parent": null
+ },
+ {
+  "exported": "true",
+  "kind": "activity",
+  "name": "com.google.firebase.auth.internal.RecaptchaActivity",
+  "parent": null
+ },
+ {
+  "exported": "false",
+  "kind": "provider",
+  "name": "com.applovin.sdk.AppLovinInitProvider",
+  "parent": null
+ },
+ {
+  "exported": "false",
+  "kind": "activity",
+  "name": "com.applovin.adview.AppLovinFullscreenActivity",
+  "parent": null
+ },
+ {
+  "exported": null,
+  "kind": "activity",
+  "name": "com.applovin.sdk.AppLovinWebViewActivity",
+  "parent": null
+ },
+ {
+  "exported": null,
+  "kind": "activity",
+  "name": "com.applovin.mediation.hybridAds.MaxHybridMRecAdActivity",
+  "parent": null
+ },
+ {
+  "exported": null,
+  "kind": "activity",
+  "name": "com.applovin.mediation.hybridAds.MaxHybridNativeAdActivity",
+  "parent": null
+ },
+ {
+  "exported": null,
+  "kind": "activity",
+  "name": "com.applovin.mediation.MaxDebuggerActivity",
+  "parent": null
+ },
+ {
+  "exported": null,
+  "kind": "activity",
+  "name": "com.applovin.mediation.MaxDebuggerDetailActivity",
+  "parent": null
+ },
+ {
+  "exported": null,
+  "kind": "activity",
+  "name": "com.applovin.mediation.MaxDebuggerMultiAdActivity",
+  "parent": null
+ },
+ {
+  "exported": null,
+  "kind": "activity",
+  "name": "com.applovin.mediation.MaxDebuggerAdUnitsListActivity",
+  "parent": null
+ },
+ {
+  "exported": null,
+  "kind": "activity",
+  "name": "com.applovin.mediation.MaxDebuggerAdUnitWaterfallsListActivity",
+  "parent": null
+ },
+ {
+  "exported": null,
+  "kind": "activity",
+  "name": "com.applovin.mediation.MaxDebuggerAdUnitDetailActivity",
+  "parent": null
+ },
+ {
+  "exported": null,
+  "kind": "activity",
+  "name": "com.applovin.mediation.MaxDebuggerTestLiveNetworkActivity",
+  "parent": null
+ },
+ {
+  "exported": null,
+  "kind": "activity",
+  "name": "com.applovin.mediation.MaxDebuggerTestModeNetworkActivity",
+  "parent": null
+ },
+ {
+  "exported": null,
+  "kind": "activity",
+  "name": "com.applovin.mediation.MaxDebuggerWaterfallKeywordsActivity",
+  "parent": null
+ },
+ {
+  "exported": null,
+  "kind": "activity",
+  "name": "com.applovin.creative.MaxCreativeDebuggerActivity",
+  "parent": null
+ },
+ {
+  "exported": null,
+  "kind": "activity",
+  "name": "com.applovin.creative.MaxCreativeDebuggerDisplayedAdActivity",
+  "parent": null
+ },
+ {
+  "exported": "false",
+  "kind": "service",
+  "name": "com.applovin.impl.adview.activity.FullscreenAdService",
+  "parent": null
+ },
+ {
+  "exported": "false",
+  "kind": "activity",
+  "name": "com.google.android.gms.common.api.GoogleApiActivity",
+  "parent": null
+ },
+ {
+  "exported": "false",
+  "kind": "service",
+  "name": "com.google.firebase.sessions.SessionLifecycleService",
+  "parent": null
+ },
+ {
+  "exported": "false",
+  "kind": "provider",
+  "name": "com.google.firebase.provider.FirebaseInitProvider",
+  "parent": null
+ },
+ {
+  "exported": "false",
+  "kind": "receiver",
+  "name": "com.google.android.gms.measurement.AppMeasurementReceiver",
+  "parent": null
+ },
+ {
+  "exported": "false",
+  "kind": "service",
+  "name": "com.google.android.gms.measurement.AppMeasurementService",
+  "parent": null
+ },
+ {
+  "exported": "false",
+  "kind": "service",
+  "name": "com.google.android.gms.measurement.AppMeasurementJobService",
+  "parent": null
+ },
+ {
+  "exported": "true",
+  "kind": "activity",
+  "name": "androidx.compose.ui.tooling.PreviewActivity",
+  "parent": null
+ },
+ {
+  "exported": "false",
+  "kind": "provider",
+  "name": "com.facebook.internal.FacebookInitProvider",
+  "parent": null
+ },
+ {
+  "exported": "false",
+  "kind": "receiver",
+  "name": "com.facebook.CurrentAccessTokenExpirationBroadcastReceiver",
+  "parent": null
+ },
+ {
+  "exported": "false",
+  "kind": "receiver",
+  "name": "com.facebook.AuthenticationTokenManager$CurrentAuthenticationTokenChangedBroadcastReceiver",
+  "parent": null
+ },
+ {
+  "exported": "false",
+  "kind": "activity",
+  "name": "com.android.billingclient.api.ProxyBillingActivity",
+  "parent": null
+ },
+ {
+  "exported": "false",
+  "kind": "service",
+  "name": "com.google.android.datatransport.runtime.backends.TransportBackendDiscovery",
+  "parent": null
+ },
+ {
+  "exported": "true",
+  "kind": "receiver",
+  "name": "androidx.profileinstaller.ProfileInstallReceiver",
+  "parent": null
+ },
+ {
+  "exported": "false",
+  "kind": "service",
+  "name": "com.google.android.datatransport.runtime.scheduling.jobscheduling.JobInfoSchedulerService",
+  "parent": null
+ },
+ {
+  "exported": "false",
+  "kind": "receiver",
+  "name": "com.google.android.datatransport.runtime.scheduling.jobscheduling.AlarmManagerSchedulerBroadcastReceiver",
+  "parent": null
+ },
+ {
+  "exported": "false",
+  "kind": "activity",
+  "name": "com.google.android.play.core.common.PlayCoreDialogWrapperActivity",
+  "parent": null
+ }
+]

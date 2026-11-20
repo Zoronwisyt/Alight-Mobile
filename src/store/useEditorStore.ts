@@ -10,6 +10,7 @@ import type {
   SavedElement,
 } from '../types/project';
 import { animatable, evalAnimatable } from '../engine/animation';
+import type { SnapGuidesState } from '../engine/snapping';
 import { setCustomEffects } from '../engine/catalog';
 import { createDefaultDemoProjects, makeBaseLayer } from './demoProjects';
 import {
@@ -91,6 +92,7 @@ interface EditorState {
   loop: boolean;
   timelinePxPerSec: number;
   snapEnabled: boolean;
+  snapGuides: SnapGuidesState;
   gridVisible: boolean;
   previewQuality: PreviewQuality;
   previewZoom: number;
@@ -200,6 +202,7 @@ interface EditorState {
   ) => void;
   setDrawingBrush: (opts: Partial<{ color: string; width: number; opacity: number }>) => void;
   setCurveClipboard: (c: EasingSpec) => void;
+  setSnapGuides: (g: SnapGuidesState) => void;
   clearCache: () => Promise<void>;
 }
 
@@ -410,6 +413,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   loop: true,
   timelinePxPerSec: 120,
   snapEnabled: true,
+  snapGuides: { x: null, y: null },
   gridVisible: false,
   previewQuality: 0.75,
   previewZoom: 1,
@@ -443,6 +447,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   },
 
   setHomeTab: (homeTab) => set({ homeTab }),
+  setSnapGuides: (snapGuides) => set({ snapGuides }),
   setTheme: (theme) => {
     if (typeof document !== 'undefined') {
       document.documentElement.setAttribute('data-theme', theme);

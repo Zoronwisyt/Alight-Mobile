@@ -1,0 +1,3836 @@
+{
+ "generatedAt": "2026-11-20T02:38:07.554Z",
+ "apk": "C:/Users/jeduc/Downloads/AM Web 2/Alight_Motion_5.0.280_1789568706_latestmodapks.com",
+ "web": "C:\\Users\\jeduc\\Downloads\\AM Web 2\\alight-motion-web",
+ "effects": {
+  "counts": {
+   "xml": 315,
+   "json": 315
+  },
+  "missingInJson": [],
+  "missingInApk": [],
+  "paramMembership": [],
+  "paramOrder": [],
+  "paramValue": [],
+  "selectorChoiceCount": [],
+  "iterationsDiff": [],
+  "shaderCount": [],
+  "shaderSource": [],
+  "shaderAttrDefaults": [
+   {
+    "file": "360-reorient-sphere.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "bend.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "blend-color-burn.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "blend-color-dodge.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "blend-color-multiply.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "blend-color.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "blend-darken.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "blend-darker-color.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "blend-diff.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "blend-divide.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "blend-exclusion.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "blend-hard-light.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "blend-hue.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "blend-lighten.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "blend-lighter-color.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "blend-linear-burn.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "blend-linear-dodge.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "blend-linear-light.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "blend-luminance.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "blend-overlay.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "blend-pin-light.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "blend-saturation.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "blend-soft-light.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "blend-soft-overlay.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "blend-subtract.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "blend-vivid-light.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "blocknoise.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "blocknoise2.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "boxblur.xml",
+    "index": 0,
+    "k": "precision",
+    "apk": null,
+    "json": "high"
+   },
+   {
+    "file": "boxblur.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "boxblur2.xml",
+    "index": 0,
+    "k": "precision",
+    "apk": null,
+    "json": "high"
+   },
+   {
+    "file": "boxblur2.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "boxblur3.xml",
+    "index": 0,
+    "k": "precision",
+    "apk": null,
+    "json": "high"
+   },
+   {
+    "file": "boxblur3.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "brightness-contrast-2.xml",
+    "index": 0,
+    "k": "precision",
+    "apk": null,
+    "json": "high"
+   },
+   {
+    "file": "brightness-contrast-2.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "brightness-contrast.xml",
+    "index": 0,
+    "k": "precision",
+    "apk": null,
+    "json": "high"
+   },
+   {
+    "file": "brightness-contrast.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "bumpmap.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "bumpmap2.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "cartoon.xml",
+    "index": 0,
+    "k": "precision",
+    "apk": null,
+    "json": "high"
+   },
+   {
+    "file": "cartoon.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "channelmap.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "channelmaphsv.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "checker.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "checker2.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "checkerdissolve.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "checkerdissolve2.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "chromakey-advanced.xml",
+    "index": 0,
+    "k": "precision",
+    "apk": null,
+    "json": "high"
+   },
+   {
+    "file": "chromakey-advanced.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "chromakey-advanced.xml",
+    "index": 1,
+    "k": "precision",
+    "apk": null,
+    "json": "high"
+   },
+   {
+    "file": "chromakey-advanced.xml",
+    "index": 1,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "chromakey.xml",
+    "index": 0,
+    "k": "precision",
+    "apk": null,
+    "json": "high"
+   },
+   {
+    "file": "chromakey.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "chromakey.xml",
+    "index": 1,
+    "k": "precision",
+    "apk": null,
+    "json": "high"
+   },
+   {
+    "file": "chromakey.xml",
+    "index": 1,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "chromatic-vortexblur.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "chromatic-zoomblur.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "circularripple.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "circularripple2.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "clouds.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "clouds2.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "clouds3.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "coloradj.xml",
+    "index": 0,
+    "k": "precision",
+    "apk": null,
+    "json": "high"
+   },
+   {
+    "file": "coloradj.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "colorbalance.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "colorhot.xml",
+    "index": 0,
+    "k": "precision",
+    "apk": null,
+    "json": "high"
+   },
+   {
+    "file": "colorhot.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "colorhot2.xml",
+    "index": 0,
+    "k": "precision",
+    "apk": null,
+    "json": "high"
+   },
+   {
+    "file": "colorhot2.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "colorize.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "colortemperature.xml",
+    "index": 0,
+    "k": "precision",
+    "apk": null,
+    "json": "high"
+   },
+   {
+    "file": "colortemperature.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "colortint.xml",
+    "index": 0,
+    "k": "precision",
+    "apk": null,
+    "json": "high"
+   },
+   {
+    "file": "colortint.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "colortune.xml",
+    "index": 0,
+    "k": "precision",
+    "apk": null,
+    "json": "high"
+   },
+   {
+    "file": "colortune.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "colortune2.xml",
+    "index": 0,
+    "k": "precision",
+    "apk": null,
+    "json": "high"
+   },
+   {
+    "file": "colortune2.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "contour-grad.xml",
+    "index": 0,
+    "k": "precision",
+    "apk": null,
+    "json": "high"
+   },
+   {
+    "file": "contour-grad.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "contour.xml",
+    "index": 0,
+    "k": "precision",
+    "apk": null,
+    "json": "high"
+   },
+   {
+    "file": "contour.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "contourstrips.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "cube.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "cube2.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "cube2.xml",
+    "index": 1,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "curl.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "darkglow.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "dblur.xml",
+    "index": 0,
+    "k": "precision",
+    "apk": null,
+    "json": "high"
+   },
+   {
+    "file": "dblur.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "difference-matte.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "difference.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "displacemap-radial.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "displacemap.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "displacemap2.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "displacemap3.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "dissolve.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "dots.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "dots2.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "edgeglow.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "electricedges.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "energybeam.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "exposure.xml",
+    "index": 0,
+    "k": "precision",
+    "apk": null,
+    "json": "high"
+   },
+   {
+    "file": "exposure.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "fastboxblur.xml",
+    "index": 0,
+    "k": "precision",
+    "apk": null,
+    "json": "high"
+   },
+   {
+    "file": "fastboxblur.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "feather.xml",
+    "index": 0,
+    "k": "precision",
+    "apk": null,
+    "json": "high"
+   },
+   {
+    "file": "feather.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "fillbehind.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "findedges-edgeglow.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "findedges.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "flip.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "flip2.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "flip3.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "fourcolorgradient.xml",
+    "index": 0,
+    "k": "precision",
+    "apk": null,
+    "json": "high"
+   },
+   {
+    "file": "fourcolorgradient.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "fractalwarp.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "fractalwarp2.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "fractalwarp3.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "fractalwarp4.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "gaussianblur.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "glass.xml",
+    "index": 0,
+    "k": "precision",
+    "apk": null,
+    "json": "high"
+   },
+   {
+    "file": "glass.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "glass2.xml",
+    "index": 0,
+    "k": "precision",
+    "apk": null,
+    "json": "high"
+   },
+   {
+    "file": "glass2.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "glow-inner.xml",
+    "index": 0,
+    "k": "precision",
+    "apk": null,
+    "json": "high"
+   },
+   {
+    "file": "glow-inner.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "glow.xml",
+    "index": 0,
+    "k": "precision",
+    "apk": null,
+    "json": "high"
+   },
+   {
+    "file": "glow.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "glowscan.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "gradientdisplace.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "gradientmap.xml",
+    "index": 0,
+    "k": "precision",
+    "apk": null,
+    "json": "high"
+   },
+   {
+    "file": "gradientmap.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "gradientoverlay.xml",
+    "index": 0,
+    "k": "precision",
+    "apk": null,
+    "json": "high"
+   },
+   {
+    "file": "gradientoverlay.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "gradientoverlay2.xml",
+    "index": 0,
+    "k": "precision",
+    "apk": null,
+    "json": "high"
+   },
+   {
+    "file": "gradientoverlay2.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "grid.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "grid2.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "grunge.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "halftonecmyk.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "halftonedots.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "halftonelines.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "hexarray.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "hexrotate.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "hexshift.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "hextile.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "highlight-shadow.xml",
+    "index": 0,
+    "k": "precision",
+    "apk": null,
+    "json": "high"
+   },
+   {
+    "file": "highlight-shadow.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "hueshift.xml",
+    "index": 0,
+    "k": "precision",
+    "apk": null,
+    "json": "high"
+   },
+   {
+    "file": "hueshift.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "innerblur.xml",
+    "index": 0,
+    "k": "precision",
+    "apk": null,
+    "json": "high"
+   },
+   {
+    "file": "innerblur.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "internal-border-center.xml",
+    "index": 0,
+    "k": "precision",
+    "apk": null,
+    "json": "high"
+   },
+   {
+    "file": "internal-border-center.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "internal-border-inside.xml",
+    "index": 0,
+    "k": "precision",
+    "apk": null,
+    "json": "high"
+   },
+   {
+    "file": "internal-border-inside.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "internal-border-outside.xml",
+    "index": 0,
+    "k": "precision",
+    "apk": null,
+    "json": "high"
+   },
+   {
+    "file": "internal-border-outside.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "internal-border-three.xml",
+    "index": 0,
+    "k": "precision",
+    "apk": null,
+    "json": "high"
+   },
+   {
+    "file": "internal-border-three.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "internal-border-two.xml",
+    "index": 0,
+    "k": "precision",
+    "apk": null,
+    "json": "high"
+   },
+   {
+    "file": "internal-border-two.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "internal-border.xml",
+    "index": 0,
+    "k": "precision",
+    "apk": null,
+    "json": "high"
+   },
+   {
+    "file": "internal-border.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "internal-shadow.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "invert.xml",
+    "index": 0,
+    "k": "precision",
+    "apk": null,
+    "json": "high"
+   },
+   {
+    "file": "invert.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "irridescence.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "irridescence2.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "kaleidoscope.xml",
+    "index": 0,
+    "k": "precision",
+    "apk": null,
+    "json": "high"
+   },
+   {
+    "file": "kaleidoscope.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "layernormtest.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "lensblur.xml",
+    "index": 0,
+    "k": "precision",
+    "apk": null,
+    "json": "high"
+   },
+   {
+    "file": "lensblur.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "lensblur2.xml",
+    "index": 0,
+    "k": "precision",
+    "apk": null,
+    "json": "high"
+   },
+   {
+    "file": "lensblur2.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "lensflare.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "lift.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "lightglow.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "lightning.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "longshadow.xml",
+    "index": 0,
+    "k": "precision",
+    "apk": null,
+    "json": "high"
+   },
+   {
+    "file": "longshadow.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "longshadow2.xml",
+    "index": 0,
+    "k": "precision",
+    "apk": null,
+    "json": "high"
+   },
+   {
+    "file": "longshadow2.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "lumakey.xml",
+    "index": 0,
+    "k": "precision",
+    "apk": null,
+    "json": "high"
+   },
+   {
+    "file": "lumakey.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "lumakey2.xml",
+    "index": 0,
+    "k": "precision",
+    "apk": null,
+    "json": "high"
+   },
+   {
+    "file": "lumakey2.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "lumakey3.xml",
+    "index": 0,
+    "k": "precision",
+    "apk": null,
+    "json": "high"
+   },
+   {
+    "file": "lumakey3.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "lumastamper.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "magnify-background.xml",
+    "index": 0,
+    "k": "precision",
+    "apk": null,
+    "json": "high"
+   },
+   {
+    "file": "magnify-background.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "maskblur.xml",
+    "index": 0,
+    "k": "precision",
+    "apk": null,
+    "json": "high"
+   },
+   {
+    "file": "maskblur.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "mattechoke.xml",
+    "index": 0,
+    "k": "precision",
+    "apk": null,
+    "json": "high"
+   },
+   {
+    "file": "mattechoke.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "mattechoke2.xml",
+    "index": 0,
+    "k": "precision",
+    "apk": null,
+    "json": "high"
+   },
+   {
+    "file": "mattechoke2.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "mattefringe.xml",
+    "index": 0,
+    "k": "precision",
+    "apk": null,
+    "json": "high"
+   },
+   {
+    "file": "mattefringe.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "mirror.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "mosaic.xml",
+    "index": 0,
+    "k": "precision",
+    "apk": null,
+    "json": "high"
+   },
+   {
+    "file": "mosaic.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "motionblur.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "motionblur.xml",
+    "index": 1,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "motionblur.xml",
+    "index": 2,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "motionblur2.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "motionblur2.xml",
+    "index": 1,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "motionblur2.xml",
+    "index": 2,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "motionblur3.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "motionblur3.xml",
+    "index": 1,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "motionblur3.xml",
+    "index": 2,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "motionblur4.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "motionblur4.xml",
+    "index": 1,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "motionblur4.xml",
+    "index": 2,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "noise.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "noise2.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "noise3.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "offset.xml",
+    "index": 0,
+    "k": "precision",
+    "apk": null,
+    "json": "high"
+   },
+   {
+    "file": "offset.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "omino-diffusion.xml",
+    "index": 0,
+    "k": "precision",
+    "apk": null,
+    "json": "high"
+   },
+   {
+    "file": "omino-diffusion.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "omino-glass.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "outline-bad.xml",
+    "index": 0,
+    "k": "precision",
+    "apk": null,
+    "json": "high"
+   },
+   {
+    "file": "outline-bad.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "outline-basic.xml",
+    "index": 0,
+    "k": "precision",
+    "apk": null,
+    "json": "high"
+   },
+   {
+    "file": "outline-basic.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "outline.xml",
+    "index": 0,
+    "k": "precision",
+    "apk": null,
+    "json": "high"
+   },
+   {
+    "file": "outline.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "pagecurl.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "palette-map.xml",
+    "index": 0,
+    "k": "precision",
+    "apk": null,
+    "json": "high"
+   },
+   {
+    "file": "palette-map.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "pinchbulge.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "pinchbulge2.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "pinchbulgeinside.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "pixelate.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "pixelate2.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "polar.xml",
+    "index": 0,
+    "k": "precision",
+    "apk": null,
+    "json": "high"
+   },
+   {
+    "file": "polar.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "posterize.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "radialshadow.xml",
+    "index": 0,
+    "k": "precision",
+    "apk": null,
+    "json": "high"
+   },
+   {
+    "file": "radialshadow.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "radialshadow2.xml",
+    "index": 0,
+    "k": "precision",
+    "apk": null,
+    "json": "high"
+   },
+   {
+    "file": "radialshadow2.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "radialwipe.xml",
+    "index": 0,
+    "k": "precision",
+    "apk": null,
+    "json": "high"
+   },
+   {
+    "file": "radialwipe.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "radial_rays.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "rays.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "replacecolor.xml",
+    "index": 0,
+    "k": "precision",
+    "apk": null,
+    "json": "high"
+   },
+   {
+    "file": "replacecolor.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "replacecolor.xml",
+    "index": 1,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "rgb-gamma.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "rgb-mixer.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "rgbsep.xml",
+    "index": 0,
+    "k": "precision",
+    "apk": null,
+    "json": "high"
+   },
+   {
+    "file": "rgbsep.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "ribbon.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "ridges.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "ridges2.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "roughenedges.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "s3d-box.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "s3d-box.xml",
+    "index": 1,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "s3d-cylinder.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "s3d-cylinder.xml",
+    "index": 1,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "s3d-ellipsoid.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "s3d-ellipsoid.xml",
+    "index": 1,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "s3d-extrude.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "s3d-extrude.xml",
+    "index": 1,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "s3d-heart.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "s3d-heart.xml",
+    "index": 1,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "s3d-heart2.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "s3d-heart2.xml",
+    "index": 1,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "s3d-hexprism.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "s3d-hexprism.xml",
+    "index": 1,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "s3d-hollowbox.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "s3d-hollowbox.xml",
+    "index": 1,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "s3d-hollowbox.xml",
+    "index": 2,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "s3d-hollowbox.xml",
+    "index": 3,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "s3d-hollowbox.xml",
+    "index": 4,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "s3d-hollowbox.xml",
+    "index": 5,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "s3d-hollowbox.xml",
+    "index": 6,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "s3d-octahedron.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "s3d-octahedron.xml",
+    "index": 1,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "s3d-plus.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "s3d-plus.xml",
+    "index": 1,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "s3d-pyramid.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "s3d-pyramid.xml",
+    "index": 1,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "s3d-ring.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "s3d-ring.xml",
+    "index": 1,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "s3d-starpoly.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "s3d-starpoly.xml",
+    "index": 1,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "s3d-starprism.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "s3d-starprism.xml",
+    "index": 1,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "s3d-torus.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "s3d-torus.xml",
+    "index": 1,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "s3d-triprism.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "s3d-triprism.xml",
+    "index": 1,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "s3d-triprism2.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "s3d-triprism2.xml",
+    "index": 1,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "shadow.xml",
+    "index": 0,
+    "k": "precision",
+    "apk": null,
+    "json": "high"
+   },
+   {
+    "file": "shadow.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "sharpen.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "simplestars.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "smoothbevel.xml",
+    "index": 0,
+    "k": "precision",
+    "apk": null,
+    "json": "high"
+   },
+   {
+    "file": "smoothbevel.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "smoothedges.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "softglow.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "solidcolor.xml",
+    "index": 0,
+    "k": "precision",
+    "apk": null,
+    "json": "high"
+   },
+   {
+    "file": "solidcolor.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "solidmatte.xml",
+    "index": 0,
+    "k": "precision",
+    "apk": null,
+    "json": "high"
+   },
+   {
+    "file": "solidmatte.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "spectralmap.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "spherize.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "spherize2.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "spherize2.xml",
+    "index": 1,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "spill-cleaner.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "spinblur.xml",
+    "index": 0,
+    "k": "precision",
+    "apk": null,
+    "json": "high"
+   },
+   {
+    "file": "spinblur.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "spinblur2.xml",
+    "index": 0,
+    "k": "precision",
+    "apk": null,
+    "json": "high"
+   },
+   {
+    "file": "spinblur2.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "spotcolor.xml",
+    "index": 0,
+    "k": "precision",
+    "apk": null,
+    "json": "high"
+   },
+   {
+    "file": "spotcolor.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "spotcolor.xml",
+    "index": 1,
+    "k": "precision",
+    "apk": null,
+    "json": "high"
+   },
+   {
+    "file": "spotcolor.xml",
+    "index": 1,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "spotcolor2.xml",
+    "index": 0,
+    "k": "precision",
+    "apk": null,
+    "json": "high"
+   },
+   {
+    "file": "spotcolor2.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "spotcolor2.xml",
+    "index": 1,
+    "k": "precision",
+    "apk": null,
+    "json": "high"
+   },
+   {
+    "file": "spotcolor2.xml",
+    "index": 1,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "squeeze.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "star.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "starfield.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "starfield2.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "starfield3.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "streaks-linear.xml",
+    "index": 0,
+    "k": "precision",
+    "apk": null,
+    "json": "high"
+   },
+   {
+    "file": "streaks-linear.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "streaks-spin.xml",
+    "index": 0,
+    "k": "precision",
+    "apk": null,
+    "json": "high"
+   },
+   {
+    "file": "streaks-spin.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "streaks-zoom.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "streakstrips.xml",
+    "index": 0,
+    "k": "precision",
+    "apk": null,
+    "json": "high"
+   },
+   {
+    "file": "streakstrips.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "stretch.xml",
+    "index": 0,
+    "k": "precision",
+    "apk": null,
+    "json": "high"
+   },
+   {
+    "file": "stretch.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "stretch2.xml",
+    "index": 0,
+    "k": "precision",
+    "apk": null,
+    "json": "high"
+   },
+   {
+    "file": "stretch2.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "stretchsegment.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "stripes.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "swirl.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "swirl2.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "swirl3.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "swirl4.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "test.xml",
+    "index": 0,
+    "k": "precision",
+    "apk": null,
+    "json": "high"
+   },
+   {
+    "file": "test.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "test2.xml",
+    "index": 0,
+    "k": "precision",
+    "apk": null,
+    "json": "high"
+   },
+   {
+    "file": "test2.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "test3.xml",
+    "index": 0,
+    "k": "precision",
+    "apk": null,
+    "json": "high"
+   },
+   {
+    "file": "test3.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "testblur.xml",
+    "index": 0,
+    "k": "precision",
+    "apk": null,
+    "json": "high"
+   },
+   {
+    "file": "testblur.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "threshold.xml",
+    "index": 0,
+    "k": "precision",
+    "apk": null,
+    "json": "high"
+   },
+   {
+    "file": "threshold.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "tile.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "tilerotate.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "tilerotate2.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "tileshift.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "tileshift2.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "transform.xml",
+    "index": 0,
+    "k": "precision",
+    "apk": null,
+    "json": "high"
+   },
+   {
+    "file": "transform.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "tunnel.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "turbulence.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "turbulence2.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "turbulentdisplace.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "turbulentdisplace2.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "turbulentdisplace3.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "unsharpmask.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "vibrance-saturation.xml",
+    "index": 0,
+    "k": "precision",
+    "apk": null,
+    "json": "high"
+   },
+   {
+    "file": "vibrance-saturation.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "vignette.xml",
+    "index": 0,
+    "k": "precision",
+    "apk": null,
+    "json": "high"
+   },
+   {
+    "file": "vignette.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "volumetric-clouds.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "voronoi.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "vortexblur.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "vr-combined.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "vr-player.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "warpblur.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "wavewarp.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "wavewarp2.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "wipe.xml",
+    "index": 0,
+    "k": "precision",
+    "apk": null,
+    "json": "high"
+   },
+   {
+    "file": "wipe.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "wipe2.xml",
+    "index": 0,
+    "k": "precision",
+    "apk": null,
+    "json": "high"
+   },
+   {
+    "file": "wipe2.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "zoomblur.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "zoomblur2.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   },
+   {
+    "file": "zoomblur3.xml",
+    "index": 0,
+    "k": "fastMath",
+    "apk": null,
+    "json": "true"
+   }
+  ],
+  "rootAttr": [
+   {
+    "file": "blend-color-burn.xml",
+    "k": "category",
+    "apk": null,
+    "json": "other"
+   },
+   {
+    "file": "blend-color-dodge.xml",
+    "k": "category",
+    "apk": null,
+    "json": "other"
+   },
+   {
+    "file": "blend-color-multiply.xml",
+    "k": "category",
+    "apk": null,
+    "json": "other"
+   },
+   {
+    "file": "blend-color.xml",
+    "k": "category",
+    "apk": null,
+    "json": "other"
+   },
+   {
+    "file": "blend-darken.xml",
+    "k": "category",
+    "apk": null,
+    "json": "other"
+   },
+   {
+    "file": "blend-darker-color.xml",
+    "k": "category",
+    "apk": null,
+    "json": "other"
+   },
+   {
+    "file": "blend-diff.xml",
+    "k": "category",
+    "apk": null,
+    "json": "other"
+   },
+   {
+    "file": "blend-divide.xml",
+    "k": "category",
+    "apk": null,
+    "json": "other"
+   },
+   {
+    "file": "blend-exclusion.xml",
+    "k": "category",
+    "apk": null,
+    "json": "other"
+   },
+   {
+    "file": "blend-hard-light.xml",
+    "k": "category",
+    "apk": null,
+    "json": "other"
+   },
+   {
+    "file": "blend-hue.xml",
+    "k": "category",
+    "apk": null,
+    "json": "other"
+   },
+   {
+    "file": "blend-lighten.xml",
+    "k": "category",
+    "apk": null,
+    "json": "other"
+   },
+   {
+    "file": "blend-lighter-color.xml",
+    "k": "category",
+    "apk": null,
+    "json": "other"
+   },
+   {
+    "file": "blend-linear-burn.xml",
+    "k": "category",
+    "apk": null,
+    "json": "other"
+   },
+   {
+    "file": "blend-linear-dodge.xml",
+    "k": "category",
+    "apk": null,
+    "json": "other"
+   },
+   {
+    "file": "blend-linear-light.xml",
+    "k": "category",
+    "apk": null,
+    "json": "other"
+   },
+   {
+    "file": "blend-luminance.xml",
+    "k": "category",
+    "apk": null,
+    "json": "other"
+   },
+   {
+    "file": "blend-overlay.xml",
+    "k": "category",
+    "apk": null,
+    "json": "other"
+   },
+   {
+    "file": "blend-pin-light.xml",
+    "k": "category",
+    "apk": null,
+    "json": "other"
+   },
+   {
+    "file": "blend-saturation.xml",
+    "k": "category",
+    "apk": null,
+    "json": "other"
+   },
+   {
+    "file": "blend-soft-light.xml",
+    "k": "category",
+    "apk": null,
+    "json": "other"
+   },
+   {
+    "file": "blend-soft-overlay.xml",
+    "k": "category",
+    "apk": null,
+    "json": "other"
+   },
+   {
+    "file": "blend-subtract.xml",
+    "k": "category",
+    "apk": null,
+    "json": "other"
+   },
+   {
+    "file": "blend-vivid-light.xml",
+    "k": "category",
+    "apk": null,
+    "json": "other"
+   },
+   {
+    "file": "boxblur2.xml",
+    "k": "max-overdraw",
+    "apk": null,
+    "json": "0.1"
+   },
+   {
+    "file": "channelmap.xml",
+    "k": "category",
+    "apk": null,
+    "json": "other"
+   },
+   {
+    "file": "channelmaphsv.xml",
+    "k": "category",
+    "apk": null,
+    "json": "other"
+   },
+   {
+    "file": "darkglow.xml",
+    "k": "max-overdraw",
+    "apk": null,
+    "json": "0.1"
+   },
+   {
+    "file": "internal-border-center.xml",
+    "k": "category",
+    "apk": null,
+    "json": "other"
+   },
+   {
+    "file": "internal-border-inside.xml",
+    "k": "category",
+    "apk": null,
+    "json": "other"
+   },
+   {
+    "file": "internal-border-outside.xml",
+    "k": "category",
+    "apk": null,
+    "json": "other"
+   },
+   {
+    "file": "internal-border-three.xml",
+    "k": "category",
+    "apk": null,
+    "json": "other"
+   },
+   {
+    "file": "internal-border-two.xml",
+    "k": "category",
+    "apk": null,
+    "json": "other"
+   },
+   {
+    "file": "internal-border.xml",
+    "k": "category",
+    "apk": null,
+    "json": "other"
+   },
+   {
+    "file": "internal-shadow.xml",
+    "k": "category",
+    "apk": null,
+    "json": "other"
+   },
+   {
+    "file": "lift.xml",
+    "k": "category",
+    "apk": null,
+    "json": "other"
+   },
+   {
+    "file": "lightglow.xml",
+    "k": "max-overdraw",
+    "apk": null,
+    "json": "0.1"
+   },
+   {
+    "file": "outline-bad.xml",
+    "k": "category",
+    "apk": null,
+    "json": "other"
+   },
+   {
+    "file": "outline-basic.xml",
+    "k": "category",
+    "apk": null,
+    "json": "other"
+   },
+   {
+    "file": "outline.xml",
+    "k": "category",
+    "apk": null,
+    "json": "other"
+   },
+   {
+    "file": "parenthelper.xml",
+    "k": "category",
+    "apk": null,
+    "json": "other"
+   },
+   {
+    "file": "s3d-extrude.xml",
+    "k": "max-overdraw",
+    "apk": null,
+    "json": "0.2"
+   },
+   {
+    "file": "s3d-heart.xml",
+    "k": "max-overdraw",
+    "apk": null,
+    "json": "0.2"
+   },
+   {
+    "file": "s3d-heart2.xml",
+    "k": "max-overdraw",
+    "apk": null,
+    "json": "0.2"
+   },
+   {
+    "file": "s3d-ring.xml",
+    "k": "max-overdraw",
+    "apk": null,
+    "json": "0.2"
+   },
+   {
+    "file": "s3d-starpoly.xml",
+    "k": "max-overdraw",
+    "apk": null,
+    "json": "0.2"
+   },
+   {
+    "file": "shadow.xml",
+    "k": "category",
+    "apk": null,
+    "json": "other"
+   },
+   {
+    "file": "test.xml",
+    "k": "category",
+    "apk": null,
+    "json": "other"
+   },
+   {
+    "file": "test2.xml",
+    "k": "category",
+    "apk": null,
+    "json": "other"
+   },
+   {
+    "file": "test3.xml",
+    "k": "category",
+    "apk": null,
+    "json": "other"
+   },
+   {
+    "file": "testblur.xml",
+    "k": "category",
+    "apk": null,
+    "json": "other"
+   },
+   {
+    "file": "timequant.xml",
+    "k": "category",
+    "apk": null,
+    "json": "other"
+   }
+  ],
+  "nonParamEntries": [
+   {
+    "file": "bend.xml",
+    "tag": "section"
+   },
+   {
+    "file": "boxblur2.xml",
+    "tag": "tip"
+   },
+   {
+    "file": "boxblur3.xml",
+    "tag": "tip"
+   },
+   {
+    "file": "bumpmap.xml",
+    "tag": "section"
+   },
+   {
+    "file": "bumpmap.xml",
+    "tag": "section"
+   },
+   {
+    "file": "bumpmap2.xml",
+    "tag": "section"
+   },
+   {
+    "file": "bumpmap2.xml",
+    "tag": "section"
+   },
+   {
+    "file": "chromakey-advanced.xml",
+    "tag": "section"
+   },
+   {
+    "file": "chromakey-advanced.xml",
+    "tag": "section"
+   },
+   {
+    "file": "chromakey-advanced.xml",
+    "tag": "section"
+   },
+   {
+    "file": "chromakey-advanced.xml",
+    "tag": "section"
+   },
+   {
+    "file": "chromakey-advanced.xml",
+    "tag": "section"
+   },
+   {
+    "file": "colorbalance.xml",
+    "tag": "section"
+   },
+   {
+    "file": "colorbalance.xml",
+    "tag": "section"
+   },
+   {
+    "file": "colorbalance.xml",
+    "tag": "section"
+   },
+   {
+    "file": "colorbalance.xml",
+    "tag": "section"
+   },
+   {
+    "file": "cube.xml",
+    "tag": "section"
+   },
+   {
+    "file": "cube2.xml",
+    "tag": "section"
+   },
+   {
+    "file": "echo-keyframe.xml",
+    "tag": "tip"
+   },
+   {
+    "file": "electricedges.xml",
+    "tag": "section"
+   },
+   {
+    "file": "electricedges.xml",
+    "tag": "section"
+   },
+   {
+    "file": "energybeam.xml",
+    "tag": "section"
+   },
+   {
+    "file": "energybeam.xml",
+    "tag": "section"
+   },
+   {
+    "file": "fastboxblur.xml",
+    "tag": "tip"
+   },
+   {
+    "file": "feather.xml",
+    "tag": "tip"
+   },
+   {
+    "file": "flip.xml",
+    "tag": "section"
+   },
+   {
+    "file": "flip2.xml",
+    "tag": "section"
+   },
+   {
+    "file": "flip2.xml",
+    "tag": "section"
+   },
+   {
+    "file": "flip3.xml",
+    "tag": "section"
+   },
+   {
+    "file": "flip3.xml",
+    "tag": "section"
+   },
+   {
+    "file": "glass2.xml",
+    "tag": "section"
+   },
+   {
+    "file": "glass2.xml",
+    "tag": "section"
+   },
+   {
+    "file": "grunge.xml",
+    "tag": "section"
+   },
+   {
+    "file": "grunge.xml",
+    "tag": "section"
+   },
+   {
+    "file": "grunge.xml",
+    "tag": "section"
+   },
+   {
+    "file": "grunge.xml",
+    "tag": "section"
+   },
+   {
+    "file": "grunge.xml",
+    "tag": "section"
+   },
+   {
+    "file": "grunge.xml",
+    "tag": "section"
+   },
+   {
+    "file": "grunge.xml",
+    "tag": "section"
+   },
+   {
+    "file": "grunge.xml",
+    "tag": "section"
+   },
+   {
+    "file": "grunge.xml",
+    "tag": "section"
+   },
+   {
+    "file": "grunge.xml",
+    "tag": "section"
+   },
+   {
+    "file": "grunge.xml",
+    "tag": "section"
+   },
+   {
+    "file": "hexrotate.xml",
+    "tag": "section"
+   },
+   {
+    "file": "innerblur.xml",
+    "tag": "tip"
+   },
+   {
+    "file": "lift.xml",
+    "tag": "tip"
+   },
+   {
+    "file": "mattefringe.xml",
+    "tag": "section"
+   },
+   {
+    "file": "mattefringe.xml",
+    "tag": "section"
+   },
+   {
+    "file": "mattefringe.xml",
+    "tag": "section"
+   },
+   {
+    "file": "motionblur.xml",
+    "tag": "tip"
+   },
+   {
+    "file": "motionblur2.xml",
+    "tag": "tip"
+   },
+   {
+    "file": "motionblur3.xml",
+    "tag": "tip"
+   },
+   {
+    "file": "motionblur4.xml",
+    "tag": "tip"
+   },
+   {
+    "file": "omino-diffusion.xml",
+    "tag": "section"
+   },
+   {
+    "file": "omino-glass.xml",
+    "tag": "section"
+   },
+   {
+    "file": "omino-glass.xml",
+    "tag": "section"
+   },
+   {
+    "file": "pagecurl.xml",
+    "tag": "section"
+   },
+   {
+    "file": "pagecurl.xml",
+    "tag": "section"
+   },
+   {
+    "file": "pagecurl.xml",
+    "tag": "section"
+   },
+   {
+    "file": "pagecurl.xml",
+    "tag": "section"
+   },
+   {
+    "file": "palette-map.xml",
+    "tag": "section"
+   },
+   {
+    "file": "parenthelper.xml",
+    "tag": "tip"
+   },
+   {
+    "file": "pixelate.xml",
+    "tag": "section"
+   },
+   {
+    "file": "pixelate2.xml",
+    "tag": "section"
+   },
+   {
+    "file": "radial_rays.xml",
+    "tag": "section"
+   },
+   {
+    "file": "radial_rays.xml",
+    "tag": "section"
+   },
+   {
+    "file": "radial_rays.xml",
+    "tag": "section"
+   },
+   {
+    "file": "radial_rays.xml",
+    "tag": "section"
+   },
+   {
+    "file": "repeat-grid.xml",
+    "tag": "section"
+   },
+   {
+    "file": "repeat-grid.xml",
+    "tag": "section"
+   },
+   {
+    "file": "repeat-grid.xml",
+    "tag": "section"
+   },
+   {
+    "file": "repeat-grid.xml",
+    "tag": "section"
+   },
+   {
+    "file": "repeat-grid.xml",
+    "tag": "section"
+   },
+   {
+    "file": "repeat-line.xml",
+    "tag": "section"
+   },
+   {
+    "file": "repeat-line.xml",
+    "tag": "section"
+   },
+   {
+    "file": "repeat-line.xml",
+    "tag": "section"
+   },
+   {
+    "file": "repeat-line.xml",
+    "tag": "section"
+   },
+   {
+    "file": "repeat-line.xml",
+    "tag": "section"
+   },
+   {
+    "file": "repeat-path.xml",
+    "tag": "section"
+   },
+   {
+    "file": "repeat-path.xml",
+    "tag": "section"
+   },
+   {
+    "file": "repeat-path.xml",
+    "tag": "section"
+   },
+   {
+    "file": "repeat-path.xml",
+    "tag": "section"
+   },
+   {
+    "file": "repeat-path.xml",
+    "tag": "section"
+   },
+   {
+    "file": "repeat-radial.xml",
+    "tag": "section"
+   },
+   {
+    "file": "repeat-radial.xml",
+    "tag": "section"
+   },
+   {
+    "file": "repeat-radial.xml",
+    "tag": "section"
+   },
+   {
+    "file": "repeat-radial.xml",
+    "tag": "section"
+   },
+   {
+    "file": "repeat-radial.xml",
+    "tag": "section"
+   },
+   {
+    "file": "repeat-scatter.xml",
+    "tag": "section"
+   },
+   {
+    "file": "repeat-scatter.xml",
+    "tag": "section"
+   },
+   {
+    "file": "repeat-scatter.xml",
+    "tag": "section"
+   },
+   {
+    "file": "repeat-scatter.xml",
+    "tag": "section"
+   },
+   {
+    "file": "repeat-scatter.xml",
+    "tag": "section"
+   },
+   {
+    "file": "s3d-box.xml",
+    "tag": "section"
+   },
+   {
+    "file": "s3d-box.xml",
+    "tag": "section"
+   },
+   {
+    "file": "s3d-box.xml",
+    "tag": "section"
+   },
+   {
+    "file": "s3d-box.xml",
+    "tag": "tip"
+   },
+   {
+    "file": "s3d-cylinder.xml",
+    "tag": "section"
+   },
+   {
+    "file": "s3d-cylinder.xml",
+    "tag": "section"
+   },
+   {
+    "file": "s3d-cylinder.xml",
+    "tag": "section"
+   },
+   {
+    "file": "s3d-cylinder.xml",
+    "tag": "tip"
+   },
+   {
+    "file": "s3d-ellipsoid.xml",
+    "tag": "section"
+   },
+   {
+    "file": "s3d-ellipsoid.xml",
+    "tag": "section"
+   },
+   {
+    "file": "s3d-ellipsoid.xml",
+    "tag": "section"
+   },
+   {
+    "file": "s3d-ellipsoid.xml",
+    "tag": "tip"
+   },
+   {
+    "file": "s3d-extrude.xml",
+    "tag": "section"
+   },
+   {
+    "file": "s3d-extrude.xml",
+    "tag": "section"
+   },
+   {
+    "file": "s3d-extrude.xml",
+    "tag": "section"
+   },
+   {
+    "file": "s3d-extrude.xml",
+    "tag": "tip"
+   },
+   {
+    "file": "s3d-heart.xml",
+    "tag": "section"
+   },
+   {
+    "file": "s3d-heart.xml",
+    "tag": "section"
+   },
+   {
+    "file": "s3d-heart.xml",
+    "tag": "section"
+   },
+   {
+    "file": "s3d-heart.xml",
+    "tag": "tip"
+   },
+   {
+    "file": "s3d-heart2.xml",
+    "tag": "section"
+   },
+   {
+    "file": "s3d-heart2.xml",
+    "tag": "section"
+   },
+   {
+    "file": "s3d-heart2.xml",
+    "tag": "section"
+   },
+   {
+    "file": "s3d-heart2.xml",
+    "tag": "tip"
+   },
+   {
+    "file": "s3d-hexprism.xml",
+    "tag": "section"
+   },
+   {
+    "file": "s3d-hexprism.xml",
+    "tag": "section"
+   },
+   {
+    "file": "s3d-hexprism.xml",
+    "tag": "section"
+   },
+   {
+    "file": "s3d-hexprism.xml",
+    "tag": "tip"
+   },
+   {
+    "file": "s3d-hollowbox.xml",
+    "tag": "section"
+   },
+   {
+    "file": "s3d-hollowbox.xml",
+    "tag": "section"
+   },
+   {
+    "file": "s3d-hollowbox.xml",
+    "tag": "section"
+   },
+   {
+    "file": "s3d-hollowbox.xml",
+    "tag": "section"
+   },
+   {
+    "file": "s3d-hollowbox.xml",
+    "tag": "section"
+   },
+   {
+    "file": "s3d-hollowbox.xml",
+    "tag": "section"
+   },
+   {
+    "file": "s3d-hollowbox.xml",
+    "tag": "section"
+   },
+   {
+    "file": "s3d-hollowbox.xml",
+    "tag": "section"
+   },
+   {
+    "file": "s3d-hollowbox.xml",
+    "tag": "section"
+   },
+   {
+    "file": "s3d-hollowbox.xml",
+    "tag": "tip"
+   },
+   {
+    "file": "s3d-octahedron.xml",
+    "tag": "section"
+   },
+   {
+    "file": "s3d-octahedron.xml",
+    "tag": "section"
+   },
+   {
+    "file": "s3d-octahedron.xml",
+    "tag": "section"
+   },
+   {
+    "file": "s3d-octahedron.xml",
+    "tag": "tip"
+   },
+   {
+    "file": "s3d-plus.xml",
+    "tag": "section"
+   },
+   {
+    "file": "s3d-plus.xml",
+    "tag": "section"
+   },
+   {
+    "file": "s3d-plus.xml",
+    "tag": "section"
+   },
+   {
+    "file": "s3d-plus.xml",
+    "tag": "tip"
+   },
+   {
+    "file": "s3d-pyramid.xml",
+    "tag": "section"
+   },
+   {
+    "file": "s3d-pyramid.xml",
+    "tag": "section"
+   },
+   {
+    "file": "s3d-pyramid.xml",
+    "tag": "section"
+   },
+   {
+    "file": "s3d-pyramid.xml",
+    "tag": "tip"
+   },
+   {
+    "file": "s3d-ring.xml",
+    "tag": "section"
+   },
+   {
+    "file": "s3d-ring.xml",
+    "tag": "section"
+   },
+   {
+    "file": "s3d-ring.xml",
+    "tag": "section"
+   },
+   {
+    "file": "s3d-ring.xml",
+    "tag": "tip"
+   },
+   {
+    "file": "s3d-starpoly.xml",
+    "tag": "section"
+   },
+   {
+    "file": "s3d-starpoly.xml",
+    "tag": "section"
+   },
+   {
+    "file": "s3d-starpoly.xml",
+    "tag": "section"
+   },
+   {
+    "file": "s3d-starpoly.xml",
+    "tag": "tip"
+   },
+   {
+    "file": "s3d-starprism.xml",
+    "tag": "section"
+   },
+   {
+    "file": "s3d-starprism.xml",
+    "tag": "section"
+   },
+   {
+    "file": "s3d-starprism.xml",
+    "tag": "section"
+   },
+   {
+    "file": "s3d-starprism.xml",
+    "tag": "tip"
+   },
+   {
+    "file": "s3d-torus.xml",
+    "tag": "section"
+   },
+   {
+    "file": "s3d-torus.xml",
+    "tag": "section"
+   },
+   {
+    "file": "s3d-torus.xml",
+    "tag": "section"
+   },
+   {
+    "file": "s3d-torus.xml",
+    "tag": "tip"
+   },
+   {
+    "file": "s3d-triprism.xml",
+    "tag": "section"
+   },
+   {
+    "file": "s3d-triprism.xml",
+    "tag": "section"
+   },
+   {
+    "file": "s3d-triprism2.xml",
+    "tag": "section"
+   },
+   {
+    "file": "s3d-triprism2.xml",
+    "tag": "section"
+   },
+   {
+    "file": "spherize.xml",
+    "tag": "section"
+   },
+   {
+    "file": "spherize2.xml",
+    "tag": "section"
+   },
+   {
+    "file": "spherize2.xml",
+    "tag": "section"
+   },
+   {
+    "file": "spherize2.xml",
+    "tag": "section"
+   },
+   {
+    "file": "spherize2.xml",
+    "tag": "tip"
+   },
+   {
+    "file": "text-transform.xml",
+    "tag": "section"
+   },
+   {
+    "file": "text-transform.xml",
+    "tag": "section"
+   },
+   {
+    "file": "text-transform.xml",
+    "tag": "section"
+   },
+   {
+    "file": "text-transform.xml",
+    "tag": "section"
+   },
+   {
+    "file": "text-transform.xml",
+    "tag": "section"
+   },
+   {
+    "file": "tilerotate.xml",
+    "tag": "section"
+   },
+   {
+    "file": "tilerotate2.xml",
+    "tag": "section"
+   },
+   {
+    "file": "vibrance-saturation.xml",
+    "tag": "tip"
+   },
+   {
+    "file": "wavewarp2.xml",
+    "tag": "section"
+   }
+  ]
+ },
+ "presets": {
+  "counts": {
+   "apkPresets": 250,
+   "jsonPresets": 250,
+   "packs": 13
+  },
+  "missingInJson": [],
+  "missingInApk": [],
+  "locallyAppliedDiff": [],
+  "propDiff": [],
+  "kfDiff": [],
+  "effectIdDrift": []
+ },
+ "reachability": {
+  "totalPresets": 250,
+  "presetsWithLocallyAppliedFalse": 76,
+  "ofThoseDeclaringCompTexture": 0,
+  "effectsDeclaringCompTexture": 43,
+  "presetPropsDroppedByRenderer": [
+   [
+    "speed",
+    6
+   ]
+  ]
+ }
+}

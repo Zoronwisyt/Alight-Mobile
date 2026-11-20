@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { replaceMediaOnLayers } from '../../engine/mediaReplace';
+import { snapTimelineMs } from '../../engine/snapping';
 import type { AlightRenderer } from '../../engine/renderer';
 import { useEditorStore } from '../../store/useEditorStore';
 import type { Layer } from '../../types/project';
@@ -80,6 +81,7 @@ export const Timeline: React.FC<TimelineProps> = ({
     selectedLayerIds,
     groupStack,
     loop,
+    snapEnabled,
     previewQuality,
     getActiveLayers,
     setCurrentTimeMs,
@@ -100,6 +102,7 @@ export const Timeline: React.FC<TimelineProps> = ({
       selectedLayerIds: s.selectedLayerIds,
       groupStack: s.groupStack,
       loop: s.loop,
+      snapEnabled: s.snapEnabled,
       previewQuality: s.previewQuality,
       getActiveLayers: s.getActiveLayers,
       setCurrentTimeMs: s.setCurrentTimeMs,
@@ -217,33 +220,41 @@ export const Timeline: React.FC<TimelineProps> = ({
     let lastMs = startTimeMs;
     setIsPlaying(false);
 
+    // Pre-collect timeline snap targets: layer starts/ends, bookmarks, project bounds, selected layer keyframes
+    const snapTargets: number[] = [0, currentProject.durationMs];
+    for (const l of layers) {
+      snapTargets.push(l.startTime, l.endTime);
+    }
+    for (const bm of currentProject.bookmarks) {
+      snapTargets.push(bm);
+    }
+    const selLayer = selectedLayerIds.length === 1 ? layers.find((l) => l.id === selectedLayerIds[0]) : undefined;
+    if (selLayer) {
+      const kfs = collectLayerKeyframes(selLayer);
+      const dur = Math.max(1, selLayer.endTime - selLayer.startTime);
+      for (const kt of kfs) {
+        snapTargets.push(selLayer.startTime + kt * dur);
+      }
+    }
+    const snapThresholdMs = (8 / Math.max(1, timelinePxPerSec)) * 1000;
+
     const onMove = (ev: PointerEvent) => {
       const dx = ev.clientX - startX;
       if (Math.abs(dx) > 3) moved = true;
-      lastMs = Math.max(0, Math.min(currentProject.durationMs, startTimeMs - (dx / timelinePxPerSec) * 1000));
+      const rawMs = Math.max(0, Math.min(currentProject.durationMs, startTimeMs - (dx / timelinePxPerSec) * 1000));
+      if (snapEnabled && !ev.altKey) {
+        lastMs = snapTimelineMs(rawMs, snapTargets, snapThresholdMs).ms;
+      } else {
+        lastMs = rawMs;
+      }
       setCurrentTimeMs(lastMs);
     };
-    const onUp = () => {
+    const onUp = (ev: PointerEvent) => {
       window.removeEventListener('pointermove', onMove);
       window.removeEventListener('pointerup', onUp);
-      if (moved) {
-        // Snap to nearest keyframe within 6px of centre playhead
-        const selLayer = selectedLayerIds.length === 1 ? layers.find((l) => l.id === selectedLayerIds[0]) : undefined;
-        if (selLayer) {
-          const kfs = collectLayerKeyframes(selLayer);
-          const dur = Math.max(1, selLayer.endTime - selLayer.startTime);
-          let bestMs = lastMs;
-          let bestPx = 6.01;
-          for (const kt of kfs) {
-            const kfMs = selLayer.startTime + kt * dur;
-            const distPx = (Math.abs(kfMs - lastMs) / 1000) * timelinePxPerSec;
-            if (distPx < bestPx) {
-              bestPx = distPx;
-              bestMs = kfMs;
-            }
-          }
-          if (bestPx <= 6) setCurrentTimeMs(bestMs);
-        }
+      if (moved && snapEnabled && !ev.altKey) {
+        const snapped = snapTimelineMs(lastMs, snapTargets, snapThresholdMs);
+        if (snapped.snapped) setCurrentTimeMs(snapped.ms);
       }
     };
     window.addEventListener('pointermove', onMove);
@@ -276,8 +287,19 @@ export const Timeline: React.FC<TimelineProps> = ({
     const origStart = layer.startTime;
     const origEnd = layer.endTime;
 
-    const update = (dxPx: number, record: boolean) => {
+    const snapTargets: number[] = [0, currentProject.durationMs, currentTimeMs];
+    for (let i = 0; i < layers.length; i++) {
+      if (i === layerIdx) continue;
+      snapTargets.push(layers[i].startTime, layers[i].endTime);
+    }
+    for (const bm of currentProject.bookmarks) {
+      snapTargets.push(bm);
+    }
+    const snapThresholdMs = (8 / Math.max(1, timelinePxPerSec)) * 1000;
+
+    const update = (dxPx: number, record: boolean, altKey: boolean) => {
       const dMs = Math.round((dxPx / timelinePxPerSec) * 1000);
+      const doSnap = snapEnabled && !altKey;
       mutateProject((proj) => {
         let list = proj.layers;
         for (const gid of groupStack) {
@@ -288,20 +310,41 @@ export const Timeline: React.FC<TimelineProps> = ({
         if (!target) return;
         if (mode === 'move') {
           const dur = origEnd - origStart;
-          const ns = Math.max(0, origStart + dMs);
+          let ns = Math.max(0, origStart + dMs);
+          if (doSnap) {
+            const snapStart = snapTimelineMs(ns, snapTargets, snapThresholdMs);
+            const snapEnd = snapTimelineMs(ns + dur, snapTargets, snapThresholdMs);
+            const distStart = snapStart.snapped ? Math.abs(snapStart.ms - ns) : Infinity;
+            const distEnd = snapEnd.snapped ? Math.abs(snapEnd.ms - (ns + dur)) : Infinity;
+            if (distStart <= distEnd && distStart < Infinity) {
+              ns = Math.max(0, snapStart.ms);
+            } else if (distEnd < Infinity) {
+              ns = Math.max(0, snapEnd.ms - dur);
+            }
+          }
           target.startTime = ns;
           target.endTime = ns + dur;
         } else if (mode === 'left') {
-          target.startTime = Math.max(0, Math.min(origEnd - 120, origStart + dMs));
+          let ns = Math.max(0, Math.min(origEnd - 120, origStart + dMs));
+          if (doSnap) {
+            const s = snapTimelineMs(ns, snapTargets, snapThresholdMs);
+            if (s.snapped) ns = Math.max(0, Math.min(origEnd - 120, s.ms));
+          }
+          target.startTime = ns;
         } else {
-          target.endTime = Math.max(origStart + 120, origEnd + dMs);
+          let ne = Math.max(origStart + 120, origEnd + dMs);
+          if (doSnap) {
+            const s = snapTimelineMs(ne, snapTargets, snapThresholdMs);
+            if (s.snapped) ne = Math.max(origStart + 120, s.ms);
+          }
+          target.endTime = ne;
         }
       }, record);
     };
 
-    const onMove = (ev: PointerEvent) => update(ev.clientX - startX, false);
+    const onMove = (ev: PointerEvent) => update(ev.clientX - startX, false, ev.altKey);
     const onUp = (ev: PointerEvent) => {
-      update(ev.clientX - startX, true);
+      update(ev.clientX - startX, true, ev.altKey);
       window.removeEventListener('pointermove', onMove);
       window.removeEventListener('pointerup', onUp);
     };

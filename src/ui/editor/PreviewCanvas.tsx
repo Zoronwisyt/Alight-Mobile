@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { evalAnimatable, evalRemappedTime } from '../../engine/animation';
+import { snapLayerPosition } from '../../engine/snapping';
 import { getShapeById, parseDefaultParamValue } from '../../engine/catalog';
 import { evaluateShapeHandles } from '../../engine/scriptRuntime';
 import { useEditorStore, type PreviewQuality } from '../../store/useEditorStore';
@@ -36,6 +37,8 @@ export const PreviewCanvas: React.FC<PreviewCanvasProps> = ({
     toggleGrid,
     snapEnabled,
     toggleSnap,
+    snapGuides,
+    setSnapGuides,
     previewQuality,
     setPreviewQuality,
     previewZoom,
@@ -61,6 +64,8 @@ export const PreviewCanvas: React.FC<PreviewCanvasProps> = ({
       toggleGrid: s.toggleGrid,
       snapEnabled: s.snapEnabled,
       toggleSnap: s.toggleSnap,
+      snapGuides: s.snapGuides,
+      setSnapGuides: s.setSnapGuides,
       previewQuality: s.previewQuality,
       setPreviewQuality: s.setPreviewQuality,
       previewZoom: s.previewZoom,
@@ -79,7 +84,6 @@ export const PreviewCanvas: React.FC<PreviewCanvasProps> = ({
 
   const wrapRef = useRef<HTMLDivElement>(null);
   const [stageSize, setStageSize] = useState<{ w: number; h: number }>({ w: 360, h: 360 });
-  const [snapGuide, setSnapGuide] = useState<{ x: boolean; y: boolean }>({ x: false, y: false });
   const [qualityMenuOpen, setQualityMenuOpen] = useState(false);
   const touchDistRef = useRef<number | null>(null);
   const touchZoomStartRef = useRef<number>(1);
@@ -287,19 +291,21 @@ export const PreviewCanvas: React.FC<PreviewCanvasProps> = ({
         if (mode === 'move') {
           let nx = Math.round(startLoc[0] + dx);
           let ny = Math.round(startLoc[1] + dy);
-          let gx = false;
-          let gy = false;
           if (snapEnabled) {
-            if (Math.abs(nx - projW / 2) < 16) {
-              nx = projW / 2;
-              gx = true;
-            }
-            if (Math.abs(ny - projH / 2) < 16) {
-              ny = projH / 2;
-              gy = true;
-            }
+            const threshold = Math.max(10, Math.min(28, 14 / Math.max(0.15, projScale * previewZoom)));
+            const snapped = snapLayerPosition(nx, ny, {
+              project: currentProject,
+              layers,
+              activeLayerId: layerId,
+              currentTimeMs,
+              threshold,
+            });
+            nx = snapped.x;
+            ny = snapped.y;
+            setSnapGuides({ x: snapped.guideX, y: snapped.guideY });
+          } else {
+            setSnapGuides({ x: null, y: null });
           }
-          setSnapGuide({ x: gx, y: gy });
           const next = [nx, ny, startLoc[2]] as [number, number, number];
           if (target.transform.location.keyframes.length > 0) {
             const kf = target.transform.location.keyframes.find((k) => Math.abs(k.t - remappedNormT) < 0.015);
@@ -355,8 +361,8 @@ export const PreviewCanvas: React.FC<PreviewCanvasProps> = ({
         cancelAnimationFrame(dragRaf);
         dragRaf = 0;
       }
-      setSnapGuide({ x: false, y: false });
       applyUpdate(ev.clientX, ev.clientY, true);
+      setSnapGuides({ x: null, y: null });
       window.removeEventListener('pointermove', onMove);
       window.removeEventListener('pointerup', onUp);
       window.removeEventListener('pointercancel', onUp);
@@ -459,25 +465,55 @@ export const PreviewCanvas: React.FC<PreviewCanvasProps> = ({
           }}
         />
 
-        {/* Grid & Snap Center Guides */}
-        {(gridVisible || snapGuide.x || snapGuide.y) && (
-          <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
+        {/* Grid & Dynamic Alight Motion Snap Guides */}
+        {(gridVisible || snapGuides.x || snapGuides.y) && (
+          <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 12 }}>
             {gridVisible && (
+              <>
+                <div
+                  style={{
+                    position: 'absolute',
+                    inset: 0,
+                    backgroundImage:
+                      'linear-gradient(rgba(255,255,255,0.12) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.12) 1px, transparent 1px)',
+                    backgroundSize: '33.333% 33.333%',
+                  }}
+                />
+                <div style={{ position: 'absolute', left: '50%', top: 0, bottom: 0, width: 1, background: 'rgba(0,255,168,0.35)' }} />
+                <div style={{ position: 'absolute', top: '50%', left: 0, right: 0, height: 1, background: 'rgba(0,255,168,0.35)' }} />
+              </>
+            )}
+            {snapGuides.x && (
               <div
                 style={{
                   position: 'absolute',
-                  inset: 0,
-                  backgroundImage:
-                    'linear-gradient(rgba(255,255,255,0.12) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.12) 1px, transparent 1px)',
-                  backgroundSize: '33.333% 33.333%',
+                  left: `${(snapGuides.x.pos / Math.max(1, currentProject.width)) * 100}%`,
+                  top: 0,
+                  bottom: 0,
+                  width: snapGuides.x.kind === 'center' ? 1.5 : 1,
+                  background: snapGuides.x.kind === 'center' || snapGuides.x.kind === 'edge' ? '#FF3B5C' : '#00FFA8',
+                  boxShadow:
+                    snapGuides.x.kind === 'center' || snapGuides.x.kind === 'edge'
+                      ? '0 0 6px rgba(255,59,92,0.75)'
+                      : '0 0 6px rgba(0,255,168,0.75)',
                 }}
               />
             )}
-            {(gridVisible || snapGuide.x) && (
-              <div style={{ position: 'absolute', left: '50%', top: 0, bottom: 0, width: 1, background: snapGuide.x ? 'var(--am-accent)' : 'rgba(0,255,168,0.35)' }} />
-            )}
-            {(gridVisible || snapGuide.y) && (
-              <div style={{ position: 'absolute', top: '50%', left: 0, right: 0, height: 1, background: snapGuide.y ? 'var(--am-accent)' : 'rgba(0,255,168,0.35)' }} />
+            {snapGuides.y && (
+              <div
+                style={{
+                  position: 'absolute',
+                  top: `${(snapGuides.y.pos / Math.max(1, currentProject.height)) * 100}%`,
+                  left: 0,
+                  right: 0,
+                  height: snapGuides.y.kind === 'center' ? 1.5 : 1,
+                  background: snapGuides.y.kind === 'center' || snapGuides.y.kind === 'edge' ? '#FF3B5C' : '#00FFA8',
+                  boxShadow:
+                    snapGuides.y.kind === 'center' || snapGuides.y.kind === 'edge'
+                      ? '0 0 6px rgba(255,59,92,0.75)'
+                      : '0 0 6px rgba(0,255,168,0.75)',
+                }}
+              />
             )}
           </div>
         )}

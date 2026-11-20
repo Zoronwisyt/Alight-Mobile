@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { evalAnimatable } from '../../engine/animation';
+import { snapLayerPosition } from '../../engine/snapping';
 import { useEditorStore, type ActiveCurveTarget } from '../../store/useEditorStore';
 import type { Layer, Project } from '../../types/project';
 import { AmIcon } from '../components/AmIcon';
@@ -34,11 +35,23 @@ function getLayerBaseDimensions(layer: Layer, project: Project, normT: number): 
 }
 
 export const MoveTransformPanel: React.FC = () => {
-  const { toggleKeyframeOnProp, stepKeyframe, setCurveTarget } = useEditorStore(
+  const {
+    toggleKeyframeOnProp,
+    stepKeyframe,
+    setCurveTarget,
+    snapEnabled,
+    setSnapGuides,
+    currentTimeMs,
+    getActiveLayers,
+  } = useEditorStore(
     useShallow((s) => ({
       toggleKeyframeOnProp: s.toggleKeyframeOnProp,
       stepKeyframe: s.stepKeyframe,
       setCurveTarget: s.setCurveTarget,
+      snapEnabled: s.snapEnabled,
+      setSnapGuides: s.setSnapGuides,
+      currentTimeMs: s.currentTimeMs,
+      getActiveLayers: s.getActiveLayers,
     }))
   );
   const { project, layer, normT, updateLayer, setAnimValue, hasKfHere, readAnim } = useSelectedLayer();
@@ -86,7 +99,23 @@ export const MoveTransformPanel: React.FC = () => {
           if (editPivot) {
             setAnimValue(l.transform.pivot, [Math.round(sPiv[0] + dx), Math.round(sPiv[1] + dy)]);
           } else {
-            setAnimValue(l.transform.location, [Math.round(sLoc[0] + dx * 2), Math.round(sLoc[1] + dy * 2), sLoc[2]]);
+            let nx = Math.round(sLoc[0] + dx * 2);
+            let ny = Math.round(sLoc[1] + dy * 2);
+            if (snapEnabled) {
+              const snapped = snapLayerPosition(nx, ny, {
+                project,
+                layers: getActiveLayers(),
+                activeLayerId: layer.id,
+                currentTimeMs,
+                threshold: 16,
+              });
+              nx = snapped.x;
+              ny = snapped.y;
+              setSnapGuides({ x: snapped.guideX, y: snapped.guideY });
+            } else {
+              setSnapGuides({ x: null, y: null });
+            }
+            setAnimValue(l.transform.location, [nx, ny, sLoc[2]]);
           }
         } else if (mode === 'rotation') {
           setAnimValue(l.transform.rotation, Math.round((sRot + dx * 0.5) * 10) / 10);
@@ -124,6 +153,7 @@ export const MoveTransformPanel: React.FC = () => {
         dragRaf = 0;
       }
       apply(ev.clientX, ev.clientY, true);
+      setSnapGuides({ x: null, y: null });
       window.removeEventListener('pointermove', onMove);
       window.removeEventListener('pointerup', onUp);
       window.removeEventListener('pointercancel', onUp);
