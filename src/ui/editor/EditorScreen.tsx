@@ -186,19 +186,20 @@ export const EditorScreen: React.FC = () => {
     });
   }, [currentProject, currentTimeMs, selectedLayerIds, groupStack, previewQuality, visibilityPaused, isPlaying]);
 
-  // Idle render-ahead (After Effects RAM Preview): walks outward from playhead on idle turns, cancels on interaction
+  // Idle render-ahead (After Effects RAM Preview): walks FORWARD monotonically and awaits exact video seeks
   useEffect(() => {
     const renderer = rendererRef.current;
     if (!renderer || !currentProject || isPlaying || visibilityPaused || isExportingRef.current) return;
     const totalFrames = Math.max(1, Math.ceil((currentProject.durationMs / 1000) * Math.max(1, currentProject.fps)));
-    const centerFrame = Math.max(0, Math.round((currentTimeMs / 1000) * Math.max(1, currentProject.fps)));
+    const startFrame = Math.max(0, Math.round((currentTimeMs / 1000) * Math.max(1, currentProject.fps)));
+    // Strictly monotonic forward order (never ping-pong +d/-d which causes video decoders to thrash)
     const order: number[] = [];
-    for (let d = 1; d < totalFrames; d++) {
-      if (centerFrame + d < totalFrames) order.push(centerFrame + d);
-      if (centerFrame - d >= 0) order.push(centerFrame - d);
-    }
+    for (let f = startFrame; f < totalFrames; f++) order.push(f);
+    for (let f = 0; f < startFrame; f++) order.push(f);
+
     let cursor = 0;
     let cancelled = false;
+    let busy = false;
     let idleHandle = 0;
     const win = window as Window & {
       requestIdleCallback?: (cb: (d: { timeRemaining: () => number }) => void) => number;
@@ -220,19 +221,24 @@ export const EditorScreen: React.FC = () => {
       }
     };
 
-    const pump = (deadline: { timeRemaining: () => number }) => {
-      if (cancelled || isExportingRef.current) return;
+    const pump = async (deadline: { timeRemaining: () => number }) => {
+      if (cancelled || busy || isExportingRef.current) return;
       const store = useEditorStore.getState();
       if (store.isPlaying || !store.currentProject || store.currentProject.id !== currentProject.id) return;
-      const start = performance.now();
-      // P-6: Hard timeRemaining() > 6 check so idle precache never steals a UI frame
-      while (
-        cursor < order.length &&
-        deadline.timeRemaining() > 6 &&
-        performance.now() - start < 8
-      ) {
-        const frameIdx = order[cursor++];
-        renderer.precacheFrame(currentProject, frameIdx, previewQuality);
+      if (deadline.timeRemaining() <= 6) {
+        if (!cancelled) idleHandle = rIC(pump);
+        return;
+      }
+      busy = true;
+      try {
+        // Precaching one deterministic async frame per turn guarantees exact video seeks without UI stutter
+        while (cursor < order.length && !cancelled) {
+          const frameIdx = order[cursor++];
+          const didCache = await renderer.precacheFrameAsync(currentProject, frameIdx, previewQuality);
+          if (didCache) break;
+        }
+      } finally {
+        busy = false;
       }
       if (cursor < order.length && !cancelled) {
         idleHandle = rIC(pump);
@@ -328,7 +334,15 @@ export const EditorScreen: React.FC = () => {
         }
       }
 
-      renderer.syncVideosForPlayback(proj, playheadMs, true);
+      // On a cache hit, pause live HTMLVideo decoding while keeping playback active -> pure 0.1ms GPU blit with zero video jitter
+      const isHit =
+        store.groupStack.length === 0 &&
+        renderer.hasCachedFrame(proj, playheadMs, store.previewQuality);
+      if (isHit) {
+        renderer.pauseAllVideos(true);
+      } else {
+        renderer.syncVideosForPlayback(proj, playheadMs, true);
+      }
       renderer.renderProject(proj, playheadMs, {
         previewScale: store.previewQuality,
         selectedIds: store.selectedLayerIds,
@@ -535,18 +549,19 @@ export const EditorScreen: React.FC = () => {
     const renderer = rendererRef.current;
     if (!renderer || !currentProject) return;
     const totalFrames = Math.max(1, Math.ceil((currentProject.durationMs / 1000) * Math.max(1, currentProject.fps)));
-    let idx = 0;
     useEditorStore.getState().showToast(`Pre-rendering ${totalFrames} preview frames…`);
-    const step = () => {
-      if (!rendererRef.current || useEditorStore.getState().isPlaying) return;
-      const start = performance.now();
-      while (idx < totalFrames && performance.now() - start < 12) {
-        rendererRef.current.precacheFrame(currentProject, idx++, previewQuality);
+    void (async () => {
+      for (let idx = 0; idx < totalFrames; idx++) {
+        if (!rendererRef.current || useEditorStore.getState().isPlaying) return;
+        const proj = useEditorStore.getState().currentProject;
+        if (!proj || proj.id !== currentProject.id) return;
+        await rendererRef.current.precacheFrameAsync(proj, idx, previewQuality);
+        if (idx % 4 === 0) {
+          await new Promise((r) => setTimeout(r, 0));
+        }
       }
-      if (idx < totalFrames) requestAnimationFrame(step);
-      else useEditorStore.getState().showToast('Preview RAM cache ready');
-    };
-    requestAnimationFrame(step);
+      useEditorStore.getState().showToast('Preview RAM cache ready');
+    })();
   };
 
   return (

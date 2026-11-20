@@ -465,6 +465,7 @@ export class AlightRenderer {
   private playbackScaleKey = '';
   private frameUploadGen = 0;
   private usedVideoSrcsThisFrame = new Set<string>();
+  private hadStaleVideoThisFrame = false;
   private onContextLostHandler: (e: Event) => void;
 
   constructor(canvas: HTMLCanvasElement) {
@@ -895,8 +896,8 @@ export class AlightRenderer {
     }
   }
 
-  public pauseAllVideos(): void {
-    this.isPlaybackActive = false;
+  public pauseAllVideos(keepPlaybackActive = false): void {
+    this.isPlaybackActive = keepPlaybackActive;
     for (const entry of this.mediaVideos.values()) {
       if (!entry.video.paused) {
         entry.video.pause();
@@ -909,7 +910,8 @@ export class AlightRenderer {
    * before rendering an offline export frame (prevents video flicker or skipped frames in export).
    */
   public async prepareMediaAtTime(project: Project, sceneTimeMs: number): Promise<void> {
-    this.pauseAllVideos();
+    this.pauseAllVideos(false);
+    this.frameUploadGen++;
     const items: { layer: Layer; localTimeMs: number }[] = [];
     this.collectActiveMediaLayers(project.layers, sceneTimeMs, items);
 
@@ -1034,6 +1036,12 @@ export class AlightRenderer {
         if (!entry.hasFrame || Math.abs(v.currentTime - entry.lastUploadedTime) > 0.0005) {
           this.uploadVideoTex(entry);
         }
+      }
+
+      // Mark frame as video-stale if video is seeking, unready, or drifted > 120ms from target time
+      // so we still display the last good texture smoothly WITHOUT baking a wrong video frame into frameCache
+      if (v.seeking || !entry.hasFrame || Math.abs(v.currentTime - targetSec) > 0.12) {
+        this.hadStaleVideoThisFrame = true;
       }
 
       if (entry.hasFrame) {
@@ -1183,7 +1191,75 @@ export class AlightRenderer {
     this.onCacheChange?.();
   }
 
-  /** Renders one frame offscreen directly into the L2 preview cache (for idle render-ahead) */
+  /** O(1) check whether a frame is already in the current-epoch L2 RAM cache */
+  public hasCachedFrame(project: Project, sceneTimeMs: number, previewScale: number): boolean {
+    const qKey = Math.round((previewScale || 1) * 100);
+    if (
+      this.lastCacheProjectId !== project.id ||
+      this.lastCacheScale !== qKey ||
+      this.lastCacheFontEpoch !== fontEpoch.value
+    ) {
+      return false;
+    }
+    const fps = Math.max(1, project.fps);
+    const frameIdx = Math.max(0, Math.round((sceneTimeMs / 1000) * fps));
+    const entry = this.frameCache.get(frameIdx);
+    return Boolean(entry && entry.epoch === this.cacheEpoch);
+  }
+
+  /** Deterministically awaits exact video seeks via prepareMediaAtTime before baking a frame into L2 cache */
+  public async precacheFrameAsync(
+    project: Project,
+    frameIdx: number,
+    previewScale: number
+  ): Promise<boolean> {
+    if (this.disposed || this.isPlaybackActive) return false;
+    const qKey = Math.round((previewScale || 1) * 100);
+    if (
+      this.lastCacheProjectId !== project.id ||
+      this.lastCacheScale !== qKey ||
+      this.lastCacheFontEpoch !== fontEpoch.value
+    ) {
+      this.lastCacheProjectId = project.id;
+      this.lastCacheScale = qKey;
+      this.lastCacheFontEpoch = fontEpoch.value;
+      this.clearPreviewCache();
+      this.cacheEpoch++;
+    }
+
+    const existing = this.frameCache.get(frameIdx);
+    if (existing && existing.epoch === this.cacheEpoch) return false;
+    if (this.cacheBytes >= this.cacheBudgetBytes * 0.88) return false;
+
+    const fps = Math.max(1, project.fps);
+    const sceneTimeMs = (frameIdx / fps) * 1000;
+    if (sceneTimeMs > project.durationMs) return false;
+
+    const myEpoch = this.cacheEpoch;
+    // Await exact video/image decode for this frame (same deterministic contract as WebCodecs export)
+    await this.prepareMediaAtTime(project, sceneTimeMs);
+    if (this.disposed || this.isPlaybackActive || myEpoch !== this.cacheEpoch) return false;
+
+    const cScale = this.resolvePlaybackScale(project, previewScale);
+    const cw = Math.max(16, Math.round(project.width * cScale));
+    const ch = Math.max(16, Math.round(project.height * cScale));
+
+    this.frameUploadGen++;
+    this.usedVideoSrcsThisFrame.clear();
+    this.hadStaleVideoThisFrame = false;
+    const sceneFbo = this.acquireFbo(cw, ch);
+    const [br, bg, bb, ba] =
+      project.bgColor === 'transparent' ? [0, 0, 0, 0] : parseColorArgb(project.bgColor);
+    this.clearFbo(sceneFbo, cw, ch, br * ba, bg * ba, bb * ba, ba);
+    this.renderLayerList(project, project.layers, sceneTimeMs, sceneFbo, cw, ch, cScale, []);
+    if (!this.hadStaleVideoThisFrame && !this.hasUnreadySeekingVideoThisFrame()) {
+      this.storeFrameInCache(frameIdx, sceneFbo, cw, ch, cScale);
+    }
+    this.releaseFbo(sceneFbo);
+    return true;
+  }
+
+  /** Renders one frame offscreen directly into the L2 preview cache (for projects without video layers) */
   public precacheFrame(
     project: Project,
     frameIdx: number,
@@ -1204,12 +1280,13 @@ export class AlightRenderer {
 
     this.frameUploadGen++;
     this.usedVideoSrcsThisFrame.clear();
+    this.hadStaleVideoThisFrame = false;
     const sceneFbo = this.acquireFbo(cw, ch);
     const [br, bg, bb, ba] =
       project.bgColor === 'transparent' ? [0, 0, 0, 0] : parseColorArgb(project.bgColor);
     this.clearFbo(sceneFbo, cw, ch, br * ba, bg * ba, bb * ba, ba);
     this.renderLayerList(project, project.layers, sceneTimeMs, sceneFbo, cw, ch, cScale, []);
-    if (!this.hasUnreadySeekingVideoThisFrame()) {
+    if (!this.hadStaleVideoThisFrame && !this.hasUnreadySeekingVideoThisFrame()) {
       this.storeFrameInCache(frameIdx, sceneFbo, cw, ch, cScale);
     }
     this.releaseFbo(sceneFbo);
@@ -1230,6 +1307,7 @@ export class AlightRenderer {
   ): void {
     this.frameUploadGen++;
     this.usedVideoSrcsThisFrame.clear();
+    this.hadStaleVideoThisFrame = false;
 
     let renderW: number;
     let renderH: number;
@@ -1261,11 +1339,9 @@ export class AlightRenderer {
       }
     }
 
-    // P-3: Skip L2 cache when anything is selected or inside a nested group isolation view
-    const hasSelectionOrGroup =
-      Boolean(options.selectedIds && options.selectedIds.length > 0) ||
-      Boolean(options.activeGroupStack && options.activeGroupStack.length > 0);
-    const cacheEligible = Boolean(options.useCache) && !isExport && !hasSelectionOrGroup;
+    // Only bypass cache inside nested group isolation view or exports; selection overlay is DOM-only so playback still hits cache
+    const hasGroupIsolation = Boolean(options.activeGroupStack && options.activeGroupStack.length > 0);
+    const cacheEligible = Boolean(options.useCache) && !isExport && !hasGroupIsolation;
     if (cacheEligible) {
       const qKey = Math.round((options.previewScale ?? 1) * 100);
       if (
@@ -1304,7 +1380,8 @@ export class AlightRenderer {
       this.renderLayerList(project, project.layers, sceneTimeMs, sceneFbo, cw, ch, pbScale, []);
       this.blitTexture(sceneFbo.tex, null, this.canvas.width, this.canvas.height, 1.0, false);
 
-      if (!this.hasUnreadySeekingVideoThisFrame()) {
+      // Only bake into frameCache when every visible video in this frame was decoded & synced (never cache stale/seeking video)
+      if (!this.hadStaleVideoThisFrame && !this.hasUnreadySeekingVideoThisFrame()) {
         this.storeFrameInCache(frameIdx, sceneFbo, cw, ch, pbScale);
       }
       this.releaseFbo(sceneFbo);
