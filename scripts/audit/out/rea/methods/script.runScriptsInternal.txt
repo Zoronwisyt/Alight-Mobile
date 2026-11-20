@@ -1,0 +1,594 @@
+    /* JADX INFO: Access modifiers changed from: private */
+    /* JADX WARN: Code duplicated, block: B:22:0x0074  */
+    /* JADX WARN: Failed to restore switch over string. Please report as a decompilation issue */
+    /* JADX WARN: Multi-variable type inference failed */
+    public static final SceneElement runScriptsInternal(final SceneElement sceneElement, final float f2, final int i2, final int i3, Scene scene, final Transform transform, final float f3, final RenderMode renderMode, final Integer num, final boolean z2, ScriptGroup scriptGroup) {
+        final VisualEffect visualEffectVisualEffectById;
+        int i4;
+        int i5;
+        T tScript_growParts;
+        T t2 = sceneElement;
+        Ref.ObjectRef objectRef = new Ref.ObjectRef();
+        objectRef.element = t2;
+        ScriptEnv scriptEnv = new ScriptEnv(scene, f2, i2, i3, transform, f3, renderMode, num, z2, scriptGroup);
+        final float endTime = (sceneElement.getEndTime() - sceneElement.getStartTime()) / 1000.0f;
+        int i6 = 0;
+        int i7 = 0;
+        SceneElement sceneElement2 = t2;
+        for (final KeyableVisualEffectRef keyableVisualEffectRef : SceneElementKt.getVisualEffectsInOrder(sceneElement)) {
+            int i8 = (i7 != 0 || Intrinsics.areEqual(keyableVisualEffectRef.getId(), "com.alightcreative.effects.repeat")) ? 1 : i6;
+            if (i8 != 0 && scriptGroup == ScriptGroup.BeforeRepeat) {
+                return (SceneElement) objectRef.element;
+            }
+            if ((i8 == 0 && scriptGroup == ScriptGroup.AfterRepeat) || keyableVisualEffectRef.getHidden() || (visualEffectVisualEffectById = VisualEffectKt.visualEffectById(keyableVisualEffectRef.getId())) == null || visualEffectVisualEffectById.getScripts().isEmpty() || (!visualEffectVisualEffectById.getShaderGroups().isEmpty() ? !(scriptGroup == ScriptGroup.ShaderCoop || scriptGroup == ScriptGroup.All) : scriptGroup == ScriptGroup.ShaderCoop)) {
+                i5 = i6;
+            } else {
+                for (ACScript aCScript : visualEffectVisualEffectById.getScripts()) {
+                    int i9 = WhenMappings.$EnumSwitchMapping$0[aCScript.getType().ordinal()];
+                    if (i9 != 1 && i9 == 2) {
+                        String source = aCScript.getSource();
+                        switch (source.hashCode()) {
+                            case -2049632889:
+                                if (!source.equals("com.alightcreative.script.growparts")) {
+                                    throw new UnsupportedOperationException();
+                                }
+                                tScript_growParts = GrowPartsKt.script_growParts(sceneElement2, keyableVisualEffectRef, scriptEnv);
+                                break;
+                                break;
+                            case -1568823296:
+                                if (!source.equals("com.alightcreative.script.shakeparts")) {
+                                    throw new UnsupportedOperationException();
+                                }
+                                tScript_growParts = ShakePartsKt.script_shakeParts(sceneElement2, keyableVisualEffectRef, scriptEnv);
+                                break;
+                                break;
+                            case 1158353195:
+                                if (!source.equals("com.alightcreative.script.movealongpath")) {
+                                    throw new UnsupportedOperationException();
+                                }
+                                tScript_growParts = MoveAlongPathKt.script_moveAlongPath(sceneElement2, keyableVisualEffectRef, scriptEnv);
+                                break;
+                                break;
+                            case 1512227847:
+                                if (!source.equals("com.alightcreative.script.morphpath")) {
+                                    throw new UnsupportedOperationException();
+                                }
+                                tScript_growParts = MorphPathKt.script_morphPath(sceneElement2, keyableVisualEffectRef, scriptEnv);
+                                break;
+                                break;
+                            case 1549210727:
+                                if (!source.equals("com.alightcreative.script.movealongpath2")) {
+                                    throw new UnsupportedOperationException();
+                                }
+                                tScript_growParts = MoveAlongPathKt.script_moveAlongPath2(sceneElement2, keyableVisualEffectRef, scriptEnv);
+                                break;
+                                break;
+                            case 1549210728:
+                                if (!source.equals("com.alightcreative.script.movealongpath3")) {
+                                    throw new UnsupportedOperationException();
+                                }
+                                tScript_growParts = MoveAlongPathKt.script_moveAlongPath3(sceneElement2, keyableVisualEffectRef, scriptEnv);
+                                break;
+                                break;
+                            default:
+                                throw new UnsupportedOperationException();
+                        }
+                        objectRef.element = tScript_growParts;
+                    }
+                }
+                List<ACScript> scripts = visualEffectVisualEffectById.getScripts();
+                if ((scripts instanceof Collection) && scripts.isEmpty()) {
+                    i4 = 1;
+                } else {
+                    Iterator<T> it = scripts.iterator();
+                    while (true) {
+                        if (!it.hasNext()) {
+                            i4 = 1;
+                        } else if ((((ACScript) it.next()).getType() == ACScriptType.JS ? 1 : i6) != 0) {
+                            i4 = i6;
+                        }
+                    }
+                }
+                if (i4 == 0) {
+                    Map<String, mY0> map = scriptEnvCache;
+                    String id = visualEffectVisualEffectById.getId();
+                    mY0 my0 = map.get(id);
+                    if (my0 == null) {
+                        my0 = new mY0("effect:" + visualEffectVisualEffectById.getId());
+                        mY0.Xu(my0, i6, new Function2<fs, V8Runtime, Unit>() { // from class: com.alightcreative.app.motion.scene.scripting.ScriptExecutorKt$runScriptsInternal$js$1$1$1
+
+                            /* JADX INFO: loaded from: classes.dex */
+                            @Metadata(k = 3, mv = {1, 9, 0}, xi = 48)
+                            public /* synthetic */ class WhenMappings {
+                                public static final /* synthetic */ int[] $EnumSwitchMapping$0;
+
+                                static {
+                                    int[] iArr = new int[ACScriptType.values().length];
+                                    try {
+                                        iArr[ACScriptType.JS.ordinal()] = 1;
+                                    } catch (NoSuchFieldError unused) {
+                                    }
+                                    $EnumSwitchMapping$0 = iArr;
+                                }
+                            }
+
+                            {
+                                super(2);
+                            }
+
+                            @Override // kotlin.jvm.functions.Function2
+                            public /* bridge */ /* synthetic */ Unit invoke(fs fsVar, V8Runtime v8Runtime) throws JavetException {
+                                invoke2(fsVar, v8Runtime);
+                                return Unit.INSTANCE;
+                            }
+
+                            /* JADX WARN: Multi-variable type inference failed */
+                            /* JADX INFO: renamed from: invoke, reason: avoid collision after fix types in other method */
+                            public final void invoke2(fs run, V8Runtime v10) throws JavetException {
+                                Intrinsics.checkNotNullParameter(run, "$this$run");
+                                Intrinsics.checkNotNullParameter(v10, "v8");
+                                euv.BWM("ScriptExecutor: Set up environment for effect '" + visualEffectVisualEffectById.getId() + "'");
+                                V8ValueObject v8ValueObjectHfr = run.Hfr();
+                                ScriptExecutorKt.registerAlightMotionScriptMethods(v10, v8ValueObjectHfr, visualEffectVisualEffectById.getId());
+                                v10.getGlobalObject().set("AM", v8ValueObjectHfr);
+                                for (ACScript aCScript2 : visualEffectVisualEffectById.getScripts()) {
+                                    int i10 = 1;
+                                    if (WhenMappings.$EnumSwitchMapping$0[aCScript2.getType().ordinal()] != 1) {
+                                        throw new NotImplementedError(null, i10, 0 == true ? 1 : 0);
+                                    }
+                                    ScriptExecutorKt.executeVoidScript(v10, aCScript2.getSource());
+                                }
+                            }
+                        }, 1, null);
+                        map.put(id, my0);
+                    }
+                    mY0 my1 = my0;
+                    final Vector2D size = SceneElementKt.boundsInScene((SceneElement) objectRef.element, scene).getSize();
+                    final Transform transformValueAtTime = ((SceneElement) objectRef.element).getTransform().valueAtTime(f2);
+                    final Ref.ObjectRef objectRef2 = objectRef;
+                    i5 = 0;
+                    mY0.Xu(my1, 0, new Function2<fs, V8Runtime, Unit>() { // from class: com.alightcreative.app.motion.scene.scripting.ScriptExecutorKt.runScriptsInternal.2
+
+                        /* JADX INFO: renamed from: com.alightcreative.app.motion.scene.scripting.ScriptExecutorKt$runScriptsInternal$2$WhenMappings */
+                        /* JADX INFO: loaded from: classes10.dex */
+                        @Metadata(k = 3, mv = {1, 9, 0}, xi = 48)
+                        public /* synthetic */ class WhenMappings {
+                            public static final /* synthetic */ int[] $EnumSwitchMapping$0;
+
+                            static {
+                                int[] iArr = new int[RenderMode.values().length];
+                                try {
+                                    iArr[RenderMode.PLAY.ordinal()] = 1;
+                                } catch (NoSuchFieldError unused) {
+                                }
+                                try {
+                                    iArr[RenderMode.PAUSE.ordinal()] = 2;
+                                } catch (NoSuchFieldError unused2) {
+                                }
+                                try {
+                                    iArr[RenderMode.EXPORT.ordinal()] = 3;
+                                } catch (NoSuchFieldError unused3) {
+                                }
+                                try {
+                                    iArr[RenderMode.THUMB.ordinal()] = 4;
+                                } catch (NoSuchFieldError unused4) {
+                                }
+                                try {
+                                    iArr[RenderMode.SCENE_THUMB.ordinal()] = 5;
+                                } catch (NoSuchFieldError unused5) {
+                                }
+                                $EnumSwitchMapping$0 = iArr;
+                            }
+                        }
+
+                        /* JADX WARN: 'super' call moved to the top of the method (can break code semantics) */
+                        {
+                            super(2);
+                        }
+
+                        @Override // kotlin.jvm.functions.Function2
+                        public /* bridge */ /* synthetic */ Unit invoke(fs fsVar, V8Runtime v8Runtime) throws JavetException {
+                            invoke2(fsVar, v8Runtime);
+                            return Unit.INSTANCE;
+                        }
+
+                        /* JADX WARN: Code duplicated, block: B:133:0x0510  */
+                        /* JADX WARN: Code duplicated, block: B:63:0x02ff  */
+                        /* JADX WARN: Multi-variable type inference failed */
+                        /* JADX WARN: Type inference failed for: r3v36, types: [T, com.alightcreative.app.motion.scene.SceneElement] */
+                        /* JADX WARN: Type inference failed for: r5v34, types: [T, com.alightcreative.app.motion.scene.SceneElement] */
+                        /* JADX WARN: Type inference failed for: r5v39, types: [T, com.alightcreative.app.motion.scene.SceneElement] */
+                        /* JADX WARN: Type inference failed for: r5v46, types: [T, com.alightcreative.app.motion.scene.Transform] */
+                        /* JADX WARN: Type inference failed for: r5v50, types: [T, com.alightcreative.app.motion.scene.Transform] */
+                        /* JADX WARN: Type inference failed for: r5v54, types: [T, com.alightcreative.app.motion.scene.Transform] */
+                        /* JADX WARN: Type inference failed for: r5v59, types: [T, com.alightcreative.app.motion.scene.Transform] */
+                        /* JADX WARN: Type inference failed for: r5v61, types: [T, com.alightcreative.app.motion.scene.Transform] */
+                        /* JADX WARN: Type inference failed for: r6v20, types: [T, com.alightcreative.app.motion.scene.SceneElement] */
+                        /* JADX WARN: Type inference failed for: r8v0, types: [T, com.alightcreative.app.motion.scene.Transform] */
+                        /* JADX INFO: renamed from: invoke, reason: avoid collision after fix types in other method */
+                        public final void invoke2(final fs run, V8Runtime v10) throws JavetException {
+                            Set setEmptySet;
+                            Set<Integer> setEmptySet2;
+                            String str;
+                            String str2;
+                            boolean z4;
+                            boolean z5;
+                            Map<Integer, ShaderGroup> shaderGroups;
+                            Set<Integer> setKeySet;
+                            Intrinsics.checkNotNullParameter(run, "$this$run");
+                            Intrinsics.checkNotNullParameter(v10, "v8");
+                            final Ref.ObjectRef objectRef3 = new Ref.ObjectRef();
+                            objectRef3.element = transformValueAtTime;
+                            final SolidColor solidColor = (SolidColor) KeyableKt.valueAtTime(objectRef2.element.getFillColor(), f2);
+                            double endTime2 = ((double) (sceneElement.getEndTime() - sceneElement.getStartTime())) / 1000.0d;
+                            V8ValueArray v8ValueArrayRw = run.Rw();
+                            VisualEffect effect = VisualEffectKt.getEffect(keyableVisualEffectRef);
+                            if (effect == null || (shaderGroups = effect.getShaderGroups()) == null || (setKeySet = shaderGroups.keySet()) == null || (setEmptySet = CollectionsKt___CollectionsKt.toSet(setKeySet)) == null) {
+                                setEmptySet = SetsKt__SetsKt.emptySet();
+                            }
+                            KeyableVisualEffectRef keyableVisualEffectRef2 = objectRef2.element.getVisualEffects().get(Long.valueOf(keyableVisualEffectRef.getInstanceId()));
+                            if (keyableVisualEffectRef2 == null || (setEmptySet2 = keyableVisualEffectRef2.getDisabledRenderGroups()) == null) {
+                                setEmptySet2 = SetsKt__SetsKt.emptySet();
+                            }
+                            Iterator it2 = SetsKt___SetsKt.minus(setEmptySet, (Iterable) setEmptySet2).iterator();
+                            while (it2.hasNext()) {
+                                v8ValueArrayRw.push(Integer.valueOf(((Number) it2.next()).intValue()));
+                            }
+                            V8ValueObject v8ValueObjectHfr = run.Hfr();
+                            Ref.ObjectRef<SceneElement> objectRef4 = objectRef2;
+                            run.Xu(v8ValueObjectHfr, "transform", new Function1<V8ValueObject, Unit>() { // from class: com.alightcreative.app.motion.scene.scripting.ScriptExecutorKt$runScriptsInternal$2$paramEl$1$1
+                                /* JADX WARN: 'super' call moved to the top of the method (can break code semantics) */
+                                {
+                                    super(1);
+                                }
+
+                                @Override // kotlin.jvm.functions.Function1
+                                public /* bridge */ /* synthetic */ Unit invoke(V8ValueObject v8ValueObject) throws JavetException {
+                                    invoke2(v8ValueObject);
+                                    return Unit.INSTANCE;
+                                }
+
+                                /* JADX INFO: renamed from: invoke, reason: avoid collision after fix types in other method */
+                                public final void invoke2(V8ValueObject setObject) throws JavetException {
+                                    Intrinsics.checkNotNullParameter(setObject, "$this$setObject");
+                                    fs fsVar = run;
+                                    final Ref.ObjectRef<Transform> objectRef5 = objectRef3;
+                                    fsVar.Xu(setObject, "location", new Function1<V8ValueObject, Unit>() { // from class: com.alightcreative.app.motion.scene.scripting.ScriptExecutorKt$runScriptsInternal$2$paramEl$1$1.1
+                                        /* JADX WARN: 'super' call moved to the top of the method (can break code semantics) */
+                                        {
+                                            super(1);
+                                        }
+
+                                        @Override // kotlin.jvm.functions.Function1
+                                        public /* bridge */ /* synthetic */ Unit invoke(V8ValueObject v8ValueObject) throws JavetException {
+                                            invoke2(v8ValueObject);
+                                            return Unit.INSTANCE;
+                                        }
+
+                                        /* JADX INFO: renamed from: invoke, reason: avoid collision after fix types in other method */
+                                        public final void invoke2(V8ValueObject setObject2) throws JavetException {
+                                            Intrinsics.checkNotNullParameter(setObject2, "$this$setObject");
+                                            setObject2.set("x", Double.valueOf(((double) objectRef5.element.getLocation().getX()) + 0.0d));
+                                            setObject2.set("y", Double.valueOf(((double) objectRef5.element.getLocation().getY()) + 0.0d));
+                                            setObject2.set("z", Double.valueOf(((double) objectRef5.element.getLocation().getZ()) + 0.0d));
+                                        }
+                                    });
+                                    fs fsVar2 = run;
+                                    final Ref.ObjectRef<Transform> objectRef6 = objectRef3;
+                                    fsVar2.Xu(setObject, "scale", new Function1<V8ValueObject, Unit>() { // from class: com.alightcreative.app.motion.scene.scripting.ScriptExecutorKt$runScriptsInternal$2$paramEl$1$1.2
+                                        /* JADX WARN: 'super' call moved to the top of the method (can break code semantics) */
+                                        {
+                                            super(1);
+                                        }
+
+                                        @Override // kotlin.jvm.functions.Function1
+                                        public /* bridge */ /* synthetic */ Unit invoke(V8ValueObject v8ValueObject) throws JavetException {
+                                            invoke2(v8ValueObject);
+                                            return Unit.INSTANCE;
+                                        }
+
+                                        /* JADX INFO: renamed from: invoke, reason: avoid collision after fix types in other method */
+                                        public final void invoke2(V8ValueObject setObject2) throws JavetException {
+                                            Intrinsics.checkNotNullParameter(setObject2, "$this$setObject");
+                                            setObject2.set("x", Double.valueOf(((double) objectRef6.element.getScale().getX()) + 0.0d));
+                                            setObject2.set("y", Double.valueOf(((double) objectRef6.element.getScale().getY()) + 0.0d));
+                                        }
+                                    });
+                                    setObject.set("angle", Double.valueOf(((double) objectRef3.element.getRotation()) + 0.0d));
+                                }
+                            });
+                            Set set = setEmptySet;
+                            v8ValueObjectHfr.set("alpha", Double.valueOf(((double) ((Transform) objectRef3.element).getOpacity()) + 0.0d));
+                            run.Xu(v8ValueObjectHfr, "fillColor", new Function1<V8ValueObject, Unit>() { // from class: com.alightcreative.app.motion.scene.scripting.ScriptExecutorKt$runScriptsInternal$2$paramEl$1$2
+                                {
+                                    super(1);
+                                }
+
+                                @Override // kotlin.jvm.functions.Function1
+                                public /* bridge */ /* synthetic */ Unit invoke(V8ValueObject v8ValueObject) throws JavetException {
+                                    invoke2(v8ValueObject);
+                                    return Unit.INSTANCE;
+                                }
+
+                                /* JADX INFO: renamed from: invoke, reason: avoid collision after fix types in other method */
+                                public final void invoke2(V8ValueObject setObject) throws JavetException {
+                                    Intrinsics.checkNotNullParameter(setObject, "$this$setObject");
+                                    Bb.Hfr(setObject, solidColor);
+                                }
+                            });
+                            v8ValueObjectHfr.set("text", objectRef4.element.getText().getText());
+                            v8ValueObjectHfr.set("shaderGroups", v8ValueArrayRw);
+                            V8ValueObject v8ValueObjectHfr2 = run.Hfr();
+                            float f4 = f2;
+                            float f5 = f3;
+                            SceneElement sceneElement3 = sceneElement;
+                            int i10 = i2;
+                            int i11 = i3;
+                            final Transform transform2 = transform;
+                            Integer num2 = num;
+                            boolean z6 = z2;
+                            RenderMode renderMode2 = renderMode;
+                            Vector2D vector2D = size;
+                            double d2 = f4;
+                            v8ValueObjectHfr2.set("time", Double.valueOf(d2 + 0.0d));
+                            v8ValueObjectHfr2.set("prevFrameTime", Double.valueOf(((double) f5) + 0.0d));
+                            v8ValueObjectHfr2.set("duration", Double.valueOf(endTime2));
+                            v8ValueObjectHfr2.set("startTime", Double.valueOf(((double) sceneElement3.getStartTime()) / 1000.0d));
+                            v8ValueObjectHfr2.set("inTime", Double.valueOf(((double) sceneElement3.getInTime()) / 1000.0d));
+                            v8ValueObjectHfr2.set("frame", Integer.valueOf(i10));
+                            v8ValueObjectHfr2.set("fps", Double.valueOf(((double) i11) / 100.0d));
+                            v8ValueObjectHfr2.set("endTime", Double.valueOf(((double) sceneElement3.getEndTime()) / 1000.0d));
+                            v8ValueObjectHfr2.set("absTime", Double.valueOf((((double) sceneElement3.getStartTime()) / 1000.0d) + (endTime2 * d2)));
+                            run.Xu(v8ValueObjectHfr2, "velocity", new Function1<V8ValueObject, Unit>() { // from class: com.alightcreative.app.motion.scene.scripting.ScriptExecutorKt$runScriptsInternal$2$paramEnv$1$1
+                                /* JADX WARN: 'super' call moved to the top of the method (can break code semantics) */
+                                {
+                                    super(1);
+                                }
+
+                                @Override // kotlin.jvm.functions.Function1
+                                public /* bridge */ /* synthetic */ Unit invoke(V8ValueObject v8ValueObject) throws JavetException {
+                                    invoke2(v8ValueObject);
+                                    return Unit.INSTANCE;
+                                }
+
+                                /* JADX INFO: renamed from: invoke, reason: avoid collision after fix types in other method */
+                                public final void invoke2(V8ValueObject setObject) throws JavetException {
+                                    Intrinsics.checkNotNullParameter(setObject, "$this$setObject");
+                                    Vector3D vector3DMinus = GeometryKt.minus(objectRef3.element.getLocation(), transform2.getLocation());
+                                    Bb.s(setObject, new Vector2D(vector3DMinus.getX(), vector3DMinus.getY()));
+                                }
+                            });
+                            v8ValueObjectHfr2.set("angularVelocity", Double.valueOf(((Transform) objectRef3.element).getRotation() - transform2.getRotation()));
+                            if (num2 != null && num2.intValue() == R.id.editmode_spoid) {
+                                str = "eyedropper";
+                            } else if (num2 != null && num2.intValue() == R.id.editmode_spoid_drag) {
+                                str = "eyedropper-drag";
+                            } else {
+                                str = (num2 != null && num2.intValue() == 0) ? "none" : "other";
+                            }
+                            v8ValueObjectHfr2.set("editMode", str);
+                            v8ValueObjectHfr2.set("selected", Boolean.valueOf(z6));
+                            int i12 = renderMode2 == null ? -1 : WhenMappings.$EnumSwitchMapping$0[renderMode2.ordinal()];
+                            if (i12 == -1) {
+                                str2 = "";
+                            } else if (i12 == 1) {
+                                str2 = "play";
+                            } else if (i12 == 2) {
+                                str2 = "pause";
+                            } else if (i12 == 3) {
+                                str2 = "export";
+                            } else if (i12 == 4) {
+                                str2 = "thumb";
+                            } else {
+                                if (i12 != 5) {
+                                    throw new NoWhenBranchMatchedException();
+                                }
+                                str2 = "sceneThumb";
+                            }
+                            v8ValueObjectHfr2.set("renderMode", str2);
+                            v8ValueObjectHfr2.set("scaleVelocity", Double.valueOf(GeometryKt.getLength(GeometryKt.times(vector2D, ((Transform) objectRef3.element).getScale())) - GeometryKt.getLength(GeometryKt.times(vector2D, transform2.getScale()))));
+                            V8Value v8ValueInvoke = v10.getGlobalObject().invoke("animate", v8ValueObjectHfr2, v8ValueObjectHfr, ScriptExecutorKt.userParamsAtTimeForScript(run, VisualEffectKt.paramsAtTime(keyableVisualEffectRef, f2, endTime), visualEffectVisualEffectById.getParamsById(), f2), ScriptExecutorKt.userParamsAtTimeForScript(run, VisualEffectKt.paramsAtTime(keyableVisualEffectRef, f3, endTime), visualEffectVisualEffectById.getParamsById(), f3));
+                            Ref.ObjectRef<SceneElement> objectRef5 = objectRef2;
+                            KeyableVisualEffectRef keyableVisualEffectRef3 = keyableVisualEffectRef;
+                            try {
+                                V8ValueObject v8ValueObject = (V8ValueObject) v8ValueInvoke;
+                                if (v8ValueObject.has("alpha")) {
+                                    Float f6 = v8ValueObject.getFloat("alpha");
+                                    if (Intrinsics.areEqual(f6, ((Transform) objectRef3.element).getOpacity())) {
+                                        z4 = false;
+                                    } else {
+                                        Transform transform3 = (Transform) objectRef3.element;
+                                        Intrinsics.checkNotNull(f6);
+                                        objectRef3.element = transform3.copy((447 & 1) != 0 ? transform3.location : null, (447 & 2) != 0 ? transform3.pivot : null, (447 & 4) != 0 ? transform3.scale : null, (447 & 8) != 0 ? transform3.orientation : 0.0f, (447 & 16) != 0 ? transform3.size : 0.0f, (447 & 32) != 0 ? transform3.rotation : 0.0f, (447 & 64) != 0 ? transform3.opacity : f6.floatValue(), (447 & 128) != 0 ? transform3.skew : null, (447 & 256) != 0 ? transform3.parentTransform : null);
+                                        z4 = true;
+                                    }
+                                } else {
+                                    z4 = false;
+                                }
+                                if (v8ValueObject.has("transform")) {
+                                    V8Value v8Value = v8ValueObject.get("transform");
+                                    try {
+                                        V8ValueObject v8ValueObject2 = (V8ValueObject) v8Value;
+                                        if (v8ValueObject2.has("location")) {
+                                            V8Value v8Value2 = v8ValueObject2.get("location");
+                                            try {
+                                                V8ValueObject v8ValueObject3 = (V8ValueObject) v8Value2;
+                                                if (v8ValueObject3.has("x") && v8ValueObject3.has("y") && v8ValueObject3.has("z")) {
+                                                    Float f7 = v8ValueObject3.getFloat("x");
+                                                    Float f8 = v8ValueObject3.getFloat("y");
+                                                    Float f9 = v8ValueObject3.getFloat("z");
+                                                    if (!Intrinsics.areEqual(f7, ((Transform) objectRef3.element).getLocation().getX()) || !Intrinsics.areEqual(f8, ((Transform) objectRef3.element).getLocation().getY()) || !Intrinsics.areEqual(f9, ((Transform) objectRef3.element).getLocation().getZ())) {
+                                                        Transform transform4 = (Transform) objectRef3.element;
+                                                        Intrinsics.checkNotNull(f7);
+                                                        float fFloatValue = f7.floatValue();
+                                                        Intrinsics.checkNotNull(f8);
+                                                        float fFloatValue2 = f8.floatValue();
+                                                        Intrinsics.checkNotNull(f9);
+                                                        objectRef3.element = transform4.copy((447 & 1) != 0 ? transform4.location : new Vector3D(fFloatValue, fFloatValue2, f9.floatValue()), (447 & 2) != 0 ? transform4.pivot : null, (447 & 4) != 0 ? transform4.scale : null, (447 & 8) != 0 ? transform4.orientation : 0.0f, (447 & 16) != 0 ? transform4.size : 0.0f, (447 & 32) != 0 ? transform4.rotation : 0.0f, (447 & 64) != 0 ? transform4.opacity : 0.0f, (447 & 128) != 0 ? transform4.skew : null, (447 & 256) != 0 ? transform4.parentTransform : null);
+                                                        z4 = true;
+                                                    }
+                                                } else if (v8ValueObject3.has("x") && v8ValueObject3.has("y")) {
+                                                    Float f10 = v8ValueObject3.getFloat("x");
+                                                    Float f11 = v8ValueObject3.getFloat("y");
+                                                    if (!Intrinsics.areEqual(f10, ((Transform) objectRef3.element).getLocation().getX()) || !Intrinsics.areEqual(f11, ((Transform) objectRef3.element).getLocation().getY())) {
+                                                        Transform transform5 = (Transform) objectRef3.element;
+                                                        Intrinsics.checkNotNull(f10);
+                                                        float fFloatValue3 = f10.floatValue();
+                                                        Intrinsics.checkNotNull(f11);
+                                                        objectRef3.element = transform5.copy((447 & 1) != 0 ? transform5.location : new Vector3D(fFloatValue3, f11.floatValue(), ((Transform) objectRef3.element).getLocation().getZ()), (447 & 2) != 0 ? transform5.pivot : null, (447 & 4) != 0 ? transform5.scale : null, (447 & 8) != 0 ? transform5.orientation : 0.0f, (447 & 16) != 0 ? transform5.size : 0.0f, (447 & 32) != 0 ? transform5.rotation : 0.0f, (447 & 64) != 0 ? transform5.opacity : 0.0f, (447 & 128) != 0 ? transform5.skew : null, (447 & 256) != 0 ? transform5.parentTransform : null);
+                                                        z4 = true;
+                                                    }
+                                                }
+                                                Unit unit = Unit.INSTANCE;
+                                                AutoCloseableKt.closeFinally(v8Value2, null);
+                                            } catch (Throwable th) {
+                                                try {
+                                                    throw th;
+                                                } catch (Throwable th2) {
+                                                    AutoCloseableKt.closeFinally(v8Value2, th);
+                                                    throw th2;
+                                                }
+                                            }
+                                        }
+                                        if (v8ValueObject2.has("scale")) {
+                                            V8Value v8Value3 = v8ValueObject2.get("scale");
+                                            try {
+                                                V8ValueObject v8ValueObject4 = (V8ValueObject) v8Value3;
+                                                if (v8ValueObject4.has("x") && v8ValueObject4.has("y")) {
+                                                    Float f12 = v8ValueObject4.getFloat("x");
+                                                    Float f13 = v8ValueObject4.getFloat("y");
+                                                    if (!Intrinsics.areEqual(f12, ((Transform) objectRef3.element).getScale().getX()) || !Intrinsics.areEqual(f13, ((Transform) objectRef3.element).getScale().getY())) {
+                                                        Transform transform6 = (Transform) objectRef3.element;
+                                                        Intrinsics.checkNotNull(f12);
+                                                        float fFloatValue4 = f12.floatValue();
+                                                        Intrinsics.checkNotNull(f13);
+                                                        objectRef3.element = transform6.copy((447 & 1) != 0 ? transform6.location : null, (447 & 2) != 0 ? transform6.pivot : null, (447 & 4) != 0 ? transform6.scale : new Vector2D(fFloatValue4, f13.floatValue()), (447 & 8) != 0 ? transform6.orientation : 0.0f, (447 & 16) != 0 ? transform6.size : 0.0f, (447 & 32) != 0 ? transform6.rotation : 0.0f, (447 & 64) != 0 ? transform6.opacity : 0.0f, (447 & 128) != 0 ? transform6.skew : null, (447 & 256) != 0 ? transform6.parentTransform : null);
+                                                        z4 = true;
+                                                    }
+                                                }
+                                                Unit unit2 = Unit.INSTANCE;
+                                                AutoCloseableKt.closeFinally(v8Value3, null);
+                                            } catch (Throwable th3) {
+                                                try {
+                                                    throw th3;
+                                                } catch (Throwable th4) {
+                                                    AutoCloseableKt.closeFinally(v8Value3, th3);
+                                                    throw th4;
+                                                }
+                                            }
+                                        }
+                                        if (v8ValueObject2.has("angle")) {
+                                            Float f14 = v8ValueObject2.getFloat("angle");
+                                            if (Intrinsics.areEqual(f14, ((Transform) objectRef3.element).getRotation())) {
+                                                z5 = z4;
+                                            } else {
+                                                Transform transform7 = (Transform) objectRef3.element;
+                                                Intrinsics.checkNotNull(f14);
+                                                objectRef3.element = transform7.copy((447 & 1) != 0 ? transform7.location : null, (447 & 2) != 0 ? transform7.pivot : null, (447 & 4) != 0 ? transform7.scale : null, (447 & 8) != 0 ? transform7.orientation : 0.0f, (447 & 16) != 0 ? transform7.size : 0.0f, (447 & 32) != 0 ? transform7.rotation : f14.floatValue(), (447 & 64) != 0 ? transform7.opacity : 0.0f, (447 & 128) != 0 ? transform7.skew : null, (447 & 256) != 0 ? transform7.parentTransform : null);
+                                                z5 = true;
+                                            }
+                                        } else {
+                                            z5 = z4;
+                                        }
+                                        Unit unit3 = Unit.INSTANCE;
+                                        AutoCloseableKt.closeFinally(v8Value, null);
+                                        z4 = z5;
+                                    } catch (Throwable th5) {
+                                        try {
+                                            throw th5;
+                                        } catch (Throwable th6) {
+                                            AutoCloseableKt.closeFinally(v8Value, th5);
+                                            throw th6;
+                                        }
+                                    }
+                                }
+                                if (z4) {
+                                    SceneElement sceneElement4 = objectRef5.element;
+                                    objectRef5.element = sceneElement4.copy(((-65) & 1) != 0 ? sceneElement4.type : null, ((-65) & 2) != 0 ? sceneElement4.startTime : 0, ((-65) & 4) != 0 ? sceneElement4.endTime : 0, ((-65) & 8) != 0 ? sceneElement4.id : 0L, ((-65) & 16) != 0 ? sceneElement4.engineState : null, ((-65) & 32) != 0 ? sceneElement4.label : null, ((-65) & 64) != 0 ? sceneElement4.transform : TransformKt.asKeyable((Transform) objectRef3.element), ((-65) & 128) != 0 ? sceneElement4.fillColor : null, ((-65) & 256) != 0 ? sceneElement4.fillImage : null, ((-65) & ConstantsKt.MINIMUM_BLOCK_SIZE) != 0 ? sceneElement4.fillVideo : null, ((-65) & 1024) != 0 ? sceneElement4.fillGradient : null, ((-65) & 2048) != 0 ? sceneElement4.fillType : null, ((-65) & 4096) != 0 ? sceneElement4.mediaFillMode : null, ((-65) & ConstantsKt.DEFAULT_BUFFER_SIZE) != 0 ? sceneElement4.outline : null, ((-65) & 16384) != 0 ? sceneElement4.src : null, ((-65) & 32768) != 0 ? sceneElement4.speedMap : null, ((-65) & 65536) != 0 ? sceneElement4.liveShape : null, ((-65) & 131072) != 0 ? sceneElement4.inTime : 0, ((-65) & 262144) != 0 ? sceneElement4.outTime : 0, ((-65) & 524288) != 0 ? sceneElement4.loop : false, ((-65) & 1048576) != 0 ? sceneElement4.gain : null, ((-65) & 2097152) != 0 ? sceneElement4.text : null, ((-65) & 4194304) != 0 ? sceneElement4.blendingMode : null, ((-65) & 8388608) != 0 ? sceneElement4.nestedScene : null, ((-65) & 16777216) != 0 ? sceneElement4.linkedSceneUUID : null, ((-65) & 33554432) != 0 ? sceneElement4.visualEffects : null, ((-65) & 67108864) != 0 ? sceneElement4.visualEffectOrder : null, ((-65) & 134217728) != 0 ? sceneElement4.tag : null, ((-65) & 268435456) != 0 ? sceneElement4.drawing : null, ((-65) & 536870912) != 0 ? sceneElement4.userElementParamValues : null, ((-65) & 1073741824) != 0 ? sceneElement4.stroke : null, ((-65) & IntCompanionObject.MIN_VALUE) != 0 ? sceneElement4.borders : null, (127 & 1) != 0 ? sceneElement4.dropShadow : null, (127 & 2) != 0 ? sceneElement4.hidden : false, (127 & 4) != 0 ? sceneElement4.cameraProperties : null, (127 & 8) != 0 ? sceneElement4.parent : null, (127 & 16) != 0 ? sceneElement4.clippingMask : false, (127 & 32) != 0 ? sceneElement4.templatePPId : null, (127 & 64) != 0 ? sceneElement4.presetId : null);
+                                }
+                                if (v8ValueObject.has("fillColor")) {
+                                    V8Value v8Value4 = v8ValueObject.get("fillColor");
+                                    try {
+                                        V8ValueObject v8ValueObject5 = (V8ValueObject) v8Value4;
+                                        Intrinsics.checkNotNull(v8ValueObject5);
+                                        SolidColor solidColorBG = Bb.bG(v8ValueObject5);
+                                        if (!Intrinsics.areEqual(solidColorBG, solidColor)) {
+                                            SceneElement sceneElement5 = objectRef5.element;
+                                            objectRef5.element = sceneElement5.copy(((-65) & 1) != 0 ? sceneElement5.type : null, ((-65) & 2) != 0 ? sceneElement5.startTime : 0, ((-65) & 4) != 0 ? sceneElement5.endTime : 0, ((-65) & 8) != 0 ? sceneElement5.id : 0L, ((-65) & 16) != 0 ? sceneElement5.engineState : null, ((-65) & 32) != 0 ? sceneElement5.label : null, ((-65) & 64) != 0 ? sceneElement5.transform : null, ((-65) & 128) != 0 ? sceneElement5.fillColor : KeyableKt.keyable(solidColorBG), ((-65) & 256) != 0 ? sceneElement5.fillImage : null, ((-65) & ConstantsKt.MINIMUM_BLOCK_SIZE) != 0 ? sceneElement5.fillVideo : null, ((-65) & 1024) != 0 ? sceneElement5.fillGradient : null, ((-65) & 2048) != 0 ? sceneElement5.fillType : null, ((-65) & 4096) != 0 ? sceneElement5.mediaFillMode : null, ((-65) & ConstantsKt.DEFAULT_BUFFER_SIZE) != 0 ? sceneElement5.outline : null, ((-65) & 16384) != 0 ? sceneElement5.src : null, ((-65) & 32768) != 0 ? sceneElement5.speedMap : null, ((-65) & 65536) != 0 ? sceneElement5.liveShape : null, ((-65) & 131072) != 0 ? sceneElement5.inTime : 0, ((-65) & 262144) != 0 ? sceneElement5.outTime : 0, ((-65) & 524288) != 0 ? sceneElement5.loop : false, ((-65) & 1048576) != 0 ? sceneElement5.gain : null, ((-65) & 2097152) != 0 ? sceneElement5.text : null, ((-65) & 4194304) != 0 ? sceneElement5.blendingMode : null, ((-65) & 8388608) != 0 ? sceneElement5.nestedScene : null, ((-65) & 16777216) != 0 ? sceneElement5.linkedSceneUUID : null, ((-65) & 33554432) != 0 ? sceneElement5.visualEffects : null, ((-65) & 67108864) != 0 ? sceneElement5.visualEffectOrder : null, ((-65) & 134217728) != 0 ? sceneElement5.tag : null, ((-65) & 268435456) != 0 ? sceneElement5.drawing : null, ((-65) & 536870912) != 0 ? sceneElement5.userElementParamValues : null, ((-65) & 1073741824) != 0 ? sceneElement5.stroke : null, ((-65) & IntCompanionObject.MIN_VALUE) != 0 ? sceneElement5.borders : null, (127 & 1) != 0 ? sceneElement5.dropShadow : null, (127 & 2) != 0 ? sceneElement5.hidden : false, (127 & 4) != 0 ? sceneElement5.cameraProperties : null, (127 & 8) != 0 ? sceneElement5.parent : null, (127 & 16) != 0 ? sceneElement5.clippingMask : false, (127 & 32) != 0 ? sceneElement5.templatePPId : null, (127 & 64) != 0 ? sceneElement5.presetId : null);
+                                        }
+                                        Unit unit4 = Unit.INSTANCE;
+                                        AutoCloseableKt.closeFinally(v8Value4, null);
+                                    } catch (Throwable th7) {
+                                        try {
+                                            throw th7;
+                                        } catch (Throwable th8) {
+                                            AutoCloseableKt.closeFinally(v8Value4, th7);
+                                            throw th8;
+                                        }
+                                    }
+                                }
+                                if (v8ValueObject.has("text")) {
+                                    String string = v8ValueObject.getString("text");
+                                    if (!Intrinsics.areEqual(string, objectRef5.element.getText().getText())) {
+                                        SceneElement sceneElement6 = objectRef5.element;
+                                        SceneElement sceneElement7 = sceneElement6;
+                                        StyledText text = sceneElement6.getText();
+                                        Intrinsics.checkNotNull(string);
+                                        objectRef5.element = sceneElement7.copy(((-65) & 1) != 0 ? sceneElement7.type : null, ((-65) & 2) != 0 ? sceneElement7.startTime : 0, ((-65) & 4) != 0 ? sceneElement7.endTime : 0, ((-65) & 8) != 0 ? sceneElement7.id : 0L, ((-65) & 16) != 0 ? sceneElement7.engineState : null, ((-65) & 32) != 0 ? sceneElement7.label : null, ((-65) & 64) != 0 ? sceneElement7.transform : null, ((-65) & 128) != 0 ? sceneElement7.fillColor : null, ((-65) & 256) != 0 ? sceneElement7.fillImage : null, ((-65) & ConstantsKt.MINIMUM_BLOCK_SIZE) != 0 ? sceneElement7.fillVideo : null, ((-65) & 1024) != 0 ? sceneElement7.fillGradient : null, ((-65) & 2048) != 0 ? sceneElement7.fillType : null, ((-65) & 4096) != 0 ? sceneElement7.mediaFillMode : null, ((-65) & ConstantsKt.DEFAULT_BUFFER_SIZE) != 0 ? sceneElement7.outline : null, ((-65) & 16384) != 0 ? sceneElement7.src : null, ((-65) & 32768) != 0 ? sceneElement7.speedMap : null, ((-65) & 65536) != 0 ? sceneElement7.liveShape : null, ((-65) & 131072) != 0 ? sceneElement7.inTime : 0, ((-65) & 262144) != 0 ? sceneElement7.outTime : 0, ((-65) & 524288) != 0 ? sceneElement7.loop : false, ((-65) & 1048576) != 0 ? sceneElement7.gain : null, ((-65) & 2097152) != 0 ? sceneElement7.text : StyledText.copy$default(text, string, 0.0f, null, 0, null, 30, null), ((-65) & 4194304) != 0 ? sceneElement7.blendingMode : null, ((-65) & 8388608) != 0 ? sceneElement7.nestedScene : null, ((-65) & 16777216) != 0 ? sceneElement7.linkedSceneUUID : null, ((-65) & 33554432) != 0 ? sceneElement7.visualEffects : null, ((-65) & 67108864) != 0 ? sceneElement7.visualEffectOrder : null, ((-65) & 134217728) != 0 ? sceneElement7.tag : null, ((-65) & 268435456) != 0 ? sceneElement7.drawing : null, ((-65) & 536870912) != 0 ? sceneElement7.userElementParamValues : null, ((-65) & 1073741824) != 0 ? sceneElement7.stroke : null, ((-65) & IntCompanionObject.MIN_VALUE) != 0 ? sceneElement7.borders : null, (127 & 1) != 0 ? sceneElement7.dropShadow : null, (127 & 2) != 0 ? sceneElement7.hidden : false, (127 & 4) != 0 ? sceneElement7.cameraProperties : null, (127 & 8) != 0 ? sceneElement7.parent : null, (127 & 16) != 0 ? sceneElement7.clippingMask : false, (127 & 32) != 0 ? sceneElement7.templatePPId : null, (127 & 64) != 0 ? sceneElement7.presetId : null);
+                                    }
+                                }
+                                if (v8ValueObject.has("shaderGroups")) {
+                                    V8Value v8Value5 = v8ValueObject.get("shaderGroups");
+                                    try {
+                                        V8ValueArray v8ValueArray = (V8ValueArray) v8Value5;
+                                        IntRange intRangeUntil = RangesKt___RangesKt.until(0, v8ValueArray.getLength());
+                                        ArrayList arrayList = new ArrayList(CollectionsKt__IterablesKt.collectionSizeOrDefault(intRangeUntil, 10));
+                                        Iterator<Integer> it3 = intRangeUntil.iterator();
+                                        while (it3.hasNext()) {
+                                            arrayList.add(v8ValueArray.getInteger(Integer.valueOf(((IntIterator) it3).nextInt())));
+                                        }
+                                        AutoCloseableKt.closeFinally(v8Value5, null);
+                                        Set setMinus = SetsKt___SetsKt.minus(set, (Iterable) CollectionsKt___CollectionsKt.toSet(arrayList));
+                                        KeyableVisualEffectRef keyableVisualEffectRef4 = objectRef5.element.getVisualEffects().get(Long.valueOf(keyableVisualEffectRef3.getInstanceId()));
+                                        if (!Intrinsics.areEqual(setMinus, keyableVisualEffectRef4 != null ? keyableVisualEffectRef4.getDisabledRenderGroups() : null)) {
+                                            KeyableVisualEffectRef keyableVisualEffectRef5 = objectRef5.element.getVisualEffects().get(Long.valueOf(keyableVisualEffectRef3.getInstanceId()));
+                                            Intrinsics.checkNotNull(keyableVisualEffectRef5);
+                                            KeyableVisualEffectRef keyableVisualEffectRef6 = keyableVisualEffectRef5;
+                                            KeyableVisualEffectRef keyableVisualEffectRefCopy = keyableVisualEffectRef6.copy((63 & 1) != 0 ? keyableVisualEffectRef6.id : null, (63 & 2) != 0 ? keyableVisualEffectRef6.instanceId : 0L, (63 & 4) != 0 ? keyableVisualEffectRef6.parameters : null, (63 & 8) != 0 ? keyableVisualEffectRef6.renderGroup : 0, (63 & 16) != 0 ? keyableVisualEffectRef6.hidden : false, (63 & 32) != 0 ? keyableVisualEffectRef6.locallyApplied : false, (63 & 64) != 0 ? keyableVisualEffectRef6.disabledRenderGroups : setMinus);
+                                            SceneElement sceneElement8 = objectRef5.element;
+                                            SceneElement sceneElement9 = sceneElement8;
+                                            objectRef5.element = sceneElement9.copy(((-65) & 1) != 0 ? sceneElement9.type : null, ((-65) & 2) != 0 ? sceneElement9.startTime : 0, ((-65) & 4) != 0 ? sceneElement9.endTime : 0, ((-65) & 8) != 0 ? sceneElement9.id : 0L, ((-65) & 16) != 0 ? sceneElement9.engineState : null, ((-65) & 32) != 0 ? sceneElement9.label : null, ((-65) & 64) != 0 ? sceneElement9.transform : null, ((-65) & 128) != 0 ? sceneElement9.fillColor : null, ((-65) & 256) != 0 ? sceneElement9.fillImage : null, ((-65) & ConstantsKt.MINIMUM_BLOCK_SIZE) != 0 ? sceneElement9.fillVideo : null, ((-65) & 1024) != 0 ? sceneElement9.fillGradient : null, ((-65) & 2048) != 0 ? sceneElement9.fillType : null, ((-65) & 4096) != 0 ? sceneElement9.mediaFillMode : null, ((-65) & ConstantsKt.DEFAULT_BUFFER_SIZE) != 0 ? sceneElement9.outline : null, ((-65) & 16384) != 0 ? sceneElement9.src : null, ((-65) & 32768) != 0 ? sceneElement9.speedMap : null, ((-65) & 65536) != 0 ? sceneElement9.liveShape : null, ((-65) & 131072) != 0 ? sceneElement9.inTime : 0, ((-65) & 262144) != 0 ? sceneElement9.outTime : 0, ((-65) & 524288) != 0 ? sceneElement9.loop : false, ((-65) & 1048576) != 0 ? sceneElement9.gain : null, ((-65) & 2097152) != 0 ? sceneElement9.text : null, ((-65) & 4194304) != 0 ? sceneElement9.blendingMode : null, ((-65) & 8388608) != 0 ? sceneElement9.nestedScene : null, ((-65) & 16777216) != 0 ? sceneElement9.linkedSceneUUID : null, ((-65) & 33554432) != 0 ? sceneElement9.visualEffects : MapsKt__MapsKt.plus(sceneElement8.getVisualEffects(), TuplesKt.to(Long.valueOf(keyableVisualEffectRef3.getInstanceId()), keyableVisualEffectRefCopy)), ((-65) & 67108864) != 0 ? sceneElement9.visualEffectOrder : null, ((-65) & 134217728) != 0 ? sceneElement9.tag : null, ((-65) & 268435456) != 0 ? sceneElement9.drawing : null, ((-65) & 536870912) != 0 ? sceneElement9.userElementParamValues : null, ((-65) & 1073741824) != 0 ? sceneElement9.stroke : null, ((-65) & IntCompanionObject.MIN_VALUE) != 0 ? sceneElement9.borders : null, (127 & 1) != 0 ? sceneElement9.dropShadow : null, (127 & 2) != 0 ? sceneElement9.hidden : false, (127 & 4) != 0 ? sceneElement9.cameraProperties : null, (127 & 8) != 0 ? sceneElement9.parent : null, (127 & 16) != 0 ? sceneElement9.clippingMask : false, (127 & 32) != 0 ? sceneElement9.templatePPId : null, (127 & 64) != 0 ? sceneElement9.presetId : null);
+                                        }
+                                    } catch (Throwable th9) {
+                                        try {
+                                            throw th9;
+                                        } catch (Throwable th10) {
+                                            AutoCloseableKt.closeFinally(v8Value5, th9);
+                                            throw th10;
+                                        }
+                                    }
+                                }
+                                Unit unit5 = Unit.INSTANCE;
+                                AutoCloseableKt.closeFinally(v8ValueInvoke, null);
+                            } catch (Throwable th11) {
+                                try {
+                                    throw th11;
+                                } catch (Throwable th12) {
+                                    AutoCloseableKt.closeFinally(v8ValueInvoke, th11);
+                                    throw th12;
+                                }
+                            }
+                        }
+                    }, 1, null);
+                } else {
+                    i5 = i6;
+                }
+            }
+            sceneElement2 = sceneElement;
+            i6 = i5;
+            i7 = i8;
+            scriptEnv = scriptEnv;
+            objectRef = objectRef;
+        }
+        return (SceneElement) objectRef.element;
+    }

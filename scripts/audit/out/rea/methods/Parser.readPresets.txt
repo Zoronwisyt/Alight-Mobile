@@ -1,0 +1,146 @@
+    /* JADX WARN: Failed to restore switch over string. Please report as a decompilation issue */
+    private static final List<EffectPreset> readPresets(XmlPullParser xmlPullParser, String str, String str2) throws XmlPullParserException, IOException, MalformedXMLException {
+        String str3;
+        int i2;
+        String str4;
+        EffectPresetTiming effectPresetTiming;
+        int i3 = 2;
+        xmlPullParser.require(2, str, "presets");
+        ArrayList arrayList = new ArrayList();
+        while (xmlPullParser.next() != 3) {
+            if (xmlPullParser.getEventType() == i3) {
+                int depth = xmlPullParser.getDepth();
+                String name = xmlPullParser.getName();
+                Intrinsics.checkNotNullExpressionValue(name, "getName(...)");
+                if (Intrinsics.areEqual(name, "preset")) {
+                    String attributeValue = xmlPullParser.getAttributeValue(str, "id");
+                    if (attributeValue == null) {
+                        throw new MalformedXMLException("<preset> element missing 'id' attribute", null, false, 6, null);
+                    }
+                    Intrinsics.checkNotNull(attributeValue);
+                    String attributeValue2 = xmlPullParser.getAttributeValue(str, "label");
+                    if (attributeValue2 == null) {
+                        str3 = attributeValue;
+                    } else {
+                        Intrinsics.checkNotNull(attributeValue2);
+                        str3 = attributeValue2;
+                    }
+                    String attributeValue3 = xmlPullParser.getAttributeValue(str, "timescale");
+                    if (attributeValue3 != null) {
+                        Intrinsics.checkNotNull(attributeValue3);
+                        i2 = Integer.parseInt(attributeValue3);
+                    } else {
+                        i2 = 0;
+                    }
+                    String attributeValue4 = xmlPullParser.getAttributeValue(str, "short-code");
+                    if (attributeValue4 == null) {
+                        StringBuilder sb2 = new StringBuilder();
+                        int length = str3.length();
+                        for (int i4 = 0; i4 < length; i4++) {
+                            char cCharAt = str3.charAt(i4);
+                            if (Character.isUpperCase(cCharAt)) {
+                                sb2.append(cCharAt);
+                            }
+                        }
+                        String string = sb2.toString();
+                        Intrinsics.checkNotNullExpressionValue(string, "toString(...)");
+                        StringBuilder sb3 = new StringBuilder();
+                        int length2 = str3.length();
+                        for (int i5 = 0; i5 < length2; i5++) {
+                            char cCharAt2 = str3.charAt(i5);
+                            if (Character.isLetterOrDigit(cCharAt2)) {
+                                sb3.append(cCharAt2);
+                            }
+                        }
+                        String string2 = sb3.toString();
+                        Intrinsics.checkNotNullExpressionValue(string2, "toString(...)");
+                        String strTake = StringsKt___StringsKt.take(string + string2 + str3 + attributeValue, 3);
+                        Locale ROOT = Locale.ROOT;
+                        Intrinsics.checkNotNullExpressionValue(ROOT, "ROOT");
+                        String upperCase = strTake.toUpperCase(ROOT);
+                        Intrinsics.checkNotNullExpressionValue(upperCase, "toUpperCase(...)");
+                        str4 = upperCase;
+                    } else {
+                        str4 = attributeValue4;
+                    }
+                    String attributeValue5 = xmlPullParser.getAttributeValue(str, "timing");
+                    if (attributeValue5 != null) {
+                        switch (attributeValue5.hashCode()) {
+                            case -1881872635:
+                                if (!attributeValue5.equals("stretch")) {
+                                    throw new MalformedXMLException("Unrecognized preset timing '" + attributeValue5 + "' (must be 'stretch', 'extend', or 'extend-match'", null, false, 6, null);
+                                }
+                                effectPresetTiming = EffectPresetTiming.Stretch;
+                                break;
+                                break;
+                            case -1539739310:
+                                if (!attributeValue5.equals("extend-match")) {
+                                    throw new MalformedXMLException("Unrecognized preset timing '" + attributeValue5 + "' (must be 'stretch', 'extend', or 'extend-match'", null, false, 6, null);
+                                }
+                                effectPresetTiming = EffectPresetTiming.ExtendMatch;
+                                break;
+                                break;
+                            case -1289044198:
+                                if (!attributeValue5.equals("extend")) {
+                                    throw new MalformedXMLException("Unrecognized preset timing '" + attributeValue5 + "' (must be 'stretch', 'extend', or 'extend-match'", null, false, 6, null);
+                                }
+                                effectPresetTiming = EffectPresetTiming.Extend;
+                                break;
+                                break;
+                            case 100571:
+                                if (!attributeValue5.equals("end")) {
+                                    throw new MalformedXMLException("Unrecognized preset timing '" + attributeValue5 + "' (must be 'stretch', 'extend', or 'extend-match'", null, false, 6, null);
+                                }
+                                effectPresetTiming = EffectPresetTiming.End;
+                                break;
+                                break;
+                            case 109648666:
+                                if (!attributeValue5.equals(V8ValueBuiltInSymbol.PROPERTY_SPLIT)) {
+                                    throw new MalformedXMLException("Unrecognized preset timing '" + attributeValue5 + "' (must be 'stretch', 'extend', or 'extend-match'", null, false, 6, null);
+                                }
+                                effectPresetTiming = EffectPresetTiming.Split;
+                                break;
+                                break;
+                            case 109757538:
+                                if (!attributeValue5.equals("start")) {
+                                    throw new MalformedXMLException("Unrecognized preset timing '" + attributeValue5 + "' (must be 'stretch', 'extend', or 'extend-match'", null, false, 6, null);
+                                }
+                                effectPresetTiming = EffectPresetTiming.Start;
+                                break;
+                                break;
+                            default:
+                                throw new MalformedXMLException("Unrecognized preset timing '" + attributeValue5 + "' (must be 'stretch', 'extend', or 'extend-match'", null, false, 6, null);
+                        }
+                    } else {
+                        effectPresetTiming = EffectPresetTiming.Stretch;
+                    }
+                    EffectPresetTiming effectPresetTiming2 = effectPresetTiming;
+                    LinkedHashMap linkedHashMap = new LinkedHashMap();
+                    while (xmlPullParser.next() != 3) {
+                        if (xmlPullParser.getEventType() == 2) {
+                            int depth2 = xmlPullParser.getDepth();
+                            String name2 = xmlPullParser.getName();
+                            Intrinsics.checkNotNullExpressionValue(name2, "getName(...)");
+                            if (Intrinsics.areEqual(name2, "property")) {
+                                Pair<String, KeyableUserParameterValue> pairUnserializeUserParameterValue = UserParameterKt.unserializeUserParameterValue(str, xmlPullParser, false);
+                                linkedHashMap.put(pairUnserializeUserParameterValue.component1(), pairUnserializeUserParameterValue.component2());
+                            } else {
+                                pN.Xu(xmlPullParser);
+                            }
+                            if (xmlPullParser.getEventType() != 3 || xmlPullParser.getDepth() != depth2) {
+                                throw new IllegalStateException("Did not consume all tag contents");
+                            }
+                        }
+                    }
+                    arrayList.add(new EffectPreset(attributeValue, str3, str4, i2, effectPresetTiming2, linkedHashMap, str2, null, null, 384, null));
+                } else {
+                    pN.Xu(xmlPullParser);
+                }
+                if (xmlPullParser.getEventType() != 3 || xmlPullParser.getDepth() != depth) {
+                    throw new IllegalStateException("Did not consume all tag contents");
+                }
+                i3 = 2;
+            }
+        }
+        return arrayList;
+    }

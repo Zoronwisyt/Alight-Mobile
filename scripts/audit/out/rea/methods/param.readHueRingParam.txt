@@ -1,0 +1,21 @@
+    private static final UserParameter.HueRing readHueRingParam(XmlPullParser xmlPullParser, String str) throws XmlPullParserException, IOException, MalformedXMLException {
+        Float floatOrNull;
+        xmlPullParser.require(2, str, "hue-ring");
+        String attributeValue = xmlPullParser.getAttributeValue(str, "id");
+        if (attributeValue == null) {
+            throw new MalformedXMLException("element missing 'id' attribute", null, false, 6, null);
+        }
+        String attributeValue2 = xmlPullParser.getAttributeValue(str, "enabled");
+        if (attributeValue2 == null) {
+            attributeValue2 = "true";
+        }
+        boolean zRw = mY0.Rw(attributeValue2);
+        String attributeValue3 = xmlPullParser.getAttributeValue(str, JavetLibLoadingListener.JAVET_LIB_LOADING_TYPE_DEFAULT);
+        float fFloatValue = (attributeValue3 == null || (floatOrNull = StringsKt__StringNumberConversionsJVMKt.toFloatOrNull(attributeValue3)) == null) ? 0.0f : floatOrNull.floatValue();
+        String attributeValue4 = xmlPullParser.getAttributeValue(str, "label");
+        if (attributeValue4 == null) {
+            attributeValue4 = "";
+        }
+        pN.Xu(xmlPullParser);
+        return new UserParameter.HueRing(attributeValue, attributeValue4, zRw, fFloatValue);
+    }

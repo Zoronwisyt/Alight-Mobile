@@ -1,0 +1,20 @@
+    public static final VisualEffect visualEffectFromXml(String effectXml, Uri uri, Bb iapManager) throws IOException, MalformedXMLException {
+        Intrinsics.checkNotNullParameter(effectXml, "effectXml");
+        Intrinsics.checkNotNullParameter(uri, "uri");
+        Intrinsics.checkNotNullParameter(iapManager, "iapManager");
+        XmlPullParser xmlPullParserNewPullParser = Xml.newPullParser();
+        try {
+            xmlPullParserNewPullParser.setFeature("http://xmlpull.org/v1/doc/features.html#process-namespaces", true);
+            xmlPullParserNewPullParser.setInput(new StringReader(effectXml));
+            xmlPullParserNewPullParser.nextTag();
+            Intrinsics.checkNotNull(xmlPullParserNewPullParser);
+            return readEffect(xmlPullParserNewPullParser, null, uri, iapManager);
+        } catch (MalformedXMLException e3) {
+            if (e3.getHasPositionInfo()) {
+                throw e3;
+            }
+            throw new MalformedXMLException("Malformed Scene: " + xmlPullParserNewPullParser.getPositionDescription(), e3, true);
+        } catch (XmlPullParserException e4) {
+            throw new MalformedXMLException("Malformed XML: " + xmlPullParserNewPullParser.getPositionDescription(), e4, true);
+        }
+    }

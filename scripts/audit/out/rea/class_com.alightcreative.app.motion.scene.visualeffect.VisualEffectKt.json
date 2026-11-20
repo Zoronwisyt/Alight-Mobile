@@ -1,0 +1,386 @@
+{
+  "engine": {
+    "name": "jadx-headless-mcp",
+    "version": "0.7.1",
+    "artifact_sha256": "6e5eacf500b64292bfb73c49797c1958f6ee44646e43e868039ae7feb573ff75",
+    "source_revision": "5844800a486d2248fa949b74c9896285f5b54de2",
+    "worker_count": 1,
+    "heap_limit_mib": 8192
+  },
+  "class_name": "com.alightcreative.app.motion.scene.visualeffect.VisualEffectKt",
+  "methods": [
+    {
+      "name": "<clinit>",
+      "reported_signature": "<clinit>(): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()V"
+    },
+    {
+      "name": "access$adjustForTiming$toLayerFraction",
+      "reported_signature": "access$adjustForTiming$toLayerFraction(int, int, float): float",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(IIF)F"
+    },
+    {
+      "name": "access$adjustForTiming$toPresetMillis",
+      "reported_signature": "access$adjustForTiming$toPresetMillis(float, int): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(FI)I"
+    },
+    {
+      "name": "access$getLoadedVisualEffectPresets$p",
+      "reported_signature": "access$getLoadedVisualEffectPresets$p(): java.util.Map",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/util/Map;"
+    },
+    {
+      "name": "access$getLoadedVisualEffects$p",
+      "reported_signature": "access$getLoadedVisualEffects$p(): java.util.Map",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/util/Map;"
+    },
+    {
+      "name": "access$getVisualEffectPresetsInitState$p",
+      "reported_signature": "access$getVisualEffectPresetsInitState$p(): java.util.concurrent.atomic.AtomicBoolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/util/concurrent/atomic/AtomicBoolean;"
+    },
+    {
+      "name": "access$getVisualEffectPresetsLoaded$p",
+      "reported_signature": "access$getVisualEffectPresetsLoaded$p(): java.util.concurrent.CountDownLatch",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/util/concurrent/CountDownLatch;"
+    },
+    {
+      "name": "access$getVisualEffectsInitState$p",
+      "reported_signature": "access$getVisualEffectsInitState$p(): java.util.concurrent.atomic.AtomicBoolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/util/concurrent/atomic/AtomicBoolean;"
+    },
+    {
+      "name": "access$getVisualEffectsLoaded$p",
+      "reported_signature": "access$getVisualEffectsLoaded$p(): java.util.concurrent.CountDownLatch",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/util/concurrent/CountDownLatch;"
+    },
+    {
+      "name": "access$loadVisualEffectPresets",
+      "reported_signature": "access$loadVisualEffectPresets(android.content.Context, java.lang.String): java.util.List",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Landroid/content/Context;Ljava/lang/String;)Ljava/util/List;"
+    },
+    {
+      "name": "access$loadVisualEffectPresets$lambda$35$updateCodes",
+      "reported_signature": "access$loadVisualEffectPresets$lambda$35$updateCodes(java.util.List): java.util.List",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Ljava/util/List;)Ljava/util/List;"
+    },
+    {
+      "name": "access$loadVisualEffects",
+      "reported_signature": "access$loadVisualEffects(android.content.Context, java.lang.String, Qaq.Bb): java.util.List",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Landroid/content/Context;Ljava/lang/String;LQaq/Bb;)Ljava/util/List;"
+    },
+    {
+      "name": "adjustForTiming",
+      "reported_signature": "adjustForTiming(com.alightcreative.app.motion.scene.userparam.KeyableUserParameterValue, com.alightcreative.app.motion.scene.visualeffect.EffectPresetTiming, int, int): com.alightcreative.app.motion.scene.userparam.KeyableUserParameterValue",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/userparam/KeyableUserParameterValue;Lcom/alightcreative/app/motion/scene/visualeffect/EffectPresetTiming;II)Lcom/alightcreative/app/motion/scene/userparam/KeyableUserParameterValue;"
+    },
+    {
+      "name": "adjustForTiming",
+      "reported_signature": "adjustForTiming(java.util.Map<java.lang.String, com.alightcreative.app.motion.scene.userparam.KeyableUserParameterValue>, com.alightcreative.app.motion.scene.visualeffect.EffectPresetTiming, int, int): java.util.Map<java.lang.String, com.alightcreative.app.motion.scene.userparam.KeyableUserParameterValue>",
+      "overload_index": 1,
+      "is_constructor": false,
+      "dex_descriptor": "(Ljava/util/Map;Lcom/alightcreative/app/motion/scene/visualeffect/EffectPresetTiming;II)Ljava/util/Map;"
+    },
+    {
+      "name": "adjustForTiming$toLayerFraction",
+      "reported_signature": "adjustForTiming$toLayerFraction(int, int, float): float",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(IIF)F"
+    },
+    {
+      "name": "adjustForTiming$toPresetMillis",
+      "reported_signature": "adjustForTiming$toPresetMillis(float, int): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(FI)I"
+    },
+    {
+      "name": "affinityFor",
+      "reported_signature": "affinityFor(com.alightcreative.app.motion.scene.visualeffect.VisualEffect, java.util.Set<? extends com.alightcreative.app.motion.scene.visualeffect.EffectAffinity$Type>): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/visualeffect/VisualEffect;Ljava/util/Set;)I"
+    },
+    {
+      "name": "getAffinityTypes",
+      "reported_signature": "getAffinityTypes(com.alightcreative.app.motion.scene.SceneElement): java.util.Set<com.alightcreative.app.motion.scene.visualeffect.EffectAffinity$Type>",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/SceneElement;)Ljava/util/Set;"
+    },
+    {
+      "name": "getEffect",
+      "reported_signature": "getEffect(com.alightcreative.app.motion.scene.visualeffect.KeyableVisualEffectRef): com.alightcreative.app.motion.scene.visualeffect.VisualEffect",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/visualeffect/KeyableVisualEffectRef;)Lcom/alightcreative/app/motion/scene/visualeffect/VisualEffect;"
+    },
+    {
+      "name": "getEffect",
+      "reported_signature": "getEffect(com.alightcreative.app.motion.scene.visualeffect.VisualEffectRef): com.alightcreative.app.motion.scene.visualeffect.VisualEffect",
+      "overload_index": 1,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/visualeffect/VisualEffectRef;)Lcom/alightcreative/app/motion/scene/visualeffect/VisualEffect;"
+    },
+    {
+      "name": "getEffectSig",
+      "reported_signature": "getEffectSig(): java.lang.String",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/lang/String;"
+    },
+    {
+      "name": "getHasWarpEffects",
+      "reported_signature": "getHasWarpEffects(com.alightcreative.app.motion.scene.visualeffect.VisualEffect): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/visualeffect/VisualEffect;)Z"
+    },
+    {
+      "name": "getPresetLoadErrors",
+      "reported_signature": "getPresetLoadErrors(): java.util.List<java.lang.String>",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/util/List;"
+    },
+    {
+      "name": "getPresets",
+      "reported_signature": "getPresets(com.alightcreative.app.motion.scene.visualeffect.VisualEffect): java.util.List<com.alightcreative.app.motion.scene.visualeffect.EffectPreset>",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/visualeffect/VisualEffect;)Ljava/util/List;"
+    },
+    {
+      "name": "getVisualEffectPresets",
+      "reported_signature": "getVisualEffectPresets(java.lang.String): java.util.List<com.alightcreative.app.motion.scene.visualeffect.EffectPreset>",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Ljava/lang/String;)Ljava/util/List;"
+    },
+    {
+      "name": "getVisualEffects",
+      "reported_signature": "getVisualEffects(): java.util.List<com.alightcreative.app.motion.scene.visualeffect.VisualEffect>",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/util/List;"
+    },
+    {
+      "name": "getVisualEffects",
+      "reported_signature": "getVisualEffects(com.alightcreative.app.motion.scene.visualeffect.EffectType, com.alightcreative.app.motion.scene.visualeffect.EffectType[]): java.util.List<com.alightcreative.app.motion.scene.visualeffect.VisualEffect>",
+      "overload_index": 1,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/visualeffect/EffectType;[Lcom/alightcreative/app/motion/scene/visualeffect/EffectType;)Ljava/util/List;"
+    },
+    {
+      "name": "initVisualEffectPresets",
+      "reported_signature": "initVisualEffectPresets(android.content.Context, java.lang.String): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Landroid/content/Context;Ljava/lang/String;)V"
+    },
+    {
+      "name": "initVisualEffects",
+      "reported_signature": "initVisualEffects(android.content.Context, java.lang.String, Qaq.Bb): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Landroid/content/Context;Ljava/lang/String;LQaq/Bb;)V"
+    },
+    {
+      "name": "isNaturallyTimeDependent",
+      "reported_signature": "isNaturallyTimeDependent(com.alightcreative.app.motion.scene.visualeffect.VisualEffect): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/visualeffect/VisualEffect;)Z"
+    },
+    {
+      "name": "loadVisualEffectPresets",
+      "reported_signature": "loadVisualEffectPresets(android.content.Context, java.lang.String): java.util.List<com.alightcreative.app.motion.scene.visualeffect.EffectPreset>",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Landroid/content/Context;Ljava/lang/String;)Ljava/util/List;"
+    },
+    {
+      "name": "loadVisualEffectPresets$lambda$19$presetError",
+      "reported_signature": "loadVisualEffectPresets$lambda$19$presetError(java.lang.String, java.lang.String, java.util.List<java.lang.String>, java.lang.String): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Ljava/lang/String;Ljava/lang/String;Ljava/util/List;Ljava/lang/String;)V"
+    },
+    {
+      "name": "loadVisualEffectPresets$lambda$35$updateCodes",
+      "reported_signature": "loadVisualEffectPresets$lambda$35$updateCodes(java.util.List<com.alightcreative.app.motion.scene.visualeffect.PresetInfo>): java.util.List<com.alightcreative.app.motion.scene.visualeffect.PresetInfo>",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Ljava/util/List;)Ljava/util/List;"
+    },
+    {
+      "name": "loadVisualEffectPresets$toEnglishUCWords",
+      "reported_signature": "loadVisualEffectPresets$toEnglishUCWords(java.lang.String, android.content.Context, java.util.List<java.lang.String>): java.util.List<java.lang.String>",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Ljava/lang/String;Landroid/content/Context;Ljava/util/List;)Ljava/util/List;"
+    },
+    {
+      "name": "loadVisualEffects",
+      "reported_signature": "loadVisualEffects(android.content.Context, java.lang.String, Qaq.Bb): java.util.List<com.alightcreative.app.motion.scene.visualeffect.VisualEffect>",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Landroid/content/Context;Ljava/lang/String;LQaq/Bb;)Ljava/util/List;"
+    },
+    {
+      "name": "loadVisualEffects$fixTags",
+      "reported_signature": "loadVisualEffects$fixTags(com.alightcreative.app.motion.scene.visualeffect.VisualEffect): com.alightcreative.app.motion.scene.visualeffect.VisualEffect",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/visualeffect/VisualEffect;)Lcom/alightcreative/app/motion/scene/visualeffect/VisualEffect;"
+    },
+    {
+      "name": "nextEffectInstanceId",
+      "reported_signature": "nextEffectInstanceId(): long",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()J"
+    },
+    {
+      "name": "paramsAtTime",
+      "reported_signature": "paramsAtTime(com.alightcreative.app.motion.scene.visualeffect.KeyableVisualEffectRef, float, float): java.util.Map<java.lang.String, com.alightcreative.app.motion.scene.userparam.UserParameterValue>",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/visualeffect/KeyableVisualEffectRef;FF)Ljava/util/Map;"
+    },
+    {
+      "name": "serialize",
+      "reported_signature": "serialize(com.alightcreative.app.motion.scene.visualeffect.KeyableVisualEffectRef, java.lang.String, org.xmlpull.v1.XmlSerializer): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/visualeffect/KeyableVisualEffectRef;Ljava/lang/String;Lorg/xmlpull/v1/XmlSerializer;)V"
+    },
+    {
+      "name": "setEffectSig",
+      "reported_signature": "setEffectSig(java.lang.String): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Ljava/lang/String;)V"
+    },
+    {
+      "name": "unserializeVisualEffect",
+      "reported_signature": "unserializeVisualEffect(java.lang.String, org.xmlpull.v1.XmlPullParser, boolean): com.alightcreative.app.motion.scene.visualeffect.KeyableVisualEffectRef",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Ljava/lang/String;Lorg/xmlpull/v1/XmlPullParser;Z)Lcom/alightcreative/app/motion/scene/visualeffect/KeyableVisualEffectRef;"
+    },
+    {
+      "name": "valueAtTime",
+      "reported_signature": "valueAtTime(com.alightcreative.app.motion.scene.visualeffect.KeyableVisualEffectRef, float, float): com.alightcreative.app.motion.scene.visualeffect.VisualEffectRef",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/visualeffect/KeyableVisualEffectRef;FF)Lcom/alightcreative/app/motion/scene/visualeffect/VisualEffectRef;"
+    },
+    {
+      "name": "visualEffectById",
+      "reported_signature": "visualEffectById(java.lang.String): com.alightcreative.app.motion.scene.visualeffect.VisualEffect",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Ljava/lang/String;)Lcom/alightcreative/app/motion/scene/visualeffect/VisualEffect;"
+    }
+  ],
+  "fields": [
+    {
+      "name": "APP_STRING_PREFIX",
+      "reported_type": "java.lang.String",
+      "dex_static_value": {
+        "type": "string",
+        "value": "@am:string/"
+      }
+    },
+    {
+      "name": "effectParamsCache",
+      "reported_type": "android.util.LruCache<kotlin.Pair<com.alightcreative.app.motion.scene.visualeffect.KeyableVisualEffectRef, java.lang.Float>, java.util.Map<java.lang.String, com.alightcreative.app.motion.scene.userparam.UserParameterValue>>",
+      "dex_static_value": null
+    },
+    {
+      "name": "effectSig",
+      "reported_type": "java.lang.String",
+      "dex_static_value": null
+    },
+    {
+      "name": "loadedVisualEffectPresets",
+      "reported_type": "java.util.Map<java.lang.String, java.util.List<com.alightcreative.app.motion.scene.visualeffect.EffectPreset>>",
+      "dex_static_value": null
+    },
+    {
+      "name": "loadedVisualEffects",
+      "reported_type": "java.util.Map<java.lang.String, com.alightcreative.app.motion.scene.visualeffect.VisualEffect>",
+      "dex_static_value": null
+    },
+    {
+      "name": "nextEID",
+      "reported_type": "java.util.concurrent.atomic.AtomicLong",
+      "dex_static_value": null
+    },
+    {
+      "name": "presetLoadErrors",
+      "reported_type": "java.util.List<java.lang.String>",
+      "dex_static_value": null
+    },
+    {
+      "name": "visualEffectPresetsInitState",
+      "reported_type": "java.util.concurrent.atomic.AtomicBoolean",
+      "dex_static_value": null
+    },
+    {
+      "name": "visualEffectPresetsLoaded",
+      "reported_type": "java.util.concurrent.CountDownLatch",
+      "dex_static_value": null
+    },
+    {
+      "name": "visualEffectsInitState",
+      "reported_type": "java.util.concurrent.atomic.AtomicBoolean",
+      "dex_static_value": null
+    },
+    {
+      "name": "visualEffectsLoaded",
+      "reported_type": "java.util.concurrent.CountDownLatch",
+      "dex_static_value": null
+    }
+  ],
+  "inner_classes": [
+    "com.alightcreative.app.motion.scene.visualeffect.VisualEffectKt.WhenMappings",
+    "com.alightcreative.app.motion.scene.visualeffect.VisualEffectKt.AnonymousClass1",
+    "com.alightcreative.app.motion.scene.visualeffect.VisualEffectKt.AnonymousClass2",
+    "com.alightcreative.app.motion.scene.visualeffect.VisualEffectKt.AnonymousClass3",
+    "com.alightcreative.app.motion.scene.visualeffect.VisualEffectKt.AnonymousClass4",
+    "com.alightcreative.app.motion.scene.visualeffect.VisualEffectKt.AnonymousClass5",
+    "com.alightcreative.app.motion.scene.visualeffect.VisualEffectKt.AnonymousClass6",
+    "com.alightcreative.app.motion.scene.visualeffect.VisualEffectKt.AnonymousClass1",
+    "com.alightcreative.app.motion.scene.visualeffect.VisualEffectKt.AnonymousClass1",
+    "com.alightcreative.app.motion.scene.visualeffect.VisualEffectKt.AnonymousClass1"
+  ]
+}

@@ -1,0 +1,116 @@
+    private static final UserParameter.Selector readSelectorParam(XmlPullParser xmlPullParser, String str) throws XmlPullParserException, IOException, MalformedXMLException {
+        SelectorStyle selectorStyle;
+        String str2;
+        boolean z2;
+        int i2 = 2;
+        xmlPullParser.require(2, str, "selector");
+        String attributeValue = xmlPullParser.getAttributeValue(str, "id");
+        if (attributeValue == null) {
+            throw new MalformedXMLException("element missing 'id' attribute", null, false, 6, null);
+        }
+        String attributeValue2 = xmlPullParser.getAttributeValue(str, "enabled");
+        if (attributeValue2 == null) {
+            attributeValue2 = "true";
+        }
+        boolean zRw = mY0.Rw(attributeValue2);
+        String attributeValue3 = xmlPullParser.getAttributeValue(str, JavetLibLoadingListener.JAVET_LIB_LOADING_TYPE_DEFAULT);
+        SelectorStyle selectorStyle2 = null;
+        Integer intOrNull = attributeValue3 != null ? StringsKt__StringNumberConversionsKt.toIntOrNull(attributeValue3) : null;
+        String attributeValue4 = xmlPullParser.getAttributeValue(str, "style");
+        if (attributeValue4 != null) {
+            if (Intrinsics.areEqual(attributeValue4, "dropdown")) {
+                selectorStyle2 = SelectorStyle.DROPDOWN;
+            } else {
+                if (!Intrinsics.areEqual(attributeValue4, "radio")) {
+                    throw new MalformedXMLException("expected 'dropdown' or 'radio'", null, false, 6, null);
+                }
+                selectorStyle2 = SelectorStyle.RADIO;
+            }
+        }
+        ArrayList arrayList = new ArrayList();
+        String attributeValue5 = xmlPullParser.getAttributeValue(str, "label");
+        if (attributeValue5 == null) {
+            attributeValue5 = "";
+        }
+        while (xmlPullParser.next() != 3) {
+            if (xmlPullParser.getEventType() == i2) {
+                int depth = xmlPullParser.getDepth();
+                String name = xmlPullParser.getName();
+                Intrinsics.checkNotNullExpressionValue(name, "getName(...)");
+                if (Intrinsics.areEqual(name, "choice")) {
+                    String attributeValue6 = xmlPullParser.getAttributeValue(str, "label");
+                    if (attributeValue6 == null) {
+                        attributeValue6 = "";
+                    } else {
+                        Intrinsics.checkNotNull(attributeValue6);
+                    }
+                    String attributeValue7 = xmlPullParser.getAttributeValue(str, "value");
+                    if (attributeValue7 != null) {
+                        Intrinsics.checkNotNull(attributeValue7);
+                        Integer intOrNull2 = StringsKt__StringNumberConversionsKt.toIntOrNull(attributeValue7);
+                        if (intOrNull2 != null) {
+                            int iIntValue = intOrNull2.intValue();
+                            String attributeValue8 = xmlPullParser.getAttributeValue(str, "enableTargets");
+                            if (attributeValue8 == null) {
+                                str2 = "";
+                            } else {
+                                Intrinsics.checkNotNull(attributeValue8);
+                                str2 = attributeValue8;
+                            }
+                            List listSplit$default = StringsKt__StringsKt.split$default((CharSequence) str2, new String[]{","}, false, 0, 6, (Object) null);
+                            ArrayList arrayList2 = new ArrayList(CollectionsKt__IterablesKt.collectionSizeOrDefault(listSplit$default, 10));
+                            Iterator it = listSplit$default.iterator();
+                            while (it.hasNext()) {
+                                arrayList2.add(StringsKt__StringsKt.trim((CharSequence) it.next()).toString());
+                            }
+                            ArrayList arrayList3 = new ArrayList();
+                            Iterator it2 = arrayList2.iterator();
+                            while (true) {
+                                z2 = true;
+                                if (!it2.hasNext()) {
+                                    break;
+                                }
+                                Object next = it2.next();
+                                if (((String) next).length() > 0) {
+                                    arrayList3.add(next);
+                                }
+                            }
+                            if (!arrayList.isEmpty()) {
+                                Iterator it3 = arrayList.iterator();
+                                do {
+                                    if (!it3.hasNext()) {
+                                        z2 = false;
+                                        break;
+                                    }
+                                } while (!(((ChoiceInfo) it3.next()).getValue() == iIntValue));
+                            } else {
+                                z2 = false;
+                                break;
+                            }
+                            if (z2) {
+                                throw new MalformedXMLException("Duplicate choice value '" + iIntValue + "'", null, false, 6, null);
+                            }
+                            arrayList.add(new ChoiceInfo(iIntValue, attributeValue6, arrayList3));
+                            pN.Xu(xmlPullParser);
+                        }
+                    }
+                    throw new MalformedXMLException("Missing or invalid choice value", null, false, 6, null);
+                }
+                pN.Xu(xmlPullParser);
+                if (xmlPullParser.getEventType() != 3 || xmlPullParser.getDepth() != depth) {
+                    throw new IllegalStateException("Did not consume all tag contents");
+                }
+                i2 = 2;
+            }
+        }
+        if (arrayList.isEmpty()) {
+            throw new MalformedXMLException("<selector> must have at least one <choice> element", null, false, 6, null);
+        }
+        int iIntValue2 = intOrNull != null ? intOrNull.intValue() : ((ChoiceInfo) CollectionsKt___CollectionsKt.first((List) arrayList)).getValue();
+        if (selectorStyle2 == null) {
+            selectorStyle = arrayList.size() <= 3 ? SelectorStyle.RADIO : SelectorStyle.DROPDOWN;
+        } else {
+            selectorStyle = selectorStyle2;
+        }
+        return new UserParameter.Selector(attributeValue, attributeValue5, zRw, arrayList, iIntValue2, selectorStyle);
+    }

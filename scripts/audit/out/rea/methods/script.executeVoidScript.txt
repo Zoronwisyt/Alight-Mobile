@@ -1,0 +1,5 @@
+    public static final void executeVoidScript(V8Runtime v8Runtime, String scriptString) throws JavetException {
+        Intrinsics.checkNotNullParameter(v8Runtime, "<this>");
+        Intrinsics.checkNotNullParameter(scriptString, "scriptString");
+        v8Runtime.execute(scriptString, new byte[0], new V8ScriptOrigin(), false);
+    }

@@ -1,0 +1,47 @@
+    private static final UserParameter.Switch readSwitchParam(XmlPullParser xmlPullParser, String str) throws XmlPullParserException, IOException, MalformedXMLException {
+        boolean z2;
+        xmlPullParser.require(2, str, "switch");
+        String attributeValue = xmlPullParser.getAttributeValue(str, "id");
+        if (attributeValue == null) {
+            throw new MalformedXMLException("element missing 'id' attribute", null, false, 6, null);
+        }
+        String attributeValue2 = xmlPullParser.getAttributeValue(str, "enabled");
+        if (attributeValue2 == null) {
+            attributeValue2 = "true";
+        }
+        boolean zRw = mY0.Rw(attributeValue2);
+        String attributeValue3 = xmlPullParser.getAttributeValue(str, "enableTargets");
+        List listSplit$default = StringsKt__StringsKt.split$default((CharSequence) (attributeValue3 == null ? "" : attributeValue3), new String[]{","}, false, 0, 6, (Object) null);
+        ArrayList arrayList = new ArrayList(CollectionsKt__IterablesKt.collectionSizeOrDefault(listSplit$default, 10));
+        Iterator it = listSplit$default.iterator();
+        while (it.hasNext()) {
+            arrayList.add(StringsKt__StringsKt.trim((CharSequence) it.next()).toString());
+        }
+        ArrayList arrayList2 = new ArrayList();
+        Iterator it2 = arrayList.iterator();
+        while (true) {
+            if (!it2.hasNext()) {
+                break;
+            }
+            Object next = it2.next();
+            if (((String) next).length() > 0) {
+                arrayList2.add(next);
+            }
+        }
+        String attributeValue4 = xmlPullParser.getAttributeValue(str, JavetLibLoadingListener.JAVET_LIB_LOADING_TYPE_DEFAULT);
+        if (attributeValue4 == null) {
+            attributeValue4 = "true";
+        }
+        if (Intrinsics.areEqual(attributeValue4, "true")) {
+            z2 = true;
+        } else {
+            if (!Intrinsics.areEqual(attributeValue4, "false")) {
+                throw new MalformedXMLException("expected 'true' or 'false'", null, false, 6, null);
+            }
+            z2 = false;
+        }
+        String attributeValue5 = xmlPullParser.getAttributeValue(str, "label");
+        String str2 = attributeValue5 != null ? attributeValue5 : "";
+        pN.Xu(xmlPullParser);
+        return new UserParameter.Switch(attributeValue, str2, zRw, z2, arrayList2);
+    }

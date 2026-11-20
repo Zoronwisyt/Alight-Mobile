@@ -1,0 +1,130 @@
+    /* JADX INFO: Access modifiers changed from: private */
+    public static final List<VisualEffect> loadVisualEffects(Context context, String str, Bb bb) throws NoSuchAlgorithmException, IOException {
+        String[] list;
+        List<String> listSorted;
+        LinkedHashSet linkedHashSet;
+        char c2;
+        Collection collectionEmptyList;
+        List<ChoiceInfo> choices;
+        String str2 = str;
+        ArrayList arrayList = new ArrayList();
+        LinkedHashSet linkedHashSet2 = new LinkedHashSet();
+        MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
+        byte[] bytes = "AMVESIG".getBytes(Charsets.UTF_8);
+        Intrinsics.checkNotNullExpressionValue(bytes, "getBytes(...)");
+        messageDigest.update(bytes);
+        Regex regex = new Regex("[^A-Za-z,0-9(){}_.+\\]\\[\\-*@#$=]");
+        new Regex("[^A-Za-z]");
+        AssetManager assets = context.getAssets();
+        if (assets != null && (list = assets.list(str2)) != null && (listSorted = ArraysKt___ArraysKt.sorted(list)) != null) {
+            for (String str3 : listSorted) {
+                Intrinsics.checkNotNull(str3);
+                if (StringsKt__StringsJVMKt.endsWith$default(str3, ".xml", false, 2, null)) {
+                    InputStream inputStreamOpen = context.getAssets().open(new File(new File(str2), str3).getPath());
+                    Intrinsics.checkNotNullExpressionValue(inputStreamOpen, "open(...)");
+                    Charset charset = Charsets.UTF_8;
+                    InputStreamReader inputStreamReader = new InputStreamReader(inputStreamOpen, charset);
+                    try {
+                        String text = TextStreamsKt.readText(inputStreamReader);
+                        CloseableKt.closeFinally(inputStreamReader, null);
+                        byte[] bytes2 = regex.replace(text, "").getBytes(charset);
+                        Intrinsics.checkNotNullExpressionValue(bytes2, "getBytes(...)");
+                        messageDigest.update(bytes2);
+                        Uri uri = Uri.parse("file:///android_asset/" + str2);
+                        Intrinsics.checkNotNullExpressionValue(uri, "parse(...)");
+                        final VisualEffect visualEffectLoadVisualEffects$fixTags = loadVisualEffects$fixTags(VisualEffectParserKt.visualEffectFromXml(text, uri, bb));
+                        if (linkedHashSet2.contains(visualEffectLoadVisualEffects$fixTags.getId())) {
+                            throw new IllegalStateException("Duplicate effect id: '" + visualEffectLoadVisualEffects$fixTags.getId() + "'");
+                        }
+                        linkedHashSet2.add(visualEffectLoadVisualEffects$fixTags.getId());
+                        List listListOf = CollectionsKt__CollectionsKt.listOf((Object[]) new String[]{visualEffectLoadVisualEffects$fixTags.getName(), visualEffectLoadVisualEffects$fixTags.getDesc()});
+                        List<UserParameter> parameters = visualEffectLoadVisualEffects$fixTags.getParameters();
+                        ArrayList arrayList2 = new ArrayList();
+                        for (UserParameter userParameter : parameters) {
+                            UserParameter.StaticText staticText = userParameter instanceof UserParameter.StaticText ? (UserParameter.StaticText) userParameter : null;
+                            String text2 = staticText != null ? staticText.getText() : null;
+                            if (text2 != null) {
+                                arrayList2.add(text2);
+                            }
+                        }
+                        List<UserParameter> parameters2 = visualEffectLoadVisualEffects$fixTags.getParameters();
+                        ArrayList arrayList3 = new ArrayList(CollectionsKt__IterablesKt.collectionSizeOrDefault(parameters2, 10));
+                        Iterator<T> it = parameters2.iterator();
+                        while (it.hasNext()) {
+                            arrayList3.add(((UserParameter) it.next()).getLabel());
+                        }
+                        List<UserParameter> parameters3 = visualEffectLoadVisualEffects$fixTags.getParameters();
+                        ArrayList arrayList4 = new ArrayList();
+                        for (UserParameter userParameter2 : parameters3) {
+                            UserParameter.Selector selector = userParameter2 instanceof UserParameter.Selector ? (UserParameter.Selector) userParameter2 : null;
+                            if (selector == null || (choices = selector.getChoices()) == null) {
+                                c2 = '\n';
+                                collectionEmptyList = CollectionsKt__CollectionsKt.emptyList();
+                            } else {
+                                List<ChoiceInfo> list2 = choices;
+                                c2 = '\n';
+                                collectionEmptyList = new ArrayList(CollectionsKt__IterablesKt.collectionSizeOrDefault(list2, 10));
+                                Iterator<T> it2 = list2.iterator();
+                                while (it2.hasNext()) {
+                                    collectionEmptyList.add(((ChoiceInfo) it2.next()).getLabel());
+                                }
+                            }
+                            CollectionsKt__MutableCollectionsKt.addAll(arrayList4, collectionEmptyList);
+                            linkedHashSet2 = linkedHashSet2;
+                        }
+                        linkedHashSet = linkedHashSet2;
+                        List listPlus = CollectionsKt___CollectionsKt.plus((Collection) CollectionsKt___CollectionsKt.plus((Collection) CollectionsKt___CollectionsKt.plus((Collection) listListOf, (Iterable) arrayList2), (Iterable) arrayList3), (Iterable) arrayList4);
+                        ArrayList arrayList5 = new ArrayList();
+                        for (Object obj : listPlus) {
+                            if (StringsKt__StringsJVMKt.startsWith$default((String) obj, APP_STRING_PREFIX, false, 2, null)) {
+                                arrayList5.add(obj);
+                            }
+                        }
+                        final ArrayList arrayList6 = new ArrayList();
+                        Iterator it3 = arrayList5.iterator();
+                        while (true) {
+                            if (!it3.hasNext()) {
+                                break;
+                            }
+                            Object next = it3.next();
+                            if (context.getResources().getIdentifier(StringsKt___StringsKt.drop((String) next, 11), "string", context.getPackageName()) == 0) {
+                                arrayList6.add(next);
+                            }
+                        }
+                        if ((!arrayList6.isEmpty()) && !visualEffectLoadVisualEffects$fixTags.getInternal()) {
+                            if (!visualEffectLoadVisualEffects$fixTags.getExperimental()) {
+                                throw new IllegalStateException("Missing strings in effect '" + visualEffectLoadVisualEffects$fixTags.getId() + "': " + CollectionsKt___CollectionsKt.joinToString$default(arrayList6, ",", null, null, 0, null, null, 62, null) + ".");
+                            }
+                            euv.Xu("loadVisualEffects", new Function0<String>() { // from class: com.alightcreative.app.motion.scene.visualeffect.VisualEffectKt$loadVisualEffects$1$1
+                                /* JADX WARN: 'super' call moved to the top of the method (can break code semantics) */
+                                {
+                                    super(0);
+                                }
+
+                                @Override // kotlin.jvm.functions.Function0
+                                public final String invoke() {
+                                    return "Missing strings in experimental effect '" + visualEffectLoadVisualEffects$fixTags.getId() + "': " + CollectionsKt___CollectionsKt.joinToString$default(arrayList6, ",", null, null, 0, null, null, 62, null) + ".";
+                                }
+                            });
+                        }
+                        arrayList.add(visualEffectLoadVisualEffects$fixTags);
+                    } catch (Throwable th) {
+                        try {
+                            throw th;
+                        } catch (Throwable th2) {
+                            CloseableKt.closeFinally(inputStreamReader, th);
+                            throw th2;
+                        }
+                    }
+                } else {
+                    linkedHashSet = linkedHashSet2;
+                }
+                str2 = str;
+                linkedHashSet2 = linkedHashSet;
+            }
+        }
+        byte[] bArrDigest = messageDigest.digest();
+        Intrinsics.checkNotNullExpressionValue(bArrDigest, "digest(...)");
+        effectSig = CZU.Fcf(bArrDigest);
+        return arrayList;
+    }

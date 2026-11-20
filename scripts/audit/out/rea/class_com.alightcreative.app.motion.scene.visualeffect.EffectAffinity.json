@@ -1,0 +1,117 @@
+{
+  "engine": {
+    "name": "jadx-headless-mcp",
+    "version": "0.7.1",
+    "artifact_sha256": "6e5eacf500b64292bfb73c49797c1958f6ee44646e43e868039ae7feb573ff75",
+    "source_revision": "5844800a486d2248fa949b74c9896285f5b54de2",
+    "worker_count": 1,
+    "heap_limit_mib": 8192
+  },
+  "class_name": "com.alightcreative.app.motion.scene.visualeffect.EffectAffinity",
+  "methods": [
+    {
+      "name": "<clinit>",
+      "reported_signature": "<clinit>(): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()V"
+    },
+    {
+      "name": "<init>",
+      "reported_signature": "<init>(com.alightcreative.app.motion.scene.visualeffect.EffectAffinity$Type, com.alightcreative.app.motion.scene.visualeffect.EffectAffinity$Strength): void",
+      "overload_index": 0,
+      "is_constructor": true,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/visualeffect/EffectAffinity$Type;Lcom/alightcreative/app/motion/scene/visualeffect/EffectAffinity$Strength;)V"
+    },
+    {
+      "name": "component1",
+      "reported_signature": "component1(): com.alightcreative.app.motion.scene.visualeffect.EffectAffinity$Type",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/visualeffect/EffectAffinity$Type;"
+    },
+    {
+      "name": "component2",
+      "reported_signature": "component2(): com.alightcreative.app.motion.scene.visualeffect.EffectAffinity$Strength",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/visualeffect/EffectAffinity$Strength;"
+    },
+    {
+      "name": "copy",
+      "reported_signature": "copy(com.alightcreative.app.motion.scene.visualeffect.EffectAffinity$Type, com.alightcreative.app.motion.scene.visualeffect.EffectAffinity$Strength): com.alightcreative.app.motion.scene.visualeffect.EffectAffinity",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/visualeffect/EffectAffinity$Type;Lcom/alightcreative/app/motion/scene/visualeffect/EffectAffinity$Strength;)Lcom/alightcreative/app/motion/scene/visualeffect/EffectAffinity;"
+    },
+    {
+      "name": "copy$default",
+      "reported_signature": "copy$default(com.alightcreative.app.motion.scene.visualeffect.EffectAffinity, com.alightcreative.app.motion.scene.visualeffect.EffectAffinity$Type, com.alightcreative.app.motion.scene.visualeffect.EffectAffinity$Strength, int, java.lang.Object): com.alightcreative.app.motion.scene.visualeffect.EffectAffinity",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/visualeffect/EffectAffinity;Lcom/alightcreative/app/motion/scene/visualeffect/EffectAffinity$Type;Lcom/alightcreative/app/motion/scene/visualeffect/EffectAffinity$Strength;ILjava/lang/Object;)Lcom/alightcreative/app/motion/scene/visualeffect/EffectAffinity;"
+    },
+    {
+      "name": "equals",
+      "reported_signature": "equals(java.lang.Object): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Ljava/lang/Object;)Z"
+    },
+    {
+      "name": "getStrength",
+      "reported_signature": "getStrength(): com.alightcreative.app.motion.scene.visualeffect.EffectAffinity$Strength",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/visualeffect/EffectAffinity$Strength;"
+    },
+    {
+      "name": "getType",
+      "reported_signature": "getType(): com.alightcreative.app.motion.scene.visualeffect.EffectAffinity$Type",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/visualeffect/EffectAffinity$Type;"
+    },
+    {
+      "name": "hashCode",
+      "reported_signature": "hashCode(): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()I"
+    },
+    {
+      "name": "toString",
+      "reported_signature": "toString(): java.lang.String",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/lang/String;"
+    }
+  ],
+  "fields": [
+    {
+      "name": "$stable",
+      "reported_type": "int",
+      "dex_static_value": null
+    },
+    {
+      "name": "Companion",
+      "reported_type": "com.alightcreative.app.motion.scene.visualeffect.EffectAffinity$Companion",
+      "dex_static_value": null
+    },
+    {
+      "name": "strength",
+      "reported_type": "com.alightcreative.app.motion.scene.visualeffect.EffectAffinity$Strength",
+      "dex_static_value": null
+    },
+    {
+      "name": "type",
+      "reported_type": "com.alightcreative.app.motion.scene.visualeffect.EffectAffinity$Type",
+      "dex_static_value": null
+    }
+  ],
+  "inner_classes": [
+    "com.alightcreative.app.motion.scene.visualeffect.EffectAffinity.Companion",
+    "com.alightcreative.app.motion.scene.visualeffect.EffectAffinity.Strength",
+    "com.alightcreative.app.motion.scene.visualeffect.EffectAffinity.Type"
+  ]
+}

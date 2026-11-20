@@ -1,0 +1,34 @@
+    private static final UserParameter.StaticText readStaticText(XmlPullParser xmlPullParser, String str, StaticTextStyle staticTextStyle) throws XmlPullParserException, IOException {
+        String str2;
+        int i2 = WhenMappings.$EnumSwitchMapping$0[staticTextStyle.ordinal()];
+        if (i2 == 1) {
+            str2 = "tip";
+        } else {
+            if (i2 != 2) {
+                throw new NoWhenBranchMatchedException();
+            }
+            str2 = "section";
+        }
+        xmlPullParser.require(2, str, str2);
+        String attributeValue = xmlPullParser.getAttributeValue(str, "id");
+        if (attributeValue == null) {
+            attributeValue = "__staticText" + xmlPullParser.getLineNumber();
+        }
+        String str3 = attributeValue;
+        String attributeValue2 = xmlPullParser.getAttributeValue(str, "enabled");
+        if (attributeValue2 == null) {
+            attributeValue2 = "true";
+        }
+        boolean zRw = mY0.Rw(attributeValue2);
+        String attributeValue3 = xmlPullParser.getAttributeValue(str, "label");
+        String str4 = attributeValue3 == null ? "" : attributeValue3;
+        String attributeValue4 = xmlPullParser.getAttributeValue(str, "text");
+        String str5 = attributeValue4 == null ? "" : attributeValue4;
+        String attributeValue5 = xmlPullParser.getAttributeValue(str, "hintType");
+        HintType hintType = null;
+        if (attributeValue5 != null && Intrinsics.areEqual(attributeValue5, "editFirst")) {
+            hintType = HintType.EDITFIRST;
+        }
+        pN.Xu(xmlPullParser);
+        return new UserParameter.StaticText(str3, str4, zRw, str5, staticTextStyle, hintType);
+    }

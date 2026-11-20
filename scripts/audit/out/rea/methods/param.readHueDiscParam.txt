@@ -1,0 +1,27 @@
+    private static final UserParameter.HueDisc readHueDiscParam(XmlPullParser xmlPullParser, String str) throws XmlPullParserException, IOException, MalformedXMLException {
+        Vector3D zero;
+        xmlPullParser.require(2, str, "hue-disc");
+        String attributeValue = xmlPullParser.getAttributeValue(str, "id");
+        if (attributeValue == null) {
+            throw new MalformedXMLException("element missing 'id' attribute", null, false, 6, null);
+        }
+        String attributeValue2 = xmlPullParser.getAttributeValue(str, "enabled");
+        if (attributeValue2 == null) {
+            attributeValue2 = "true";
+        }
+        boolean zRw = mY0.Rw(attributeValue2);
+        String attributeValue3 = xmlPullParser.getAttributeValue(str, JavetLibLoadingListener.JAVET_LIB_LOADING_TYPE_DEFAULT);
+        if (attributeValue3 == null || (zero = GeometryKt.toVector3DOrNull(attributeValue3)) == null) {
+            zero = Vector3D.INSTANCE.getZERO();
+        }
+        Vector3D vector3D = zero;
+        String attributeValue4 = xmlPullParser.getAttributeValue(str, "label");
+        if (attributeValue4 == null) {
+            attributeValue4 = "";
+        }
+        String str2 = attributeValue4;
+        String attributeValue5 = xmlPullParser.getAttributeValue(str, "bias");
+        boolean z2 = attributeValue5 != null ? Boolean.parseBoolean(attributeValue5) : false;
+        pN.Xu(xmlPullParser);
+        return new UserParameter.HueDisc(attributeValue, str2, zRw, z2, vector3D);
+    }

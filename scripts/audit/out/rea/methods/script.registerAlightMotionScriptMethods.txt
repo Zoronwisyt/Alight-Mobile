@@ -1,0 +1,62 @@
+    public static final void registerAlightMotionScriptMethods(final V8Runtime v10, V8ValueObject AM, final String logtag) throws JavetException {
+        Intrinsics.checkNotNullParameter(v10, "v8");
+        Intrinsics.checkNotNullParameter(AM, "AM");
+        Intrinsics.checkNotNullParameter(logtag, "logtag");
+        AM.bind(new Object() { // from class: com.alightcreative.app.motion.scene.scripting.ScriptExecutorKt.registerAlightMotionScriptMethods.1
+            @Keep
+            @V8Function
+            public final V8ValueObject hsvToRgb(V8ValueObject hsv) throws JavetException {
+                Intrinsics.checkNotNullParameter(hsv, "hsv");
+                V8ValueObject v8ValueObjectCreateV8ValueObject = v10.createV8ValueObject();
+                Intrinsics.checkNotNullExpressionValue(v8ValueObjectCreateV8ValueObject, "createV8ValueObject(...)");
+                return Bb.Hfr(v8ValueObjectCreateV8ValueObject, ColorKt.toRGB(Bb.L(hsv)));
+            }
+
+            @Keep
+            @V8Function
+            public final void log(V8ValueString logstr) {
+                Intrinsics.checkNotNullParameter(logstr, "logstr");
+                Log.i(logtag, logstr.getValue());
+            }
+
+            @Keep
+            @V8Function
+            public final V8ValueObject rgbToHsv(V8ValueObject rgb) throws JavetException {
+                Intrinsics.checkNotNullParameter(rgb, "rgb");
+                V8ValueObject v8ValueObjectCreateV8ValueObject = v10.createV8ValueObject();
+                Intrinsics.checkNotNullExpressionValue(v8ValueObjectCreateV8ValueObject, "createV8ValueObject(...)");
+                return Bb.BWM(v8ValueObjectCreateV8ValueObject, ColorKt.toHSV(Bb.bG(rgb)));
+            }
+
+            @Keep
+            @V8Function(name = "simplexNoise")
+            public final double simplexNoiseFun(Number... params) {
+                Intrinsics.checkNotNullParameter(params, "params");
+                int length = params.length;
+                if (length == 0) {
+                    return 0.0d;
+                }
+                if (length == 1) {
+                    return SimplexNoiseKt.simplexNoise(params[0].doubleValue(), 0.0d);
+                }
+                if (length == 2) {
+                    return SimplexNoiseKt.simplexNoise(params[0].doubleValue(), params[1].doubleValue());
+                }
+                if (length == 3) {
+                    return SimplexNoiseKt.simplexNoise(params[0].doubleValue(), params[1].doubleValue(), params[2].doubleValue());
+                }
+                if (length != 4) {
+                    return 0.0d;
+                }
+                return SimplexNoiseKt.simplexNoise(params[0].doubleValue(), params[1].doubleValue(), params[2].doubleValue(), params[3].doubleValue());
+            }
+
+            @Keep
+            @V8Function
+            public final double triangle(Number x2) {
+                Intrinsics.checkNotNullParameter(x2, "x");
+                double d2 = 1;
+                return (Math.abs(((x2.doubleValue() + 0.75d) % d2) - 0.5d) * ((double) 4)) - d2;
+            }
+        });
+    }

@@ -1,0 +1,165 @@
+{
+  "engine": {
+    "name": "jadx-headless-mcp",
+    "version": "0.7.1",
+    "artifact_sha256": "6e5eacf500b64292bfb73c49797c1958f6ee44646e43e868039ae7feb573ff75",
+    "source_revision": "5844800a486d2248fa949b74c9896285f5b54de2",
+    "worker_count": 1,
+    "heap_limit_mib": 8192
+  },
+  "class_name": "com.alightcreative.app.motion.scene.scripting.ScriptEnv",
+  "methods": [
+    {
+      "name": "<clinit>",
+      "reported_signature": "<clinit>(): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()V"
+    },
+    {
+      "name": "<init>",
+      "reported_signature": "<init>(com.alightcreative.app.motion.scene.Scene, float, int, int, com.alightcreative.app.motion.scene.Transform, float, com.alightcreative.app.motion.scene.rendering.RenderMode, java.lang.Integer, boolean, com.alightcreative.app.motion.scene.scripting.ScriptGroup): void",
+      "overload_index": 0,
+      "is_constructor": true,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/Scene;FIILcom/alightcreative/app/motion/scene/Transform;FLcom/alightcreative/app/motion/scene/rendering/RenderMode;Ljava/lang/Integer;ZLcom/alightcreative/app/motion/scene/scripting/ScriptGroup;)V"
+    },
+    {
+      "name": "<init>",
+      "reported_signature": "<init>(com.alightcreative.app.motion.scene.Scene, float, int, int, com.alightcreative.app.motion.scene.Transform, float, com.alightcreative.app.motion.scene.rendering.RenderMode, java.lang.Integer, boolean, com.alightcreative.app.motion.scene.scripting.ScriptGroup, int, kotlin.jvm.internal.DefaultConstructorMarker): void",
+      "overload_index": 1,
+      "is_constructor": true,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/Scene;FIILcom/alightcreative/app/motion/scene/Transform;FLcom/alightcreative/app/motion/scene/rendering/RenderMode;Ljava/lang/Integer;ZLcom/alightcreative/app/motion/scene/scripting/ScriptGroup;ILkotlin/jvm/internal/DefaultConstructorMarker;)V"
+    },
+    {
+      "name": "getEditMode",
+      "reported_signature": "getEditMode(): java.lang.Integer",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/lang/Integer;"
+    },
+    {
+      "name": "getFphs",
+      "reported_signature": "getFphs(): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()I"
+    },
+    {
+      "name": "getFrame",
+      "reported_signature": "getFrame(): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()I"
+    },
+    {
+      "name": "getPrevFrameTf",
+      "reported_signature": "getPrevFrameTf(): com.alightcreative.app.motion.scene.Transform",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/Transform;"
+    },
+    {
+      "name": "getPrevFrameTime",
+      "reported_signature": "getPrevFrameTime(): float",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()F"
+    },
+    {
+      "name": "getRenderMode",
+      "reported_signature": "getRenderMode(): com.alightcreative.app.motion.scene.rendering.RenderMode",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/rendering/RenderMode;"
+    },
+    {
+      "name": "getRunGroup",
+      "reported_signature": "getRunGroup(): com.alightcreative.app.motion.scene.scripting.ScriptGroup",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/scripting/ScriptGroup;"
+    },
+    {
+      "name": "getScene",
+      "reported_signature": "getScene(): com.alightcreative.app.motion.scene.Scene",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/Scene;"
+    },
+    {
+      "name": "getSelected",
+      "reported_signature": "getSelected(): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Z"
+    },
+    {
+      "name": "getTime",
+      "reported_signature": "getTime(): float",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()F"
+    }
+  ],
+  "fields": [
+    {
+      "name": "$stable",
+      "reported_type": "int",
+      "dex_static_value": {
+        "type": "int",
+        "value": 8
+      }
+    },
+    {
+      "name": "editMode",
+      "reported_type": "java.lang.Integer",
+      "dex_static_value": null
+    },
+    {
+      "name": "fphs",
+      "reported_type": "int",
+      "dex_static_value": null
+    },
+    {
+      "name": "frame",
+      "reported_type": "int",
+      "dex_static_value": null
+    },
+    {
+      "name": "prevFrameTf",
+      "reported_type": "com.alightcreative.app.motion.scene.Transform",
+      "dex_static_value": null
+    },
+    {
+      "name": "prevFrameTime",
+      "reported_type": "float",
+      "dex_static_value": null
+    },
+    {
+      "name": "renderMode",
+      "reported_type": "com.alightcreative.app.motion.scene.rendering.RenderMode",
+      "dex_static_value": null
+    },
+    {
+      "name": "runGroup",
+      "reported_type": "com.alightcreative.app.motion.scene.scripting.ScriptGroup",
+      "dex_static_value": null
+    },
+    {
+      "name": "scene",
+      "reported_type": "com.alightcreative.app.motion.scene.Scene",
+      "dex_static_value": null
+    },
+    {
+      "name": "selected",
+      "reported_type": "boolean",
+      "dex_static_value": null
+    },
+    {
+      "name": "time",
+      "reported_type": "float",
+      "dex_static_value": null
+    }
+  ],
+  "inner_classes": []
+}

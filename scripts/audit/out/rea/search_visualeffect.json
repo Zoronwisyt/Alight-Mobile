@@ -1,0 +1,34 @@
+{
+  "engine": {
+    "name": "jadx-headless-mcp",
+    "version": "0.7.1",
+    "artifact_sha256": "6e5eacf500b64292bfb73c49797c1958f6ee44646e43e868039ae7feb573ff75",
+    "source_revision": "5844800a486d2248fa949b74c9896285f5b54de2",
+    "worker_count": 1,
+    "heap_limit_mib": 8192
+  },
+  "query": "VisualEffect",
+  "total_classes": 24194,
+  "matches": [
+    "com.alightcreative.app.motion.scene.visualeffect.KeyableVisualEffectRef",
+    "com.alightcreative.app.motion.scene.visualeffect.OptionalVisualEffect",
+    "com.alightcreative.app.motion.scene.visualeffect.VisualEffect",
+    "com.alightcreative.app.motion.scene.visualeffect.VisualEffectKt",
+    "com.alightcreative.app.motion.scene.visualeffect.VisualEffectKt$loadVisualEffectPresets$2$3",
+    "com.alightcreative.app.motion.scene.visualeffect.VisualEffectKt$loadVisualEffects$1$2",
+    "com.alightcreative.app.motion.scene.visualeffect.VisualEffectKt$loadVisualEffects$1$3",
+    "com.alightcreative.app.motion.scene.visualeffect.VisualEffectKt$loadVisualEffects$1$4",
+    "com.alightcreative.app.motion.scene.visualeffect.VisualEffectKt$loadVisualEffects$1$5",
+    "com.alightcreative.app.motion.scene.visualeffect.VisualEffectKt$loadVisualEffects$1$6",
+    "com.alightcreative.app.motion.scene.visualeffect.VisualEffectKt$loadVisualEffects$1$7",
+    "com.alightcreative.app.motion.scene.visualeffect.VisualEffectKt$loadVisualEffects$1$8$1",
+    "com.alightcreative.app.motion.scene.visualeffect.VisualEffectParserKt",
+    "com.alightcreative.app.motion.scene.visualeffect.VisualEffectParserKt$readEffect$result$1",
+    "com.alightcreative.app.motion.scene.visualeffect.VisualEffectParserKt$readEffect$result$2",
+    "com.alightcreative.app.motion.scene.visualeffect.VisualEffectParserKt$readEffect$result$4",
+    "com.alightcreative.app.motion.scene.visualeffect.VisualEffectParserKt$readEffect$result$5",
+    "com.alightcreative.app.motion.scene.visualeffect.VisualEffectRef"
+  ],
+  "duplicate_names": [],
+  "coverage": "complete"
+}

@@ -1,0 +1,560 @@
+{
+  "engine": {
+    "name": "jadx-headless-mcp",
+    "version": "0.7.1",
+    "artifact_sha256": "6e5eacf500b64292bfb73c49797c1958f6ee44646e43e868039ae7feb573ff75",
+    "source_revision": "5844800a486d2248fa949b74c9896285f5b54de2",
+    "worker_count": 1,
+    "heap_limit_mib": 8192
+  },
+  "class_name": "com.alightcreative.app.motion.scene.visualeffect.VisualEffect",
+  "methods": [
+    {
+      "name": "<clinit>",
+      "reported_signature": "<clinit>(): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()V"
+    },
+    {
+      "name": "<init>",
+      "reported_signature": "<init>(java.lang.String, java.lang.String, java.lang.String, java.util.List<? extends com.alightcreative.app.motion.scene.userparam.UserParameter>, XKd.mY0, java.util.Map<java.lang.Integer, com.alightcreative.app.motion.scene.visualeffect.ShaderGroup>, java.util.List<com.alightcreative.app.motion.scene.scripting.ACScript>, java.util.List<com.alightcreative.app.motion.scene.visualeffect.EffectRenderPass>, android.net.Uri, com.alightcreative.app.motion.scene.visualeffect.EffectType, boolean, boolean, boolean, java.util.List<com.alightcreative.app.motion.scene.visualeffect.EffectPreset>, java.lang.String, java.util.List<? extends fi.vlE>, java.util.Set<com.alightcreative.app.motion.scene.visualeffect.EffectAffinity>, java.util.List<fi.EIS>, android.net.Uri, android.net.Uri, int, java.lang.String, boolean, float, boolean): void",
+      "overload_index": 0,
+      "is_constructor": true,
+      "dex_descriptor": "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/util/List;LXKd/mY0;Ljava/util/Map;Ljava/util/List;Ljava/util/List;Landroid/net/Uri;Lcom/alightcreative/app/motion/scene/visualeffect/EffectType;ZZZLjava/util/List;Ljava/lang/String;Ljava/util/List;Ljava/util/Set;Ljava/util/List;Landroid/net/Uri;Landroid/net/Uri;ILjava/lang/String;ZFZ)V"
+    },
+    {
+      "name": "component1",
+      "reported_signature": "component1(): java.lang.String",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/lang/String;"
+    },
+    {
+      "name": "component10",
+      "reported_signature": "component10(): com.alightcreative.app.motion.scene.visualeffect.EffectType",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/visualeffect/EffectType;"
+    },
+    {
+      "name": "component11",
+      "reported_signature": "component11(): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Z"
+    },
+    {
+      "name": "component12",
+      "reported_signature": "component12(): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Z"
+    },
+    {
+      "name": "component13",
+      "reported_signature": "component13(): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Z"
+    },
+    {
+      "name": "component14",
+      "reported_signature": "component14(): java.util.List<com.alightcreative.app.motion.scene.visualeffect.EffectPreset>",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/util/List;"
+    },
+    {
+      "name": "component15",
+      "reported_signature": "component15(): java.lang.String",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/lang/String;"
+    },
+    {
+      "name": "component16",
+      "reported_signature": "component16(): java.util.List<fi.vlE>",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/util/List;"
+    },
+    {
+      "name": "component17",
+      "reported_signature": "component17(): java.util.Set<com.alightcreative.app.motion.scene.visualeffect.EffectAffinity>",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/util/Set;"
+    },
+    {
+      "name": "component18",
+      "reported_signature": "component18(): java.util.List<fi.EIS>",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/util/List;"
+    },
+    {
+      "name": "component19",
+      "reported_signature": "component19(): android.net.Uri",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Landroid/net/Uri;"
+    },
+    {
+      "name": "component2",
+      "reported_signature": "component2(): java.lang.String",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/lang/String;"
+    },
+    {
+      "name": "component20",
+      "reported_signature": "component20(): android.net.Uri",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Landroid/net/Uri;"
+    },
+    {
+      "name": "component21",
+      "reported_signature": "component21(): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()I"
+    },
+    {
+      "name": "component22",
+      "reported_signature": "component22(): java.lang.String",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/lang/String;"
+    },
+    {
+      "name": "component23",
+      "reported_signature": "component23(): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Z"
+    },
+    {
+      "name": "component24",
+      "reported_signature": "component24(): float",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()F"
+    },
+    {
+      "name": "component25",
+      "reported_signature": "component25(): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Z"
+    },
+    {
+      "name": "component3",
+      "reported_signature": "component3(): java.lang.String",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/lang/String;"
+    },
+    {
+      "name": "component4",
+      "reported_signature": "component4(): java.util.List<com.alightcreative.app.motion.scene.userparam.UserParameter>",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/util/List;"
+    },
+    {
+      "name": "component5",
+      "reported_signature": "component5(): XKd.mY0",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()LXKd/mY0;"
+    },
+    {
+      "name": "component6",
+      "reported_signature": "component6(): java.util.Map<java.lang.Integer, com.alightcreative.app.motion.scene.visualeffect.ShaderGroup>",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/util/Map;"
+    },
+    {
+      "name": "component7",
+      "reported_signature": "component7(): java.util.List<com.alightcreative.app.motion.scene.scripting.ACScript>",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/util/List;"
+    },
+    {
+      "name": "component8",
+      "reported_signature": "component8(): java.util.List<com.alightcreative.app.motion.scene.visualeffect.EffectRenderPass>",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/util/List;"
+    },
+    {
+      "name": "component9",
+      "reported_signature": "component9(): android.net.Uri",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Landroid/net/Uri;"
+    },
+    {
+      "name": "copy",
+      "reported_signature": "copy(java.lang.String, java.lang.String, java.lang.String, java.util.List<? extends com.alightcreative.app.motion.scene.userparam.UserParameter>, XKd.mY0, java.util.Map<java.lang.Integer, com.alightcreative.app.motion.scene.visualeffect.ShaderGroup>, java.util.List<com.alightcreative.app.motion.scene.scripting.ACScript>, java.util.List<com.alightcreative.app.motion.scene.visualeffect.EffectRenderPass>, android.net.Uri, com.alightcreative.app.motion.scene.visualeffect.EffectType, boolean, boolean, boolean, java.util.List<com.alightcreative.app.motion.scene.visualeffect.EffectPreset>, java.lang.String, java.util.List<? extends fi.vlE>, java.util.Set<com.alightcreative.app.motion.scene.visualeffect.EffectAffinity>, java.util.List<fi.EIS>, android.net.Uri, android.net.Uri, int, java.lang.String, boolean, float, boolean): com.alightcreative.app.motion.scene.visualeffect.VisualEffect",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/util/List;LXKd/mY0;Ljava/util/Map;Ljava/util/List;Ljava/util/List;Landroid/net/Uri;Lcom/alightcreative/app/motion/scene/visualeffect/EffectType;ZZZLjava/util/List;Ljava/lang/String;Ljava/util/List;Ljava/util/Set;Ljava/util/List;Landroid/net/Uri;Landroid/net/Uri;ILjava/lang/String;ZFZ)Lcom/alightcreative/app/motion/scene/visualeffect/VisualEffect;"
+    },
+    {
+      "name": "copy$default",
+      "reported_signature": "copy$default(com.alightcreative.app.motion.scene.visualeffect.VisualEffect, java.lang.String, java.lang.String, java.lang.String, java.util.List, XKd.mY0, java.util.Map, java.util.List, java.util.List, android.net.Uri, com.alightcreative.app.motion.scene.visualeffect.EffectType, boolean, boolean, boolean, java.util.List, java.lang.String, java.util.List, java.util.Set, java.util.List, android.net.Uri, android.net.Uri, int, java.lang.String, boolean, float, boolean, int, java.lang.Object): com.alightcreative.app.motion.scene.visualeffect.VisualEffect",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/visualeffect/VisualEffect;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/util/List;LXKd/mY0;Ljava/util/Map;Ljava/util/List;Ljava/util/List;Landroid/net/Uri;Lcom/alightcreative/app/motion/scene/visualeffect/EffectType;ZZZLjava/util/List;Ljava/lang/String;Ljava/util/List;Ljava/util/Set;Ljava/util/List;Landroid/net/Uri;Landroid/net/Uri;ILjava/lang/String;ZFZILjava/lang/Object;)Lcom/alightcreative/app/motion/scene/visualeffect/VisualEffect;"
+    },
+    {
+      "name": "equals",
+      "reported_signature": "equals(java.lang.Object): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Ljava/lang/Object;)Z"
+    },
+    {
+      "name": "getAffinity",
+      "reported_signature": "getAffinity(): java.util.Set<com.alightcreative.app.motion.scene.visualeffect.EffectAffinity>",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/util/Set;"
+    },
+    {
+      "name": "getAutoTransform",
+      "reported_signature": "getAutoTransform(): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Z"
+    },
+    {
+      "name": "getBackgroundImage",
+      "reported_signature": "getBackgroundImage(): android.net.Uri",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Landroid/net/Uri;"
+    },
+    {
+      "name": "getCategories",
+      "reported_signature": "getCategories(): java.util.List<fi.EIS>",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/util/List;"
+    },
+    {
+      "name": "getCategoryId",
+      "reported_signature": "getCategoryId(): java.lang.String",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/lang/String;"
+    },
+    {
+      "name": "getDeprecated",
+      "reported_signature": "getDeprecated(): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Z"
+    },
+    {
+      "name": "getDesc",
+      "reported_signature": "getDesc(): java.lang.String",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/lang/String;"
+    },
+    {
+      "name": "getExperimental",
+      "reported_signature": "getExperimental(): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Z"
+    },
+    {
+      "name": "getHasOverdaw",
+      "reported_signature": "getHasOverdaw(): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Z"
+    },
+    {
+      "name": "getId",
+      "reported_signature": "getId(): java.lang.String",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/lang/String;"
+    },
+    {
+      "name": "getInternal",
+      "reported_signature": "getInternal(): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Z"
+    },
+    {
+      "name": "getIterCount",
+      "reported_signature": "getIterCount(): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()I"
+    },
+    {
+      "name": "getIterParam",
+      "reported_signature": "getIterParam(): java.lang.String",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/lang/String;"
+    },
+    {
+      "name": "getLocalizedStrings",
+      "reported_signature": "getLocalizedStrings(): XKd.mY0",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()LXKd/mY0;"
+    },
+    {
+      "name": "getMaxOverdraw",
+      "reported_signature": "getMaxOverdraw(): float",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()F"
+    },
+    {
+      "name": "getName",
+      "reported_signature": "getName(): java.lang.String",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/lang/String;"
+    },
+    {
+      "name": "getPackagedPresets",
+      "reported_signature": "getPackagedPresets(): java.util.List<com.alightcreative.app.motion.scene.visualeffect.EffectPreset>",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/util/List;"
+    },
+    {
+      "name": "getParameters",
+      "reported_signature": "getParameters(): java.util.List<com.alightcreative.app.motion.scene.userparam.UserParameter>",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/util/List;"
+    },
+    {
+      "name": "getParamsById",
+      "reported_signature": "getParamsById(): java.util.Map<java.lang.String, com.alightcreative.app.motion.scene.userparam.UserParameter>",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/util/Map;"
+    },
+    {
+      "name": "getPasses",
+      "reported_signature": "getPasses(): java.util.List<com.alightcreative.app.motion.scene.visualeffect.EffectRenderPass>",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/util/List;"
+    },
+    {
+      "name": "getScripts",
+      "reported_signature": "getScripts(): java.util.List<com.alightcreative.app.motion.scene.scripting.ACScript>",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/util/List;"
+    },
+    {
+      "name": "getShaderGroups",
+      "reported_signature": "getShaderGroups(): java.util.Map<java.lang.Integer, com.alightcreative.app.motion.scene.visualeffect.ShaderGroup>",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/util/Map;"
+    },
+    {
+      "name": "getTags",
+      "reported_signature": "getTags(): java.util.List<fi.vlE>",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/util/List;"
+    },
+    {
+      "name": "getThumbnail",
+      "reported_signature": "getThumbnail(): android.net.Uri",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Landroid/net/Uri;"
+    },
+    {
+      "name": "getType",
+      "reported_signature": "getType(): com.alightcreative.app.motion.scene.visualeffect.EffectType",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/visualeffect/EffectType;"
+    },
+    {
+      "name": "getUri",
+      "reported_signature": "getUri(): android.net.Uri",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Landroid/net/Uri;"
+    },
+    {
+      "name": "hashCode",
+      "reported_signature": "hashCode(): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()I"
+    },
+    {
+      "name": "toString",
+      "reported_signature": "toString(): java.lang.String",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/lang/String;"
+    }
+  ],
+  "fields": [
+    {
+      "name": "$stable",
+      "reported_type": "int",
+      "dex_static_value": {
+        "type": "int",
+        "value": 8
+      }
+    },
+    {
+      "name": "affinity",
+      "reported_type": "java.util.Set<com.alightcreative.app.motion.scene.visualeffect.EffectAffinity>",
+      "dex_static_value": null
+    },
+    {
+      "name": "autoTransform",
+      "reported_type": "boolean",
+      "dex_static_value": null
+    },
+    {
+      "name": "backgroundImage",
+      "reported_type": "android.net.Uri",
+      "dex_static_value": null
+    },
+    {
+      "name": "categories",
+      "reported_type": "java.util.List<fi.EIS>",
+      "dex_static_value": null
+    },
+    {
+      "name": "categoryId",
+      "reported_type": "java.lang.String",
+      "dex_static_value": null
+    },
+    {
+      "name": "deprecated",
+      "reported_type": "boolean",
+      "dex_static_value": null
+    },
+    {
+      "name": "desc",
+      "reported_type": "java.lang.String",
+      "dex_static_value": null
+    },
+    {
+      "name": "experimental",
+      "reported_type": "boolean",
+      "dex_static_value": null
+    },
+    {
+      "name": "hasOverdaw",
+      "reported_type": "boolean",
+      "dex_static_value": null
+    },
+    {
+      "name": "id",
+      "reported_type": "java.lang.String",
+      "dex_static_value": null
+    },
+    {
+      "name": "internal",
+      "reported_type": "boolean",
+      "dex_static_value": null
+    },
+    {
+      "name": "iterCount",
+      "reported_type": "int",
+      "dex_static_value": null
+    },
+    {
+      "name": "iterParam",
+      "reported_type": "java.lang.String",
+      "dex_static_value": null
+    },
+    {
+      "name": "localizedStrings",
+      "reported_type": "XKd.mY0",
+      "dex_static_value": null
+    },
+    {
+      "name": "maxOverdraw",
+      "reported_type": "float",
+      "dex_static_value": null
+    },
+    {
+      "name": "name",
+      "reported_type": "java.lang.String",
+      "dex_static_value": null
+    },
+    {
+      "name": "packagedPresets",
+      "reported_type": "java.util.List<com.alightcreative.app.motion.scene.visualeffect.EffectPreset>",
+      "dex_static_value": null
+    },
+    {
+      "name": "parameters",
+      "reported_type": "java.util.List<com.alightcreative.app.motion.scene.userparam.UserParameter>",
+      "dex_static_value": null
+    },
+    {
+      "name": "paramsById$delegate",
+      "reported_type": "kotlin.Lazy",
+      "dex_static_value": null
+    },
+    {
+      "name": "passes",
+      "reported_type": "java.util.List<com.alightcreative.app.motion.scene.visualeffect.EffectRenderPass>",
+      "dex_static_value": null
+    },
+    {
+      "name": "scripts",
+      "reported_type": "java.util.List<com.alightcreative.app.motion.scene.scripting.ACScript>",
+      "dex_static_value": null
+    },
+    {
+      "name": "shaderGroups",
+      "reported_type": "java.util.Map<java.lang.Integer, com.alightcreative.app.motion.scene.visualeffect.ShaderGroup>",
+      "dex_static_value": null
+    },
+    {
+      "name": "tags",
+      "reported_type": "java.util.List<fi.vlE>",
+      "dex_static_value": null
+    },
+    {
+      "name": "thumbnail",
+      "reported_type": "android.net.Uri",
+      "dex_static_value": null
+    },
+    {
+      "name": "type",
+      "reported_type": "com.alightcreative.app.motion.scene.visualeffect.EffectType",
+      "dex_static_value": null
+    },
+    {
+      "name": "uri",
+      "reported_type": "android.net.Uri",
+      "dex_static_value": null
+    }
+  ],
+  "inner_classes": []
+}

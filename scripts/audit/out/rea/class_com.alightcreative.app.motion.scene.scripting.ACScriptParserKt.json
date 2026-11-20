@@ -1,0 +1,22 @@
+{
+  "engine": {
+    "name": "jadx-headless-mcp",
+    "version": "0.7.1",
+    "artifact_sha256": "6e5eacf500b64292bfb73c49797c1958f6ee44646e43e868039ae7feb573ff75",
+    "source_revision": "5844800a486d2248fa949b74c9896285f5b54de2",
+    "worker_count": 1,
+    "heap_limit_mib": 8192
+  },
+  "class_name": "com.alightcreative.app.motion.scene.scripting.ACScriptParserKt",
+  "methods": [
+    {
+      "name": "readACScript",
+      "reported_signature": "readACScript(org.xmlpull.v1.XmlPullParser, java.lang.String): com.alightcreative.app.motion.scene.scripting.ACScript",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lorg/xmlpull/v1/XmlPullParser;Ljava/lang/String;)Lcom/alightcreative/app/motion/scene/scripting/ACScript;"
+    }
+  ],
+  "fields": [],
+  "inner_classes": []
+}

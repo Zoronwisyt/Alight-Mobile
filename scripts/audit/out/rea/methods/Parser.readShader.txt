@@ -1,0 +1,44 @@
+    private static final ShaderInfo readShader(XmlPullParser xmlPullParser, String str) throws XmlPullParserException, IOException, MalformedXMLException {
+        ShaderType shaderType;
+        ShaderPrecision shaderPrecision;
+        Integer intOrNull;
+        xmlPullParser.require(2, str, "shader");
+        String attributeValue = xmlPullParser.getAttributeValue(str, "type");
+        if (attributeValue == null) {
+            throw new MalformedXMLException("<shader> element missing 'type' attribute", null, false, 6, null);
+        }
+        String attributeValue2 = xmlPullParser.getAttributeValue(str, "precision");
+        if (attributeValue2 == null) {
+            attributeValue2 = "high";
+        }
+        String attributeValue3 = xmlPullParser.getAttributeValue(str, "group");
+        int iIntValue = (attributeValue3 == null || (intOrNull = StringsKt__StringNumberConversionsKt.toIntOrNull(attributeValue3)) == null) ? 0 : intOrNull.intValue();
+        if (Intrinsics.areEqual(attributeValue, "fragment")) {
+            shaderType = ShaderType.FRAGMENT;
+        } else {
+            if (!Intrinsics.areEqual(attributeValue, oaxoZnB.xvyKAmQkdVXPU)) {
+                throw new MalformedXMLException("Unrecognized shader type '" + attributeValue, null, false, 6, null);
+            }
+            shaderType = ShaderType.VERTEX;
+        }
+        int iHashCode = attributeValue2.hashCode();
+        if (iHashCode == -1078030475) {
+            if (attributeValue2.equals("medium")) {
+                shaderPrecision = ShaderPrecision.MEDIUM;
+                return new ShaderInfo(shaderType, pN.dZ(xmlPullParser), shaderPrecision, iIntValue);
+            }
+            throw new MalformedXMLException("Unrecognized shader precision '" + attributeValue2, null, false, 6, null);
+        }
+        if (iHashCode == 107348) {
+            if (attributeValue2.equals("low")) {
+                shaderPrecision = ShaderPrecision.LOW;
+                return new ShaderInfo(shaderType, pN.dZ(xmlPullParser), shaderPrecision, iIntValue);
+            }
+            throw new MalformedXMLException("Unrecognized shader precision '" + attributeValue2, null, false, 6, null);
+        }
+        if (iHashCode == 3202466 && attributeValue2.equals("high")) {
+            shaderPrecision = ShaderPrecision.HIGH;
+            return new ShaderInfo(shaderType, pN.dZ(xmlPullParser), shaderPrecision, iIntValue);
+        }
+        throw new MalformedXMLException("Unrecognized shader precision '" + attributeValue2, null, false, 6, null);
+    }

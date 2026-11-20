@@ -1,0 +1,218 @@
+    public static final V8ValueObject userParamsAtTimeForScript(fs fsVar, Map<String, UserParameterValue> parameterRefs, Map<String, ? extends UserParameter> parameters, final float f2) throws JavetException {
+        Object string;
+        Uri textureValue;
+        Intrinsics.checkNotNullParameter(fsVar, "<this>");
+        Intrinsics.checkNotNullParameter(parameterRefs, "parameterRefs");
+        Intrinsics.checkNotNullParameter(parameters, "parameters");
+        V8ValueObject v8ValueObjectHfr = fsVar.Hfr();
+        for (Map.Entry<String, UserParameterValue> entry : parameterRefs.entrySet()) {
+            String key = entry.getKey();
+            final UserParameterValue value = entry.getValue();
+            switch (WhenMappings.$EnumSwitchMapping$1[value.getDataType().ordinal()]) {
+                case 1:
+                    v8ValueObjectHfr.set(key, Double.valueOf(value.getFloatValue()));
+                    break;
+                case 2:
+                    v8ValueObjectHfr.set(key, Integer.valueOf(value.getIntValue()));
+                    break;
+                case 3:
+                    fsVar.Xu(v8ValueObjectHfr, key, new Function1<V8ValueObject, Unit>() { // from class: com.alightcreative.app.motion.scene.scripting.ScriptExecutorKt$userParamsAtTimeForScript$1$1
+                        {
+                            super(1);
+                        }
+
+                        @Override // kotlin.jvm.functions.Function1
+                        public /* bridge */ /* synthetic */ Unit invoke(V8ValueObject v8ValueObject) throws JavetException {
+                            invoke2(v8ValueObject);
+                            return Unit.INSTANCE;
+                        }
+
+                        /* JADX INFO: renamed from: invoke, reason: avoid collision after fix types in other method */
+                        public final void invoke2(V8ValueObject setObject) throws JavetException {
+                            Intrinsics.checkNotNullParameter(setObject, "$this$setObject");
+                            Bb.Hfr(setObject, value.getColorValue());
+                        }
+                    });
+                    break;
+                case 4:
+                    fsVar.Xu(v8ValueObjectHfr, key, new Function1<V8ValueObject, Unit>() { // from class: com.alightcreative.app.motion.scene.scripting.ScriptExecutorKt$userParamsAtTimeForScript$1$2
+                        {
+                            super(1);
+                        }
+
+                        @Override // kotlin.jvm.functions.Function1
+                        public /* bridge */ /* synthetic */ Unit invoke(V8ValueObject v8ValueObject) throws JavetException {
+                            invoke2(v8ValueObject);
+                            return Unit.INSTANCE;
+                        }
+
+                        /* JADX INFO: renamed from: invoke, reason: avoid collision after fix types in other method */
+                        public final void invoke2(V8ValueObject setObject) throws JavetException {
+                            Intrinsics.checkNotNullParameter(setObject, "$this$setObject");
+                            Bb.s(setObject, value.getVec2DValue());
+                        }
+                    });
+                    break;
+                case 5:
+                    fsVar.Xu(v8ValueObjectHfr, key, new Function1<V8ValueObject, Unit>() { // from class: com.alightcreative.app.motion.scene.scripting.ScriptExecutorKt$userParamsAtTimeForScript$1$3
+                        {
+                            super(1);
+                        }
+
+                        @Override // kotlin.jvm.functions.Function1
+                        public /* bridge */ /* synthetic */ Unit invoke(V8ValueObject v8ValueObject) throws JavetException {
+                            invoke2(v8ValueObject);
+                            return Unit.INSTANCE;
+                        }
+
+                        /* JADX INFO: renamed from: invoke, reason: avoid collision after fix types in other method */
+                        public final void invoke2(V8ValueObject setObject) throws JavetException {
+                            Intrinsics.checkNotNullParameter(setObject, "$this$setObject");
+                            Bb.dZ(setObject, value.getVec3DValue());
+                        }
+                    });
+                    break;
+                case 6:
+                    fsVar.Xu(v8ValueObjectHfr, key, new Function1<V8ValueObject, Unit>() { // from class: com.alightcreative.app.motion.scene.scripting.ScriptExecutorKt$userParamsAtTimeForScript$1$4
+                        {
+                            super(1);
+                        }
+
+                        @Override // kotlin.jvm.functions.Function1
+                        public /* bridge */ /* synthetic */ Unit invoke(V8ValueObject v8ValueObject) throws JavetException {
+                            invoke2(v8ValueObject);
+                            return Unit.INSTANCE;
+                        }
+
+                        /* JADX INFO: renamed from: invoke, reason: avoid collision after fix types in other method */
+                        public final void invoke2(V8ValueObject setObject) throws JavetException {
+                            Intrinsics.checkNotNullParameter(setObject, "$this$setObject");
+                            Bb.Xu(setObject, value.getVec4DValue());
+                        }
+                    });
+                    break;
+                case 7:
+                    v8ValueObjectHfr.set(key, Boolean.valueOf(value.getBooleanValue()));
+                    break;
+                case 8:
+                    v8ValueObjectHfr.set(key, value.getTextureValue().toString());
+                    break;
+            }
+        }
+        for (Map.Entry<String, ? extends UserParameter> entry2 : parameters.entrySet()) {
+            String key2 = entry2.getKey();
+            UserParameter value2 = entry2.getValue();
+            if (!parameterRefs.containsKey(key2)) {
+                final KeyableUserParameterValue defaultKeyableUserParameterValue = UserParameterKt.getDefaultKeyableUserParameterValue(value2);
+                switch (WhenMappings.$EnumSwitchMapping$1[value2.getDataType().ordinal()]) {
+                    case 1:
+                        Intrinsics.checkNotNull(defaultKeyableUserParameterValue);
+                        v8ValueObjectHfr.set(key2, Double.valueOf(((Number) KeyableKt.valueAtTime(defaultKeyableUserParameterValue.getFloatValue(), f2)).floatValue()));
+                        break;
+                    case 2:
+                        Intrinsics.checkNotNull(defaultKeyableUserParameterValue);
+                        v8ValueObjectHfr.set(key2, Integer.valueOf(defaultKeyableUserParameterValue.getIntValue()));
+                        break;
+                    case 3:
+                        fsVar.Xu(v8ValueObjectHfr, key2, new Function1<V8ValueObject, Unit>() { // from class: com.alightcreative.app.motion.scene.scripting.ScriptExecutorKt$userParamsAtTimeForScript$2$1
+                            /* JADX WARN: 'super' call moved to the top of the method (can break code semantics) */
+                            {
+                                super(1);
+                            }
+
+                            @Override // kotlin.jvm.functions.Function1
+                            public /* bridge */ /* synthetic */ Unit invoke(V8ValueObject v8ValueObject) throws JavetException {
+                                invoke2(v8ValueObject);
+                                return Unit.INSTANCE;
+                            }
+
+                            /* JADX INFO: renamed from: invoke, reason: avoid collision after fix types in other method */
+                            public final void invoke2(V8ValueObject setObject) throws JavetException {
+                                Intrinsics.checkNotNullParameter(setObject, "$this$setObject");
+                                KeyableUserParameterValue keyableUserParameterValue = defaultKeyableUserParameterValue;
+                                Intrinsics.checkNotNull(keyableUserParameterValue);
+                                Bb.Hfr(setObject, (SolidColor) KeyableKt.valueAtTime(keyableUserParameterValue.getColorValue(), f2));
+                            }
+                        });
+                        break;
+                    case 4:
+                        fsVar.Xu(v8ValueObjectHfr, key2, new Function1<V8ValueObject, Unit>() { // from class: com.alightcreative.app.motion.scene.scripting.ScriptExecutorKt$userParamsAtTimeForScript$2$2
+                            /* JADX WARN: 'super' call moved to the top of the method (can break code semantics) */
+                            {
+                                super(1);
+                            }
+
+                            @Override // kotlin.jvm.functions.Function1
+                            public /* bridge */ /* synthetic */ Unit invoke(V8ValueObject v8ValueObject) throws JavetException {
+                                invoke2(v8ValueObject);
+                                return Unit.INSTANCE;
+                            }
+
+                            /* JADX INFO: renamed from: invoke, reason: avoid collision after fix types in other method */
+                            public final void invoke2(V8ValueObject setObject) throws JavetException {
+                                Intrinsics.checkNotNullParameter(setObject, "$this$setObject");
+                                KeyableUserParameterValue keyableUserParameterValue = defaultKeyableUserParameterValue;
+                                Intrinsics.checkNotNull(keyableUserParameterValue);
+                                Bb.s(setObject, (Vector2D) KeyableKt.valueAtTime(keyableUserParameterValue.getVec2DValue(), f2));
+                            }
+                        });
+                        break;
+                    case 5:
+                        fsVar.Xu(v8ValueObjectHfr, key2, new Function1<V8ValueObject, Unit>() { // from class: com.alightcreative.app.motion.scene.scripting.ScriptExecutorKt$userParamsAtTimeForScript$2$3
+                            /* JADX WARN: 'super' call moved to the top of the method (can break code semantics) */
+                            {
+                                super(1);
+                            }
+
+                            @Override // kotlin.jvm.functions.Function1
+                            public /* bridge */ /* synthetic */ Unit invoke(V8ValueObject v8ValueObject) throws JavetException {
+                                invoke2(v8ValueObject);
+                                return Unit.INSTANCE;
+                            }
+
+                            /* JADX INFO: renamed from: invoke, reason: avoid collision after fix types in other method */
+                            public final void invoke2(V8ValueObject setObject) throws JavetException {
+                                Intrinsics.checkNotNullParameter(setObject, "$this$setObject");
+                                KeyableUserParameterValue keyableUserParameterValue = defaultKeyableUserParameterValue;
+                                Intrinsics.checkNotNull(keyableUserParameterValue);
+                                Bb.dZ(setObject, (Vector3D) KeyableKt.valueAtTime(keyableUserParameterValue.getVec3DValue(), f2));
+                            }
+                        });
+                        break;
+                    case 6:
+                        fsVar.Xu(v8ValueObjectHfr, key2, new Function1<V8ValueObject, Unit>() { // from class: com.alightcreative.app.motion.scene.scripting.ScriptExecutorKt$userParamsAtTimeForScript$2$4
+                            /* JADX WARN: 'super' call moved to the top of the method (can break code semantics) */
+                            {
+                                super(1);
+                            }
+
+                            @Override // kotlin.jvm.functions.Function1
+                            public /* bridge */ /* synthetic */ Unit invoke(V8ValueObject v8ValueObject) throws JavetException {
+                                invoke2(v8ValueObject);
+                                return Unit.INSTANCE;
+                            }
+
+                            /* JADX INFO: renamed from: invoke, reason: avoid collision after fix types in other method */
+                            public final void invoke2(V8ValueObject setObject) throws JavetException {
+                                Intrinsics.checkNotNullParameter(setObject, "$this$setObject");
+                                KeyableUserParameterValue keyableUserParameterValue = defaultKeyableUserParameterValue;
+                                Intrinsics.checkNotNull(keyableUserParameterValue);
+                                Bb.Xu(setObject, (Vector4D) KeyableKt.valueAtTime(keyableUserParameterValue.getVec4DValue(), f2));
+                            }
+                        });
+                        break;
+                    case 7:
+                        Intrinsics.checkNotNull(defaultKeyableUserParameterValue);
+                        v8ValueObjectHfr.set(key2, Boolean.valueOf(defaultKeyableUserParameterValue.getBooleanValue()));
+                        break;
+                    case 8:
+                        if (defaultKeyableUserParameterValue == null || (textureValue = defaultKeyableUserParameterValue.getTextureValue()) == null || (string = textureValue.toString()) == null) {
+                            string = "";
+                        }
+                        v8ValueObjectHfr.set(key2, string);
+                        break;
+                }
+            }
+        }
+        return v8ValueObjectHfr;
+    }

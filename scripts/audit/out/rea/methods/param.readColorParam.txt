@@ -1,0 +1,38 @@
+    private static final UserParameter.Color readColorParam(XmlPullParser xmlPullParser, String str) throws XmlPullParserException, IOException, MalformedXMLException {
+        boolean z2;
+        SolidColor black;
+        xmlPullParser.require(2, str, "color");
+        String attributeValue = xmlPullParser.getAttributeValue(str, "id");
+        if (attributeValue == null) {
+            throw new MalformedXMLException("element missing 'id' attribute", null, false, 6, null);
+        }
+        String attributeValue2 = xmlPullParser.getAttributeValue(str, eahvYdhAm.ZlyZGQTX);
+        if (attributeValue2 == null) {
+            attributeValue2 = "true";
+        }
+        boolean zRw = mY0.Rw(attributeValue2);
+        String attributeValue3 = xmlPullParser.getAttributeValue(str, "alpha");
+        if (attributeValue3 == null) {
+            attributeValue3 = "false";
+        }
+        if (Intrinsics.areEqual(attributeValue3, "true")) {
+            z2 = true;
+        } else {
+            if (!Intrinsics.areEqual(attributeValue3, "false")) {
+                throw new MalformedXMLException("expected 'true' or 'false'", null, false, 6, null);
+            }
+            z2 = false;
+        }
+        boolean z4 = z2;
+        String attributeValue4 = xmlPullParser.getAttributeValue(str, JavetLibLoadingListener.JAVET_LIB_LOADING_TYPE_DEFAULT);
+        if (attributeValue4 == null || (black = W.BWM(CZU.Xu(attributeValue4))) == null) {
+            black = SolidColor.INSTANCE.getBLACK();
+        }
+        SolidColor solidColor = black;
+        String attributeValue5 = xmlPullParser.getAttributeValue(str, "label");
+        if (attributeValue5 == null) {
+            attributeValue5 = "";
+        }
+        pN.Xu(xmlPullParser);
+        return new UserParameter.Color(attributeValue, attributeValue5, zRw, solidColor, z4);
+    }

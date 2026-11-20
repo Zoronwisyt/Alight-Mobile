@@ -1,0 +1,1512 @@
+    /* JADX WARN: Can't fix incorrect switch cases order, some code will duplicate */
+    /* JADX WARN: Code duplicated, block: B:100:0x0188  */
+    /* JADX WARN: Code duplicated, block: B:104:0x0196  */
+    /* JADX WARN: Code duplicated, block: B:106:0x01ac  */
+    /* JADX WARN: Code duplicated, block: B:109:0x01bd  */
+    /* JADX WARN: Code duplicated, block: B:113:0x01d7  */
+    /* JADX WARN: Code duplicated, block: B:121:0x0184 A[SYNTHETIC] */
+    /* JADX WARN: Code duplicated, block: B:123:0x016a A[SYNTHETIC] */
+    /* JADX WARN: Code duplicated, block: B:126:0x01d1 A[SYNTHETIC] */
+    /* JADX WARN: Code duplicated, block: B:128:0x01b7 A[SYNTHETIC] */
+    /* JADX WARN: Code duplicated, block: B:45:0x00aa  */
+    /* JADX WARN: Code duplicated, block: B:48:0x00b6  */
+    /* JADX WARN: Code duplicated, block: B:51:0x00c0  */
+    /* JADX WARN: Code duplicated, block: B:54:0x00cc  */
+    /* JADX WARN: Code duplicated, block: B:57:0x00d5  */
+    /* JADX WARN: Code duplicated, block: B:60:0x00e1  */
+    /* JADX WARN: Code duplicated, block: B:63:0x00ea  */
+    /* JADX WARN: Code duplicated, block: B:66:0x00f5  */
+    /* JADX WARN: Code duplicated, block: B:68:0x00f9  */
+    /* JADX WARN: Code duplicated, block: B:70:0x00fd  */
+    /* JADX WARN: Code duplicated, block: B:73:0x0106  */
+    /* JADX WARN: Code duplicated, block: B:76:0x0111  */
+    /* JADX WARN: Code duplicated, block: B:78:0x0115  */
+    /* JADX WARN: Code duplicated, block: B:79:0x0117  */
+    /* JADX WARN: Code duplicated, block: B:83:0x0125  */
+    /* JADX WARN: Code duplicated, block: B:86:0x0131  */
+    /* JADX WARN: Code duplicated, block: B:89:0x013a  */
+    /* JADX WARN: Code duplicated, block: B:92:0x014b  */
+    /* JADX WARN: Code duplicated, block: B:94:0x015f  */
+    /* JADX WARN: Code duplicated, block: B:97:0x0170  */
+    /* JADX WARN: Failed to restore switch over string. Please report as a decompilation issue */
+    private static final UserParameter.Slider readSliderParam(XmlPullParser xmlPullParser, String str) throws XmlPullParserException, IOException, MalformedXMLException {
+        SliderType sliderType;
+        SliderType sliderType2;
+        String attributeValue;
+        float fFloatValue;
+        String attributeValue2;
+        float fFloatValue2;
+        String attributeValue3;
+        float fFloatValue3;
+        String attributeValue4;
+        float f2;
+        float fFloatValue4;
+        String attributeValue5;
+        float fFloatValue5;
+        float f3;
+        String attributeValue6;
+        float fFloatValue6;
+        String attributeValue7;
+        String attributeValue8;
+        int i2;
+        List listEmptyList;
+        String attributeValue9;
+        List listEmptyList2;
+        List listSplit$default;
+        ArrayList arrayList;
+        Iterator it;
+        Float fU2;
+        List listSplit$default2;
+        Iterator it2;
+        Float fU3;
+        Float fU4;
+        Float fU5;
+        Float fU6;
+        Float fU7;
+        Float fU8;
+        Float floatOrNull;
+        xmlPullParser.require(2, str, "slider");
+        String attributeValue10 = xmlPullParser.getAttributeValue(str, "id");
+        if (attributeValue10 == null) {
+            throw new MalformedXMLException("element missing 'id' attribute", null, false, 6, null);
+        }
+        String attributeValue11 = xmlPullParser.getAttributeValue(str, "enabled");
+        if (attributeValue11 == null) {
+            attributeValue11 = "true";
+        }
+        boolean zRw = mY0.Rw(attributeValue11);
+        String attributeValue12 = xmlPullParser.getAttributeValue(str, "type");
+        if (attributeValue12 == null) {
+            attributeValue12 = "float";
+        }
+        switch (attributeValue12.hashCode()) {
+            case -1266514778:
+                if (attributeValue12.equals("frames")) {
+                    sliderType = SliderType.FRAMES;
+                    sliderType2 = sliderType;
+                    attributeValue = xmlPullParser.getAttributeValue(str, "logscale");
+                    if (attributeValue != null || (floatOrNull = StringsKt__StringNumberConversionsJVMKt.toFloatOrNull(attributeValue)) == null) {
+                        fFloatValue = 1.0f;
+                    } else {
+                        fFloatValue = floatOrNull.floatValue();
+                    }
+                    attributeValue2 = xmlPullParser.getAttributeValue(str, JavetLibLoadingListener.JAVET_LIB_LOADING_TYPE_DEFAULT);
+                    if (attributeValue2 != null || (fU8 = CZU.u(attributeValue2)) == null) {
+                        fFloatValue2 = 0.0f;
+                    } else {
+                        fFloatValue2 = fU8.floatValue();
+                    }
+                    attributeValue3 = xmlPullParser.getAttributeValue(str, "min");
+                    if (attributeValue3 != null || (fU7 = CZU.u(attributeValue3)) == null) {
+                        fFloatValue3 = 0.0f;
+                    } else {
+                        fFloatValue3 = fU7.floatValue();
+                    }
+                    attributeValue4 = xmlPullParser.getAttributeValue(str, AppLovinMediationProvider.MAX);
+                    if (attributeValue4 != null || (fU6 = CZU.u(attributeValue4)) == null) {
+                        if (sliderType2 == SliderType.INTEGER) {
+                            fFloatValue4 = 10.0f;
+                        } else {
+                            f2 = 1.0f;
+                        }
+                        attributeValue5 = xmlPullParser.getAttributeValue(str, "step");
+                        if (attributeValue5 != null || (fU5 = CZU.u(attributeValue5)) == null) {
+                            if (sliderType2 == SliderType.INTEGER) {
+                                f3 = 1.0f;
+                            } else {
+                                fFloatValue5 = (f2 - fFloatValue3) / 100.0f;
+                            }
+                            attributeValue6 = xmlPullParser.getAttributeValue(str, "originValue");
+                            if (attributeValue6 != null || (fU4 = CZU.u(attributeValue6)) == null) {
+                                fFloatValue6 = 0.0f;
+                            } else {
+                                fFloatValue6 = fU4.floatValue();
+                            }
+                            attributeValue7 = xmlPullParser.getAttributeValue(str, "label");
+                            if (attributeValue7 == null) {
+                                attributeValue7 = "";
+                            }
+                            String str2 = attributeValue7;
+                            attributeValue8 = xmlPullParser.getAttributeValue(str, "ticks");
+                            float f4 = fFloatValue;
+                            if (attributeValue8 != null) {
+                                i2 = 1;
+                                listSplit$default2 = StringsKt__StringsKt.split$default((CharSequence) attributeValue8, new char[]{','}, false, 0, 6, (Object) null);
+                                if (listSplit$default2 != null) {
+                                    listEmptyList = new ArrayList();
+                                    it2 = listSplit$default2.iterator();
+                                    while (it2.hasNext()) {
+                                        fU3 = CZU.u(StringsKt__StringsKt.trim((CharSequence) it2.next()).toString());
+                                        if (fU3 != null) {
+                                            listEmptyList.add(fU3);
+                                        }
+                                    }
+                                }
+                                attributeValue9 = xmlPullParser.getAttributeValue(str, "snap");
+                                if (attributeValue9 != null) {
+                                    char[] cArr = new char[i2];
+                                    cArr[0] = ',';
+                                    listSplit$default = StringsKt__StringsKt.split$default((CharSequence) attributeValue9, cArr, false, 0, 6, (Object) null);
+                                    if (listSplit$default != null) {
+                                        arrayList = new ArrayList();
+                                        it = listSplit$default.iterator();
+                                        while (it.hasNext()) {
+                                            fU2 = CZU.u(StringsKt__StringsKt.trim((CharSequence) it.next()).toString());
+                                            if (fU2 != null) {
+                                                arrayList.add(fU2);
+                                            }
+                                        }
+                                        listEmptyList2 = arrayList;
+                                    } else {
+                                        listEmptyList2 = CollectionsKt__CollectionsKt.emptyList();
+                                    }
+                                } else {
+                                    listEmptyList2 = CollectionsKt__CollectionsKt.emptyList();
+                                }
+                                pN.Xu(xmlPullParser);
+                                return new UserParameter.Slider(attributeValue10, str2, zRw, fFloatValue3, f2, f3, fFloatValue2, fFloatValue6, sliderType2, f4, listEmptyList, listEmptyList2);
+                            }
+                            i2 = 1;
+                            listEmptyList = CollectionsKt__CollectionsKt.emptyList();
+                            attributeValue9 = xmlPullParser.getAttributeValue(str, "snap");
+                            if (attributeValue9 != null) {
+                                char[] cArr2 = new char[i2];
+                                cArr2[0] = ',';
+                                listSplit$default = StringsKt__StringsKt.split$default((CharSequence) attributeValue9, cArr2, false, 0, 6, (Object) null);
+                                if (listSplit$default != null) {
+                                    arrayList = new ArrayList();
+                                    it = listSplit$default.iterator();
+                                    while (it.hasNext()) {
+                                        fU2 = CZU.u(StringsKt__StringsKt.trim((CharSequence) it.next()).toString());
+                                        if (fU2 != null) {
+                                            arrayList.add(fU2);
+                                        }
+                                    }
+                                    listEmptyList2 = arrayList;
+                                } else {
+                                    listEmptyList2 = CollectionsKt__CollectionsKt.emptyList();
+                                }
+                            } else {
+                                listEmptyList2 = CollectionsKt__CollectionsKt.emptyList();
+                            }
+                            pN.Xu(xmlPullParser);
+                            return new UserParameter.Slider(attributeValue10, str2, zRw, fFloatValue3, f2, f3, fFloatValue2, fFloatValue6, sliderType2, f4, listEmptyList, listEmptyList2);
+                        }
+                        fFloatValue5 = fU5.floatValue();
+                        f3 = fFloatValue5;
+                        attributeValue6 = xmlPullParser.getAttributeValue(str, "originValue");
+                        if (attributeValue6 != null) {
+                            fFloatValue6 = 0.0f;
+                        } else {
+                            fFloatValue6 = 0.0f;
+                        }
+                        attributeValue7 = xmlPullParser.getAttributeValue(str, "label");
+                        if (attributeValue7 == null) {
+                            attributeValue7 = "";
+                        }
+                        String str3 = attributeValue7;
+                        attributeValue8 = xmlPullParser.getAttributeValue(str, "ticks");
+                        float f5 = fFloatValue;
+                        if (attributeValue8 != null) {
+                            i2 = 1;
+                            listSplit$default2 = StringsKt__StringsKt.split$default((CharSequence) attributeValue8, new char[]{','}, false, 0, 6, (Object) null);
+                            if (listSplit$default2 != null) {
+                                listEmptyList = new ArrayList();
+                                it2 = listSplit$default2.iterator();
+                                while (it2.hasNext()) {
+                                    fU3 = CZU.u(StringsKt__StringsKt.trim((CharSequence) it2.next()).toString());
+                                    if (fU3 != null) {
+                                        listEmptyList.add(fU3);
+                                    }
+                                }
+                            }
+                            attributeValue9 = xmlPullParser.getAttributeValue(str, "snap");
+                            if (attributeValue9 != null) {
+                                char[] cArr3 = new char[i2];
+                                cArr3[0] = ',';
+                                listSplit$default = StringsKt__StringsKt.split$default((CharSequence) attributeValue9, cArr3, false, 0, 6, (Object) null);
+                                if (listSplit$default != null) {
+                                    arrayList = new ArrayList();
+                                    it = listSplit$default.iterator();
+                                    while (it.hasNext()) {
+                                        fU2 = CZU.u(StringsKt__StringsKt.trim((CharSequence) it.next()).toString());
+                                        if (fU2 != null) {
+                                            arrayList.add(fU2);
+                                        }
+                                    }
+                                    listEmptyList2 = arrayList;
+                                } else {
+                                    listEmptyList2 = CollectionsKt__CollectionsKt.emptyList();
+                                }
+                            } else {
+                                listEmptyList2 = CollectionsKt__CollectionsKt.emptyList();
+                            }
+                            pN.Xu(xmlPullParser);
+                            return new UserParameter.Slider(attributeValue10, str3, zRw, fFloatValue3, f2, f3, fFloatValue2, fFloatValue6, sliderType2, f5, listEmptyList, listEmptyList2);
+                        }
+                        i2 = 1;
+                        listEmptyList = CollectionsKt__CollectionsKt.emptyList();
+                        attributeValue9 = xmlPullParser.getAttributeValue(str, "snap");
+                        if (attributeValue9 != null) {
+                            char[] cArr4 = new char[i2];
+                            cArr4[0] = ',';
+                            listSplit$default = StringsKt__StringsKt.split$default((CharSequence) attributeValue9, cArr4, false, 0, 6, (Object) null);
+                            if (listSplit$default != null) {
+                                arrayList = new ArrayList();
+                                it = listSplit$default.iterator();
+                                while (it.hasNext()) {
+                                    fU2 = CZU.u(StringsKt__StringsKt.trim((CharSequence) it.next()).toString());
+                                    if (fU2 != null) {
+                                        arrayList.add(fU2);
+                                    }
+                                }
+                                listEmptyList2 = arrayList;
+                            } else {
+                                listEmptyList2 = CollectionsKt__CollectionsKt.emptyList();
+                            }
+                        } else {
+                            listEmptyList2 = CollectionsKt__CollectionsKt.emptyList();
+                        }
+                        pN.Xu(xmlPullParser);
+                        return new UserParameter.Slider(attributeValue10, str3, zRw, fFloatValue3, f2, f3, fFloatValue2, fFloatValue6, sliderType2, f5, listEmptyList, listEmptyList2);
+                    }
+                    fFloatValue4 = fU6.floatValue();
+                    f2 = fFloatValue4;
+                    attributeValue5 = xmlPullParser.getAttributeValue(str, "step");
+                    if (attributeValue5 != null) {
+                        if (sliderType2 == SliderType.INTEGER) {
+                            f3 = 1.0f;
+                        } else {
+                            fFloatValue5 = (f2 - fFloatValue3) / 100.0f;
+                            f3 = fFloatValue5;
+                        }
+                    } else if (sliderType2 == SliderType.INTEGER) {
+                        f3 = 1.0f;
+                    } else {
+                        fFloatValue5 = (f2 - fFloatValue3) / 100.0f;
+                        f3 = fFloatValue5;
+                    }
+                    attributeValue6 = xmlPullParser.getAttributeValue(str, "originValue");
+                    if (attributeValue6 != null) {
+                        fFloatValue6 = 0.0f;
+                    } else {
+                        fFloatValue6 = 0.0f;
+                    }
+                    attributeValue7 = xmlPullParser.getAttributeValue(str, "label");
+                    if (attributeValue7 == null) {
+                        attributeValue7 = "";
+                    }
+                    String str4 = attributeValue7;
+                    attributeValue8 = xmlPullParser.getAttributeValue(str, "ticks");
+                    float f6 = fFloatValue;
+                    if (attributeValue8 != null) {
+                        i2 = 1;
+                        listSplit$default2 = StringsKt__StringsKt.split$default((CharSequence) attributeValue8, new char[]{','}, false, 0, 6, (Object) null);
+                        if (listSplit$default2 != null) {
+                            listEmptyList = new ArrayList();
+                            it2 = listSplit$default2.iterator();
+                            while (it2.hasNext()) {
+                                fU3 = CZU.u(StringsKt__StringsKt.trim((CharSequence) it2.next()).toString());
+                                if (fU3 != null) {
+                                    listEmptyList.add(fU3);
+                                }
+                            }
+                        }
+                        attributeValue9 = xmlPullParser.getAttributeValue(str, "snap");
+                        if (attributeValue9 != null) {
+                            char[] cArr5 = new char[i2];
+                            cArr5[0] = ',';
+                            listSplit$default = StringsKt__StringsKt.split$default((CharSequence) attributeValue9, cArr5, false, 0, 6, (Object) null);
+                            if (listSplit$default != null) {
+                                arrayList = new ArrayList();
+                                it = listSplit$default.iterator();
+                                while (it.hasNext()) {
+                                    fU2 = CZU.u(StringsKt__StringsKt.trim((CharSequence) it.next()).toString());
+                                    if (fU2 != null) {
+                                        arrayList.add(fU2);
+                                    }
+                                }
+                                listEmptyList2 = arrayList;
+                            } else {
+                                listEmptyList2 = CollectionsKt__CollectionsKt.emptyList();
+                            }
+                        } else {
+                            listEmptyList2 = CollectionsKt__CollectionsKt.emptyList();
+                        }
+                        pN.Xu(xmlPullParser);
+                        return new UserParameter.Slider(attributeValue10, str4, zRw, fFloatValue3, f2, f3, fFloatValue2, fFloatValue6, sliderType2, f6, listEmptyList, listEmptyList2);
+                    }
+                    i2 = 1;
+                    listEmptyList = CollectionsKt__CollectionsKt.emptyList();
+                    attributeValue9 = xmlPullParser.getAttributeValue(str, "snap");
+                    if (attributeValue9 != null) {
+                        char[] cArr6 = new char[i2];
+                        cArr6[0] = ',';
+                        listSplit$default = StringsKt__StringsKt.split$default((CharSequence) attributeValue9, cArr6, false, 0, 6, (Object) null);
+                        if (listSplit$default != null) {
+                            arrayList = new ArrayList();
+                            it = listSplit$default.iterator();
+                            while (it.hasNext()) {
+                                fU2 = CZU.u(StringsKt__StringsKt.trim((CharSequence) it.next()).toString());
+                                if (fU2 != null) {
+                                    arrayList.add(fU2);
+                                }
+                            }
+                            listEmptyList2 = arrayList;
+                        } else {
+                            listEmptyList2 = CollectionsKt__CollectionsKt.emptyList();
+                        }
+                    } else {
+                        listEmptyList2 = CollectionsKt__CollectionsKt.emptyList();
+                    }
+                    pN.Xu(xmlPullParser);
+                    return new UserParameter.Slider(attributeValue10, str4, zRw, fFloatValue3, f2, f3, fFloatValue2, fFloatValue6, sliderType2, f6, listEmptyList, listEmptyList2);
+                }
+                throw new MalformedXMLException("expected 'float', 'integer', or 'percent'", null, false, 6, null);
+            case -1135038327:
+                if (attributeValue12.equals("kelvin")) {
+                    sliderType = SliderType.KELVIN;
+                    sliderType2 = sliderType;
+                    attributeValue = xmlPullParser.getAttributeValue(str, "logscale");
+                    if (attributeValue != null) {
+                        fFloatValue = 1.0f;
+                    } else {
+                        fFloatValue = 1.0f;
+                    }
+                    attributeValue2 = xmlPullParser.getAttributeValue(str, JavetLibLoadingListener.JAVET_LIB_LOADING_TYPE_DEFAULT);
+                    if (attributeValue2 != null) {
+                        fFloatValue2 = 0.0f;
+                    } else {
+                        fFloatValue2 = 0.0f;
+                    }
+                    attributeValue3 = xmlPullParser.getAttributeValue(str, "min");
+                    if (attributeValue3 != null) {
+                        fFloatValue3 = 0.0f;
+                    } else {
+                        fFloatValue3 = 0.0f;
+                    }
+                    attributeValue4 = xmlPullParser.getAttributeValue(str, AppLovinMediationProvider.MAX);
+                    if (attributeValue4 != null) {
+                        if (sliderType2 == SliderType.INTEGER) {
+                            fFloatValue4 = 10.0f;
+                            f2 = fFloatValue4;
+                        } else {
+                            f2 = 1.0f;
+                        }
+                    } else if (sliderType2 == SliderType.INTEGER) {
+                        fFloatValue4 = 10.0f;
+                        f2 = fFloatValue4;
+                    } else {
+                        f2 = 1.0f;
+                    }
+                    attributeValue5 = xmlPullParser.getAttributeValue(str, "step");
+                    if (attributeValue5 != null) {
+                        if (sliderType2 == SliderType.INTEGER) {
+                            f3 = 1.0f;
+                        } else {
+                            fFloatValue5 = (f2 - fFloatValue3) / 100.0f;
+                            f3 = fFloatValue5;
+                        }
+                    } else if (sliderType2 == SliderType.INTEGER) {
+                        f3 = 1.0f;
+                    } else {
+                        fFloatValue5 = (f2 - fFloatValue3) / 100.0f;
+                        f3 = fFloatValue5;
+                    }
+                    attributeValue6 = xmlPullParser.getAttributeValue(str, "originValue");
+                    if (attributeValue6 != null) {
+                        fFloatValue6 = 0.0f;
+                    } else {
+                        fFloatValue6 = 0.0f;
+                    }
+                    attributeValue7 = xmlPullParser.getAttributeValue(str, "label");
+                    if (attributeValue7 == null) {
+                        attributeValue7 = "";
+                    }
+                    String str5 = attributeValue7;
+                    attributeValue8 = xmlPullParser.getAttributeValue(str, "ticks");
+                    float f7 = fFloatValue;
+                    if (attributeValue8 != null) {
+                        i2 = 1;
+                        listSplit$default2 = StringsKt__StringsKt.split$default((CharSequence) attributeValue8, new char[]{','}, false, 0, 6, (Object) null);
+                        if (listSplit$default2 != null) {
+                            listEmptyList = new ArrayList();
+                            it2 = listSplit$default2.iterator();
+                            while (it2.hasNext()) {
+                                fU3 = CZU.u(StringsKt__StringsKt.trim((CharSequence) it2.next()).toString());
+                                if (fU3 != null) {
+                                    listEmptyList.add(fU3);
+                                }
+                            }
+                        }
+                        attributeValue9 = xmlPullParser.getAttributeValue(str, "snap");
+                        if (attributeValue9 != null) {
+                            char[] cArr7 = new char[i2];
+                            cArr7[0] = ',';
+                            listSplit$default = StringsKt__StringsKt.split$default((CharSequence) attributeValue9, cArr7, false, 0, 6, (Object) null);
+                            if (listSplit$default != null) {
+                                arrayList = new ArrayList();
+                                it = listSplit$default.iterator();
+                                while (it.hasNext()) {
+                                    fU2 = CZU.u(StringsKt__StringsKt.trim((CharSequence) it.next()).toString());
+                                    if (fU2 != null) {
+                                        arrayList.add(fU2);
+                                    }
+                                }
+                                listEmptyList2 = arrayList;
+                            } else {
+                                listEmptyList2 = CollectionsKt__CollectionsKt.emptyList();
+                            }
+                        } else {
+                            listEmptyList2 = CollectionsKt__CollectionsKt.emptyList();
+                        }
+                        pN.Xu(xmlPullParser);
+                        return new UserParameter.Slider(attributeValue10, str5, zRw, fFloatValue3, f2, f3, fFloatValue2, fFloatValue6, sliderType2, f7, listEmptyList, listEmptyList2);
+                    }
+                    i2 = 1;
+                    listEmptyList = CollectionsKt__CollectionsKt.emptyList();
+                    attributeValue9 = xmlPullParser.getAttributeValue(str, "snap");
+                    if (attributeValue9 != null) {
+                        char[] cArr8 = new char[i2];
+                        cArr8[0] = ',';
+                        listSplit$default = StringsKt__StringsKt.split$default((CharSequence) attributeValue9, cArr8, false, 0, 6, (Object) null);
+                        if (listSplit$default != null) {
+                            arrayList = new ArrayList();
+                            it = listSplit$default.iterator();
+                            while (it.hasNext()) {
+                                fU2 = CZU.u(StringsKt__StringsKt.trim((CharSequence) it.next()).toString());
+                                if (fU2 != null) {
+                                    arrayList.add(fU2);
+                                }
+                            }
+                            listEmptyList2 = arrayList;
+                        } else {
+                            listEmptyList2 = CollectionsKt__CollectionsKt.emptyList();
+                        }
+                    } else {
+                        listEmptyList2 = CollectionsKt__CollectionsKt.emptyList();
+                    }
+                    pN.Xu(xmlPullParser);
+                    return new UserParameter.Slider(attributeValue10, str5, zRw, fFloatValue3, f2, f3, fFloatValue2, fFloatValue6, sliderType2, f7, listEmptyList, listEmptyList2);
+                }
+                throw new MalformedXMLException("expected 'float', 'integer', or 'percent'", null, false, 6, null);
+            case -678927291:
+                if (attributeValue12.equals("percent")) {
+                    sliderType = SliderType.PERCENT;
+                    sliderType2 = sliderType;
+                    attributeValue = xmlPullParser.getAttributeValue(str, "logscale");
+                    if (attributeValue != null) {
+                        fFloatValue = 1.0f;
+                    } else {
+                        fFloatValue = 1.0f;
+                    }
+                    attributeValue2 = xmlPullParser.getAttributeValue(str, JavetLibLoadingListener.JAVET_LIB_LOADING_TYPE_DEFAULT);
+                    if (attributeValue2 != null) {
+                        fFloatValue2 = 0.0f;
+                    } else {
+                        fFloatValue2 = 0.0f;
+                    }
+                    attributeValue3 = xmlPullParser.getAttributeValue(str, "min");
+                    if (attributeValue3 != null) {
+                        fFloatValue3 = 0.0f;
+                    } else {
+                        fFloatValue3 = 0.0f;
+                    }
+                    attributeValue4 = xmlPullParser.getAttributeValue(str, AppLovinMediationProvider.MAX);
+                    if (attributeValue4 != null) {
+                        if (sliderType2 == SliderType.INTEGER) {
+                            fFloatValue4 = 10.0f;
+                            f2 = fFloatValue4;
+                        } else {
+                            f2 = 1.0f;
+                        }
+                    } else if (sliderType2 == SliderType.INTEGER) {
+                        fFloatValue4 = 10.0f;
+                        f2 = fFloatValue4;
+                    } else {
+                        f2 = 1.0f;
+                    }
+                    attributeValue5 = xmlPullParser.getAttributeValue(str, "step");
+                    if (attributeValue5 != null) {
+                        if (sliderType2 == SliderType.INTEGER) {
+                            f3 = 1.0f;
+                        } else {
+                            fFloatValue5 = (f2 - fFloatValue3) / 100.0f;
+                            f3 = fFloatValue5;
+                        }
+                    } else if (sliderType2 == SliderType.INTEGER) {
+                        f3 = 1.0f;
+                    } else {
+                        fFloatValue5 = (f2 - fFloatValue3) / 100.0f;
+                        f3 = fFloatValue5;
+                    }
+                    attributeValue6 = xmlPullParser.getAttributeValue(str, "originValue");
+                    if (attributeValue6 != null) {
+                        fFloatValue6 = 0.0f;
+                    } else {
+                        fFloatValue6 = 0.0f;
+                    }
+                    attributeValue7 = xmlPullParser.getAttributeValue(str, "label");
+                    if (attributeValue7 == null) {
+                        attributeValue7 = "";
+                    }
+                    String str6 = attributeValue7;
+                    attributeValue8 = xmlPullParser.getAttributeValue(str, "ticks");
+                    float f8 = fFloatValue;
+                    if (attributeValue8 != null) {
+                        i2 = 1;
+                        listSplit$default2 = StringsKt__StringsKt.split$default((CharSequence) attributeValue8, new char[]{','}, false, 0, 6, (Object) null);
+                        if (listSplit$default2 != null) {
+                            listEmptyList = new ArrayList();
+                            it2 = listSplit$default2.iterator();
+                            while (it2.hasNext()) {
+                                fU3 = CZU.u(StringsKt__StringsKt.trim((CharSequence) it2.next()).toString());
+                                if (fU3 != null) {
+                                    listEmptyList.add(fU3);
+                                }
+                            }
+                        }
+                        attributeValue9 = xmlPullParser.getAttributeValue(str, "snap");
+                        if (attributeValue9 != null) {
+                            char[] cArr9 = new char[i2];
+                            cArr9[0] = ',';
+                            listSplit$default = StringsKt__StringsKt.split$default((CharSequence) attributeValue9, cArr9, false, 0, 6, (Object) null);
+                            if (listSplit$default != null) {
+                                arrayList = new ArrayList();
+                                it = listSplit$default.iterator();
+                                while (it.hasNext()) {
+                                    fU2 = CZU.u(StringsKt__StringsKt.trim((CharSequence) it.next()).toString());
+                                    if (fU2 != null) {
+                                        arrayList.add(fU2);
+                                    }
+                                }
+                                listEmptyList2 = arrayList;
+                            } else {
+                                listEmptyList2 = CollectionsKt__CollectionsKt.emptyList();
+                            }
+                        } else {
+                            listEmptyList2 = CollectionsKt__CollectionsKt.emptyList();
+                        }
+                        pN.Xu(xmlPullParser);
+                        return new UserParameter.Slider(attributeValue10, str6, zRw, fFloatValue3, f2, f3, fFloatValue2, fFloatValue6, sliderType2, f8, listEmptyList, listEmptyList2);
+                    }
+                    i2 = 1;
+                    listEmptyList = CollectionsKt__CollectionsKt.emptyList();
+                    attributeValue9 = xmlPullParser.getAttributeValue(str, "snap");
+                    if (attributeValue9 != null) {
+                        char[] cArr10 = new char[i2];
+                        cArr10[0] = ',';
+                        listSplit$default = StringsKt__StringsKt.split$default((CharSequence) attributeValue9, cArr10, false, 0, 6, (Object) null);
+                        if (listSplit$default != null) {
+                            arrayList = new ArrayList();
+                            it = listSplit$default.iterator();
+                            while (it.hasNext()) {
+                                fU2 = CZU.u(StringsKt__StringsKt.trim((CharSequence) it.next()).toString());
+                                if (fU2 != null) {
+                                    arrayList.add(fU2);
+                                }
+                            }
+                            listEmptyList2 = arrayList;
+                        } else {
+                            listEmptyList2 = CollectionsKt__CollectionsKt.emptyList();
+                        }
+                    } else {
+                        listEmptyList2 = CollectionsKt__CollectionsKt.emptyList();
+                    }
+                    pN.Xu(xmlPullParser);
+                    return new UserParameter.Slider(attributeValue10, str6, zRw, fFloatValue3, f2, f3, fFloatValue2, fFloatValue6, sliderType2, f8, listEmptyList, listEmptyList2);
+                }
+                throw new MalformedXMLException("expected 'float', 'integer', or 'percent'", null, false, 6, null);
+            case -324933605:
+                if (attributeValue12.equals("relative-float")) {
+                    sliderType = SliderType.RELATIVE_FLOAT;
+                    sliderType2 = sliderType;
+                    attributeValue = xmlPullParser.getAttributeValue(str, "logscale");
+                    if (attributeValue != null) {
+                        fFloatValue = 1.0f;
+                    } else {
+                        fFloatValue = 1.0f;
+                    }
+                    attributeValue2 = xmlPullParser.getAttributeValue(str, JavetLibLoadingListener.JAVET_LIB_LOADING_TYPE_DEFAULT);
+                    if (attributeValue2 != null) {
+                        fFloatValue2 = 0.0f;
+                    } else {
+                        fFloatValue2 = 0.0f;
+                    }
+                    attributeValue3 = xmlPullParser.getAttributeValue(str, "min");
+                    if (attributeValue3 != null) {
+                        fFloatValue3 = 0.0f;
+                    } else {
+                        fFloatValue3 = 0.0f;
+                    }
+                    attributeValue4 = xmlPullParser.getAttributeValue(str, AppLovinMediationProvider.MAX);
+                    if (attributeValue4 != null) {
+                        if (sliderType2 == SliderType.INTEGER) {
+                            fFloatValue4 = 10.0f;
+                            f2 = fFloatValue4;
+                        } else {
+                            f2 = 1.0f;
+                        }
+                    } else if (sliderType2 == SliderType.INTEGER) {
+                        fFloatValue4 = 10.0f;
+                        f2 = fFloatValue4;
+                    } else {
+                        f2 = 1.0f;
+                    }
+                    attributeValue5 = xmlPullParser.getAttributeValue(str, "step");
+                    if (attributeValue5 != null) {
+                        if (sliderType2 == SliderType.INTEGER) {
+                            f3 = 1.0f;
+                        } else {
+                            fFloatValue5 = (f2 - fFloatValue3) / 100.0f;
+                            f3 = fFloatValue5;
+                        }
+                    } else if (sliderType2 == SliderType.INTEGER) {
+                        f3 = 1.0f;
+                    } else {
+                        fFloatValue5 = (f2 - fFloatValue3) / 100.0f;
+                        f3 = fFloatValue5;
+                    }
+                    attributeValue6 = xmlPullParser.getAttributeValue(str, "originValue");
+                    if (attributeValue6 != null) {
+                        fFloatValue6 = 0.0f;
+                    } else {
+                        fFloatValue6 = 0.0f;
+                    }
+                    attributeValue7 = xmlPullParser.getAttributeValue(str, "label");
+                    if (attributeValue7 == null) {
+                        attributeValue7 = "";
+                    }
+                    String str7 = attributeValue7;
+                    attributeValue8 = xmlPullParser.getAttributeValue(str, "ticks");
+                    float f9 = fFloatValue;
+                    if (attributeValue8 != null) {
+                        i2 = 1;
+                        listSplit$default2 = StringsKt__StringsKt.split$default((CharSequence) attributeValue8, new char[]{','}, false, 0, 6, (Object) null);
+                        if (listSplit$default2 != null) {
+                            listEmptyList = new ArrayList();
+                            it2 = listSplit$default2.iterator();
+                            while (it2.hasNext()) {
+                                fU3 = CZU.u(StringsKt__StringsKt.trim((CharSequence) it2.next()).toString());
+                                if (fU3 != null) {
+                                    listEmptyList.add(fU3);
+                                }
+                            }
+                        }
+                        attributeValue9 = xmlPullParser.getAttributeValue(str, "snap");
+                        if (attributeValue9 != null) {
+                            char[] cArr11 = new char[i2];
+                            cArr11[0] = ',';
+                            listSplit$default = StringsKt__StringsKt.split$default((CharSequence) attributeValue9, cArr11, false, 0, 6, (Object) null);
+                            if (listSplit$default != null) {
+                                arrayList = new ArrayList();
+                                it = listSplit$default.iterator();
+                                while (it.hasNext()) {
+                                    fU2 = CZU.u(StringsKt__StringsKt.trim((CharSequence) it.next()).toString());
+                                    if (fU2 != null) {
+                                        arrayList.add(fU2);
+                                    }
+                                }
+                                listEmptyList2 = arrayList;
+                            } else {
+                                listEmptyList2 = CollectionsKt__CollectionsKt.emptyList();
+                            }
+                        } else {
+                            listEmptyList2 = CollectionsKt__CollectionsKt.emptyList();
+                        }
+                        pN.Xu(xmlPullParser);
+                        return new UserParameter.Slider(attributeValue10, str7, zRw, fFloatValue3, f2, f3, fFloatValue2, fFloatValue6, sliderType2, f9, listEmptyList, listEmptyList2);
+                    }
+                    i2 = 1;
+                    listEmptyList = CollectionsKt__CollectionsKt.emptyList();
+                    attributeValue9 = xmlPullParser.getAttributeValue(str, "snap");
+                    if (attributeValue9 != null) {
+                        char[] cArr12 = new char[i2];
+                        cArr12[0] = ',';
+                        listSplit$default = StringsKt__StringsKt.split$default((CharSequence) attributeValue9, cArr12, false, 0, 6, (Object) null);
+                        if (listSplit$default != null) {
+                            arrayList = new ArrayList();
+                            it = listSplit$default.iterator();
+                            while (it.hasNext()) {
+                                fU2 = CZU.u(StringsKt__StringsKt.trim((CharSequence) it.next()).toString());
+                                if (fU2 != null) {
+                                    arrayList.add(fU2);
+                                }
+                            }
+                            listEmptyList2 = arrayList;
+                        } else {
+                            listEmptyList2 = CollectionsKt__CollectionsKt.emptyList();
+                        }
+                    } else {
+                        listEmptyList2 = CollectionsKt__CollectionsKt.emptyList();
+                    }
+                    pN.Xu(xmlPullParser);
+                    return new UserParameter.Slider(attributeValue10, str7, zRw, fFloatValue3, f2, f3, fFloatValue2, fFloatValue6, sliderType2, f9, listEmptyList, listEmptyList2);
+                }
+                throw new MalformedXMLException("expected 'float', 'integer', or 'percent'", null, false, 6, null);
+            case 3346:
+                if (attributeValue12.equals("hz")) {
+                    sliderType = SliderType.HZ;
+                    sliderType2 = sliderType;
+                    attributeValue = xmlPullParser.getAttributeValue(str, "logscale");
+                    if (attributeValue != null) {
+                        fFloatValue = 1.0f;
+                    } else {
+                        fFloatValue = 1.0f;
+                    }
+                    attributeValue2 = xmlPullParser.getAttributeValue(str, JavetLibLoadingListener.JAVET_LIB_LOADING_TYPE_DEFAULT);
+                    if (attributeValue2 != null) {
+                        fFloatValue2 = 0.0f;
+                    } else {
+                        fFloatValue2 = 0.0f;
+                    }
+                    attributeValue3 = xmlPullParser.getAttributeValue(str, "min");
+                    if (attributeValue3 != null) {
+                        fFloatValue3 = 0.0f;
+                    } else {
+                        fFloatValue3 = 0.0f;
+                    }
+                    attributeValue4 = xmlPullParser.getAttributeValue(str, AppLovinMediationProvider.MAX);
+                    if (attributeValue4 != null) {
+                        if (sliderType2 == SliderType.INTEGER) {
+                            fFloatValue4 = 10.0f;
+                            f2 = fFloatValue4;
+                        } else {
+                            f2 = 1.0f;
+                        }
+                    } else if (sliderType2 == SliderType.INTEGER) {
+                        fFloatValue4 = 10.0f;
+                        f2 = fFloatValue4;
+                    } else {
+                        f2 = 1.0f;
+                    }
+                    attributeValue5 = xmlPullParser.getAttributeValue(str, "step");
+                    if (attributeValue5 != null) {
+                        if (sliderType2 == SliderType.INTEGER) {
+                            f3 = 1.0f;
+                        } else {
+                            fFloatValue5 = (f2 - fFloatValue3) / 100.0f;
+                            f3 = fFloatValue5;
+                        }
+                    } else if (sliderType2 == SliderType.INTEGER) {
+                        f3 = 1.0f;
+                    } else {
+                        fFloatValue5 = (f2 - fFloatValue3) / 100.0f;
+                        f3 = fFloatValue5;
+                    }
+                    attributeValue6 = xmlPullParser.getAttributeValue(str, "originValue");
+                    if (attributeValue6 != null) {
+                        fFloatValue6 = 0.0f;
+                    } else {
+                        fFloatValue6 = 0.0f;
+                    }
+                    attributeValue7 = xmlPullParser.getAttributeValue(str, "label");
+                    if (attributeValue7 == null) {
+                        attributeValue7 = "";
+                    }
+                    String str8 = attributeValue7;
+                    attributeValue8 = xmlPullParser.getAttributeValue(str, "ticks");
+                    float f10 = fFloatValue;
+                    if (attributeValue8 != null) {
+                        i2 = 1;
+                        listSplit$default2 = StringsKt__StringsKt.split$default((CharSequence) attributeValue8, new char[]{','}, false, 0, 6, (Object) null);
+                        if (listSplit$default2 != null) {
+                            listEmptyList = new ArrayList();
+                            it2 = listSplit$default2.iterator();
+                            while (it2.hasNext()) {
+                                fU3 = CZU.u(StringsKt__StringsKt.trim((CharSequence) it2.next()).toString());
+                                if (fU3 != null) {
+                                    listEmptyList.add(fU3);
+                                }
+                            }
+                        }
+                        attributeValue9 = xmlPullParser.getAttributeValue(str, "snap");
+                        if (attributeValue9 != null) {
+                            char[] cArr13 = new char[i2];
+                            cArr13[0] = ',';
+                            listSplit$default = StringsKt__StringsKt.split$default((CharSequence) attributeValue9, cArr13, false, 0, 6, (Object) null);
+                            if (listSplit$default != null) {
+                                arrayList = new ArrayList();
+                                it = listSplit$default.iterator();
+                                while (it.hasNext()) {
+                                    fU2 = CZU.u(StringsKt__StringsKt.trim((CharSequence) it.next()).toString());
+                                    if (fU2 != null) {
+                                        arrayList.add(fU2);
+                                    }
+                                }
+                                listEmptyList2 = arrayList;
+                            } else {
+                                listEmptyList2 = CollectionsKt__CollectionsKt.emptyList();
+                            }
+                        } else {
+                            listEmptyList2 = CollectionsKt__CollectionsKt.emptyList();
+                        }
+                        pN.Xu(xmlPullParser);
+                        return new UserParameter.Slider(attributeValue10, str8, zRw, fFloatValue3, f2, f3, fFloatValue2, fFloatValue6, sliderType2, f10, listEmptyList, listEmptyList2);
+                    }
+                    i2 = 1;
+                    listEmptyList = CollectionsKt__CollectionsKt.emptyList();
+                    attributeValue9 = xmlPullParser.getAttributeValue(str, "snap");
+                    if (attributeValue9 != null) {
+                        char[] cArr14 = new char[i2];
+                        cArr14[0] = ',';
+                        listSplit$default = StringsKt__StringsKt.split$default((CharSequence) attributeValue9, cArr14, false, 0, 6, (Object) null);
+                        if (listSplit$default != null) {
+                            arrayList = new ArrayList();
+                            it = listSplit$default.iterator();
+                            while (it.hasNext()) {
+                                fU2 = CZU.u(StringsKt__StringsKt.trim((CharSequence) it.next()).toString());
+                                if (fU2 != null) {
+                                    arrayList.add(fU2);
+                                }
+                            }
+                            listEmptyList2 = arrayList;
+                        } else {
+                            listEmptyList2 = CollectionsKt__CollectionsKt.emptyList();
+                        }
+                    } else {
+                        listEmptyList2 = CollectionsKt__CollectionsKt.emptyList();
+                    }
+                    pN.Xu(xmlPullParser);
+                    return new UserParameter.Slider(attributeValue10, str8, zRw, fFloatValue3, f2, f3, fFloatValue2, fFloatValue6, sliderType2, f10, listEmptyList, listEmptyList2);
+                }
+                throw new MalformedXMLException("expected 'float', 'integer', or 'percent'", null, false, 6, null);
+            case 113135:
+                if (attributeValue12.equals("rpm")) {
+                    sliderType = SliderType.RPM;
+                    sliderType2 = sliderType;
+                    attributeValue = xmlPullParser.getAttributeValue(str, "logscale");
+                    if (attributeValue != null) {
+                        fFloatValue = 1.0f;
+                    } else {
+                        fFloatValue = 1.0f;
+                    }
+                    attributeValue2 = xmlPullParser.getAttributeValue(str, JavetLibLoadingListener.JAVET_LIB_LOADING_TYPE_DEFAULT);
+                    if (attributeValue2 != null) {
+                        fFloatValue2 = 0.0f;
+                    } else {
+                        fFloatValue2 = 0.0f;
+                    }
+                    attributeValue3 = xmlPullParser.getAttributeValue(str, "min");
+                    if (attributeValue3 != null) {
+                        fFloatValue3 = 0.0f;
+                    } else {
+                        fFloatValue3 = 0.0f;
+                    }
+                    attributeValue4 = xmlPullParser.getAttributeValue(str, AppLovinMediationProvider.MAX);
+                    if (attributeValue4 != null) {
+                        if (sliderType2 == SliderType.INTEGER) {
+                            fFloatValue4 = 10.0f;
+                            f2 = fFloatValue4;
+                        } else {
+                            f2 = 1.0f;
+                        }
+                    } else if (sliderType2 == SliderType.INTEGER) {
+                        fFloatValue4 = 10.0f;
+                        f2 = fFloatValue4;
+                    } else {
+                        f2 = 1.0f;
+                    }
+                    attributeValue5 = xmlPullParser.getAttributeValue(str, "step");
+                    if (attributeValue5 != null) {
+                        if (sliderType2 == SliderType.INTEGER) {
+                            f3 = 1.0f;
+                        } else {
+                            fFloatValue5 = (f2 - fFloatValue3) / 100.0f;
+                            f3 = fFloatValue5;
+                        }
+                    } else if (sliderType2 == SliderType.INTEGER) {
+                        f3 = 1.0f;
+                    } else {
+                        fFloatValue5 = (f2 - fFloatValue3) / 100.0f;
+                        f3 = fFloatValue5;
+                    }
+                    attributeValue6 = xmlPullParser.getAttributeValue(str, "originValue");
+                    if (attributeValue6 != null) {
+                        fFloatValue6 = 0.0f;
+                    } else {
+                        fFloatValue6 = 0.0f;
+                    }
+                    attributeValue7 = xmlPullParser.getAttributeValue(str, "label");
+                    if (attributeValue7 == null) {
+                        attributeValue7 = "";
+                    }
+                    String str9 = attributeValue7;
+                    attributeValue8 = xmlPullParser.getAttributeValue(str, "ticks");
+                    float f11 = fFloatValue;
+                    if (attributeValue8 != null) {
+                        i2 = 1;
+                        listSplit$default2 = StringsKt__StringsKt.split$default((CharSequence) attributeValue8, new char[]{','}, false, 0, 6, (Object) null);
+                        if (listSplit$default2 != null) {
+                            listEmptyList = new ArrayList();
+                            it2 = listSplit$default2.iterator();
+                            while (it2.hasNext()) {
+                                fU3 = CZU.u(StringsKt__StringsKt.trim((CharSequence) it2.next()).toString());
+                                if (fU3 != null) {
+                                    listEmptyList.add(fU3);
+                                }
+                            }
+                        }
+                        attributeValue9 = xmlPullParser.getAttributeValue(str, "snap");
+                        if (attributeValue9 != null) {
+                            char[] cArr15 = new char[i2];
+                            cArr15[0] = ',';
+                            listSplit$default = StringsKt__StringsKt.split$default((CharSequence) attributeValue9, cArr15, false, 0, 6, (Object) null);
+                            if (listSplit$default != null) {
+                                arrayList = new ArrayList();
+                                it = listSplit$default.iterator();
+                                while (it.hasNext()) {
+                                    fU2 = CZU.u(StringsKt__StringsKt.trim((CharSequence) it.next()).toString());
+                                    if (fU2 != null) {
+                                        arrayList.add(fU2);
+                                    }
+                                }
+                                listEmptyList2 = arrayList;
+                            } else {
+                                listEmptyList2 = CollectionsKt__CollectionsKt.emptyList();
+                            }
+                        } else {
+                            listEmptyList2 = CollectionsKt__CollectionsKt.emptyList();
+                        }
+                        pN.Xu(xmlPullParser);
+                        return new UserParameter.Slider(attributeValue10, str9, zRw, fFloatValue3, f2, f3, fFloatValue2, fFloatValue6, sliderType2, f11, listEmptyList, listEmptyList2);
+                    }
+                    i2 = 1;
+                    listEmptyList = CollectionsKt__CollectionsKt.emptyList();
+                    attributeValue9 = xmlPullParser.getAttributeValue(str, "snap");
+                    if (attributeValue9 != null) {
+                        char[] cArr16 = new char[i2];
+                        cArr16[0] = ',';
+                        listSplit$default = StringsKt__StringsKt.split$default((CharSequence) attributeValue9, cArr16, false, 0, 6, (Object) null);
+                        if (listSplit$default != null) {
+                            arrayList = new ArrayList();
+                            it = listSplit$default.iterator();
+                            while (it.hasNext()) {
+                                fU2 = CZU.u(StringsKt__StringsKt.trim((CharSequence) it.next()).toString());
+                                if (fU2 != null) {
+                                    arrayList.add(fU2);
+                                }
+                            }
+                            listEmptyList2 = arrayList;
+                        } else {
+                            listEmptyList2 = CollectionsKt__CollectionsKt.emptyList();
+                        }
+                    } else {
+                        listEmptyList2 = CollectionsKt__CollectionsKt.emptyList();
+                    }
+                    pN.Xu(xmlPullParser);
+                    return new UserParameter.Slider(attributeValue10, str9, zRw, fFloatValue3, f2, f3, fFloatValue2, fFloatValue6, sliderType2, f11, listEmptyList, listEmptyList2);
+                }
+                throw new MalformedXMLException("expected 'float', 'integer', or 'percent'", null, false, 6, null);
+            case 97526364:
+                if (attributeValue12.equals("float")) {
+                    sliderType = SliderType.FLOAT;
+                    sliderType2 = sliderType;
+                    attributeValue = xmlPullParser.getAttributeValue(str, "logscale");
+                    if (attributeValue != null) {
+                        fFloatValue = 1.0f;
+                    } else {
+                        fFloatValue = 1.0f;
+                    }
+                    attributeValue2 = xmlPullParser.getAttributeValue(str, JavetLibLoadingListener.JAVET_LIB_LOADING_TYPE_DEFAULT);
+                    if (attributeValue2 != null) {
+                        fFloatValue2 = 0.0f;
+                    } else {
+                        fFloatValue2 = 0.0f;
+                    }
+                    attributeValue3 = xmlPullParser.getAttributeValue(str, "min");
+                    if (attributeValue3 != null) {
+                        fFloatValue3 = 0.0f;
+                    } else {
+                        fFloatValue3 = 0.0f;
+                    }
+                    attributeValue4 = xmlPullParser.getAttributeValue(str, AppLovinMediationProvider.MAX);
+                    if (attributeValue4 != null) {
+                        if (sliderType2 == SliderType.INTEGER) {
+                            fFloatValue4 = 10.0f;
+                            f2 = fFloatValue4;
+                        } else {
+                            f2 = 1.0f;
+                        }
+                    } else if (sliderType2 == SliderType.INTEGER) {
+                        fFloatValue4 = 10.0f;
+                        f2 = fFloatValue4;
+                    } else {
+                        f2 = 1.0f;
+                    }
+                    attributeValue5 = xmlPullParser.getAttributeValue(str, "step");
+                    if (attributeValue5 != null) {
+                        if (sliderType2 == SliderType.INTEGER) {
+                            f3 = 1.0f;
+                        } else {
+                            fFloatValue5 = (f2 - fFloatValue3) / 100.0f;
+                            f3 = fFloatValue5;
+                        }
+                    } else if (sliderType2 == SliderType.INTEGER) {
+                        f3 = 1.0f;
+                    } else {
+                        fFloatValue5 = (f2 - fFloatValue3) / 100.0f;
+                        f3 = fFloatValue5;
+                    }
+                    attributeValue6 = xmlPullParser.getAttributeValue(str, "originValue");
+                    if (attributeValue6 != null) {
+                        fFloatValue6 = 0.0f;
+                    } else {
+                        fFloatValue6 = 0.0f;
+                    }
+                    attributeValue7 = xmlPullParser.getAttributeValue(str, "label");
+                    if (attributeValue7 == null) {
+                        attributeValue7 = "";
+                    }
+                    String str10 = attributeValue7;
+                    attributeValue8 = xmlPullParser.getAttributeValue(str, "ticks");
+                    float f12 = fFloatValue;
+                    if (attributeValue8 != null) {
+                        i2 = 1;
+                        listSplit$default2 = StringsKt__StringsKt.split$default((CharSequence) attributeValue8, new char[]{','}, false, 0, 6, (Object) null);
+                        if (listSplit$default2 != null) {
+                            listEmptyList = new ArrayList();
+                            it2 = listSplit$default2.iterator();
+                            while (it2.hasNext()) {
+                                fU3 = CZU.u(StringsKt__StringsKt.trim((CharSequence) it2.next()).toString());
+                                if (fU3 != null) {
+                                    listEmptyList.add(fU3);
+                                }
+                            }
+                        }
+                        attributeValue9 = xmlPullParser.getAttributeValue(str, "snap");
+                        if (attributeValue9 != null) {
+                            char[] cArr17 = new char[i2];
+                            cArr17[0] = ',';
+                            listSplit$default = StringsKt__StringsKt.split$default((CharSequence) attributeValue9, cArr17, false, 0, 6, (Object) null);
+                            if (listSplit$default != null) {
+                                arrayList = new ArrayList();
+                                it = listSplit$default.iterator();
+                                while (it.hasNext()) {
+                                    fU2 = CZU.u(StringsKt__StringsKt.trim((CharSequence) it.next()).toString());
+                                    if (fU2 != null) {
+                                        arrayList.add(fU2);
+                                    }
+                                }
+                                listEmptyList2 = arrayList;
+                            } else {
+                                listEmptyList2 = CollectionsKt__CollectionsKt.emptyList();
+                            }
+                        } else {
+                            listEmptyList2 = CollectionsKt__CollectionsKt.emptyList();
+                        }
+                        pN.Xu(xmlPullParser);
+                        return new UserParameter.Slider(attributeValue10, str10, zRw, fFloatValue3, f2, f3, fFloatValue2, fFloatValue6, sliderType2, f12, listEmptyList, listEmptyList2);
+                    }
+                    i2 = 1;
+                    listEmptyList = CollectionsKt__CollectionsKt.emptyList();
+                    attributeValue9 = xmlPullParser.getAttributeValue(str, "snap");
+                    if (attributeValue9 != null) {
+                        char[] cArr18 = new char[i2];
+                        cArr18[0] = ',';
+                        listSplit$default = StringsKt__StringsKt.split$default((CharSequence) attributeValue9, cArr18, false, 0, 6, (Object) null);
+                        if (listSplit$default != null) {
+                            arrayList = new ArrayList();
+                            it = listSplit$default.iterator();
+                            while (it.hasNext()) {
+                                fU2 = CZU.u(StringsKt__StringsKt.trim((CharSequence) it.next()).toString());
+                                if (fU2 != null) {
+                                    arrayList.add(fU2);
+                                }
+                            }
+                            listEmptyList2 = arrayList;
+                        } else {
+                            listEmptyList2 = CollectionsKt__CollectionsKt.emptyList();
+                        }
+                    } else {
+                        listEmptyList2 = CollectionsKt__CollectionsKt.emptyList();
+                    }
+                    pN.Xu(xmlPullParser);
+                    return new UserParameter.Slider(attributeValue10, str10, zRw, fFloatValue3, f2, f3, fFloatValue2, fFloatValue6, sliderType2, f12, listEmptyList, listEmptyList2);
+                }
+                throw new MalformedXMLException("expected 'float', 'integer', or 'percent'", null, false, 6, null);
+            case 1358935620:
+                if (attributeValue12.equals("relative-percent")) {
+                    sliderType = SliderType.RELATIVE_PERCENT;
+                    sliderType2 = sliderType;
+                    attributeValue = xmlPullParser.getAttributeValue(str, "logscale");
+                    if (attributeValue != null) {
+                        fFloatValue = 1.0f;
+                    } else {
+                        fFloatValue = 1.0f;
+                    }
+                    attributeValue2 = xmlPullParser.getAttributeValue(str, JavetLibLoadingListener.JAVET_LIB_LOADING_TYPE_DEFAULT);
+                    if (attributeValue2 != null) {
+                        fFloatValue2 = 0.0f;
+                    } else {
+                        fFloatValue2 = 0.0f;
+                    }
+                    attributeValue3 = xmlPullParser.getAttributeValue(str, "min");
+                    if (attributeValue3 != null) {
+                        fFloatValue3 = 0.0f;
+                    } else {
+                        fFloatValue3 = 0.0f;
+                    }
+                    attributeValue4 = xmlPullParser.getAttributeValue(str, AppLovinMediationProvider.MAX);
+                    if (attributeValue4 != null) {
+                        if (sliderType2 == SliderType.INTEGER) {
+                            fFloatValue4 = 10.0f;
+                            f2 = fFloatValue4;
+                        } else {
+                            f2 = 1.0f;
+                        }
+                    } else if (sliderType2 == SliderType.INTEGER) {
+                        fFloatValue4 = 10.0f;
+                        f2 = fFloatValue4;
+                    } else {
+                        f2 = 1.0f;
+                    }
+                    attributeValue5 = xmlPullParser.getAttributeValue(str, "step");
+                    if (attributeValue5 != null) {
+                        if (sliderType2 == SliderType.INTEGER) {
+                            f3 = 1.0f;
+                        } else {
+                            fFloatValue5 = (f2 - fFloatValue3) / 100.0f;
+                            f3 = fFloatValue5;
+                        }
+                    } else if (sliderType2 == SliderType.INTEGER) {
+                        f3 = 1.0f;
+                    } else {
+                        fFloatValue5 = (f2 - fFloatValue3) / 100.0f;
+                        f3 = fFloatValue5;
+                    }
+                    attributeValue6 = xmlPullParser.getAttributeValue(str, "originValue");
+                    if (attributeValue6 != null) {
+                        fFloatValue6 = 0.0f;
+                    } else {
+                        fFloatValue6 = 0.0f;
+                    }
+                    attributeValue7 = xmlPullParser.getAttributeValue(str, "label");
+                    if (attributeValue7 == null) {
+                        attributeValue7 = "";
+                    }
+                    String str11 = attributeValue7;
+                    attributeValue8 = xmlPullParser.getAttributeValue(str, "ticks");
+                    float f13 = fFloatValue;
+                    if (attributeValue8 != null) {
+                        i2 = 1;
+                        listSplit$default2 = StringsKt__StringsKt.split$default((CharSequence) attributeValue8, new char[]{','}, false, 0, 6, (Object) null);
+                        if (listSplit$default2 != null) {
+                            listEmptyList = new ArrayList();
+                            it2 = listSplit$default2.iterator();
+                            while (it2.hasNext()) {
+                                fU3 = CZU.u(StringsKt__StringsKt.trim((CharSequence) it2.next()).toString());
+                                if (fU3 != null) {
+                                    listEmptyList.add(fU3);
+                                }
+                            }
+                        }
+                        attributeValue9 = xmlPullParser.getAttributeValue(str, "snap");
+                        if (attributeValue9 != null) {
+                            char[] cArr19 = new char[i2];
+                            cArr19[0] = ',';
+                            listSplit$default = StringsKt__StringsKt.split$default((CharSequence) attributeValue9, cArr19, false, 0, 6, (Object) null);
+                            if (listSplit$default != null) {
+                                arrayList = new ArrayList();
+                                it = listSplit$default.iterator();
+                                while (it.hasNext()) {
+                                    fU2 = CZU.u(StringsKt__StringsKt.trim((CharSequence) it.next()).toString());
+                                    if (fU2 != null) {
+                                        arrayList.add(fU2);
+                                    }
+                                }
+                                listEmptyList2 = arrayList;
+                            } else {
+                                listEmptyList2 = CollectionsKt__CollectionsKt.emptyList();
+                            }
+                        } else {
+                            listEmptyList2 = CollectionsKt__CollectionsKt.emptyList();
+                        }
+                        pN.Xu(xmlPullParser);
+                        return new UserParameter.Slider(attributeValue10, str11, zRw, fFloatValue3, f2, f3, fFloatValue2, fFloatValue6, sliderType2, f13, listEmptyList, listEmptyList2);
+                    }
+                    i2 = 1;
+                    listEmptyList = CollectionsKt__CollectionsKt.emptyList();
+                    attributeValue9 = xmlPullParser.getAttributeValue(str, "snap");
+                    if (attributeValue9 != null) {
+                        char[] cArr110 = new char[i2];
+                        cArr110[0] = ',';
+                        listSplit$default = StringsKt__StringsKt.split$default((CharSequence) attributeValue9, cArr110, false, 0, 6, (Object) null);
+                        if (listSplit$default != null) {
+                            arrayList = new ArrayList();
+                            it = listSplit$default.iterator();
+                            while (it.hasNext()) {
+                                fU2 = CZU.u(StringsKt__StringsKt.trim((CharSequence) it.next()).toString());
+                                if (fU2 != null) {
+                                    arrayList.add(fU2);
+                                }
+                            }
+                            listEmptyList2 = arrayList;
+                        } else {
+                            listEmptyList2 = CollectionsKt__CollectionsKt.emptyList();
+                        }
+                    } else {
+                        listEmptyList2 = CollectionsKt__CollectionsKt.emptyList();
+                    }
+                    pN.Xu(xmlPullParser);
+                    return new UserParameter.Slider(attributeValue10, str11, zRw, fFloatValue3, f2, f3, fFloatValue2, fFloatValue6, sliderType2, f13, listEmptyList, listEmptyList2);
+                }
+                throw new MalformedXMLException("expected 'float', 'integer', or 'percent'", null, false, 6, null);
+            case 1958052158:
+                if (attributeValue12.equals("integer")) {
+                    sliderType = SliderType.INTEGER;
+                    sliderType2 = sliderType;
+                    attributeValue = xmlPullParser.getAttributeValue(str, "logscale");
+                    if (attributeValue != null) {
+                        fFloatValue = 1.0f;
+                    } else {
+                        fFloatValue = 1.0f;
+                    }
+                    attributeValue2 = xmlPullParser.getAttributeValue(str, JavetLibLoadingListener.JAVET_LIB_LOADING_TYPE_DEFAULT);
+                    if (attributeValue2 != null) {
+                        fFloatValue2 = 0.0f;
+                    } else {
+                        fFloatValue2 = 0.0f;
+                    }
+                    attributeValue3 = xmlPullParser.getAttributeValue(str, "min");
+                    if (attributeValue3 != null) {
+                        fFloatValue3 = 0.0f;
+                    } else {
+                        fFloatValue3 = 0.0f;
+                    }
+                    attributeValue4 = xmlPullParser.getAttributeValue(str, AppLovinMediationProvider.MAX);
+                    if (attributeValue4 != null) {
+                        if (sliderType2 == SliderType.INTEGER) {
+                            fFloatValue4 = 10.0f;
+                            f2 = fFloatValue4;
+                        } else {
+                            f2 = 1.0f;
+                        }
+                    } else if (sliderType2 == SliderType.INTEGER) {
+                        fFloatValue4 = 10.0f;
+                        f2 = fFloatValue4;
+                    } else {
+                        f2 = 1.0f;
+                    }
+                    attributeValue5 = xmlPullParser.getAttributeValue(str, "step");
+                    if (attributeValue5 != null) {
+                        if (sliderType2 == SliderType.INTEGER) {
+                            f3 = 1.0f;
+                        } else {
+                            fFloatValue5 = (f2 - fFloatValue3) / 100.0f;
+                            f3 = fFloatValue5;
+                        }
+                    } else if (sliderType2 == SliderType.INTEGER) {
+                        f3 = 1.0f;
+                    } else {
+                        fFloatValue5 = (f2 - fFloatValue3) / 100.0f;
+                        f3 = fFloatValue5;
+                    }
+                    attributeValue6 = xmlPullParser.getAttributeValue(str, "originValue");
+                    if (attributeValue6 != null) {
+                        fFloatValue6 = 0.0f;
+                    } else {
+                        fFloatValue6 = 0.0f;
+                    }
+                    attributeValue7 = xmlPullParser.getAttributeValue(str, "label");
+                    if (attributeValue7 == null) {
+                        attributeValue7 = "";
+                    }
+                    String str12 = attributeValue7;
+                    attributeValue8 = xmlPullParser.getAttributeValue(str, "ticks");
+                    float f14 = fFloatValue;
+                    if (attributeValue8 != null) {
+                        i2 = 1;
+                        listSplit$default2 = StringsKt__StringsKt.split$default((CharSequence) attributeValue8, new char[]{','}, false, 0, 6, (Object) null);
+                        if (listSplit$default2 != null) {
+                            listEmptyList = new ArrayList();
+                            it2 = listSplit$default2.iterator();
+                            while (it2.hasNext()) {
+                                fU3 = CZU.u(StringsKt__StringsKt.trim((CharSequence) it2.next()).toString());
+                                if (fU3 != null) {
+                                    listEmptyList.add(fU3);
+                                }
+                            }
+                        }
+                        attributeValue9 = xmlPullParser.getAttributeValue(str, "snap");
+                        if (attributeValue9 != null) {
+                            char[] cArr111 = new char[i2];
+                            cArr111[0] = ',';
+                            listSplit$default = StringsKt__StringsKt.split$default((CharSequence) attributeValue9, cArr111, false, 0, 6, (Object) null);
+                            if (listSplit$default != null) {
+                                arrayList = new ArrayList();
+                                it = listSplit$default.iterator();
+                                while (it.hasNext()) {
+                                    fU2 = CZU.u(StringsKt__StringsKt.trim((CharSequence) it.next()).toString());
+                                    if (fU2 != null) {
+                                        arrayList.add(fU2);
+                                    }
+                                }
+                                listEmptyList2 = arrayList;
+                            } else {
+                                listEmptyList2 = CollectionsKt__CollectionsKt.emptyList();
+                            }
+                        } else {
+                            listEmptyList2 = CollectionsKt__CollectionsKt.emptyList();
+                        }
+                        pN.Xu(xmlPullParser);
+                        return new UserParameter.Slider(attributeValue10, str12, zRw, fFloatValue3, f2, f3, fFloatValue2, fFloatValue6, sliderType2, f14, listEmptyList, listEmptyList2);
+                    }
+                    i2 = 1;
+                    listEmptyList = CollectionsKt__CollectionsKt.emptyList();
+                    attributeValue9 = xmlPullParser.getAttributeValue(str, "snap");
+                    if (attributeValue9 != null) {
+                        char[] cArr112 = new char[i2];
+                        cArr112[0] = ',';
+                        listSplit$default = StringsKt__StringsKt.split$default((CharSequence) attributeValue9, cArr112, false, 0, 6, (Object) null);
+                        if (listSplit$default != null) {
+                            arrayList = new ArrayList();
+                            it = listSplit$default.iterator();
+                            while (it.hasNext()) {
+                                fU2 = CZU.u(StringsKt__StringsKt.trim((CharSequence) it.next()).toString());
+                                if (fU2 != null) {
+                                    arrayList.add(fU2);
+                                }
+                            }
+                            listEmptyList2 = arrayList;
+                        } else {
+                            listEmptyList2 = CollectionsKt__CollectionsKt.emptyList();
+                        }
+                    } else {
+                        listEmptyList2 = CollectionsKt__CollectionsKt.emptyList();
+                    }
+                    pN.Xu(xmlPullParser);
+                    return new UserParameter.Slider(attributeValue10, str12, zRw, fFloatValue3, f2, f3, fFloatValue2, fFloatValue6, sliderType2, f14, listEmptyList, listEmptyList2);
+                }
+                throw new MalformedXMLException("expected 'float', 'integer', or 'percent'", null, false, 6, null);
+            case 1970096767:
+                if (attributeValue12.equals("seconds")) {
+                    sliderType = SliderType.SECONDS;
+                    sliderType2 = sliderType;
+                    attributeValue = xmlPullParser.getAttributeValue(str, "logscale");
+                    if (attributeValue != null) {
+                        fFloatValue = 1.0f;
+                    } else {
+                        fFloatValue = 1.0f;
+                    }
+                    attributeValue2 = xmlPullParser.getAttributeValue(str, JavetLibLoadingListener.JAVET_LIB_LOADING_TYPE_DEFAULT);
+                    if (attributeValue2 != null) {
+                        fFloatValue2 = 0.0f;
+                    } else {
+                        fFloatValue2 = 0.0f;
+                    }
+                    attributeValue3 = xmlPullParser.getAttributeValue(str, "min");
+                    if (attributeValue3 != null) {
+                        fFloatValue3 = 0.0f;
+                    } else {
+                        fFloatValue3 = 0.0f;
+                    }
+                    attributeValue4 = xmlPullParser.getAttributeValue(str, AppLovinMediationProvider.MAX);
+                    if (attributeValue4 != null) {
+                        if (sliderType2 == SliderType.INTEGER) {
+                            fFloatValue4 = 10.0f;
+                            f2 = fFloatValue4;
+                        } else {
+                            f2 = 1.0f;
+                        }
+                    } else if (sliderType2 == SliderType.INTEGER) {
+                        fFloatValue4 = 10.0f;
+                        f2 = fFloatValue4;
+                    } else {
+                        f2 = 1.0f;
+                    }
+                    attributeValue5 = xmlPullParser.getAttributeValue(str, "step");
+                    if (attributeValue5 != null) {
+                        if (sliderType2 == SliderType.INTEGER) {
+                            f3 = 1.0f;
+                        } else {
+                            fFloatValue5 = (f2 - fFloatValue3) / 100.0f;
+                            f3 = fFloatValue5;
+                        }
+                    } else if (sliderType2 == SliderType.INTEGER) {
+                        f3 = 1.0f;
+                    } else {
+                        fFloatValue5 = (f2 - fFloatValue3) / 100.0f;
+                        f3 = fFloatValue5;
+                    }
+                    attributeValue6 = xmlPullParser.getAttributeValue(str, "originValue");
+                    if (attributeValue6 != null) {
+                        fFloatValue6 = 0.0f;
+                    } else {
+                        fFloatValue6 = 0.0f;
+                    }
+                    attributeValue7 = xmlPullParser.getAttributeValue(str, "label");
+                    if (attributeValue7 == null) {
+                        attributeValue7 = "";
+                    }
+                    String str13 = attributeValue7;
+                    attributeValue8 = xmlPullParser.getAttributeValue(str, "ticks");
+                    float f15 = fFloatValue;
+                    if (attributeValue8 != null) {
+                        i2 = 1;
+                        listSplit$default2 = StringsKt__StringsKt.split$default((CharSequence) attributeValue8, new char[]{','}, false, 0, 6, (Object) null);
+                        if (listSplit$default2 != null) {
+                            listEmptyList = new ArrayList();
+                            it2 = listSplit$default2.iterator();
+                            while (it2.hasNext()) {
+                                fU3 = CZU.u(StringsKt__StringsKt.trim((CharSequence) it2.next()).toString());
+                                if (fU3 != null) {
+                                    listEmptyList.add(fU3);
+                                }
+                            }
+                        }
+                        attributeValue9 = xmlPullParser.getAttributeValue(str, "snap");
+                        if (attributeValue9 != null) {
+                            char[] cArr113 = new char[i2];
+                            cArr113[0] = ',';
+                            listSplit$default = StringsKt__StringsKt.split$default((CharSequence) attributeValue9, cArr113, false, 0, 6, (Object) null);
+                            if (listSplit$default != null) {
+                                arrayList = new ArrayList();
+                                it = listSplit$default.iterator();
+                                while (it.hasNext()) {
+                                    fU2 = CZU.u(StringsKt__StringsKt.trim((CharSequence) it.next()).toString());
+                                    if (fU2 != null) {
+                                        arrayList.add(fU2);
+                                    }
+                                }
+                                listEmptyList2 = arrayList;
+                            } else {
+                                listEmptyList2 = CollectionsKt__CollectionsKt.emptyList();
+                            }
+                        } else {
+                            listEmptyList2 = CollectionsKt__CollectionsKt.emptyList();
+                        }
+                        pN.Xu(xmlPullParser);
+                        return new UserParameter.Slider(attributeValue10, str13, zRw, fFloatValue3, f2, f3, fFloatValue2, fFloatValue6, sliderType2, f15, listEmptyList, listEmptyList2);
+                    }
+                    i2 = 1;
+                    listEmptyList = CollectionsKt__CollectionsKt.emptyList();
+                    attributeValue9 = xmlPullParser.getAttributeValue(str, "snap");
+                    if (attributeValue9 != null) {
+                        char[] cArr114 = new char[i2];
+                        cArr114[0] = ',';
+                        listSplit$default = StringsKt__StringsKt.split$default((CharSequence) attributeValue9, cArr114, false, 0, 6, (Object) null);
+                        if (listSplit$default != null) {
+                            arrayList = new ArrayList();
+                            it = listSplit$default.iterator();
+                            while (it.hasNext()) {
+                                fU2 = CZU.u(StringsKt__StringsKt.trim((CharSequence) it.next()).toString());
+                                if (fU2 != null) {
+                                    arrayList.add(fU2);
+                                }
+                            }
+                            listEmptyList2 = arrayList;
+                        } else {
+                            listEmptyList2 = CollectionsKt__CollectionsKt.emptyList();
+                        }
+                    } else {
+                        listEmptyList2 = CollectionsKt__CollectionsKt.emptyList();
+                    }
+                    pN.Xu(xmlPullParser);
+                    return new UserParameter.Slider(attributeValue10, str13, zRw, fFloatValue3, f2, f3, fFloatValue2, fFloatValue6, sliderType2, f15, listEmptyList, listEmptyList2);
+                }
+                throw new MalformedXMLException("expected 'float', 'integer', or 'percent'", null, false, 6, null);
+            default:
+                throw new MalformedXMLException("expected 'float', 'integer', or 'percent'", null, false, 6, null);
+        }
+    }

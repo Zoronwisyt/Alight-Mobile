@@ -1,0 +1,447 @@
+    /* JADX WARN: Can't fix incorrect switch cases order, some code will duplicate */
+    /* JADX WARN: Code duplicated, block: B:126:0x029f  */
+    /* JADX WARN: Code duplicated, block: B:129:0x02ab  */
+    /* JADX WARN: Code duplicated, block: B:165:0x0374  */
+    /* JADX WARN: Code duplicated, block: B:185:0x0492 A[DONT_INVERT] */
+    /* JADX WARN: Code duplicated, block: B:186:0x0494  */
+    /* JADX WARN: Code duplicated, block: B:187:0x049b  */
+    /* JADX WARN: Code duplicated, block: B:191:0x04f9  */
+    /* JADX WARN: Code duplicated, block: B:193:0x0507  */
+    /* JADX WARN: Code duplicated, block: B:196:0x0514 A[LOOP:3: B:192:0x0505->B:196:0x0514, LOOP_END] */
+    /* JADX WARN: Code duplicated, block: B:199:0x051b  */
+    /* JADX WARN: Code duplicated, block: B:205:0x052d  */
+    /* JADX WARN: Code duplicated, block: B:208:0x0534  */
+    /* JADX WARN: Code duplicated, block: B:209:0x0543  */
+    /* JADX WARN: Code duplicated, block: B:211:0x0547  */
+    /* JADX WARN: Code duplicated, block: B:214:0x0550  */
+    /* JADX WARN: Code duplicated, block: B:218:0x05a8  */
+    /* JADX WARN: Code duplicated, block: B:223:0x05e8  */
+    /* JADX WARN: Code duplicated, block: B:229:0x02b4 A[ADDED_TO_REGION, REMOVE, SYNTHETIC] */
+    /* JADX WARN: Code duplicated, block: B:242:0x051e A[SYNTHETIC] */
+    /* JADX WARN: Code duplicated, block: B:243:0x0518 A[SYNTHETIC] */
+    /* JADX WARN: Code duplicated, block: B:244:0x0519 A[SYNTHETIC] */
+    /* JADX WARN: Code duplicated, block: B:246:0x05c8 A[SYNTHETIC] */
+    /* JADX WARN: Code duplicated, block: B:248:0x05a2 A[SYNTHETIC] */
+    /* JADX WARN: Code duplicated, block: B:48:0x00b7 A[PHI: r4
+  0x00b7: PHI (r4v73 java.lang.Float) = (r4v17 java.lang.Float), (r4v75 java.lang.Float) binds: [B:54:0x00cc, B:47:0x00b5] A[DONT_GENERATE, DONT_INLINE]] */
+    /* JADX WARN: Code duplicated, block: B:61:0x00f5  */
+    private static final VisualEffect readEffect(XmlPullParser xmlPullParser, String str, Uri uri, Bb bb) throws XmlPullParserException, IOException, MalformedXMLException {
+        Float floatOrNull;
+        float fFloatValue;
+        EffectType effectType;
+        vlE vle;
+        Uri uriBuild;
+        int i2;
+        boolean z2;
+        List<UserParameter> listEmptyList;
+        int i3;
+        ArrayList arrayList;
+        List listPlus;
+        List<EffectRenderPass> listListOf;
+        VisualEffect visualEffect;
+        ArrayList arrayList2;
+        vlE[] vleArrValues;
+        int length;
+        int i4;
+        vlE vle2;
+        String str2;
+        int i5 = 2;
+        xmlPullParser.require(2, str, "effect");
+        String attributeValue = xmlPullParser.getAttributeValue(str, "id");
+        if (attributeValue == null) {
+            throw new MalformedXMLException("<effect> element missing 'id' attribute", null, false, 6, null);
+        }
+        String attributeValue2 = xmlPullParser.getAttributeValue(str, "name");
+        String str3 = attributeValue2 == null ? attributeValue : attributeValue2;
+        String attributeValue3 = xmlPullParser.getAttributeValue(str, "desc");
+        String str4 = attributeValue3 == null ? "" : attributeValue3;
+        String attributeValue4 = xmlPullParser.getAttributeValue(str, "tags");
+        String str5 = attributeValue4 == null ? "" : attributeValue4;
+        String attributeValue5 = xmlPullParser.getAttributeValue(str, "affinity");
+        String str6 = attributeValue5 == null ? "" : attributeValue5;
+        String attributeValue6 = xmlPullParser.getAttributeValue(str, "category");
+        String str7 = attributeValue6 == null ? "" : attributeValue6;
+        String attributeValue7 = xmlPullParser.getAttributeValue(str, "thumb");
+        String attributeValue8 = xmlPullParser.getAttributeValue(str, PPXtLFFaQxN.jRVCTXwFenNURta);
+        boolean z4 = attributeValue8 != null ? Boolean.parseBoolean(attributeValue8) : false;
+        String attributeValue9 = xmlPullParser.getAttributeValue(str, "auto-transform");
+        boolean z5 = attributeValue9 != null ? Boolean.parseBoolean(attributeValue9) : false;
+        String attributeValue10 = xmlPullParser.getAttributeValue(str, "experimental");
+        boolean z6 = attributeValue10 != null ? Boolean.parseBoolean(attributeValue10) : false;
+        String attributeValue11 = xmlPullParser.getAttributeValue(str, "internal");
+        boolean z7 = attributeValue11 != null ? Boolean.parseBoolean(attributeValue11) : false;
+        String attributeValue12 = xmlPullParser.getAttributeValue(str, "overdraw");
+        boolean z8 = attributeValue12 != null ? Boolean.parseBoolean(attributeValue12) : false;
+        String attributeValue13 = xmlPullParser.getAttributeValue(str, "max-overdraw");
+        if (attributeValue13 == null || (floatOrNull = StringsKt__StringNumberConversionsJVMKt.toFloatOrNull(attributeValue13)) == null) {
+            String attributeValue14 = xmlPullParser.getAttributeValue(str, "maxOverdraw");
+            floatOrNull = attributeValue14 != null ? StringsKt__StringNumberConversionsJVMKt.toFloatOrNull(attributeValue14) : null;
+            if (floatOrNull != null) {
+                fFloatValue = floatOrNull.floatValue();
+            } else {
+                fFloatValue = 0.0f;
+            }
+        } else {
+            fFloatValue = floatOrNull.floatValue();
+        }
+        float f2 = fFloatValue;
+        String attributeValue15 = xmlPullParser.getAttributeValue(str, "type");
+        if (attributeValue15 != null) {
+            EffectType[] effectTypeArrValues = EffectType.values();
+            Locale ENGLISH = Locale.ENGLISH;
+            Intrinsics.checkNotNullExpressionValue(ENGLISH, "ENGLISH");
+            String upperCase = attributeValue15.toUpperCase(ENGLISH);
+            Intrinsics.checkNotNullExpressionValue(upperCase, "toUpperCase(...)");
+            effectType = (EffectType) gj.Rw(effectTypeArrValues, upperCase);
+            if (effectType == null) {
+                effectType = EffectType.SHADER;
+            }
+        } else {
+            effectType = EffectType.SHADER;
+        }
+        EffectType effectType2 = effectType;
+        LinkedHashMap linkedHashMap = new LinkedHashMap();
+        ArrayList arrayList3 = new ArrayList();
+        mY0 my0 = null;
+        List<UserParameter> list = null;
+        List<EffectRenderPass> list2 = null;
+        List<EffectPreset> listEmptyList2 = null;
+        int iIntValue = 1;
+        String attributeValue16 = null;
+        while (xmlPullParser.next() != 3) {
+            if (xmlPullParser.getEventType() == i5) {
+                int depth = xmlPullParser.getDepth();
+                String name = xmlPullParser.getName();
+                Intrinsics.checkNotNullExpressionValue(name, "getName(...)");
+                switch (name.hashCode()) {
+                    case -1881759102:
+                        if (!name.equals("strings")) {
+                            pN.Xu(xmlPullParser);
+                            Unit unit = Unit.INSTANCE;
+                        } else {
+                            if (my0 != null) {
+                                throw new MalformedXMLException("More than one <strings> element found", null, false, 6, null);
+                            }
+                            mY0 my0DZ = B8K.dZ(xmlPullParser, str);
+                            Unit unit2 = Unit.INSTANCE;
+                            my0 = my0DZ;
+                        }
+                        if (xmlPullParser.getEventType() == 3 || xmlPullParser.getDepth() != depth) {
+                            throw new IllegalStateException("Did not consume all tag contents");
+                        }
+                        i5 = 2;
+                        break;
+                        break;
+                    case -1751585482:
+                        if (name.equals("iterations")) {
+                            String attributeValue17 = xmlPullParser.getAttributeValue(str, JavetError.PARAMETER_COUNT);
+                            if (attributeValue17 != null) {
+                                Intrinsics.checkNotNull(attributeValue17);
+                                Integer intOrNull = StringsKt__StringNumberConversionsKt.toIntOrNull(attributeValue17);
+                                if (intOrNull != null) {
+                                    iIntValue = intOrNull.intValue();
+                                }
+                            }
+                            attributeValue16 = xmlPullParser.getAttributeValue(str, "param");
+                            pN.Xu(xmlPullParser);
+                            Unit unit3 = Unit.INSTANCE;
+                        } else {
+                            pN.Xu(xmlPullParser);
+                            Unit unit4 = Unit.INSTANCE;
+                        }
+                        if (xmlPullParser.getEventType() == 3) {
+                        }
+                        throw new IllegalStateException("Did not consume all tag contents");
+                    case -995427962:
+                        if (!name.equals(YHXc.DgLqVGAKRsZsEI)) {
+                            pN.Xu(xmlPullParser);
+                            Unit unit5 = Unit.INSTANCE;
+                        } else {
+                            if (list != null) {
+                                throw new MalformedXMLException("More than one <params> element found", null, false, 6, null);
+                            }
+                            if (z4 || z6) {
+                                str2 = null;
+                            } else {
+                                Context applicationContext = py.mY0.Hfr().getApplicationContext();
+                                Intrinsics.checkNotNullExpressionValue(applicationContext, "getApplicationContext(...)");
+                                str2 = "effect: " + B8K.Hfr(str3, applicationContext);
+                            }
+                            List<UserParameter> userParams = UserParamParserKt.readUserParams(xmlPullParser, str, str2);
+                            Unit unit6 = Unit.INSTANCE;
+                            list = userParams;
+                        }
+                        if (xmlPullParser.getEventType() == 3) {
+                        }
+                        throw new IllegalStateException("Did not consume all tag contents");
+                    case -995381121:
+                        if (!name.equals("passes")) {
+                            pN.Xu(xmlPullParser);
+                            Unit unit7 = Unit.INSTANCE;
+                        } else {
+                            if (list2 != null) {
+                                throw new MalformedXMLException("More than one <passes> element found", null, false, 6, null);
+                            }
+                            List<EffectRenderPass> passes = readPasses(xmlPullParser, str);
+                            Unit unit8 = Unit.INSTANCE;
+                            list2 = passes;
+                        }
+                        if (xmlPullParser.getEventType() == 3) {
+                        }
+                        throw new IllegalStateException("Did not consume all tag contents");
+                    case -907685685:
+                        if (name.equals("script")) {
+                            arrayList3.add(ACScriptParserKt.readACScript(xmlPullParser, str));
+                            Unit unit9 = Unit.INSTANCE;
+                        } else {
+                            pN.Xu(xmlPullParser);
+                            Unit unit10 = Unit.INSTANCE;
+                        }
+                        if (xmlPullParser.getEventType() == 3) {
+                        }
+                        throw new IllegalStateException("Did not consume all tag contents");
+                    case -903579675:
+                        if (name.equals("shader")) {
+                            ShaderInfo shader = readShader(xmlPullParser, str);
+                            Integer numValueOf = Integer.valueOf(shader.getGroupId());
+                            Object linkedHashMap2 = linkedHashMap.get(numValueOf);
+                            if (linkedHashMap2 == null) {
+                                linkedHashMap2 = new LinkedHashMap();
+                                linkedHashMap.put(numValueOf, linkedHashMap2);
+                            }
+                            Map map = (Map) linkedHashMap2;
+                            if (map.containsKey(shader.getType())) {
+                                throw new MalformedXMLException("More than  one " + shader.getType() + " shader in group " + shader.getGroupId(), null, false, 6, null);
+                            }
+                            map.put(shader.getType(), shader);
+                            Unit unit11 = Unit.INSTANCE;
+                        } else {
+                            pN.Xu(xmlPullParser);
+                            Unit unit12 = Unit.INSTANCE;
+                        }
+                        if (xmlPullParser.getEventType() == 3) {
+                        }
+                        throw new IllegalStateException("Did not consume all tag contents");
+                    case -318277260:
+                        if (!name.equals("presets")) {
+                            pN.Xu(xmlPullParser);
+                            Unit unit13 = Unit.INSTANCE;
+                        } else {
+                            if (listEmptyList2 != null) {
+                                throw new MalformedXMLException("More than one <presets> element found", null, false, 6, null);
+                            }
+                            List<EffectPreset> presets = readPresets(xmlPullParser, str, attributeValue);
+                            Unit unit14 = Unit.INSTANCE;
+                            listEmptyList2 = presets;
+                        }
+                        if (xmlPullParser.getEventType() == 3) {
+                        }
+                        throw new IllegalStateException("Did not consume all tag contents");
+                    default:
+                        pN.Xu(xmlPullParser);
+                        Unit unit15 = Unit.INSTANCE;
+                        if (xmlPullParser.getEventType() == 3) {
+                        }
+                        throw new IllegalStateException("Did not consume all tag contents");
+                }
+            }
+        }
+        ArrayList arrayList4 = new ArrayList(linkedHashMap.size());
+        for (Iterator it = linkedHashMap.entrySet().iterator(); it.hasNext(); it = it) {
+            Map.Entry entry = (Map.Entry) it.next();
+            int iIntValue2 = ((Number) entry.getKey()).intValue();
+            arrayList4.add(TuplesKt.to(Integer.valueOf(iIntValue2), new ShaderGroup(iIntValue2, true, (Map) entry.getValue())));
+        }
+        Map map2 = MapsKt__MapsKt.toMap(arrayList4);
+        if (StringsKt__StringsJVMKt.startsWith$default(attributeValue, "com.alightcreative.effects.repeat.", false, 2, null)) {
+            vle = vlE.Repeat;
+        } else if (!map2.isEmpty()) {
+            vle = vlE.Raster;
+        } else if (Intrinsics.areEqual(attributeValue, "com.alightcreative.effects.drawing.progress") || Intrinsics.areEqual(attributeValue, "com.alightcreative.effects.drawing.strokecolor") || Intrinsics.areEqual(attributeValue, "com.alightcreative.effects.drawing.stroketaper")) {
+            vle = vlE.Vector;
+        } else if (!arrayList3.isEmpty()) {
+            ACScript aCScript = (ACScript) CollectionsKt___CollectionsKt.first((List) arrayList3);
+            int i6 = WhenMappings.$EnumSwitchMapping$0[aCScript.getType().ordinal()];
+            if (i6 == 1) {
+                vle = vlE.PropAdjust;
+            } else {
+                if (i6 != 2) {
+                    throw new NoWhenBranchMatchedException();
+                }
+                if (Intrinsics.areEqual(aCScript.getSource(), "com.alightcreative.script.movealongpath")) {
+                    vle = vlE.PropAdjust;
+                } else {
+                    vle = null;
+                }
+            }
+        } else {
+            vle = null;
+        }
+        mY0 my1 = my0 == null ? new mY0(MapsKt__MapsKt.emptyMap(), true) : my0;
+        Regex regex = new Regex("[^A-Za-z0-9]");
+        Regex regex2 = new Regex("-{2,}");
+        Context applicationContext2 = py.mY0.Hfr().getApplicationContext();
+        Intrinsics.checkNotNullExpressionValue(applicationContext2, "getApplicationContext(...)");
+        Context contextBWM = RM.B8K.BWM(applicationContext2);
+        Intrinsics.checkNotNullExpressionValue(contextBWM, "getEnglishContext(...)");
+        String strTrim = StringsKt__StringsKt.trim(regex2.replace(regex.replace(StringsKt__StringsKt.trim((CharSequence) B8K.Rw(my1, contextBWM, str3)).toString(), "-"), "-"), '-');
+        Locale ROOT = Locale.ROOT;
+        Intrinsics.checkNotNullExpressionValue(ROOT, "ROOT");
+        String lowerCase = strTrim.toLowerCase(ROOT);
+        Intrinsics.checkNotNullExpressionValue(lowerCase, "toLowerCase(...)");
+        Context applicationContext3 = py.mY0.Hfr().getApplicationContext();
+        Intrinsics.checkNotNullExpressionValue(applicationContext3, "getApplicationContext(...)");
+        HT ht = new HT(applicationContext3);
+        Uri uriBuild2 = uri.buildUpon().clearQuery().appendEncodedPath("thumb/" + StringsKt__StringsJVMKt.replace$default(lowerCase, "-", "_", false, 4, (Object) null) + ".webp").build();
+        Uri uriBuild3 = uri.buildUpon().clearQuery().appendEncodedPath("thumb/" + StringsKt__StringsJVMKt.replace$default(lowerCase, "-", "_", false, 4, (Object) null) + "_bg.webp").build();
+        Intrinsics.checkNotNull(uriBuild2);
+        boolean zDZ = ht.dZ(uriBuild2);
+        Intrinsics.checkNotNull(uriBuild3);
+        boolean zDZ2 = ht.dZ(uriBuild3);
+        if (zDZ) {
+            uriBuild = uriBuild2;
+        } else if (attributeValue7 == null) {
+            uriBuild = null;
+        } else {
+            uriBuild = Uri.parse(attributeValue7).isAbsolute() ? Uri.parse(attributeValue7) : uri.buildUpon().clearQuery().appendEncodedPath(attributeValue7).build();
+        }
+        if (list2 != null) {
+            i2 = 1;
+            z2 = list2.isEmpty();
+            if (!z2) {
+                throw new MalformedXMLException("If <passes> is present, at least one <pass> must be specified.", null, false, 6, null);
+            }
+            if (list == null) {
+                listEmptyList = CollectionsKt__CollectionsKt.emptyList();
+            } else {
+                listEmptyList = list;
+            }
+            char[] cArr = new char[i2];
+            cArr[0] = ',';
+            Set set = SequencesKt___SequencesKt.toSet(SequencesKt___SequencesKt.mapNotNull(SequencesKt___SequencesKt.filter(SequencesKt___SequencesKt.map(StringsKt__StringsKt.splitToSequence$default((CharSequence) str6, cArr, false, 0, 6, (Object) null), VisualEffectParserKt$readEffect$result$1.INSTANCE), VisualEffectParserKt$readEffect$result$2.INSTANCE), new Function1<String, EffectAffinity>() { // from class: com.alightcreative.app.motion.scene.visualeffect.VisualEffectParserKt$readEffect$result$3
+                @Override // kotlin.jvm.functions.Function1
+                public final EffectAffinity invoke(String it2) {
+                    Intrinsics.checkNotNullParameter(it2, "it");
+                    return EffectAffinity.Companion.fromString(it2);
+                }
+            }));
+            char[] cArr2 = new char[i2];
+            i3 = 0;
+            cArr2[0] = ',';
+            Set<String> set2 = SequencesKt___SequencesKt.toSet(SequencesKt___SequencesKt.filter(SequencesKt___SequencesKt.map(StringsKt__StringsKt.splitToSequence$default((CharSequence) str5, cArr2, false, 0, 6, (Object) null), VisualEffectParserKt$readEffect$result$4.INSTANCE), VisualEffectParserKt$readEffect$result$5.INSTANCE));
+            arrayList = new ArrayList();
+            for (String str8 : set2) {
+                vleArrValues = vlE.values();
+                length = vleArrValues.length;
+                i4 = i3;
+                while (true) {
+                    if (i4 < length) {
+                        vle2 = vleArrValues[i4];
+                        if (Intrinsics.areEqual(vle2.Hfr(), str8)) {
+                            i4++;
+                        }
+                    } else {
+                        vle2 = null;
+                    }
+                }
+                if (vle2 != null) {
+                    arrayList.add(vle2);
+                }
+                i3 = 0;
+            }
+            if (vle != null || arrayList.contains(vle)) {
+                listPlus = arrayList;
+            } else {
+                listPlus = CollectionsKt___CollectionsKt.plus((Collection<? extends vlE>) arrayList, vle);
+            }
+            List listEmptyList3 = CollectionsKt__CollectionsKt.emptyList();
+            if (list2 == null) {
+                listListOf = CollectionsKt__CollectionsJVMKt.listOf(new EffectRenderPass("-", "normal", "none", "-"));
+            } else {
+                listListOf = list2;
+            }
+            if (listEmptyList2 == null) {
+                listEmptyList2 = CollectionsKt__CollectionsKt.emptyList();
+            }
+            if (!zDZ2) {
+                uriBuild3 = uriBuild;
+            }
+            visualEffect = new VisualEffect(attributeValue, str3, str4, listEmptyList, my1, map2, arrayList3, listListOf, uri, effectType2, z7, z4, z6, listEmptyList2, str7, listPlus, set, listEmptyList3, uriBuild, uriBuild3, iIntValue, attributeValue16, z8, f2, z5);
+            List listHfr = jd.Hfr();
+            arrayList2 = new ArrayList();
+            for (Object obj : listHfr) {
+                if (((Boolean) ((EIS) obj).Hfr().invoke(visualEffect, null, Boolean.valueOf(bb.BWM()))).booleanValue()) {
+                    arrayList2.add(obj);
+                }
+            }
+            return visualEffect.copy((33423359 & 1) != 0 ? visualEffect.id : null, (33423359 & 2) != 0 ? visualEffect.name : null, (33423359 & 4) != 0 ? visualEffect.desc : null, (33423359 & 8) != 0 ? visualEffect.parameters : null, (33423359 & 16) != 0 ? visualEffect.localizedStrings : null, (33423359 & 32) != 0 ? visualEffect.shaderGroups : null, (33423359 & 64) != 0 ? visualEffect.scripts : null, (33423359 & 128) != 0 ? visualEffect.passes : null, (33423359 & 256) != 0 ? visualEffect.uri : null, (33423359 & ConstantsKt.MINIMUM_BLOCK_SIZE) != 0 ? visualEffect.type : null, (33423359 & 1024) != 0 ? visualEffect.internal : false, (33423359 & 2048) != 0 ? visualEffect.deprecated : false, (33423359 & 4096) != 0 ? visualEffect.experimental : false, (33423359 & ConstantsKt.DEFAULT_BUFFER_SIZE) != 0 ? visualEffect.packagedPresets : null, (33423359 & 16384) != 0 ? visualEffect.categoryId : null, (33423359 & 32768) != 0 ? visualEffect.tags : null, (33423359 & 65536) != 0 ? visualEffect.affinity : null, (33423359 & 131072) != 0 ? visualEffect.categories : arrayList2, (33423359 & 262144) != 0 ? visualEffect.thumbnail : null, (33423359 & 524288) != 0 ? visualEffect.backgroundImage : null, (33423359 & 1048576) != 0 ? visualEffect.iterCount : 0, (33423359 & 2097152) != 0 ? visualEffect.iterParam : null, (33423359 & 4194304) != 0 ? visualEffect.hasOverdaw : false, (33423359 & 8388608) != 0 ? visualEffect.maxOverdraw : 0.0f, (33423359 & 16777216) != 0 ? visualEffect.autoTransform : false);
+        }
+        i2 = 1;
+        if (!z2) {
+            throw new MalformedXMLException("If <passes> is present, at least one <pass> must be specified.", null, false, 6, null);
+        }
+        if (list == null) {
+            listEmptyList = CollectionsKt__CollectionsKt.emptyList();
+        } else {
+            listEmptyList = list;
+        }
+        char[] cArr3 = new char[i2];
+        cArr3[0] = ',';
+        Set set3 = SequencesKt___SequencesKt.toSet(SequencesKt___SequencesKt.mapNotNull(SequencesKt___SequencesKt.filter(SequencesKt___SequencesKt.map(StringsKt__StringsKt.splitToSequence$default((CharSequence) str6, cArr3, false, 0, 6, (Object) null), VisualEffectParserKt$readEffect$result$1.INSTANCE), VisualEffectParserKt$readEffect$result$2.INSTANCE), new Function1<String, EffectAffinity>() { // from class: com.alightcreative.app.motion.scene.visualeffect.VisualEffectParserKt$readEffect$result$3
+            @Override // kotlin.jvm.functions.Function1
+            public final EffectAffinity invoke(String it2) {
+                Intrinsics.checkNotNullParameter(it2, "it");
+                return EffectAffinity.Companion.fromString(it2);
+            }
+        }));
+        char[] cArr4 = new char[i2];
+        i3 = 0;
+        cArr4[0] = ',';
+        Set<String> set4 = SequencesKt___SequencesKt.toSet(SequencesKt___SequencesKt.filter(SequencesKt___SequencesKt.map(StringsKt__StringsKt.splitToSequence$default((CharSequence) str5, cArr4, false, 0, 6, (Object) null), VisualEffectParserKt$readEffect$result$4.INSTANCE), VisualEffectParserKt$readEffect$result$5.INSTANCE));
+        arrayList = new ArrayList();
+        while (r8.hasNext()) {
+            vleArrValues = vlE.values();
+            length = vleArrValues.length;
+            i4 = i3;
+            while (true) {
+                if (i4 < length) {
+                    vle2 = vleArrValues[i4];
+                    if (Intrinsics.areEqual(vle2.Hfr(), str8)) {
+                        i4++;
+                    }
+                } else {
+                    vle2 = null;
+                }
+            }
+            if (vle2 != null) {
+                arrayList.add(vle2);
+            }
+            i3 = 0;
+        }
+        if (vle != null) {
+            listPlus = arrayList;
+        } else {
+            listPlus = arrayList;
+        }
+        List listEmptyList4 = CollectionsKt__CollectionsKt.emptyList();
+        if (list2 == null) {
+            listListOf = CollectionsKt__CollectionsJVMKt.listOf(new EffectRenderPass("-", "normal", "none", "-"));
+        } else {
+            listListOf = list2;
+        }
+        if (listEmptyList2 == null) {
+            listEmptyList2 = CollectionsKt__CollectionsKt.emptyList();
+        }
+        if (!zDZ2) {
+            uriBuild3 = uriBuild;
+        }
+        visualEffect = new VisualEffect(attributeValue, str3, str4, listEmptyList, my1, map2, arrayList3, listListOf, uri, effectType2, z7, z4, z6, listEmptyList2, str7, listPlus, set3, listEmptyList4, uriBuild, uriBuild3, iIntValue, attributeValue16, z8, f2, z5);
+        List listHfr2 = jd.Hfr();
+        arrayList2 = new ArrayList();
+        while (r0.hasNext()) {
+            if (((Boolean) ((EIS) obj).Hfr().invoke(visualEffect, null, Boolean.valueOf(bb.BWM()))).booleanValue()) {
+                arrayList2.add(obj);
+            }
+        }
+        return visualEffect.copy((33423359 & 1) != 0 ? visualEffect.id : null, (33423359 & 2) != 0 ? visualEffect.name : null, (33423359 & 4) != 0 ? visualEffect.desc : null, (33423359 & 8) != 0 ? visualEffect.parameters : null, (33423359 & 16) != 0 ? visualEffect.localizedStrings : null, (33423359 & 32) != 0 ? visualEffect.shaderGroups : null, (33423359 & 64) != 0 ? visualEffect.scripts : null, (33423359 & 128) != 0 ? visualEffect.passes : null, (33423359 & 256) != 0 ? visualEffect.uri : null, (33423359 & ConstantsKt.MINIMUM_BLOCK_SIZE) != 0 ? visualEffect.type : null, (33423359 & 1024) != 0 ? visualEffect.internal : false, (33423359 & 2048) != 0 ? visualEffect.deprecated : false, (33423359 & 4096) != 0 ? visualEffect.experimental : false, (33423359 & ConstantsKt.DEFAULT_BUFFER_SIZE) != 0 ? visualEffect.packagedPresets : null, (33423359 & 16384) != 0 ? visualEffect.categoryId : null, (33423359 & 32768) != 0 ? visualEffect.tags : null, (33423359 & 65536) != 0 ? visualEffect.affinity : null, (33423359 & 131072) != 0 ? visualEffect.categories : arrayList2, (33423359 & 262144) != 0 ? visualEffect.thumbnail : null, (33423359 & 524288) != 0 ? visualEffect.backgroundImage : null, (33423359 & 1048576) != 0 ? visualEffect.iterCount : 0, (33423359 & 2097152) != 0 ? visualEffect.iterParam : null, (33423359 & 4194304) != 0 ? visualEffect.hasOverdaw : false, (33423359 & 8388608) != 0 ? visualEffect.maxOverdraw : 0.0f, (33423359 & 16777216) != 0 ? visualEffect.autoTransform : false);
+    }

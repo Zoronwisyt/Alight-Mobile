@@ -1,0 +1,466 @@
+    /* JADX INFO: Access modifiers changed from: private */
+    /* JADX WARN: Can't fix incorrect switch cases order, some code will duplicate */
+    /* JADX WARN: Code duplicated, block: B:104:0x0312  */
+    /* JADX WARN: Code duplicated, block: B:133:0x0366  */
+    /* JADX WARN: Code duplicated, block: B:249:0x06aa A[LOOP:13: B:202:0x05c8->B:249:0x06aa, LOOP_END] */
+    /* JADX WARN: Code duplicated, block: B:80:0x028d  */
+    /* JADX WARN: Instruction removed from duplicated block: B:133:0x0366, please report this as an issue */
+    /* JADX WARN: Multi-variable type inference failed */
+    /* JADX WARN: Type inference failed for: r14v16, types: [java.lang.Object[], java.lang.String[]] */
+    /* JADX WARN: Type inference failed for: r14v17, types: [java.lang.Object[], java.lang.String[]] */
+    /* JADX WARN: Type inference failed for: r8v11 */
+    /* JADX WARN: Type inference failed for: r8v14 */
+    /* JADX WARN: Type inference failed for: r8v73 */
+    public static final List<EffectPreset> loadVisualEffectPresets(Context context, String str) throws IOException {
+        Context context2;
+        String str2;
+        boolean z2;
+        ArrayList arrayList;
+        Object next;
+        boolean z4;
+        boolean z5;
+        boolean z6;
+        ?? r8;
+        int i2;
+        String[] list;
+        List listSorted;
+        Iterator it;
+        String str3;
+        boolean z7;
+        ArrayList arrayList2;
+        int i3;
+        int i4;
+        int i5;
+        Map map;
+        Pair pair;
+        String strReplace;
+        String string;
+        EffectPresetTiming effectPresetTiming;
+        String strReplace$default;
+        String str4 = str;
+        ArrayList arrayList3 = new ArrayList();
+        Context contextBWM = RM.B8K.BWM(context);
+        AssetManager assets = context.getAssets();
+        String str5 = "";
+        Throwable th = null;
+        boolean z8 = false;
+        int i6 = 1;
+        if (assets == null || (list = assets.list(str4)) == null || (listSorted = ArraysKt___ArraysKt.sorted(list)) == null) {
+            context2 = contextBWM;
+            str2 = "";
+            z2 = false;
+            arrayList = arrayList3;
+        } else {
+            Iterator it2 = listSorted.iterator();
+            while (it2.hasNext()) {
+                String str6 = (String) it2.next();
+                Intrinsics.checkNotNull(str6);
+                int i7 = 2;
+                if (StringsKt__StringsJVMKt.endsWith$default(str6, ".xml", z8, 2, th)) {
+                    InputStream inputStreamOpen = context.getAssets().open(new File(new File(str4), str6).getPath());
+                    Intrinsics.checkNotNullExpressionValue(inputStreamOpen, "open(...)");
+                    InputStreamReader inputStreamReader = new InputStreamReader(inputStreamOpen, Charsets.UTF_8);
+                    try {
+                        String text = TextStreamsKt.readText(inputStreamReader);
+                        CloseableKt.closeFinally(inputStreamReader, th);
+                        for (SceneElement sceneElement : SceneSerializerKt.unserializeScene$default(text, false, false, false, 12, null).getElements()) {
+                            String label = sceneElement.getLabel();
+                            ArrayList arrayList4 = new ArrayList();
+                            if (sceneElement.getType() == SceneElementType.Audio || sceneElement.getType() == SceneElementType.Scene) {
+                                contextBWM = contextBWM;
+                                it = it2;
+                                str3 = str5;
+                                z7 = z8;
+                                arrayList2 = arrayList3;
+                                i3 = i7;
+                                loadVisualEffectPresets$lambda$19$presetError(str6, label, arrayList4, "Audio and Scene elements are not supported in projects use for preset definitions");
+                                i7 = i3;
+                                arrayList3 = arrayList2;
+                                z8 = z7;
+                                it2 = it;
+                                contextBWM = contextBWM;
+                                str5 = str3;
+                                i6 = 1;
+                            } else {
+                                Map<Long, KeyableVisualEffectRef> visualEffects = sceneElement.getVisualEffects();
+                                LinkedHashMap linkedHashMap = new LinkedHashMap();
+                                for (Map.Entry<Long, KeyableVisualEffectRef> entry : visualEffects.entrySet()) {
+                                    if (!entry.getValue().getHidden()) {
+                                        linkedHashMap.put(entry.getKey(), entry.getValue());
+                                    }
+                                }
+                                if (linkedHashMap.size() > i6) {
+                                    loadVisualEffectPresets$lambda$19$presetError(str6, label, arrayList4, "At most one visual effect per layer is allowed in projects use for preset definitions");
+                                } else {
+                                    KeyableVisualEffectRef keyableVisualEffectRef = (KeyableVisualEffectRef) CollectionsKt___CollectionsKt.singleOrNull(linkedHashMap.values());
+                                    if (keyableVisualEffectRef != null) {
+                                        VisualEffect visualEffectVisualEffectById = visualEffectById(keyableVisualEffectRef.getId());
+                                        if (visualEffectVisualEffectById == null) {
+                                            loadVisualEffectPresets$lambda$19$presetError(str6, label, arrayList4, "Unknown effect '" + keyableVisualEffectRef.getId() + "'");
+                                        } else {
+                                            List<String> listSplit = new Regex(";(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)").split(label, i7);
+                                            String str7 = ":";
+                                            if (listSplit.size() >= i7) {
+                                                it = it2;
+                                                i5 = 1;
+                                                i4 = 0;
+                                            } else {
+                                                it = it2;
+                                                i4 = 0;
+                                                if (StringsKt__StringsKt.contains$default((CharSequence) CollectionsKt___CollectionsKt.single((List) listSplit), (CharSequence) ":", false, i7, (Object) null)) {
+                                                    ?? r14 = new String[i7];
+                                                    r14[0] = 0;
+                                                    i5 = 1;
+                                                    r14[1] = CollectionsKt___CollectionsKt.single((List) listSplit);
+                                                    listSplit = CollectionsKt__CollectionsKt.listOf((Object[]) r14);
+                                                } else {
+                                                    i5 = 1;
+                                                    ?? r15 = new String[i7];
+                                                    r15[0] = CollectionsKt___CollectionsKt.single((List) listSplit);
+                                                    r15[1] = 0;
+                                                    listSplit = CollectionsKt__CollectionsKt.listOf((Object[]) r15);
+                                                }
+                                            }
+                                            String str8 = listSplit.get(i4);
+                                            String str9 = listSplit.get(i5);
+                                            if (str9 == null) {
+                                                map = MapsKt__MapsKt.emptyMap();
+                                            } else {
+                                                List<String> listSplit2 = new Regex(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)").split(str9, i4);
+                                                ArrayList arrayList5 = new ArrayList(CollectionsKt__IterablesKt.collectionSizeOrDefault(listSplit2, 10));
+                                                Iterator it3 = listSplit2.iterator();
+                                                while (it3.hasNext()) {
+                                                    arrayList5.add(StringsKt__StringsKt.trim((CharSequence) it3.next()).toString());
+                                                }
+                                                ArrayList arrayList6 = new ArrayList();
+                                                for (Object obj : arrayList5) {
+                                                    if (!StringsKt__StringsJVMKt.isBlank((String) obj)) {
+                                                        arrayList6.add(obj);
+                                                    }
+                                                }
+                                                ArrayList arrayList7 = new ArrayList();
+                                                Iterator it4 = arrayList6.iterator();
+                                                while (it4.hasNext()) {
+                                                    List listSplit$default = StringsKt__StringsKt.split$default((CharSequence) it4.next(), new String[]{str7}, false, 2, 2, (Object) null);
+                                                    Iterator it5 = it4;
+                                                    String str10 = str7;
+                                                    ArrayList arrayList8 = new ArrayList(CollectionsKt__IterablesKt.collectionSizeOrDefault(listSplit$default, 10));
+                                                    Iterator it6 = listSplit$default.iterator();
+                                                    while (it6.hasNext()) {
+                                                        arrayList8.add(StringsKt__StringsKt.trim((CharSequence) it6.next()).toString());
+                                                    }
+                                                    if (arrayList8.size() != 2) {
+                                                        loadVisualEffectPresets$lambda$19$presetError(str6, label, arrayList4, "Layer name format incorrect");
+                                                        pair = null;
+                                                    } else {
+                                                        pair = TuplesKt.to((String) arrayList8.get(0), (String) arrayList8.get(1));
+                                                    }
+                                                    if (pair != null) {
+                                                        arrayList7.add(pair);
+                                                    }
+                                                    it4 = it5;
+                                                    str7 = str10;
+                                                }
+                                                map = MapsKt__MapsKt.toMap(arrayList7);
+                                            }
+                                            if (str8 == null || (strReplace$default = StringsKt__StringsJVMKt.replace$default(str8, " ", "_", false, 4, (Object) null)) == null) {
+                                                strReplace = null;
+                                            } else {
+                                                Locale ROOT = Locale.ROOT;
+                                                Intrinsics.checkNotNullExpressionValue(ROOT, "ROOT");
+                                                String lowerCase = strReplace$default.toLowerCase(ROOT);
+                                                Intrinsics.checkNotNullExpressionValue(lowerCase, "toLowerCase(...)");
+                                                if (lowerCase != null) {
+                                                    strReplace = new Regex("[^A-Za-z0-9_]").replace(lowerCase, str5);
+                                                } else {
+                                                    strReplace = null;
+                                                }
+                                            }
+                                            String str11 = strReplace == null ? null : "@am:string/effectpreset_" + strReplace;
+                                            String str12 = (String) map.get("label");
+                                            if (str12 != null) {
+                                                str11 = str12;
+                                            } else if (str11 == null) {
+                                                str11 = AppLovinMediationProvider.UNKNOWN;
+                                            }
+                                            String str13 = (String) map.get("id");
+                                            if (str13 == null) {
+                                                str13 = strReplace;
+                                            }
+                                            if (str13 == null) {
+                                                loadVisualEffectPresets$lambda$19$presetError(str6, label, arrayList4, "Missing ID");
+                                                it2 = it;
+                                                contextBWM = contextBWM;
+                                                z8 = false;
+                                                i6 = 1;
+                                                i7 = 2;
+                                            } else {
+                                                str3 = str5;
+                                                String strHfr = B8K.Hfr(str11, context);
+                                                ArrayList arrayList9 = arrayList3;
+                                                String str14 = str11;
+                                                String str15 = str13;
+                                                i3 = 2;
+                                                z7 = false;
+                                                if (!StringsKt__StringsJVMKt.startsWith$default(strHfr, "?", false, 2, null) || str8 == null) {
+                                                    str8 = str14;
+                                                }
+                                                String str16 = (String) map.get("t");
+                                                if (str16 != null) {
+                                                    Locale ROOT2 = Locale.ROOT;
+                                                    Intrinsics.checkNotNullExpressionValue(ROOT2, "ROOT");
+                                                    String lowerCase2 = str16.toLowerCase(ROOT2);
+                                                    Intrinsics.checkNotNullExpressionValue(lowerCase2, "toLowerCase(...)");
+                                                    if (lowerCase2 != null) {
+                                                        string = StringsKt__StringsKt.trim((CharSequence) lowerCase2).toString();
+                                                    } else {
+                                                        string = null;
+                                                    }
+                                                } else {
+                                                    string = null;
+                                                }
+                                                if (string != null) {
+                                                    switch (string) {
+                                                        case "stretch":
+                                                            effectPresetTiming = EffectPresetTiming.Stretch;
+                                                            break;
+                                                        case "extend-match":
+                                                            effectPresetTiming = EffectPresetTiming.ExtendMatch;
+                                                            break;
+                                                        case "extend":
+                                                            effectPresetTiming = EffectPresetTiming.Extend;
+                                                            break;
+                                                        case "end":
+                                                            effectPresetTiming = EffectPresetTiming.End;
+                                                            break;
+                                                        case "split":
+                                                            effectPresetTiming = EffectPresetTiming.Split;
+                                                            break;
+                                                        case "start":
+                                                            effectPresetTiming = EffectPresetTiming.Start;
+                                                            break;
+                                                        default:
+                                                            loadVisualEffectPresets$lambda$19$presetError(str6, label, arrayList4, "Unknown preset timing '" + string + "'");
+                                                            i7 = 2;
+                                                            z8 = false;
+                                                            arrayList3 = arrayList9;
+                                                            break;
+                                                    }
+                                                    it2 = it;
+                                                    contextBWM = contextBWM;
+                                                    str5 = str3;
+                                                    i6 = 1;
+                                                } else {
+                                                    effectPresetTiming = EffectPresetTiming.Stretch;
+                                                }
+                                                EffectPresetTiming effectPresetTiming2 = effectPresetTiming;
+                                                if (visualEffectVisualEffectById.getDeprecated()) {
+                                                    loadVisualEffectPresets$lambda$19$presetError(str6, label, arrayList4, "Use of deprecated effect '" + visualEffectVisualEffectById.getId() + "'");
+                                                } else if (visualEffectVisualEffectById.getInternal()) {
+                                                    loadVisualEffectPresets$lambda$19$presetError(str6, label, arrayList4, "Use of internal effect '" + visualEffectVisualEffectById.getId() + "'");
+                                                } else {
+                                                    visualEffectVisualEffectById.getExperimental();
+                                                }
+                                                arrayList2 = arrayList9;
+                                                arrayList2.add(new EffectPreset(str15, str8, "", sceneElement.getEndTime() - sceneElement.getStartTime(), effectPresetTiming2, keyableVisualEffectRef.getParameters(), keyableVisualEffectRef.getId(), arrayList4.isEmpty() ? CollectionsKt__CollectionsKt.emptyList() : arrayList4, str6));
+                                                i7 = i3;
+                                                arrayList3 = arrayList2;
+                                                z8 = z7;
+                                                it2 = it;
+                                                contextBWM = contextBWM;
+                                                str5 = str3;
+                                                i6 = 1;
+                                            }
+                                        }
+                                    } else {
+                                        contextBWM = contextBWM;
+                                        i6 = 1;
+                                    }
+                                }
+                            }
+                        }
+                    } catch (Throwable th2) {
+                        try {
+                            throw th2;
+                        } catch (Throwable th3) {
+                            CloseableKt.closeFinally(inputStreamReader, th2);
+                            throw th3;
+                        }
+                    }
+                }
+                str4 = str;
+                arrayList3 = arrayList3;
+                z8 = z8;
+                it2 = it2;
+                contextBWM = contextBWM;
+                str5 = str5;
+                th = null;
+                i6 = 1;
+            }
+            context2 = contextBWM;
+            str2 = str5;
+            z2 = z8;
+            arrayList = arrayList3;
+            Unit unit = Unit.INSTANCE;
+        }
+        List listListOf = CollectionsKt__CollectionsKt.listOf((Object[]) new String[]{"TO", "AND", "OR", "OF", "FROM", "TO", "THEN"});
+        List listListOf2 = CollectionsKt__CollectionsJVMKt.listOf("FU");
+        Set<String> set = SequencesKt___SequencesKt.toSet(SequencesKt___SequencesKt.map(CollectionsKt___CollectionsKt.asSequence(arrayList), new Function1<EffectPreset, String>() { // from class: com.alightcreative.app.motion.scene.visualeffect.VisualEffectKt$loadVisualEffectPresets$effectsWithPresets$1
+            @Override // kotlin.jvm.functions.Function1
+            public final String invoke(EffectPreset it7) {
+                Intrinsics.checkNotNullParameter(it7, "it");
+                return it7.getEffectId();
+            }
+        }));
+        ArrayList arrayList10 = new ArrayList();
+        boolean z9 = z2;
+        for (final String str17 : set) {
+            ArrayList<EffectPreset> arrayList11 = new ArrayList();
+            for (Object obj2 : arrayList) {
+                if (Intrinsics.areEqual(((EffectPreset) obj2).getEffectId(), str17)) {
+                    arrayList11.add(obj2);
+                }
+            }
+            ArrayList arrayList12 = new ArrayList();
+            for (Object obj3 : arrayList11) {
+                EffectPreset effectPreset = (EffectPreset) obj3;
+                if (arrayList11.isEmpty()) {
+                    i2 = z9 ? 1 : 0;
+                } else {
+                    Iterator it7 = arrayList11.iterator();
+                    i2 = z9 ? 1 : 0;
+                    while (it7.hasNext()) {
+                        if (Intrinsics.areEqual(((EffectPreset) it7.next()).getLabel(), effectPreset.getLabel()) && (i2 = i2 + 1) < 0) {
+                            CollectionsKt__CollectionsKt.throwCountOverflow();
+                        }
+                    }
+                }
+                if (i2 > 1 ? true : z9 ? 1 : 0) {
+                    arrayList12.add(obj3);
+                }
+            }
+            ArrayList arrayList13 = new ArrayList(CollectionsKt__IterablesKt.collectionSizeOrDefault(arrayList11, 10));
+            for (EffectPreset effectPreset2 : arrayList11) {
+                arrayList13.add(new PresetInfo(effectPreset2, str2, loadVisualEffectPresets$toEnglishUCWords(effectPreset2.getLabel(), context2, listListOf)));
+            }
+            Context context3 = context2;
+            String str18 = str2;
+            if (!arrayList12.isEmpty()) {
+                List<String> list2 = presetLoadErrors;
+                ArrayList arrayList14 = new ArrayList(CollectionsKt__IterablesKt.collectionSizeOrDefault(arrayList12, 10));
+                Iterator it8 = arrayList12.iterator();
+                while (it8.hasNext()) {
+                    arrayList14.add(((EffectPreset) it8.next()).getLabel());
+                }
+                list2.add("Duplicate preset name: effect '" + str17 + "', presets: " + CollectionsKt___CollectionsKt.joinToString$default(CollectionsKt___CollectionsJvmKt.toSortedSet(arrayList14), ", ", null, null, 0, null, null, 62, null) + " ");
+            }
+            euv.Xu("PresetCode", new Function0<String>() { // from class: com.alightcreative.app.motion.scene.visualeffect.VisualEffectKt$loadVisualEffectPresets$2$2
+                /* JADX WARN: 'super' call moved to the top of the method (can break code semantics) */
+                {
+                    super(0);
+                }
+
+                @Override // kotlin.jvm.functions.Function0
+                public final String invoke() {
+                    return "Finding code for effect: " + str17;
+                }
+            });
+            Iterator it9 = SequencesKt___SequencesKt.onEach(SequencesKt__SequenceBuilderKt.sequence(new VisualEffectKt$loadVisualEffectPresets$2$3(arrayList13, null)), new Function1<List<? extends PresetInfo>, Unit>() { // from class: com.alightcreative.app.motion.scene.visualeffect.VisualEffectKt$loadVisualEffectPresets$2$4
+                @Override // kotlin.jvm.functions.Function1
+                public /* bridge */ /* synthetic */ Unit invoke(List<? extends PresetInfo> list3) {
+                    invoke2((List<PresetInfo>) list3);
+                    return Unit.INSTANCE;
+                }
+
+                /* JADX INFO: renamed from: invoke, reason: avoid collision after fix types in other method */
+                public final void invoke2(final List<PresetInfo> it10) {
+                    Intrinsics.checkNotNullParameter(it10, "it");
+                    euv.Xu("PresetCode", new Function0<String>() { // from class: com.alightcreative.app.motion.scene.visualeffect.VisualEffectKt$loadVisualEffectPresets$2$4.1
+                        /* JADX WARN: 'super' call moved to the top of the method (can break code semantics) */
+                        {
+                            super(0);
+                        }
+
+                        @Override // kotlin.jvm.functions.Function0
+                        public final String invoke() {
+                            return "Candidate! " + CollectionsKt___CollectionsKt.joinToString$default(it10, ",", null, null, 0, null, new Function1<PresetInfo, CharSequence>() { // from class: com.alightcreative.app.motion.scene.visualeffect.VisualEffectKt.loadVisualEffectPresets.2.4.1.1
+                                @Override // kotlin.jvm.functions.Function1
+                                public final CharSequence invoke(PresetInfo it11) {
+                                    Intrinsics.checkNotNullParameter(it11, "it");
+                                    return it11.getCode();
+                                }
+                            }, 30, null);
+                        }
+                    });
+                }
+            }).iterator();
+            boolean z10 = z9;
+            while (true) {
+                if (!it9.hasNext()) {
+                    throw new NoSuchElementException("Sequence contains no element matching the predicate.");
+                }
+                next = it9.next();
+                List list3 = (List) next;
+                if (!arrayList12.isEmpty()) {
+                    z4 = true;
+                } else {
+                    List list4 = list3;
+                    boolean z11 = list4 instanceof Collection;
+                    if (z11 && list4.isEmpty()) {
+                        z4 = true;
+                        z6 = true;
+                    } else {
+                        Iterator it10 = list4.iterator();
+                        boolean z12 = z10;
+                        while (true) {
+                            if (it10.hasNext()) {
+                                PresetInfo presetInfo = (PresetInfo) it10.next();
+                                if (!z11 || !list4.isEmpty()) {
+                                    r8 = z12;
+                                    Iterator it11 = list4.iterator();
+                                    int i8 = z12 ? 1 : 0;
+                                    while (it11.hasNext()) {
+                                        if (Intrinsics.areEqual(((PresetInfo) it11.next()).getCode(), presetInfo.getCode()) && (i8 = i8 + 1) < 0) {
+                                            CollectionsKt__CollectionsKt.throwCountOverflow();
+                                        }
+                                    }
+                                    r8 = i8;
+                                }
+                                r8 = z12;
+                                z4 = true;
+                                if (r8 <= 1 && !listListOf2.contains(presetInfo.getCode())) {
+                                    z12 = false;
+                                } else {
+                                    z6 = false;
+                                }
+                            } else {
+                                z4 = true;
+                                z6 = true;
+                            }
+                        }
+                    }
+                    if (!z6) {
+                        z5 = false;
+                    }
+                    if (z5) {
+                        z10 = false;
+                    }
+                }
+                z5 = z4;
+                if (z5) {
+                    z10 = false;
+                }
+            }
+            Iterable<PresetInfo> iterable = (Iterable) next;
+            ArrayList arrayList15 = new ArrayList(CollectionsKt__IterablesKt.collectionSizeOrDefault(iterable, 10));
+            for (PresetInfo presetInfo2 : iterable) {
+                EffectPreset preset = presetInfo2.getPreset();
+                arrayList15.add(preset.copy((507 & 1) != 0 ? preset.id : null, (507 & 2) != 0 ? preset.label : null, (507 & 4) != 0 ? preset.shortCode : presetInfo2.getCode(), (507 & 8) != 0 ? preset.timescale : 0, (507 & 16) != 0 ? preset.timing : null, (507 & 32) != 0 ? preset.properties : null, (507 & 64) != 0 ? preset.effectId : null, (507 & 128) != 0 ? preset.parseErrors : null, (507 & 256) != 0 ? preset.presetSource : null));
+            }
+            CollectionsKt__MutableCollectionsKt.addAll(arrayList10, arrayList15);
+            context2 = context3;
+            str2 = str18;
+            z9 = false;
+        }
+        return arrayList10;
+    }

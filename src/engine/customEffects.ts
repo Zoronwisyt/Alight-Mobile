@@ -16,6 +16,7 @@ const ALLOWED_PARAM_TAGS = new Set([
   'orient',
   'color',
   'hue-disc',
+  'hue-ring',
   'selector',
   'switch',
   'section',
@@ -23,7 +24,10 @@ const ALLOWED_PARAM_TAGS = new Set([
   'texture',
 ]);
 
-const ALLOWED_TEX_SRC_TYPES = new Set(['content', 'buffer', 'comp', 'image']);
+// Matches UserParamParserKt.readTextureParam: content | buffer | comp | image | user.
+// 'user' is AM's default when <texture> carries no src; the port still defaults to
+// 'content' because a bare <texture id="inputImg" /> in this engine means "the layer".
+const ALLOWED_TEX_SRC_TYPES = new Set(['content', 'buffer', 'comp', 'image', 'user']);
 const ALLOWED_PASS_ATTRS = new Set(['target', 'effect', 'src', 'blend']);
 const FORBIDDEN_SHADER_RE =
   /(#include|#extension|\bsampler3D\b|\bsamplerCube\b|\bimageLoad\b|https?:\/\/)/i;
@@ -248,7 +252,7 @@ export async function validateCustomEffectXml(
         if (!ALLOWED_TEX_SRC_TYPES.has(st)) {
           return {
             ok: false,
-            error: { rule: 8, message: `Invalid texture srcType "${st}".`, hint: 'Use content, buffer, comp, or image.' },
+            error: { rule: 8, message: `Invalid texture srcType "${st}".`, hint: 'Use content, buffer, comp, image, or user.' },
           };
         }
         if (st === 'image' && pDef.src && /https?:\/\/|\.\./i.test(pDef.src)) {
@@ -272,9 +276,24 @@ export async function validateCustomEffectXml(
   // Rule 9: Passes <= 8 & attribute allowlist
   const passes: EffectPassDef[] = [];
   const passesNode = root.querySelector('passes');
-  const iterations = passesNode?.getAttribute('iterations') || null;
+  // AM carries the quality knob as <iterations param="iter" />, a sibling of
+  // <passes>; the old attr form is still honoured for files authored against it.
+  const iterationsNode = Array.from(root.children).find((c) => c.tagName.toLowerCase() === 'iterations');
+  const iterations =
+    iterationsNode?.getAttribute('param') || passesNode?.getAttribute('iterations') || null;
   if (passesNode) {
     const passEls = Array.from(passesNode.children).filter((c) => c.tagName.toLowerCase() === 'pass');
+    // VisualEffectParserKt.readPasses: a present-but-empty <passes> is a hard error in AM.
+    if (passEls.length === 0) {
+      return {
+        ok: false,
+        error: {
+          rule: 9,
+          message: 'If <passes> is present, at least one <pass> must be specified.',
+          hint: 'Add a <pass /> child, or remove the <passes> block entirely.',
+        },
+      };
+    }
     if (passEls.length > 8) {
       return { ok: false, error: { rule: 9, message: `Too many passes (${passEls.length} > 8).`, hint: 'Limit custom effects to at most 8 passes.' } };
     }

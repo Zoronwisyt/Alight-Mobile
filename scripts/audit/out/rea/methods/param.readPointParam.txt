@@ -1,0 +1,94 @@
+    /* JADX WARN: Can't fix incorrect switch cases order, some code will duplicate */
+    /* JADX WARN: Code duplicated, block: B:48:0x00be  */
+    /* JADX WARN: Failed to restore switch over string. Please report as a decompilation issue */
+    private static final UserParameter.Point readPointParam(XmlPullParser xmlPullParser, String str) throws XmlPullParserException, IOException, MalformedXMLException {
+        Vector2D zero;
+        Vector2D vector2D;
+        Vector2D vector2D2;
+        PointType pointType;
+        String attributeValue;
+        Float fU2;
+        xmlPullParser.require(2, str, "point");
+        String attributeValue2 = xmlPullParser.getAttributeValue(str, "id");
+        if (attributeValue2 == null) {
+            throw new MalformedXMLException("element missing 'id' attribute", null, false, 6, null);
+        }
+        String attributeValue3 = xmlPullParser.getAttributeValue(str, "enabled");
+        if (attributeValue3 == null) {
+            attributeValue3 = "true";
+        }
+        boolean zRw = mY0.Rw(attributeValue3);
+        String attributeValue4 = xmlPullParser.getAttributeValue(str, JavetLibLoadingListener.JAVET_LIB_LOADING_TYPE_DEFAULT);
+        if (attributeValue4 == null || (zero = GeometryKt.toVector2DOrNull(attributeValue4)) == null) {
+            zero = Vector2D.INSTANCE.getZERO();
+        }
+        Vector2D vector2D3 = zero;
+        String attributeValue5 = xmlPullParser.getAttributeValue(str, "min");
+        if (attributeValue5 == null || (vector2D = GeometryKt.toVector2DOrNull(attributeValue5)) == null) {
+            vector2D = new Vector2D(-9999.0f, -9999.0f);
+        }
+        Vector2D vector2D4 = vector2D;
+        String attributeValue6 = xmlPullParser.getAttributeValue(str, AppLovinMediationProvider.MAX);
+        if (attributeValue6 == null || (vector2D2 = GeometryKt.toVector2DOrNull(attributeValue6)) == null) {
+            vector2D2 = new Vector2D(9999.0f, 9999.0f);
+        }
+        Vector2D vector2D5 = vector2D2;
+        String attributeValue7 = xmlPullParser.getAttributeValue(str, "step");
+        float fFloatValue = (attributeValue7 == null || (fU2 = CZU.u(attributeValue7)) == null) ? 1.0f : fU2.floatValue();
+        String attributeValue8 = xmlPullParser.getAttributeValue(str, "type");
+        if (attributeValue8 == null) {
+            attributeValue8 = "layer";
+        }
+        switch (attributeValue8.hashCode()) {
+            case -1019779949:
+                if (attributeValue8.equals("offset")) {
+                    pointType = PointType.OFFSET;
+                    PointType pointType2 = pointType;
+                    attributeValue = xmlPullParser.getAttributeValue(str, "label");
+                    if (attributeValue == null) {
+                        attributeValue = "";
+                    }
+                    pN.Xu(xmlPullParser);
+                    return new UserParameter.Point(attributeValue2, attributeValue, zRw, vector2D4, vector2D5, vector2D3, pointType2, fFloatValue);
+                }
+                throw new MalformedXMLException("expected 'layer', 'screen', 'offset', or 'size'", null, false, 6, null);
+            case -907689876:
+                if (attributeValue8.equals("screen")) {
+                    pointType = PointType.SCREEN;
+                    PointType pointType3 = pointType;
+                    attributeValue = xmlPullParser.getAttributeValue(str, "label");
+                    if (attributeValue == null) {
+                        attributeValue = "";
+                    }
+                    pN.Xu(xmlPullParser);
+                    return new UserParameter.Point(attributeValue2, attributeValue, zRw, vector2D4, vector2D5, vector2D3, pointType3, fFloatValue);
+                }
+                throw new MalformedXMLException("expected 'layer', 'screen', 'offset', or 'size'", null, false, 6, null);
+            case 3530753:
+                if (attributeValue8.equals("size")) {
+                    pointType = PointType.SIZE;
+                    PointType pointType4 = pointType;
+                    attributeValue = xmlPullParser.getAttributeValue(str, "label");
+                    if (attributeValue == null) {
+                        attributeValue = "";
+                    }
+                    pN.Xu(xmlPullParser);
+                    return new UserParameter.Point(attributeValue2, attributeValue, zRw, vector2D4, vector2D5, vector2D3, pointType4, fFloatValue);
+                }
+                throw new MalformedXMLException("expected 'layer', 'screen', 'offset', or 'size'", null, false, 6, null);
+            case 102749521:
+                if (attributeValue8.equals("layer")) {
+                    pointType = PointType.LAYER;
+                    PointType pointType5 = pointType;
+                    attributeValue = xmlPullParser.getAttributeValue(str, "label");
+                    if (attributeValue == null) {
+                        attributeValue = "";
+                    }
+                    pN.Xu(xmlPullParser);
+                    return new UserParameter.Point(attributeValue2, attributeValue, zRw, vector2D4, vector2D5, vector2D3, pointType5, fFloatValue);
+                }
+                throw new MalformedXMLException("expected 'layer', 'screen', 'offset', or 'size'", null, false, 6, null);
+            default:
+                throw new MalformedXMLException("expected 'layer', 'screen', 'offset', or 'size'", null, false, 6, null);
+        }
+    }

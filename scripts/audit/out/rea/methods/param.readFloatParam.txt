@@ -1,0 +1,12 @@
+    private static final UserParameter.FloatValue readFloatParam(XmlPullParser xmlPullParser, String str) throws XmlPullParserException, IOException, MalformedXMLException {
+        Float fU2;
+        xmlPullParser.require(2, str, "float");
+        String attributeValue = xmlPullParser.getAttributeValue(str, "id");
+        if (attributeValue == null) {
+            throw new MalformedXMLException("element missing 'id' attribute", null, false, 6, null);
+        }
+        String attributeValue2 = xmlPullParser.getAttributeValue(str, "value");
+        float fFloatValue = (attributeValue2 == null || (fU2 = CZU.u(attributeValue2)) == null) ? 0.0f : fU2.floatValue();
+        pN.Xu(xmlPullParser);
+        return new UserParameter.FloatValue(attributeValue, fFloatValue);
+    }

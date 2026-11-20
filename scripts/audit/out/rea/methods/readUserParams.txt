@@ -1,0 +1,121 @@
+    /* JADX WARN: Can't fix incorrect switch cases order, some code will duplicate */
+    /* JADX WARN: Code duplicated, block: B:66:0x0136  */
+    public static final List<UserParameter> readUserParams(XmlPullParser xmlPullParser, String str, String str2) throws XmlPullParserException, IOException {
+        Intrinsics.checkNotNullParameter(xmlPullParser, "<this>");
+        xmlPullParser.require(2, str, "params");
+        ArrayList arrayList = new ArrayList();
+        while (xmlPullParser.next() != 3) {
+            if (xmlPullParser.getEventType() == 2) {
+                int depth = xmlPullParser.getDepth();
+                String name = xmlPullParser.getName();
+                Intrinsics.checkNotNullExpressionValue(name, "getName(...)");
+                switch (name.hashCode()) {
+                    case -2004438503:
+                        if (!name.equals("spinner")) {
+                            pN.Xu(xmlPullParser);
+                        } else {
+                            arrayList.add(readSpinnerParam(xmlPullParser, str, str2));
+                        }
+                        break;
+                    case -1417816805:
+                        if (!name.equals("texture")) {
+                            pN.Xu(xmlPullParser);
+                        } else {
+                            arrayList.add(readTextureParam(xmlPullParser, str));
+                        }
+                        break;
+                    case -1008621499:
+                        if (!name.equals("orient")) {
+                            pN.Xu(xmlPullParser);
+                        } else {
+                            arrayList.add(readOrientationParam(xmlPullParser, str));
+                        }
+                        break;
+                    case -899647263:
+                        if (!name.equals("slider")) {
+                            pN.Xu(xmlPullParser);
+                        } else {
+                            arrayList.add(readSliderParam(xmlPullParser, str));
+                        }
+                        break;
+                    case -889473228:
+                        if (!name.equals("switch")) {
+                            pN.Xu(xmlPullParser);
+                        } else {
+                            arrayList.add(readSwitchParam(xmlPullParser, str));
+                        }
+                        break;
+                    case 114843:
+                        if (!name.equals("tip")) {
+                            pN.Xu(xmlPullParser);
+                        } else {
+                            arrayList.add(readStaticText(xmlPullParser, str, StaticTextStyle.TIP));
+                        }
+                        break;
+                    case 119193:
+                        if (!name.equals("xyz")) {
+                            pN.Xu(xmlPullParser);
+                        } else {
+                            arrayList.add(readXYZParam(xmlPullParser, str));
+                        }
+                        break;
+                    case 94842723:
+                        if (!name.equals("color")) {
+                            pN.Xu(xmlPullParser);
+                        } else {
+                            arrayList.add(readColorParam(xmlPullParser, str));
+                        }
+                        break;
+                    case 97526364:
+                        if (!name.equals(ZZgUmLQd.pLdoeXxj)) {
+                            pN.Xu(xmlPullParser);
+                        } else {
+                            arrayList.add(readFloatParam(xmlPullParser, str));
+                        }
+                        break;
+                    case 106845584:
+                        if (!name.equals("point")) {
+                            pN.Xu(xmlPullParser);
+                        } else {
+                            arrayList.add(readPointParam(xmlPullParser, str));
+                        }
+                        break;
+                    case 263583050:
+                        if (!name.equals("hue-disc")) {
+                            pN.Xu(xmlPullParser);
+                        } else {
+                            arrayList.add(readHueDiscParam(xmlPullParser, str));
+                        }
+                        break;
+                    case 263999973:
+                        if (!name.equals("hue-ring")) {
+                            pN.Xu(xmlPullParser);
+                        } else {
+                            arrayList.add(readHueRingParam(xmlPullParser, str));
+                        }
+                        break;
+                    case 1191572447:
+                        if (!name.equals("selector")) {
+                            pN.Xu(xmlPullParser);
+                        } else {
+                            arrayList.add(readSelectorParam(xmlPullParser, str));
+                        }
+                        break;
+                    case 1970241253:
+                        if (!name.equals("section")) {
+                            pN.Xu(xmlPullParser);
+                        } else {
+                            arrayList.add(readStaticText(xmlPullParser, str, StaticTextStyle.SECTION));
+                        }
+                        break;
+                    default:
+                        pN.Xu(xmlPullParser);
+                        break;
+                }
+                if (xmlPullParser.getEventType() != 3 || xmlPullParser.getDepth() != depth) {
+                    throw new IllegalStateException("Did not consume all tag contents");
+                }
+            }
+        }
+        return arrayList;
+    }

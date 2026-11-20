@@ -1,0 +1,26 @@
+    private static final UserParameter.Orientation readOrientationParam(XmlPullParser xmlPullParser, String str) throws XmlPullParserException, IOException, MalformedXMLException {
+        Quaternion identity;
+        xmlPullParser.require(2, str, "orient");
+        String attributeValue = xmlPullParser.getAttributeValue(str, "id");
+        if (attributeValue == null) {
+            throw new MalformedXMLException("element missing 'id' attribute", null, false, 6, null);
+        }
+        String attributeValue2 = xmlPullParser.getAttributeValue(str, "enabled");
+        if (attributeValue2 == null) {
+            attributeValue2 = "true";
+        }
+        boolean zRw = mY0.Rw(attributeValue2);
+        String attributeValue3 = xmlPullParser.getAttributeValue(str, "label");
+        if (attributeValue3 == null) {
+            attributeValue3 = "";
+        }
+        String str2 = attributeValue3;
+        String attributeValue4 = xmlPullParser.getAttributeValue(str, "invert");
+        boolean zRw2 = attributeValue4 != null ? mY0.Rw(attributeValue4) : false;
+        String attributeValue5 = xmlPullParser.getAttributeValue(str, JavetLibLoadingListener.JAVET_LIB_LOADING_TYPE_DEFAULT);
+        if (attributeValue5 == null || (identity = QuaternionKt.toQuaternionOrNull(attributeValue5)) == null) {
+            identity = Quaternion.INSTANCE.getIDENTITY();
+        }
+        pN.Xu(xmlPullParser);
+        return new UserParameter.Orientation(attributeValue, str2, zRw, identity, zRw2);
+    }

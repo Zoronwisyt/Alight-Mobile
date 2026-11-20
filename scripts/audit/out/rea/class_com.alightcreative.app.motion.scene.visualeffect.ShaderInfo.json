@@ -1,0 +1,146 @@
+{
+  "engine": {
+    "name": "jadx-headless-mcp",
+    "version": "0.7.1",
+    "artifact_sha256": "6e5eacf500b64292bfb73c49797c1958f6ee44646e43e868039ae7feb573ff75",
+    "source_revision": "5844800a486d2248fa949b74c9896285f5b54de2",
+    "worker_count": 1,
+    "heap_limit_mib": 8192
+  },
+  "class_name": "com.alightcreative.app.motion.scene.visualeffect.ShaderInfo",
+  "methods": [
+    {
+      "name": "<clinit>",
+      "reported_signature": "<clinit>(): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()V"
+    },
+    {
+      "name": "<init>",
+      "reported_signature": "<init>(com.alightcreative.app.motion.scene.visualeffect.ShaderType, java.lang.String, com.alightcreative.app.motion.scene.visualeffect.ShaderPrecision, int): void",
+      "overload_index": 0,
+      "is_constructor": true,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/visualeffect/ShaderType;Ljava/lang/String;Lcom/alightcreative/app/motion/scene/visualeffect/ShaderPrecision;I)V"
+    },
+    {
+      "name": "component1",
+      "reported_signature": "component1(): com.alightcreative.app.motion.scene.visualeffect.ShaderType",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/visualeffect/ShaderType;"
+    },
+    {
+      "name": "component2",
+      "reported_signature": "component2(): java.lang.String",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/lang/String;"
+    },
+    {
+      "name": "component3",
+      "reported_signature": "component3(): com.alightcreative.app.motion.scene.visualeffect.ShaderPrecision",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/visualeffect/ShaderPrecision;"
+    },
+    {
+      "name": "component4",
+      "reported_signature": "component4(): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()I"
+    },
+    {
+      "name": "copy",
+      "reported_signature": "copy(com.alightcreative.app.motion.scene.visualeffect.ShaderType, java.lang.String, com.alightcreative.app.motion.scene.visualeffect.ShaderPrecision, int): com.alightcreative.app.motion.scene.visualeffect.ShaderInfo",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/visualeffect/ShaderType;Ljava/lang/String;Lcom/alightcreative/app/motion/scene/visualeffect/ShaderPrecision;I)Lcom/alightcreative/app/motion/scene/visualeffect/ShaderInfo;"
+    },
+    {
+      "name": "copy$default",
+      "reported_signature": "copy$default(com.alightcreative.app.motion.scene.visualeffect.ShaderInfo, com.alightcreative.app.motion.scene.visualeffect.ShaderType, java.lang.String, com.alightcreative.app.motion.scene.visualeffect.ShaderPrecision, int, int, java.lang.Object): com.alightcreative.app.motion.scene.visualeffect.ShaderInfo",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/visualeffect/ShaderInfo;Lcom/alightcreative/app/motion/scene/visualeffect/ShaderType;Ljava/lang/String;Lcom/alightcreative/app/motion/scene/visualeffect/ShaderPrecision;IILjava/lang/Object;)Lcom/alightcreative/app/motion/scene/visualeffect/ShaderInfo;"
+    },
+    {
+      "name": "equals",
+      "reported_signature": "equals(java.lang.Object): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Ljava/lang/Object;)Z"
+    },
+    {
+      "name": "getGroupId",
+      "reported_signature": "getGroupId(): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()I"
+    },
+    {
+      "name": "getPrecision",
+      "reported_signature": "getPrecision(): com.alightcreative.app.motion.scene.visualeffect.ShaderPrecision",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/visualeffect/ShaderPrecision;"
+    },
+    {
+      "name": "getSource",
+      "reported_signature": "getSource(): java.lang.String",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/lang/String;"
+    },
+    {
+      "name": "getType",
+      "reported_signature": "getType(): com.alightcreative.app.motion.scene.visualeffect.ShaderType",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/visualeffect/ShaderType;"
+    },
+    {
+      "name": "hashCode",
+      "reported_signature": "hashCode(): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()I"
+    },
+    {
+      "name": "toString",
+      "reported_signature": "toString(): java.lang.String",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/lang/String;"
+    }
+  ],
+  "fields": [
+    {
+      "name": "$stable",
+      "reported_type": "int",
+      "dex_static_value": null
+    },
+    {
+      "name": "groupId",
+      "reported_type": "int",
+      "dex_static_value": null
+    },
+    {
+      "name": "precision",
+      "reported_type": "com.alightcreative.app.motion.scene.visualeffect.ShaderPrecision",
+      "dex_static_value": null
+    },
+    {
+      "name": "source",
+      "reported_type": "java.lang.String",
+      "dex_static_value": null
+    },
+    {
+      "name": "type",
+      "reported_type": "com.alightcreative.app.motion.scene.visualeffect.ShaderType",
+      "dex_static_value": null
+    }
+  ],
+  "inner_classes": []
+}

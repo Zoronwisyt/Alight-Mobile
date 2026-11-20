@@ -1,0 +1,91 @@
+    /* JADX WARN: Can't fix incorrect switch cases order, some code will duplicate */
+    /* JADX WARN: Code duplicated, block: B:35:0x0084  */
+    /* JADX WARN: Failed to restore switch over string. Please report as a decompilation issue */
+    private static final UserParameter.Texture readTextureParam(XmlPullParser xmlPullParser, String str) throws XmlPullParserException, IOException, MalformedXMLException {
+        TextureSrcType textureSrcType;
+        String attributeValue;
+        xmlPullParser.require(2, str, "texture");
+        String attributeValue2 = xmlPullParser.getAttributeValue(str, "id");
+        if (attributeValue2 == null) {
+            throw new MalformedXMLException("element missing 'id' attribute", null, false, 6, null);
+        }
+        String attributeValue3 = xmlPullParser.getAttributeValue(str, "enabled");
+        if (attributeValue3 == null) {
+            attributeValue3 = "true";
+        }
+        boolean zRw = mY0.Rw(attributeValue3);
+        String attributeValue4 = xmlPullParser.getAttributeValue(str, "src");
+        String attributeValue5 = xmlPullParser.getAttributeValue(str, "downsample");
+        if (attributeValue5 == null) {
+            attributeValue5 = "1";
+        }
+        int iHfr = mY0.Hfr(attributeValue5);
+        String attributeValue6 = xmlPullParser.getAttributeValue(str, "srcType");
+        if (attributeValue6 == null) {
+            attributeValue6 = attributeValue4 == null ? "user" : "image";
+        }
+        switch (attributeValue6.hashCode()) {
+            case -1378118592:
+                if (attributeValue6.equals(V8ValueTypedArray.PROPERTY_BUFFER)) {
+                    textureSrcType = TextureSrcType.BUFFER;
+                    TextureSrcType textureSrcType2 = textureSrcType;
+                    attributeValue = xmlPullParser.getAttributeValue(str, "label");
+                    if (attributeValue == null) {
+                        attributeValue = "";
+                    }
+                    pN.Xu(xmlPullParser);
+                    return new UserParameter.Texture(attributeValue2, attributeValue, zRw, textureSrcType2, attributeValue4, iHfr);
+                }
+                throw new MalformedXMLException("expected 'composition', 'content', 'image', or 'user'", null, false, 6, null);
+            case 3059471:
+                if (attributeValue6.equals("comp")) {
+                    textureSrcType = TextureSrcType.COMPOSITION;
+                    TextureSrcType textureSrcType3 = textureSrcType;
+                    attributeValue = xmlPullParser.getAttributeValue(str, "label");
+                    if (attributeValue == null) {
+                        attributeValue = "";
+                    }
+                    pN.Xu(xmlPullParser);
+                    return new UserParameter.Texture(attributeValue2, attributeValue, zRw, textureSrcType3, attributeValue4, iHfr);
+                }
+                throw new MalformedXMLException("expected 'composition', 'content', 'image', or 'user'", null, false, 6, null);
+            case 3599307:
+                if (attributeValue6.equals("user")) {
+                    textureSrcType = TextureSrcType.USER;
+                    TextureSrcType textureSrcType4 = textureSrcType;
+                    attributeValue = xmlPullParser.getAttributeValue(str, "label");
+                    if (attributeValue == null) {
+                        attributeValue = "";
+                    }
+                    pN.Xu(xmlPullParser);
+                    return new UserParameter.Texture(attributeValue2, attributeValue, zRw, textureSrcType4, attributeValue4, iHfr);
+                }
+                throw new MalformedXMLException("expected 'composition', 'content', 'image', or 'user'", null, false, 6, null);
+            case 100313435:
+                if (attributeValue6.equals("image")) {
+                    textureSrcType = TextureSrcType.IMAGE;
+                    TextureSrcType textureSrcType5 = textureSrcType;
+                    attributeValue = xmlPullParser.getAttributeValue(str, "label");
+                    if (attributeValue == null) {
+                        attributeValue = "";
+                    }
+                    pN.Xu(xmlPullParser);
+                    return new UserParameter.Texture(attributeValue2, attributeValue, zRw, textureSrcType5, attributeValue4, iHfr);
+                }
+                throw new MalformedXMLException("expected 'composition', 'content', 'image', or 'user'", null, false, 6, null);
+            case 951530617:
+                if (attributeValue6.equals(AppLovinEventTypes.USER_VIEWED_CONTENT)) {
+                    textureSrcType = TextureSrcType.CONTENT;
+                    TextureSrcType textureSrcType6 = textureSrcType;
+                    attributeValue = xmlPullParser.getAttributeValue(str, "label");
+                    if (attributeValue == null) {
+                        attributeValue = "";
+                    }
+                    pN.Xu(xmlPullParser);
+                    return new UserParameter.Texture(attributeValue2, attributeValue, zRw, textureSrcType6, attributeValue4, iHfr);
+                }
+                throw new MalformedXMLException("expected 'composition', 'content', 'image', or 'user'", null, false, 6, null);
+            default:
+                throw new MalformedXMLException("expected 'composition', 'content', 'image', or 'user'", null, false, 6, null);
+        }
+    }

@@ -15,57 +15,15 @@ import {
   type CustomEffectValidationResult,
 } from '../../engine/customEffects';
 import { useEditorStore } from '../../store/useEditorStore';
+// The full APK-derived authoring rundown lives as a real markdown file so it can be
+// downloaded, diffed and updated without touching this component.
+import EFFECT_AUTHORING_MD from '../../../EFFECT_AUTHORING.md?raw';
 import type { CustomEffectRecord, EffectDef, EffectPreset } from '../../types/project';
 import { AmDialog } from '../components/AmDialog';
 import { AmIcon } from '../components/AmIcon';
 import { useSelectedLayer } from './useSelectedLayer';
 
 const CUSTOM_LIBS_STORAGE_KEY = 'am.customEffectLibs.v1';
-
-const AM_CUSTOM_EFFECT_GUIDE = `# Alight Motion Custom Effect Format (WebGL2 / XML)
-
-An Alight Motion effect is a single <effect> XML file (<= 64 KB) with <params>, <shader> (GLSL), and optional <script> (JS).
-
-## 1. Root Tag
-<effect id="custom.my_effect" name="My Effect" category="color" desc="Short description">
-
-## 2. Parameters (<params>)
-- Texture input: <texture id="inputImg" srcType="content" /> (or srcType="comp" for scene backdrop, srcType="buffer" for multi-pass)
-- Number slider/spinner: <spinner id="strength" name="Strength" default="0.5" min="0" max="2" step="0.01" />
-- Color: <color id="tint" name="Tint" default="#FF00FFA8" /> (ARGB hex -> bound as vec4 RGBA 0..1)
-- 2D point: <point id="center" name="Center" default="0.5,0.5" /> (bound as vec2)
-- Switch: <switch id="invert" name="Invert" default="false" /> (bound as bool/int)
-- Selector: <selector id="mode" name="Mode" default="0"><choice value="0" label="Normal" /><choice value="1" label="Add" /></selector>
-
-## 3. Fragment Shader (<shader type="fragment">)
-Built-in uniforms & varyings available automatically:
-- acScreenNorm (vec2 0..1 screen UV), acLayerNorm (vec2 0..1 layer UV)
-- acTime (float seconds), acProjectSize (vec2 px), acLayerSize (vec2 px), acLayerScale (vec2), acLayerCenter (vec2)
-- Sample textures with: texture2DCv(inputImg.texture, acScreenNorm)
-- Output premultiplied RGBA to gl_FragColor.
-
-## 4. Optional Script (<script>)
-function animate(env, el, p) {
-  // env: { time (0..1), absTime (sec), duration, fps, frame, selected }
-  // el: { alpha, shaderGroups, transform: { location: {x,y,z}, angle, scale: {x,y} } }
-  return el;
-}
-
-## 5. Working Example
-<effect id="custom.neon_tint" name="Neon Tint" category="color">
-  <params>
-    <texture id="inputImg" srcType="content" />
-    <color id="tint" name="Tint" default="#FF00FFA8" />
-    <spinner id="amount" name="Amount" default="0.5" min="0" max="1" step="0.01" />
-  </params>
-  <shader type="fragment">
-    void main() {
-      vec4 c = texture2DCv(inputImg.texture, acScreenNorm);
-      vec3 rgb = mix(c.rgb, tint.rgb * c.a, amount);
-      gl_FragColor = vec4(rgb, c.a);
-    }
-  </shader>
-</effect>`;
 
 function loadSavedLibraries(): string[] {
   try {
@@ -159,12 +117,22 @@ export const EffectBrowserDialog: React.FC = () => {
     });
   }, [customEffects, activeLibrary, query]);
 
-  const handleCopyGuide = async () => {
+  const handleDownloadGuide = () => {
     try {
-      await navigator.clipboard.writeText(AM_CUSTOM_EFFECT_GUIDE);
-      showToast('Copied Alight Motion effect guide to clipboard!');
+      const blob = new Blob([EFFECT_AUTHORING_MD], { type: 'text/markdown;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'alight-motion-effect-authoring.md';
+      a.rel = 'noopener';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      // Revoke on the next task so Safari has the URL alive during the click.
+      setTimeout(() => URL.revokeObjectURL(url), 10_000);
+      showToast('Downloaded alight-motion-effect-authoring.md');
     } catch {
-      showToast('Clipboard blocked — allow clipboard access');
+      showToast('Download blocked by the browser');
     }
   };
 
@@ -486,8 +454,8 @@ export const EffectBrowserDialog: React.FC = () => {
                 </div>
 
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-                  <button type="button" className="am-btn" onClick={handleCopyGuide} title="Copy Alight Motion custom effect XML/GLSL guide to clipboard">
-                    📋 Copy Effect Guide
+                  <button type="button" className="am-btn" onClick={handleDownloadGuide} title="Download the full Alight Motion effect authoring guide (Markdown)">
+                    ⬇️ Download Effect Guide
                   </button>
                   <button type="button" className="am-btn" onClick={handleCopyLibraryJson} title="Copy this custom effect library as JSON to share">
                     📋 Copy Library JSON

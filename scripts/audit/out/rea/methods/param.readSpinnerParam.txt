@@ -1,0 +1,1315 @@
+    /* JADX WARN: Can't fix incorrect switch cases order, some code will duplicate */
+    /* JADX WARN: Code duplicated, block: B:100:0x0194  */
+    /* JADX WARN: Code duplicated, block: B:103:0x019e  */
+    /* JADX WARN: Code duplicated, block: B:106:0x01aa  */
+    /* JADX WARN: Code duplicated, block: B:109:0x01b4  */
+    /* JADX WARN: Code duplicated, block: B:112:0x01c0  */
+    /* JADX WARN: Code duplicated, block: B:115:0x01c9  */
+    /* JADX WARN: Code duplicated, block: B:124:0x020a  */
+    /* JADX WARN: Code duplicated, block: B:51:0x00c2  */
+    /* JADX WARN: Code duplicated, block: B:54:0x00cd  */
+    /* JADX WARN: Code duplicated, block: B:57:0x00d9  */
+    /* JADX WARN: Code duplicated, block: B:60:0x00e2  */
+    /* JADX WARN: Code duplicated, block: B:63:0x00ee  */
+    /* JADX WARN: Code duplicated, block: B:66:0x00f9  */
+    /* JADX WARN: Code duplicated, block: B:69:0x0104  */
+    /* JADX WARN: Code duplicated, block: B:71:0x0108  */
+    /* JADX WARN: Code duplicated, block: B:72:0x010a  */
+    /* JADX WARN: Code duplicated, block: B:75:0x0132  */
+    /* JADX WARN: Code duplicated, block: B:76:0x014d  */
+    /* JADX WARN: Code duplicated, block: B:79:0x0157  */
+    /* JADX WARN: Code duplicated, block: B:82:0x0162  */
+    /* JADX WARN: Code duplicated, block: B:84:0x0166  */
+    /* JADX WARN: Code duplicated, block: B:85:0x0169  */
+    /* JADX WARN: Code duplicated, block: B:89:0x0172  */
+    /* JADX WARN: Code duplicated, block: B:90:0x0177  */
+    /* JADX WARN: Code duplicated, block: B:93:0x017c  */
+    /* JADX WARN: Code duplicated, block: B:95:0x0182  */
+    /* JADX WARN: Code duplicated, block: B:96:0x0184  */
+    /* JADX WARN: Code duplicated, block: B:98:0x0187 A[ADDED_TO_REGION] */
+    /* JADX WARN: Failed to restore switch over string. Please report as a decompilation issue */
+    private static final UserParameter.Spinner readSpinnerParam(XmlPullParser xmlPullParser, String str, final String str2) throws XmlPullParserException, IOException, MalformedXMLException {
+        SliderType sliderType;
+        SliderType sliderType2;
+        String attributeValue;
+        String str3;
+        String attributeValue2;
+        float fFloatValue;
+        String attributeValue3;
+        float fFloatValue2;
+        String attributeValue4;
+        float fFloatValue3;
+        final float f2;
+        final Ref.FloatRef floatRef;
+        double d2;
+        float fPow;
+        String attributeValue5;
+        float fFloatValue4;
+        float f3;
+        String attributeValue6;
+        Float fU2;
+        final String str4;
+        String attributeValue7;
+        float fFloatValue5;
+        String attributeValue8;
+        float fFloatValue6;
+        String attributeValue9;
+        List listEmptyList;
+        List listSplit$default;
+        Float fU3;
+        Float floatOrNull;
+        boolean z2;
+        Float fU4;
+        Float fU5;
+        Float fU6;
+        Float fU7;
+        xmlPullParser.require(2, str, "spinner");
+        String attributeValue10 = xmlPullParser.getAttributeValue(str, "id");
+        if (attributeValue10 == null) {
+            throw new MalformedXMLException("element missing 'id' attribute", null, false, 6, null);
+        }
+        String attributeValue11 = xmlPullParser.getAttributeValue(str, "enabled");
+        if (attributeValue11 == null) {
+            attributeValue11 = "true";
+        }
+        boolean zRw = mY0.Rw(attributeValue11);
+        String attributeValue12 = xmlPullParser.getAttributeValue(str, "type");
+        if (attributeValue12 == null) {
+            attributeValue12 = "float";
+        }
+        switch (attributeValue12.hashCode()) {
+            case -1266514778:
+                if (attributeValue12.equals("frames")) {
+                    sliderType = SliderType.FRAMES;
+                    sliderType2 = sliderType;
+                    attributeValue = xmlPullParser.getAttributeValue(str, "label");
+                    if (attributeValue == null) {
+                        attributeValue = "";
+                    }
+                    str3 = attributeValue;
+                    attributeValue2 = xmlPullParser.getAttributeValue(str, JavetLibLoadingListener.JAVET_LIB_LOADING_TYPE_DEFAULT);
+                    if (attributeValue2 != null || (fU7 = CZU.u(attributeValue2)) == null) {
+                        fFloatValue = 0.0f;
+                    } else {
+                        fFloatValue = fU7.floatValue();
+                    }
+                    attributeValue3 = xmlPullParser.getAttributeValue(str, "min");
+                    if (attributeValue3 != null || (fU6 = CZU.u(attributeValue3)) == null) {
+                        fFloatValue2 = 0.0f;
+                    } else {
+                        fFloatValue2 = fU6.floatValue();
+                    }
+                    attributeValue4 = xmlPullParser.getAttributeValue(str, AppLovinMediationProvider.MAX);
+                    if (attributeValue4 == null && (fU5 = CZU.u(attributeValue4)) != null) {
+                        fFloatValue3 = fU5.floatValue();
+                    } else if (sliderType2 == SliderType.INTEGER) {
+                        fFloatValue3 = 10.0f;
+                    } else {
+                        fFloatValue3 = 1.0f;
+                    }
+                    f2 = (fFloatValue3 - fFloatValue2) / 100.0f;
+                    floatRef = new Ref.FloatRef();
+                    float f4 = fFloatValue;
+                    d2 = 10.0f;
+                    fPow = (float) Math.pow(d2, (float) Math.floor((float) Math.log10(f2)));
+                    floatRef.element = fPow;
+                    if (fFloatValue2 > 0.0f) {
+                        floatRef.element = RangesKt___RangesKt.coerceAtMost(fPow, (float) Math.pow(d2, (float) Math.floor((float) Math.log10(fFloatValue2))));
+                    }
+                    attributeValue5 = xmlPullParser.getAttributeValue(str, "step");
+                    if (attributeValue5 != null || (fU4 = CZU.u(attributeValue5)) == null) {
+                        if (sliderType2 == SliderType.INTEGER) {
+                            f3 = 1.0f;
+                        } else {
+                            fFloatValue4 = floatRef.element;
+                        }
+                        attributeValue6 = xmlPullParser.getAttributeValue(str, "step");
+                        if (attributeValue6 != null) {
+                            fU2 = CZU.u(attributeValue6);
+                        } else {
+                            fU2 = null;
+                        }
+                        if (fU2 != null) {
+                            str4 = str3;
+                        } else {
+                            if (floatRef.element == f2) {
+                                z2 = true;
+                            } else {
+                                z2 = false;
+                            }
+                            if (!z2 || str2 == null) {
+                                str4 = str3;
+                            } else {
+                                str4 = str3;
+                                euv.dZ(xmlPullParser, new Function0<String>() { // from class: com.alightcreative.app.motion.scene.userparam.UserParamParserKt.readSpinnerParam.1
+                                    /* JADX WARN: 'super' call moved to the top of the method (can break code semantics) */
+                                    {
+                                        super(0);
+                                    }
+
+                                    @Override // kotlin.jvm.functions.Function0
+                                    public final String invoke() {
+                                        String str5 = str2;
+                                        String str6 = str4;
+                                        Context applicationContext = py.mY0.Hfr().getApplicationContext();
+                                        Intrinsics.checkNotNullExpressionValue(applicationContext, "getApplicationContext(...)");
+                                        return "Changed Spinner Default Step:  " + str5 + "/" + B8K.Hfr(str6, applicationContext) + ": " + f2 + " -> " + floatRef.element;
+                                    }
+                                });
+                            }
+                        }
+                        attributeValue7 = xmlPullParser.getAttributeValue(str, "multiplier");
+                        if (attributeValue7 != null || (floatOrNull = StringsKt__StringNumberConversionsJVMKt.toFloatOrNull(attributeValue7)) == null) {
+                            fFloatValue5 = 1.0f;
+                        } else {
+                            fFloatValue5 = floatOrNull.floatValue();
+                        }
+                        attributeValue8 = xmlPullParser.getAttributeValue(str, "originValue");
+                        if (attributeValue8 != null || (fU3 = CZU.u(attributeValue8)) == null) {
+                            fFloatValue6 = 0.0f;
+                        } else {
+                            fFloatValue6 = fU3.floatValue();
+                        }
+                        attributeValue9 = xmlPullParser.getAttributeValue(str, "ticks");
+                        if (attributeValue9 != null || (listSplit$default = StringsKt__StringsKt.split$default((CharSequence) attributeValue9, new char[]{','}, false, 0, 6, (Object) null)) == null) {
+                            listEmptyList = CollectionsKt__CollectionsKt.emptyList();
+                        } else {
+                            ArrayList arrayList = new ArrayList();
+                            Iterator it = listSplit$default.iterator();
+                            while (it.hasNext()) {
+                                Float fU8 = CZU.u(StringsKt__StringsKt.trim((CharSequence) it.next()).toString());
+                                if (fU8 != null) {
+                                    arrayList.add(fU8);
+                                }
+                            }
+                            listEmptyList = arrayList;
+                        }
+                        pN.Xu(xmlPullParser);
+                        return new UserParameter.Spinner(attributeValue10, str4, zRw, fFloatValue2, fFloatValue3, f3, f4, fFloatValue6, sliderType2, fFloatValue5, listEmptyList);
+                    }
+                    fFloatValue4 = fU4.floatValue();
+                    f3 = fFloatValue4;
+                    attributeValue6 = xmlPullParser.getAttributeValue(str, "step");
+                    if (attributeValue6 != null) {
+                        fU2 = CZU.u(attributeValue6);
+                    } else {
+                        fU2 = null;
+                    }
+                    if (fU2 != null) {
+                        str4 = str3;
+                    } else {
+                        if (floatRef.element == f2) {
+                            z2 = true;
+                        } else {
+                            z2 = false;
+                        }
+                        if (z2) {
+                            str4 = str3;
+                        } else {
+                            str4 = str3;
+                        }
+                    }
+                    attributeValue7 = xmlPullParser.getAttributeValue(str, "multiplier");
+                    if (attributeValue7 != null) {
+                        fFloatValue5 = 1.0f;
+                    } else {
+                        fFloatValue5 = 1.0f;
+                    }
+                    attributeValue8 = xmlPullParser.getAttributeValue(str, "originValue");
+                    if (attributeValue8 != null) {
+                        fFloatValue6 = 0.0f;
+                    } else {
+                        fFloatValue6 = 0.0f;
+                    }
+                    attributeValue9 = xmlPullParser.getAttributeValue(str, "ticks");
+                    if (attributeValue9 != null) {
+                        listEmptyList = CollectionsKt__CollectionsKt.emptyList();
+                    } else {
+                        listEmptyList = CollectionsKt__CollectionsKt.emptyList();
+                    }
+                    pN.Xu(xmlPullParser);
+                    return new UserParameter.Spinner(attributeValue10, str4, zRw, fFloatValue2, fFloatValue3, f3, f4, fFloatValue6, sliderType2, fFloatValue5, listEmptyList);
+                }
+                throw new MalformedXMLException("expected 'float', 'integer', or 'percent'", null, false, 6, null);
+            case -1135038327:
+                if (attributeValue12.equals("kelvin")) {
+                    sliderType = SliderType.KELVIN;
+                    sliderType2 = sliderType;
+                    attributeValue = xmlPullParser.getAttributeValue(str, "label");
+                    if (attributeValue == null) {
+                        attributeValue = "";
+                    }
+                    str3 = attributeValue;
+                    attributeValue2 = xmlPullParser.getAttributeValue(str, JavetLibLoadingListener.JAVET_LIB_LOADING_TYPE_DEFAULT);
+                    if (attributeValue2 != null) {
+                        fFloatValue = 0.0f;
+                    } else {
+                        fFloatValue = 0.0f;
+                    }
+                    attributeValue3 = xmlPullParser.getAttributeValue(str, "min");
+                    if (attributeValue3 != null) {
+                        fFloatValue2 = 0.0f;
+                    } else {
+                        fFloatValue2 = 0.0f;
+                    }
+                    attributeValue4 = xmlPullParser.getAttributeValue(str, AppLovinMediationProvider.MAX);
+                    if (attributeValue4 == null) {
+                        if (sliderType2 == SliderType.INTEGER) {
+                            fFloatValue3 = 10.0f;
+                        } else {
+                            fFloatValue3 = 1.0f;
+                        }
+                    } else if (sliderType2 == SliderType.INTEGER) {
+                        fFloatValue3 = 10.0f;
+                    } else {
+                        fFloatValue3 = 1.0f;
+                    }
+                    f2 = (fFloatValue3 - fFloatValue2) / 100.0f;
+                    floatRef = new Ref.FloatRef();
+                    float f5 = fFloatValue;
+                    d2 = 10.0f;
+                    fPow = (float) Math.pow(d2, (float) Math.floor((float) Math.log10(f2)));
+                    floatRef.element = fPow;
+                    if (fFloatValue2 > 0.0f) {
+                        floatRef.element = RangesKt___RangesKt.coerceAtMost(fPow, (float) Math.pow(d2, (float) Math.floor((float) Math.log10(fFloatValue2))));
+                    }
+                    attributeValue5 = xmlPullParser.getAttributeValue(str, "step");
+                    if (attributeValue5 != null) {
+                        if (sliderType2 == SliderType.INTEGER) {
+                            f3 = 1.0f;
+                        } else {
+                            fFloatValue4 = floatRef.element;
+                            f3 = fFloatValue4;
+                        }
+                    } else if (sliderType2 == SliderType.INTEGER) {
+                        f3 = 1.0f;
+                    } else {
+                        fFloatValue4 = floatRef.element;
+                        f3 = fFloatValue4;
+                    }
+                    attributeValue6 = xmlPullParser.getAttributeValue(str, "step");
+                    if (attributeValue6 != null) {
+                        fU2 = CZU.u(attributeValue6);
+                    } else {
+                        fU2 = null;
+                    }
+                    if (fU2 != null) {
+                        str4 = str3;
+                    } else {
+                        if (floatRef.element == f2) {
+                            z2 = true;
+                        } else {
+                            z2 = false;
+                        }
+                        if (z2) {
+                            str4 = str3;
+                        } else {
+                            str4 = str3;
+                        }
+                    }
+                    attributeValue7 = xmlPullParser.getAttributeValue(str, "multiplier");
+                    if (attributeValue7 != null) {
+                        fFloatValue5 = 1.0f;
+                    } else {
+                        fFloatValue5 = 1.0f;
+                    }
+                    attributeValue8 = xmlPullParser.getAttributeValue(str, "originValue");
+                    if (attributeValue8 != null) {
+                        fFloatValue6 = 0.0f;
+                    } else {
+                        fFloatValue6 = 0.0f;
+                    }
+                    attributeValue9 = xmlPullParser.getAttributeValue(str, "ticks");
+                    if (attributeValue9 != null) {
+                        listEmptyList = CollectionsKt__CollectionsKt.emptyList();
+                    } else {
+                        listEmptyList = CollectionsKt__CollectionsKt.emptyList();
+                    }
+                    pN.Xu(xmlPullParser);
+                    return new UserParameter.Spinner(attributeValue10, str4, zRw, fFloatValue2, fFloatValue3, f3, f5, fFloatValue6, sliderType2, fFloatValue5, listEmptyList);
+                }
+                throw new MalformedXMLException("expected 'float', 'integer', or 'percent'", null, false, 6, null);
+            case -678927291:
+                if (attributeValue12.equals("percent")) {
+                    sliderType = SliderType.PERCENT;
+                    sliderType2 = sliderType;
+                    attributeValue = xmlPullParser.getAttributeValue(str, "label");
+                    if (attributeValue == null) {
+                        attributeValue = "";
+                    }
+                    str3 = attributeValue;
+                    attributeValue2 = xmlPullParser.getAttributeValue(str, JavetLibLoadingListener.JAVET_LIB_LOADING_TYPE_DEFAULT);
+                    if (attributeValue2 != null) {
+                        fFloatValue = 0.0f;
+                    } else {
+                        fFloatValue = 0.0f;
+                    }
+                    attributeValue3 = xmlPullParser.getAttributeValue(str, "min");
+                    if (attributeValue3 != null) {
+                        fFloatValue2 = 0.0f;
+                    } else {
+                        fFloatValue2 = 0.0f;
+                    }
+                    attributeValue4 = xmlPullParser.getAttributeValue(str, AppLovinMediationProvider.MAX);
+                    if (attributeValue4 == null) {
+                        if (sliderType2 == SliderType.INTEGER) {
+                            fFloatValue3 = 10.0f;
+                        } else {
+                            fFloatValue3 = 1.0f;
+                        }
+                    } else if (sliderType2 == SliderType.INTEGER) {
+                        fFloatValue3 = 10.0f;
+                    } else {
+                        fFloatValue3 = 1.0f;
+                    }
+                    f2 = (fFloatValue3 - fFloatValue2) / 100.0f;
+                    floatRef = new Ref.FloatRef();
+                    float f6 = fFloatValue;
+                    d2 = 10.0f;
+                    fPow = (float) Math.pow(d2, (float) Math.floor((float) Math.log10(f2)));
+                    floatRef.element = fPow;
+                    if (fFloatValue2 > 0.0f) {
+                        floatRef.element = RangesKt___RangesKt.coerceAtMost(fPow, (float) Math.pow(d2, (float) Math.floor((float) Math.log10(fFloatValue2))));
+                    }
+                    attributeValue5 = xmlPullParser.getAttributeValue(str, "step");
+                    if (attributeValue5 != null) {
+                        if (sliderType2 == SliderType.INTEGER) {
+                            f3 = 1.0f;
+                        } else {
+                            fFloatValue4 = floatRef.element;
+                            f3 = fFloatValue4;
+                        }
+                    } else if (sliderType2 == SliderType.INTEGER) {
+                        f3 = 1.0f;
+                    } else {
+                        fFloatValue4 = floatRef.element;
+                        f3 = fFloatValue4;
+                    }
+                    attributeValue6 = xmlPullParser.getAttributeValue(str, "step");
+                    if (attributeValue6 != null) {
+                        fU2 = CZU.u(attributeValue6);
+                    } else {
+                        fU2 = null;
+                    }
+                    if (fU2 != null) {
+                        str4 = str3;
+                    } else {
+                        if (floatRef.element == f2) {
+                            z2 = true;
+                        } else {
+                            z2 = false;
+                        }
+                        if (z2) {
+                            str4 = str3;
+                        } else {
+                            str4 = str3;
+                        }
+                    }
+                    attributeValue7 = xmlPullParser.getAttributeValue(str, "multiplier");
+                    if (attributeValue7 != null) {
+                        fFloatValue5 = 1.0f;
+                    } else {
+                        fFloatValue5 = 1.0f;
+                    }
+                    attributeValue8 = xmlPullParser.getAttributeValue(str, "originValue");
+                    if (attributeValue8 != null) {
+                        fFloatValue6 = 0.0f;
+                    } else {
+                        fFloatValue6 = 0.0f;
+                    }
+                    attributeValue9 = xmlPullParser.getAttributeValue(str, "ticks");
+                    if (attributeValue9 != null) {
+                        listEmptyList = CollectionsKt__CollectionsKt.emptyList();
+                    } else {
+                        listEmptyList = CollectionsKt__CollectionsKt.emptyList();
+                    }
+                    pN.Xu(xmlPullParser);
+                    return new UserParameter.Spinner(attributeValue10, str4, zRw, fFloatValue2, fFloatValue3, f3, f6, fFloatValue6, sliderType2, fFloatValue5, listEmptyList);
+                }
+                throw new MalformedXMLException("expected 'float', 'integer', or 'percent'", null, false, 6, null);
+            case -324933605:
+                if (attributeValue12.equals("relative-float")) {
+                    sliderType = SliderType.RELATIVE_FLOAT;
+                    sliderType2 = sliderType;
+                    attributeValue = xmlPullParser.getAttributeValue(str, "label");
+                    if (attributeValue == null) {
+                        attributeValue = "";
+                    }
+                    str3 = attributeValue;
+                    attributeValue2 = xmlPullParser.getAttributeValue(str, JavetLibLoadingListener.JAVET_LIB_LOADING_TYPE_DEFAULT);
+                    if (attributeValue2 != null) {
+                        fFloatValue = 0.0f;
+                    } else {
+                        fFloatValue = 0.0f;
+                    }
+                    attributeValue3 = xmlPullParser.getAttributeValue(str, "min");
+                    if (attributeValue3 != null) {
+                        fFloatValue2 = 0.0f;
+                    } else {
+                        fFloatValue2 = 0.0f;
+                    }
+                    attributeValue4 = xmlPullParser.getAttributeValue(str, AppLovinMediationProvider.MAX);
+                    if (attributeValue4 == null) {
+                        if (sliderType2 == SliderType.INTEGER) {
+                            fFloatValue3 = 10.0f;
+                        } else {
+                            fFloatValue3 = 1.0f;
+                        }
+                    } else if (sliderType2 == SliderType.INTEGER) {
+                        fFloatValue3 = 10.0f;
+                    } else {
+                        fFloatValue3 = 1.0f;
+                    }
+                    f2 = (fFloatValue3 - fFloatValue2) / 100.0f;
+                    floatRef = new Ref.FloatRef();
+                    float f7 = fFloatValue;
+                    d2 = 10.0f;
+                    fPow = (float) Math.pow(d2, (float) Math.floor((float) Math.log10(f2)));
+                    floatRef.element = fPow;
+                    if (fFloatValue2 > 0.0f) {
+                        floatRef.element = RangesKt___RangesKt.coerceAtMost(fPow, (float) Math.pow(d2, (float) Math.floor((float) Math.log10(fFloatValue2))));
+                    }
+                    attributeValue5 = xmlPullParser.getAttributeValue(str, "step");
+                    if (attributeValue5 != null) {
+                        if (sliderType2 == SliderType.INTEGER) {
+                            f3 = 1.0f;
+                        } else {
+                            fFloatValue4 = floatRef.element;
+                            f3 = fFloatValue4;
+                        }
+                    } else if (sliderType2 == SliderType.INTEGER) {
+                        f3 = 1.0f;
+                    } else {
+                        fFloatValue4 = floatRef.element;
+                        f3 = fFloatValue4;
+                    }
+                    attributeValue6 = xmlPullParser.getAttributeValue(str, "step");
+                    if (attributeValue6 != null) {
+                        fU2 = CZU.u(attributeValue6);
+                    } else {
+                        fU2 = null;
+                    }
+                    if (fU2 != null) {
+                        str4 = str3;
+                    } else {
+                        if (floatRef.element == f2) {
+                            z2 = true;
+                        } else {
+                            z2 = false;
+                        }
+                        if (z2) {
+                            str4 = str3;
+                        } else {
+                            str4 = str3;
+                        }
+                    }
+                    attributeValue7 = xmlPullParser.getAttributeValue(str, "multiplier");
+                    if (attributeValue7 != null) {
+                        fFloatValue5 = 1.0f;
+                    } else {
+                        fFloatValue5 = 1.0f;
+                    }
+                    attributeValue8 = xmlPullParser.getAttributeValue(str, "originValue");
+                    if (attributeValue8 != null) {
+                        fFloatValue6 = 0.0f;
+                    } else {
+                        fFloatValue6 = 0.0f;
+                    }
+                    attributeValue9 = xmlPullParser.getAttributeValue(str, "ticks");
+                    if (attributeValue9 != null) {
+                        listEmptyList = CollectionsKt__CollectionsKt.emptyList();
+                    } else {
+                        listEmptyList = CollectionsKt__CollectionsKt.emptyList();
+                    }
+                    pN.Xu(xmlPullParser);
+                    return new UserParameter.Spinner(attributeValue10, str4, zRw, fFloatValue2, fFloatValue3, f3, f7, fFloatValue6, sliderType2, fFloatValue5, listEmptyList);
+                }
+                throw new MalformedXMLException("expected 'float', 'integer', or 'percent'", null, false, 6, null);
+            case 3346:
+                if (attributeValue12.equals("hz")) {
+                    sliderType = SliderType.HZ;
+                    sliderType2 = sliderType;
+                    attributeValue = xmlPullParser.getAttributeValue(str, "label");
+                    if (attributeValue == null) {
+                        attributeValue = "";
+                    }
+                    str3 = attributeValue;
+                    attributeValue2 = xmlPullParser.getAttributeValue(str, JavetLibLoadingListener.JAVET_LIB_LOADING_TYPE_DEFAULT);
+                    if (attributeValue2 != null) {
+                        fFloatValue = 0.0f;
+                    } else {
+                        fFloatValue = 0.0f;
+                    }
+                    attributeValue3 = xmlPullParser.getAttributeValue(str, "min");
+                    if (attributeValue3 != null) {
+                        fFloatValue2 = 0.0f;
+                    } else {
+                        fFloatValue2 = 0.0f;
+                    }
+                    attributeValue4 = xmlPullParser.getAttributeValue(str, AppLovinMediationProvider.MAX);
+                    if (attributeValue4 == null) {
+                        if (sliderType2 == SliderType.INTEGER) {
+                            fFloatValue3 = 10.0f;
+                        } else {
+                            fFloatValue3 = 1.0f;
+                        }
+                    } else if (sliderType2 == SliderType.INTEGER) {
+                        fFloatValue3 = 10.0f;
+                    } else {
+                        fFloatValue3 = 1.0f;
+                    }
+                    f2 = (fFloatValue3 - fFloatValue2) / 100.0f;
+                    floatRef = new Ref.FloatRef();
+                    float f8 = fFloatValue;
+                    d2 = 10.0f;
+                    fPow = (float) Math.pow(d2, (float) Math.floor((float) Math.log10(f2)));
+                    floatRef.element = fPow;
+                    if (fFloatValue2 > 0.0f) {
+                        floatRef.element = RangesKt___RangesKt.coerceAtMost(fPow, (float) Math.pow(d2, (float) Math.floor((float) Math.log10(fFloatValue2))));
+                    }
+                    attributeValue5 = xmlPullParser.getAttributeValue(str, "step");
+                    if (attributeValue5 != null) {
+                        if (sliderType2 == SliderType.INTEGER) {
+                            f3 = 1.0f;
+                        } else {
+                            fFloatValue4 = floatRef.element;
+                            f3 = fFloatValue4;
+                        }
+                    } else if (sliderType2 == SliderType.INTEGER) {
+                        f3 = 1.0f;
+                    } else {
+                        fFloatValue4 = floatRef.element;
+                        f3 = fFloatValue4;
+                    }
+                    attributeValue6 = xmlPullParser.getAttributeValue(str, "step");
+                    if (attributeValue6 != null) {
+                        fU2 = CZU.u(attributeValue6);
+                    } else {
+                        fU2 = null;
+                    }
+                    if (fU2 != null) {
+                        str4 = str3;
+                    } else {
+                        if (floatRef.element == f2) {
+                            z2 = true;
+                        } else {
+                            z2 = false;
+                        }
+                        if (z2) {
+                            str4 = str3;
+                        } else {
+                            str4 = str3;
+                        }
+                    }
+                    attributeValue7 = xmlPullParser.getAttributeValue(str, "multiplier");
+                    if (attributeValue7 != null) {
+                        fFloatValue5 = 1.0f;
+                    } else {
+                        fFloatValue5 = 1.0f;
+                    }
+                    attributeValue8 = xmlPullParser.getAttributeValue(str, "originValue");
+                    if (attributeValue8 != null) {
+                        fFloatValue6 = 0.0f;
+                    } else {
+                        fFloatValue6 = 0.0f;
+                    }
+                    attributeValue9 = xmlPullParser.getAttributeValue(str, "ticks");
+                    if (attributeValue9 != null) {
+                        listEmptyList = CollectionsKt__CollectionsKt.emptyList();
+                    } else {
+                        listEmptyList = CollectionsKt__CollectionsKt.emptyList();
+                    }
+                    pN.Xu(xmlPullParser);
+                    return new UserParameter.Spinner(attributeValue10, str4, zRw, fFloatValue2, fFloatValue3, f3, f8, fFloatValue6, sliderType2, fFloatValue5, listEmptyList);
+                }
+                throw new MalformedXMLException("expected 'float', 'integer', or 'percent'", null, false, 6, null);
+            case 113135:
+                if (attributeValue12.equals("rpm")) {
+                    sliderType = SliderType.RPM;
+                    sliderType2 = sliderType;
+                    attributeValue = xmlPullParser.getAttributeValue(str, "label");
+                    if (attributeValue == null) {
+                        attributeValue = "";
+                    }
+                    str3 = attributeValue;
+                    attributeValue2 = xmlPullParser.getAttributeValue(str, JavetLibLoadingListener.JAVET_LIB_LOADING_TYPE_DEFAULT);
+                    if (attributeValue2 != null) {
+                        fFloatValue = 0.0f;
+                    } else {
+                        fFloatValue = 0.0f;
+                    }
+                    attributeValue3 = xmlPullParser.getAttributeValue(str, "min");
+                    if (attributeValue3 != null) {
+                        fFloatValue2 = 0.0f;
+                    } else {
+                        fFloatValue2 = 0.0f;
+                    }
+                    attributeValue4 = xmlPullParser.getAttributeValue(str, AppLovinMediationProvider.MAX);
+                    if (attributeValue4 == null) {
+                        if (sliderType2 == SliderType.INTEGER) {
+                            fFloatValue3 = 10.0f;
+                        } else {
+                            fFloatValue3 = 1.0f;
+                        }
+                    } else if (sliderType2 == SliderType.INTEGER) {
+                        fFloatValue3 = 10.0f;
+                    } else {
+                        fFloatValue3 = 1.0f;
+                    }
+                    f2 = (fFloatValue3 - fFloatValue2) / 100.0f;
+                    floatRef = new Ref.FloatRef();
+                    float f9 = fFloatValue;
+                    d2 = 10.0f;
+                    fPow = (float) Math.pow(d2, (float) Math.floor((float) Math.log10(f2)));
+                    floatRef.element = fPow;
+                    if (fFloatValue2 > 0.0f) {
+                        floatRef.element = RangesKt___RangesKt.coerceAtMost(fPow, (float) Math.pow(d2, (float) Math.floor((float) Math.log10(fFloatValue2))));
+                    }
+                    attributeValue5 = xmlPullParser.getAttributeValue(str, "step");
+                    if (attributeValue5 != null) {
+                        if (sliderType2 == SliderType.INTEGER) {
+                            f3 = 1.0f;
+                        } else {
+                            fFloatValue4 = floatRef.element;
+                            f3 = fFloatValue4;
+                        }
+                    } else if (sliderType2 == SliderType.INTEGER) {
+                        f3 = 1.0f;
+                    } else {
+                        fFloatValue4 = floatRef.element;
+                        f3 = fFloatValue4;
+                    }
+                    attributeValue6 = xmlPullParser.getAttributeValue(str, "step");
+                    if (attributeValue6 != null) {
+                        fU2 = CZU.u(attributeValue6);
+                    } else {
+                        fU2 = null;
+                    }
+                    if (fU2 != null) {
+                        str4 = str3;
+                    } else {
+                        if (floatRef.element == f2) {
+                            z2 = true;
+                        } else {
+                            z2 = false;
+                        }
+                        if (z2) {
+                            str4 = str3;
+                        } else {
+                            str4 = str3;
+                        }
+                    }
+                    attributeValue7 = xmlPullParser.getAttributeValue(str, "multiplier");
+                    if (attributeValue7 != null) {
+                        fFloatValue5 = 1.0f;
+                    } else {
+                        fFloatValue5 = 1.0f;
+                    }
+                    attributeValue8 = xmlPullParser.getAttributeValue(str, "originValue");
+                    if (attributeValue8 != null) {
+                        fFloatValue6 = 0.0f;
+                    } else {
+                        fFloatValue6 = 0.0f;
+                    }
+                    attributeValue9 = xmlPullParser.getAttributeValue(str, "ticks");
+                    if (attributeValue9 != null) {
+                        listEmptyList = CollectionsKt__CollectionsKt.emptyList();
+                    } else {
+                        listEmptyList = CollectionsKt__CollectionsKt.emptyList();
+                    }
+                    pN.Xu(xmlPullParser);
+                    return new UserParameter.Spinner(attributeValue10, str4, zRw, fFloatValue2, fFloatValue3, f3, f9, fFloatValue6, sliderType2, fFloatValue5, listEmptyList);
+                }
+                throw new MalformedXMLException("expected 'float', 'integer', or 'percent'", null, false, 6, null);
+            case 92960979:
+                if (attributeValue12.equals("angle")) {
+                    sliderType = SliderType.ANGLE;
+                    sliderType2 = sliderType;
+                    attributeValue = xmlPullParser.getAttributeValue(str, "label");
+                    if (attributeValue == null) {
+                        attributeValue = "";
+                    }
+                    str3 = attributeValue;
+                    attributeValue2 = xmlPullParser.getAttributeValue(str, JavetLibLoadingListener.JAVET_LIB_LOADING_TYPE_DEFAULT);
+                    if (attributeValue2 != null) {
+                        fFloatValue = 0.0f;
+                    } else {
+                        fFloatValue = 0.0f;
+                    }
+                    attributeValue3 = xmlPullParser.getAttributeValue(str, "min");
+                    if (attributeValue3 != null) {
+                        fFloatValue2 = 0.0f;
+                    } else {
+                        fFloatValue2 = 0.0f;
+                    }
+                    attributeValue4 = xmlPullParser.getAttributeValue(str, AppLovinMediationProvider.MAX);
+                    if (attributeValue4 == null) {
+                        if (sliderType2 == SliderType.INTEGER) {
+                            fFloatValue3 = 10.0f;
+                        } else {
+                            fFloatValue3 = 1.0f;
+                        }
+                    } else if (sliderType2 == SliderType.INTEGER) {
+                        fFloatValue3 = 10.0f;
+                    } else {
+                        fFloatValue3 = 1.0f;
+                    }
+                    f2 = (fFloatValue3 - fFloatValue2) / 100.0f;
+                    floatRef = new Ref.FloatRef();
+                    float f10 = fFloatValue;
+                    d2 = 10.0f;
+                    fPow = (float) Math.pow(d2, (float) Math.floor((float) Math.log10(f2)));
+                    floatRef.element = fPow;
+                    if (fFloatValue2 > 0.0f) {
+                        floatRef.element = RangesKt___RangesKt.coerceAtMost(fPow, (float) Math.pow(d2, (float) Math.floor((float) Math.log10(fFloatValue2))));
+                    }
+                    attributeValue5 = xmlPullParser.getAttributeValue(str, "step");
+                    if (attributeValue5 != null) {
+                        if (sliderType2 == SliderType.INTEGER) {
+                            f3 = 1.0f;
+                        } else {
+                            fFloatValue4 = floatRef.element;
+                            f3 = fFloatValue4;
+                        }
+                    } else if (sliderType2 == SliderType.INTEGER) {
+                        f3 = 1.0f;
+                    } else {
+                        fFloatValue4 = floatRef.element;
+                        f3 = fFloatValue4;
+                    }
+                    attributeValue6 = xmlPullParser.getAttributeValue(str, "step");
+                    if (attributeValue6 != null) {
+                        fU2 = CZU.u(attributeValue6);
+                    } else {
+                        fU2 = null;
+                    }
+                    if (fU2 != null) {
+                        str4 = str3;
+                    } else {
+                        if (floatRef.element == f2) {
+                            z2 = true;
+                        } else {
+                            z2 = false;
+                        }
+                        if (z2) {
+                            str4 = str3;
+                        } else {
+                            str4 = str3;
+                        }
+                    }
+                    attributeValue7 = xmlPullParser.getAttributeValue(str, "multiplier");
+                    if (attributeValue7 != null) {
+                        fFloatValue5 = 1.0f;
+                    } else {
+                        fFloatValue5 = 1.0f;
+                    }
+                    attributeValue8 = xmlPullParser.getAttributeValue(str, "originValue");
+                    if (attributeValue8 != null) {
+                        fFloatValue6 = 0.0f;
+                    } else {
+                        fFloatValue6 = 0.0f;
+                    }
+                    attributeValue9 = xmlPullParser.getAttributeValue(str, "ticks");
+                    if (attributeValue9 != null) {
+                        listEmptyList = CollectionsKt__CollectionsKt.emptyList();
+                    } else {
+                        listEmptyList = CollectionsKt__CollectionsKt.emptyList();
+                    }
+                    pN.Xu(xmlPullParser);
+                    return new UserParameter.Spinner(attributeValue10, str4, zRw, fFloatValue2, fFloatValue3, f3, f10, fFloatValue6, sliderType2, fFloatValue5, listEmptyList);
+                }
+                throw new MalformedXMLException("expected 'float', 'integer', or 'percent'", null, false, 6, null);
+            case 97526364:
+                if (attributeValue12.equals("float")) {
+                    sliderType = SliderType.FLOAT;
+                    sliderType2 = sliderType;
+                    attributeValue = xmlPullParser.getAttributeValue(str, "label");
+                    if (attributeValue == null) {
+                        attributeValue = "";
+                    }
+                    str3 = attributeValue;
+                    attributeValue2 = xmlPullParser.getAttributeValue(str, JavetLibLoadingListener.JAVET_LIB_LOADING_TYPE_DEFAULT);
+                    if (attributeValue2 != null) {
+                        fFloatValue = 0.0f;
+                    } else {
+                        fFloatValue = 0.0f;
+                    }
+                    attributeValue3 = xmlPullParser.getAttributeValue(str, "min");
+                    if (attributeValue3 != null) {
+                        fFloatValue2 = 0.0f;
+                    } else {
+                        fFloatValue2 = 0.0f;
+                    }
+                    attributeValue4 = xmlPullParser.getAttributeValue(str, AppLovinMediationProvider.MAX);
+                    if (attributeValue4 == null) {
+                        if (sliderType2 == SliderType.INTEGER) {
+                            fFloatValue3 = 10.0f;
+                        } else {
+                            fFloatValue3 = 1.0f;
+                        }
+                    } else if (sliderType2 == SliderType.INTEGER) {
+                        fFloatValue3 = 10.0f;
+                    } else {
+                        fFloatValue3 = 1.0f;
+                    }
+                    f2 = (fFloatValue3 - fFloatValue2) / 100.0f;
+                    floatRef = new Ref.FloatRef();
+                    float f11 = fFloatValue;
+                    d2 = 10.0f;
+                    fPow = (float) Math.pow(d2, (float) Math.floor((float) Math.log10(f2)));
+                    floatRef.element = fPow;
+                    if (fFloatValue2 > 0.0f) {
+                        floatRef.element = RangesKt___RangesKt.coerceAtMost(fPow, (float) Math.pow(d2, (float) Math.floor((float) Math.log10(fFloatValue2))));
+                    }
+                    attributeValue5 = xmlPullParser.getAttributeValue(str, "step");
+                    if (attributeValue5 != null) {
+                        if (sliderType2 == SliderType.INTEGER) {
+                            f3 = 1.0f;
+                        } else {
+                            fFloatValue4 = floatRef.element;
+                            f3 = fFloatValue4;
+                        }
+                    } else if (sliderType2 == SliderType.INTEGER) {
+                        f3 = 1.0f;
+                    } else {
+                        fFloatValue4 = floatRef.element;
+                        f3 = fFloatValue4;
+                    }
+                    attributeValue6 = xmlPullParser.getAttributeValue(str, "step");
+                    if (attributeValue6 != null) {
+                        fU2 = CZU.u(attributeValue6);
+                    } else {
+                        fU2 = null;
+                    }
+                    if (fU2 != null) {
+                        str4 = str3;
+                    } else {
+                        if (floatRef.element == f2) {
+                            z2 = true;
+                        } else {
+                            z2 = false;
+                        }
+                        if (z2) {
+                            str4 = str3;
+                        } else {
+                            str4 = str3;
+                        }
+                    }
+                    attributeValue7 = xmlPullParser.getAttributeValue(str, "multiplier");
+                    if (attributeValue7 != null) {
+                        fFloatValue5 = 1.0f;
+                    } else {
+                        fFloatValue5 = 1.0f;
+                    }
+                    attributeValue8 = xmlPullParser.getAttributeValue(str, "originValue");
+                    if (attributeValue8 != null) {
+                        fFloatValue6 = 0.0f;
+                    } else {
+                        fFloatValue6 = 0.0f;
+                    }
+                    attributeValue9 = xmlPullParser.getAttributeValue(str, "ticks");
+                    if (attributeValue9 != null) {
+                        listEmptyList = CollectionsKt__CollectionsKt.emptyList();
+                    } else {
+                        listEmptyList = CollectionsKt__CollectionsKt.emptyList();
+                    }
+                    pN.Xu(xmlPullParser);
+                    return new UserParameter.Spinner(attributeValue10, str4, zRw, fFloatValue2, fFloatValue3, f3, f11, fFloatValue6, sliderType2, fFloatValue5, listEmptyList);
+                }
+                throw new MalformedXMLException("expected 'float', 'integer', or 'percent'", null, false, 6, null);
+            case 248617923:
+                if (attributeValue12.equals("angle-range")) {
+                    sliderType = SliderType.ANGLE_RANGE;
+                    sliderType2 = sliderType;
+                    attributeValue = xmlPullParser.getAttributeValue(str, "label");
+                    if (attributeValue == null) {
+                        attributeValue = "";
+                    }
+                    str3 = attributeValue;
+                    attributeValue2 = xmlPullParser.getAttributeValue(str, JavetLibLoadingListener.JAVET_LIB_LOADING_TYPE_DEFAULT);
+                    if (attributeValue2 != null) {
+                        fFloatValue = 0.0f;
+                    } else {
+                        fFloatValue = 0.0f;
+                    }
+                    attributeValue3 = xmlPullParser.getAttributeValue(str, "min");
+                    if (attributeValue3 != null) {
+                        fFloatValue2 = 0.0f;
+                    } else {
+                        fFloatValue2 = 0.0f;
+                    }
+                    attributeValue4 = xmlPullParser.getAttributeValue(str, AppLovinMediationProvider.MAX);
+                    if (attributeValue4 == null) {
+                        if (sliderType2 == SliderType.INTEGER) {
+                            fFloatValue3 = 10.0f;
+                        } else {
+                            fFloatValue3 = 1.0f;
+                        }
+                    } else if (sliderType2 == SliderType.INTEGER) {
+                        fFloatValue3 = 10.0f;
+                    } else {
+                        fFloatValue3 = 1.0f;
+                    }
+                    f2 = (fFloatValue3 - fFloatValue2) / 100.0f;
+                    floatRef = new Ref.FloatRef();
+                    float f12 = fFloatValue;
+                    d2 = 10.0f;
+                    fPow = (float) Math.pow(d2, (float) Math.floor((float) Math.log10(f2)));
+                    floatRef.element = fPow;
+                    if (fFloatValue2 > 0.0f) {
+                        floatRef.element = RangesKt___RangesKt.coerceAtMost(fPow, (float) Math.pow(d2, (float) Math.floor((float) Math.log10(fFloatValue2))));
+                    }
+                    attributeValue5 = xmlPullParser.getAttributeValue(str, "step");
+                    if (attributeValue5 != null) {
+                        if (sliderType2 == SliderType.INTEGER) {
+                            f3 = 1.0f;
+                        } else {
+                            fFloatValue4 = floatRef.element;
+                            f3 = fFloatValue4;
+                        }
+                    } else if (sliderType2 == SliderType.INTEGER) {
+                        f3 = 1.0f;
+                    } else {
+                        fFloatValue4 = floatRef.element;
+                        f3 = fFloatValue4;
+                    }
+                    attributeValue6 = xmlPullParser.getAttributeValue(str, "step");
+                    if (attributeValue6 != null) {
+                        fU2 = CZU.u(attributeValue6);
+                    } else {
+                        fU2 = null;
+                    }
+                    if (fU2 != null) {
+                        str4 = str3;
+                    } else {
+                        if (floatRef.element == f2) {
+                            z2 = true;
+                        } else {
+                            z2 = false;
+                        }
+                        if (z2) {
+                            str4 = str3;
+                        } else {
+                            str4 = str3;
+                        }
+                    }
+                    attributeValue7 = xmlPullParser.getAttributeValue(str, "multiplier");
+                    if (attributeValue7 != null) {
+                        fFloatValue5 = 1.0f;
+                    } else {
+                        fFloatValue5 = 1.0f;
+                    }
+                    attributeValue8 = xmlPullParser.getAttributeValue(str, "originValue");
+                    if (attributeValue8 != null) {
+                        fFloatValue6 = 0.0f;
+                    } else {
+                        fFloatValue6 = 0.0f;
+                    }
+                    attributeValue9 = xmlPullParser.getAttributeValue(str, "ticks");
+                    if (attributeValue9 != null) {
+                        listEmptyList = CollectionsKt__CollectionsKt.emptyList();
+                    } else {
+                        listEmptyList = CollectionsKt__CollectionsKt.emptyList();
+                    }
+                    pN.Xu(xmlPullParser);
+                    return new UserParameter.Spinner(attributeValue10, str4, zRw, fFloatValue2, fFloatValue3, f3, f12, fFloatValue6, sliderType2, fFloatValue5, listEmptyList);
+                }
+                throw new MalformedXMLException("expected 'float', 'integer', or 'percent'", null, false, 6, null);
+            case 1358935620:
+                if (attributeValue12.equals("relative-percent")) {
+                    sliderType = SliderType.RELATIVE_PERCENT;
+                    sliderType2 = sliderType;
+                    attributeValue = xmlPullParser.getAttributeValue(str, "label");
+                    if (attributeValue == null) {
+                        attributeValue = "";
+                    }
+                    str3 = attributeValue;
+                    attributeValue2 = xmlPullParser.getAttributeValue(str, JavetLibLoadingListener.JAVET_LIB_LOADING_TYPE_DEFAULT);
+                    if (attributeValue2 != null) {
+                        fFloatValue = 0.0f;
+                    } else {
+                        fFloatValue = 0.0f;
+                    }
+                    attributeValue3 = xmlPullParser.getAttributeValue(str, "min");
+                    if (attributeValue3 != null) {
+                        fFloatValue2 = 0.0f;
+                    } else {
+                        fFloatValue2 = 0.0f;
+                    }
+                    attributeValue4 = xmlPullParser.getAttributeValue(str, AppLovinMediationProvider.MAX);
+                    if (attributeValue4 == null) {
+                        if (sliderType2 == SliderType.INTEGER) {
+                            fFloatValue3 = 10.0f;
+                        } else {
+                            fFloatValue3 = 1.0f;
+                        }
+                    } else if (sliderType2 == SliderType.INTEGER) {
+                        fFloatValue3 = 10.0f;
+                    } else {
+                        fFloatValue3 = 1.0f;
+                    }
+                    f2 = (fFloatValue3 - fFloatValue2) / 100.0f;
+                    floatRef = new Ref.FloatRef();
+                    float f13 = fFloatValue;
+                    d2 = 10.0f;
+                    fPow = (float) Math.pow(d2, (float) Math.floor((float) Math.log10(f2)));
+                    floatRef.element = fPow;
+                    if (fFloatValue2 > 0.0f) {
+                        floatRef.element = RangesKt___RangesKt.coerceAtMost(fPow, (float) Math.pow(d2, (float) Math.floor((float) Math.log10(fFloatValue2))));
+                    }
+                    attributeValue5 = xmlPullParser.getAttributeValue(str, "step");
+                    if (attributeValue5 != null) {
+                        if (sliderType2 == SliderType.INTEGER) {
+                            f3 = 1.0f;
+                        } else {
+                            fFloatValue4 = floatRef.element;
+                            f3 = fFloatValue4;
+                        }
+                    } else if (sliderType2 == SliderType.INTEGER) {
+                        f3 = 1.0f;
+                    } else {
+                        fFloatValue4 = floatRef.element;
+                        f3 = fFloatValue4;
+                    }
+                    attributeValue6 = xmlPullParser.getAttributeValue(str, "step");
+                    if (attributeValue6 != null) {
+                        fU2 = CZU.u(attributeValue6);
+                    } else {
+                        fU2 = null;
+                    }
+                    if (fU2 != null) {
+                        str4 = str3;
+                    } else {
+                        if (floatRef.element == f2) {
+                            z2 = true;
+                        } else {
+                            z2 = false;
+                        }
+                        if (z2) {
+                            str4 = str3;
+                        } else {
+                            str4 = str3;
+                        }
+                    }
+                    attributeValue7 = xmlPullParser.getAttributeValue(str, "multiplier");
+                    if (attributeValue7 != null) {
+                        fFloatValue5 = 1.0f;
+                    } else {
+                        fFloatValue5 = 1.0f;
+                    }
+                    attributeValue8 = xmlPullParser.getAttributeValue(str, "originValue");
+                    if (attributeValue8 != null) {
+                        fFloatValue6 = 0.0f;
+                    } else {
+                        fFloatValue6 = 0.0f;
+                    }
+                    attributeValue9 = xmlPullParser.getAttributeValue(str, "ticks");
+                    if (attributeValue9 != null) {
+                        listEmptyList = CollectionsKt__CollectionsKt.emptyList();
+                    } else {
+                        listEmptyList = CollectionsKt__CollectionsKt.emptyList();
+                    }
+                    pN.Xu(xmlPullParser);
+                    return new UserParameter.Spinner(attributeValue10, str4, zRw, fFloatValue2, fFloatValue3, f3, f13, fFloatValue6, sliderType2, fFloatValue5, listEmptyList);
+                }
+                throw new MalformedXMLException("expected 'float', 'integer', or 'percent'", null, false, 6, null);
+            case 1958052158:
+                if (attributeValue12.equals("integer")) {
+                    sliderType = SliderType.INTEGER;
+                    sliderType2 = sliderType;
+                    attributeValue = xmlPullParser.getAttributeValue(str, "label");
+                    if (attributeValue == null) {
+                        attributeValue = "";
+                    }
+                    str3 = attributeValue;
+                    attributeValue2 = xmlPullParser.getAttributeValue(str, JavetLibLoadingListener.JAVET_LIB_LOADING_TYPE_DEFAULT);
+                    if (attributeValue2 != null) {
+                        fFloatValue = 0.0f;
+                    } else {
+                        fFloatValue = 0.0f;
+                    }
+                    attributeValue3 = xmlPullParser.getAttributeValue(str, "min");
+                    if (attributeValue3 != null) {
+                        fFloatValue2 = 0.0f;
+                    } else {
+                        fFloatValue2 = 0.0f;
+                    }
+                    attributeValue4 = xmlPullParser.getAttributeValue(str, AppLovinMediationProvider.MAX);
+                    if (attributeValue4 == null) {
+                        if (sliderType2 == SliderType.INTEGER) {
+                            fFloatValue3 = 10.0f;
+                        } else {
+                            fFloatValue3 = 1.0f;
+                        }
+                    } else if (sliderType2 == SliderType.INTEGER) {
+                        fFloatValue3 = 10.0f;
+                    } else {
+                        fFloatValue3 = 1.0f;
+                    }
+                    f2 = (fFloatValue3 - fFloatValue2) / 100.0f;
+                    floatRef = new Ref.FloatRef();
+                    float f14 = fFloatValue;
+                    d2 = 10.0f;
+                    fPow = (float) Math.pow(d2, (float) Math.floor((float) Math.log10(f2)));
+                    floatRef.element = fPow;
+                    if (fFloatValue2 > 0.0f) {
+                        floatRef.element = RangesKt___RangesKt.coerceAtMost(fPow, (float) Math.pow(d2, (float) Math.floor((float) Math.log10(fFloatValue2))));
+                    }
+                    attributeValue5 = xmlPullParser.getAttributeValue(str, "step");
+                    if (attributeValue5 != null) {
+                        if (sliderType2 == SliderType.INTEGER) {
+                            f3 = 1.0f;
+                        } else {
+                            fFloatValue4 = floatRef.element;
+                            f3 = fFloatValue4;
+                        }
+                    } else if (sliderType2 == SliderType.INTEGER) {
+                        f3 = 1.0f;
+                    } else {
+                        fFloatValue4 = floatRef.element;
+                        f3 = fFloatValue4;
+                    }
+                    attributeValue6 = xmlPullParser.getAttributeValue(str, "step");
+                    if (attributeValue6 != null) {
+                        fU2 = CZU.u(attributeValue6);
+                    } else {
+                        fU2 = null;
+                    }
+                    if (fU2 != null) {
+                        str4 = str3;
+                    } else {
+                        if (floatRef.element == f2) {
+                            z2 = true;
+                        } else {
+                            z2 = false;
+                        }
+                        if (z2) {
+                            str4 = str3;
+                        } else {
+                            str4 = str3;
+                        }
+                    }
+                    attributeValue7 = xmlPullParser.getAttributeValue(str, "multiplier");
+                    if (attributeValue7 != null) {
+                        fFloatValue5 = 1.0f;
+                    } else {
+                        fFloatValue5 = 1.0f;
+                    }
+                    attributeValue8 = xmlPullParser.getAttributeValue(str, "originValue");
+                    if (attributeValue8 != null) {
+                        fFloatValue6 = 0.0f;
+                    } else {
+                        fFloatValue6 = 0.0f;
+                    }
+                    attributeValue9 = xmlPullParser.getAttributeValue(str, "ticks");
+                    if (attributeValue9 != null) {
+                        listEmptyList = CollectionsKt__CollectionsKt.emptyList();
+                    } else {
+                        listEmptyList = CollectionsKt__CollectionsKt.emptyList();
+                    }
+                    pN.Xu(xmlPullParser);
+                    return new UserParameter.Spinner(attributeValue10, str4, zRw, fFloatValue2, fFloatValue3, f3, f14, fFloatValue6, sliderType2, fFloatValue5, listEmptyList);
+                }
+                throw new MalformedXMLException("expected 'float', 'integer', or 'percent'", null, false, 6, null);
+            case 1970096767:
+                if (attributeValue12.equals("seconds")) {
+                    sliderType = SliderType.SECONDS;
+                    sliderType2 = sliderType;
+                    attributeValue = xmlPullParser.getAttributeValue(str, "label");
+                    if (attributeValue == null) {
+                        attributeValue = "";
+                    }
+                    str3 = attributeValue;
+                    attributeValue2 = xmlPullParser.getAttributeValue(str, JavetLibLoadingListener.JAVET_LIB_LOADING_TYPE_DEFAULT);
+                    if (attributeValue2 != null) {
+                        fFloatValue = 0.0f;
+                    } else {
+                        fFloatValue = 0.0f;
+                    }
+                    attributeValue3 = xmlPullParser.getAttributeValue(str, "min");
+                    if (attributeValue3 != null) {
+                        fFloatValue2 = 0.0f;
+                    } else {
+                        fFloatValue2 = 0.0f;
+                    }
+                    attributeValue4 = xmlPullParser.getAttributeValue(str, AppLovinMediationProvider.MAX);
+                    if (attributeValue4 == null) {
+                        if (sliderType2 == SliderType.INTEGER) {
+                            fFloatValue3 = 10.0f;
+                        } else {
+                            fFloatValue3 = 1.0f;
+                        }
+                    } else if (sliderType2 == SliderType.INTEGER) {
+                        fFloatValue3 = 10.0f;
+                    } else {
+                        fFloatValue3 = 1.0f;
+                    }
+                    f2 = (fFloatValue3 - fFloatValue2) / 100.0f;
+                    floatRef = new Ref.FloatRef();
+                    float f15 = fFloatValue;
+                    d2 = 10.0f;
+                    fPow = (float) Math.pow(d2, (float) Math.floor((float) Math.log10(f2)));
+                    floatRef.element = fPow;
+                    if (fFloatValue2 > 0.0f) {
+                        floatRef.element = RangesKt___RangesKt.coerceAtMost(fPow, (float) Math.pow(d2, (float) Math.floor((float) Math.log10(fFloatValue2))));
+                    }
+                    attributeValue5 = xmlPullParser.getAttributeValue(str, "step");
+                    if (attributeValue5 != null) {
+                        if (sliderType2 == SliderType.INTEGER) {
+                            f3 = 1.0f;
+                        } else {
+                            fFloatValue4 = floatRef.element;
+                            f3 = fFloatValue4;
+                        }
+                    } else if (sliderType2 == SliderType.INTEGER) {
+                        f3 = 1.0f;
+                    } else {
+                        fFloatValue4 = floatRef.element;
+                        f3 = fFloatValue4;
+                    }
+                    attributeValue6 = xmlPullParser.getAttributeValue(str, "step");
+                    if (attributeValue6 != null) {
+                        fU2 = CZU.u(attributeValue6);
+                    } else {
+                        fU2 = null;
+                    }
+                    if (fU2 != null) {
+                        str4 = str3;
+                    } else {
+                        if (floatRef.element == f2) {
+                            z2 = true;
+                        } else {
+                            z2 = false;
+                        }
+                        if (z2) {
+                            str4 = str3;
+                        } else {
+                            str4 = str3;
+                        }
+                    }
+                    attributeValue7 = xmlPullParser.getAttributeValue(str, "multiplier");
+                    if (attributeValue7 != null) {
+                        fFloatValue5 = 1.0f;
+                    } else {
+                        fFloatValue5 = 1.0f;
+                    }
+                    attributeValue8 = xmlPullParser.getAttributeValue(str, "originValue");
+                    if (attributeValue8 != null) {
+                        fFloatValue6 = 0.0f;
+                    } else {
+                        fFloatValue6 = 0.0f;
+                    }
+                    attributeValue9 = xmlPullParser.getAttributeValue(str, "ticks");
+                    if (attributeValue9 != null) {
+                        listEmptyList = CollectionsKt__CollectionsKt.emptyList();
+                    } else {
+                        listEmptyList = CollectionsKt__CollectionsKt.emptyList();
+                    }
+                    pN.Xu(xmlPullParser);
+                    return new UserParameter.Spinner(attributeValue10, str4, zRw, fFloatValue2, fFloatValue3, f3, f15, fFloatValue6, sliderType2, fFloatValue5, listEmptyList);
+                }
+                throw new MalformedXMLException("expected 'float', 'integer', or 'percent'", null, false, 6, null);
+            default:
+                throw new MalformedXMLException("expected 'float', 'integer', or 'percent'", null, false, 6, null);
+        }
+    }

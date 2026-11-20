@@ -1,0 +1,218 @@
+{
+  "engine": {
+    "name": "jadx-headless-mcp",
+    "version": "0.7.1",
+    "artifact_sha256": "6e5eacf500b64292bfb73c49797c1958f6ee44646e43e868039ae7feb573ff75",
+    "source_revision": "5844800a486d2248fa949b74c9896285f5b54de2",
+    "worker_count": 1,
+    "heap_limit_mib": 8192
+  },
+  "class_name": "com.alightcreative.app.motion.scene.visualeffect.KeyableVisualEffectRef",
+  "methods": [
+    {
+      "name": "<clinit>",
+      "reported_signature": "<clinit>(): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()V"
+    },
+    {
+      "name": "<init>",
+      "reported_signature": "<init>(java.lang.String, long, java.util.Map<java.lang.String, com.alightcreative.app.motion.scene.userparam.KeyableUserParameterValue>, int, boolean, boolean, java.util.Set<java.lang.Integer>): void",
+      "overload_index": 0,
+      "is_constructor": true,
+      "dex_descriptor": "(Ljava/lang/String;JLjava/util/Map;IZZLjava/util/Set;)V"
+    },
+    {
+      "name": "<init>",
+      "reported_signature": "<init>(java.lang.String, long, java.util.Map, int, boolean, boolean, java.util.Set, int, kotlin.jvm.internal.DefaultConstructorMarker): void",
+      "overload_index": 1,
+      "is_constructor": true,
+      "dex_descriptor": "(Ljava/lang/String;JLjava/util/Map;IZZLjava/util/Set;ILkotlin/jvm/internal/DefaultConstructorMarker;)V"
+    },
+    {
+      "name": "component1",
+      "reported_signature": "component1(): java.lang.String",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/lang/String;"
+    },
+    {
+      "name": "component2",
+      "reported_signature": "component2(): long",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()J"
+    },
+    {
+      "name": "component3",
+      "reported_signature": "component3(): java.util.Map<java.lang.String, com.alightcreative.app.motion.scene.userparam.KeyableUserParameterValue>",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/util/Map;"
+    },
+    {
+      "name": "component4",
+      "reported_signature": "component4(): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()I"
+    },
+    {
+      "name": "component5",
+      "reported_signature": "component5(): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Z"
+    },
+    {
+      "name": "component6",
+      "reported_signature": "component6(): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Z"
+    },
+    {
+      "name": "component7",
+      "reported_signature": "component7(): java.util.Set<java.lang.Integer>",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/util/Set;"
+    },
+    {
+      "name": "copy",
+      "reported_signature": "copy(java.lang.String, long, java.util.Map<java.lang.String, com.alightcreative.app.motion.scene.userparam.KeyableUserParameterValue>, int, boolean, boolean, java.util.Set<java.lang.Integer>): com.alightcreative.app.motion.scene.visualeffect.KeyableVisualEffectRef",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Ljava/lang/String;JLjava/util/Map;IZZLjava/util/Set;)Lcom/alightcreative/app/motion/scene/visualeffect/KeyableVisualEffectRef;"
+    },
+    {
+      "name": "copy$default",
+      "reported_signature": "copy$default(com.alightcreative.app.motion.scene.visualeffect.KeyableVisualEffectRef, java.lang.String, long, java.util.Map, int, boolean, boolean, java.util.Set, int, java.lang.Object): com.alightcreative.app.motion.scene.visualeffect.KeyableVisualEffectRef",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/visualeffect/KeyableVisualEffectRef;Ljava/lang/String;JLjava/util/Map;IZZLjava/util/Set;ILjava/lang/Object;)Lcom/alightcreative/app/motion/scene/visualeffect/KeyableVisualEffectRef;"
+    },
+    {
+      "name": "equals",
+      "reported_signature": "equals(java.lang.Object): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Ljava/lang/Object;)Z"
+    },
+    {
+      "name": "getDisabledRenderGroups",
+      "reported_signature": "getDisabledRenderGroups(): java.util.Set<java.lang.Integer>",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/util/Set;"
+    },
+    {
+      "name": "getHidden",
+      "reported_signature": "getHidden(): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Z"
+    },
+    {
+      "name": "getId",
+      "reported_signature": "getId(): java.lang.String",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/lang/String;"
+    },
+    {
+      "name": "getInstanceId",
+      "reported_signature": "getInstanceId(): long",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()J"
+    },
+    {
+      "name": "getLocallyApplied",
+      "reported_signature": "getLocallyApplied(): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Z"
+    },
+    {
+      "name": "getParameters",
+      "reported_signature": "getParameters(): java.util.Map<java.lang.String, com.alightcreative.app.motion.scene.userparam.KeyableUserParameterValue>",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/util/Map;"
+    },
+    {
+      "name": "getRenderGroup",
+      "reported_signature": "getRenderGroup(): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()I"
+    },
+    {
+      "name": "hashCode",
+      "reported_signature": "hashCode(): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()I"
+    },
+    {
+      "name": "toString",
+      "reported_signature": "toString(): java.lang.String",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/lang/String;"
+    }
+  ],
+  "fields": [
+    {
+      "name": "$stable",
+      "reported_type": "int",
+      "dex_static_value": {
+        "type": "int",
+        "value": 8
+      }
+    },
+    {
+      "name": "_hashCode",
+      "reported_type": "int",
+      "dex_static_value": null
+    },
+    {
+      "name": "disabledRenderGroups",
+      "reported_type": "java.util.Set<java.lang.Integer>",
+      "dex_static_value": null
+    },
+    {
+      "name": "hidden",
+      "reported_type": "boolean",
+      "dex_static_value": null
+    },
+    {
+      "name": "id",
+      "reported_type": "java.lang.String",
+      "dex_static_value": null
+    },
+    {
+      "name": "instanceId",
+      "reported_type": "long",
+      "dex_static_value": null
+    },
+    {
+      "name": "locallyApplied",
+      "reported_type": "boolean",
+      "dex_static_value": null
+    },
+    {
+      "name": "parameters",
+      "reported_type": "java.util.Map<java.lang.String, com.alightcreative.app.motion.scene.userparam.KeyableUserParameterValue>",
+      "dex_static_value": null
+    },
+    {
+      "name": "renderGroup",
+      "reported_type": "int",
+      "dex_static_value": null
+    }
+  ],
+  "inner_classes": []
+}

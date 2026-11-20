@@ -337,6 +337,7 @@ export interface EffectParamDef {
     | 'orient'
     | 'color'
     | 'hue-disc'
+    | 'hue-ring'
     | 'selector'
     | 'switch'
     | 'section'

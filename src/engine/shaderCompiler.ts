@@ -107,6 +107,9 @@ function paramUniformDecl(p: EffectParamDef): string {
       return `uniform float ${uid};`;
     case 'point':
       return `uniform vec2 ${uid};`;
+    case 'hue-ring':
+      // UserParamParserKt.readHueRingParam reads a single float, not a vec3.
+      return `uniform float ${uid};`;
     case 'xyz':
     case 'hue-disc':
       return `uniform vec3 ${uid};`;

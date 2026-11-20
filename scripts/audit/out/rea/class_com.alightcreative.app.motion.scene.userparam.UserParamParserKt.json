@@ -1,0 +1,116 @@
+{
+  "engine": {
+    "name": "jadx-headless-mcp",
+    "version": "0.7.1",
+    "artifact_sha256": "6e5eacf500b64292bfb73c49797c1958f6ee44646e43e868039ae7feb573ff75",
+    "source_revision": "5844800a486d2248fa949b74c9896285f5b54de2",
+    "worker_count": 1,
+    "heap_limit_mib": 8192
+  },
+  "class_name": "com.alightcreative.app.motion.scene.userparam.UserParamParserKt",
+  "methods": [
+    {
+      "name": "readColorParam",
+      "reported_signature": "readColorParam(org.xmlpull.v1.XmlPullParser, java.lang.String): com.alightcreative.app.motion.scene.userparam.UserParameter$Color",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lorg/xmlpull/v1/XmlPullParser;Ljava/lang/String;)Lcom/alightcreative/app/motion/scene/userparam/UserParameter$Color;"
+    },
+    {
+      "name": "readFloatParam",
+      "reported_signature": "readFloatParam(org.xmlpull.v1.XmlPullParser, java.lang.String): com.alightcreative.app.motion.scene.userparam.UserParameter$FloatValue",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lorg/xmlpull/v1/XmlPullParser;Ljava/lang/String;)Lcom/alightcreative/app/motion/scene/userparam/UserParameter$FloatValue;"
+    },
+    {
+      "name": "readHueDiscParam",
+      "reported_signature": "readHueDiscParam(org.xmlpull.v1.XmlPullParser, java.lang.String): com.alightcreative.app.motion.scene.userparam.UserParameter$HueDisc",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lorg/xmlpull/v1/XmlPullParser;Ljava/lang/String;)Lcom/alightcreative/app/motion/scene/userparam/UserParameter$HueDisc;"
+    },
+    {
+      "name": "readHueRingParam",
+      "reported_signature": "readHueRingParam(org.xmlpull.v1.XmlPullParser, java.lang.String): com.alightcreative.app.motion.scene.userparam.UserParameter$HueRing",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lorg/xmlpull/v1/XmlPullParser;Ljava/lang/String;)Lcom/alightcreative/app/motion/scene/userparam/UserParameter$HueRing;"
+    },
+    {
+      "name": "readOrientationParam",
+      "reported_signature": "readOrientationParam(org.xmlpull.v1.XmlPullParser, java.lang.String): com.alightcreative.app.motion.scene.userparam.UserParameter$Orientation",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lorg/xmlpull/v1/XmlPullParser;Ljava/lang/String;)Lcom/alightcreative/app/motion/scene/userparam/UserParameter$Orientation;"
+    },
+    {
+      "name": "readPointParam",
+      "reported_signature": "readPointParam(org.xmlpull.v1.XmlPullParser, java.lang.String): com.alightcreative.app.motion.scene.userparam.UserParameter$Point",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lorg/xmlpull/v1/XmlPullParser;Ljava/lang/String;)Lcom/alightcreative/app/motion/scene/userparam/UserParameter$Point;"
+    },
+    {
+      "name": "readSelectorParam",
+      "reported_signature": "readSelectorParam(org.xmlpull.v1.XmlPullParser, java.lang.String): com.alightcreative.app.motion.scene.userparam.UserParameter$Selector",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lorg/xmlpull/v1/XmlPullParser;Ljava/lang/String;)Lcom/alightcreative/app/motion/scene/userparam/UserParameter$Selector;"
+    },
+    {
+      "name": "readSliderParam",
+      "reported_signature": "readSliderParam(org.xmlpull.v1.XmlPullParser, java.lang.String): com.alightcreative.app.motion.scene.userparam.UserParameter$Slider",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lorg/xmlpull/v1/XmlPullParser;Ljava/lang/String;)Lcom/alightcreative/app/motion/scene/userparam/UserParameter$Slider;"
+    },
+    {
+      "name": "readSpinnerParam",
+      "reported_signature": "readSpinnerParam(org.xmlpull.v1.XmlPullParser, java.lang.String, java.lang.String): com.alightcreative.app.motion.scene.userparam.UserParameter$Spinner",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lorg/xmlpull/v1/XmlPullParser;Ljava/lang/String;Ljava/lang/String;)Lcom/alightcreative/app/motion/scene/userparam/UserParameter$Spinner;"
+    },
+    {
+      "name": "readStaticText",
+      "reported_signature": "readStaticText(org.xmlpull.v1.XmlPullParser, java.lang.String, com.alightcreative.app.motion.scene.userparam.StaticTextStyle): com.alightcreative.app.motion.scene.userparam.UserParameter$StaticText",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lorg/xmlpull/v1/XmlPullParser;Ljava/lang/String;Lcom/alightcreative/app/motion/scene/userparam/StaticTextStyle;)Lcom/alightcreative/app/motion/scene/userparam/UserParameter$StaticText;"
+    },
+    {
+      "name": "readSwitchParam",
+      "reported_signature": "readSwitchParam(org.xmlpull.v1.XmlPullParser, java.lang.String): com.alightcreative.app.motion.scene.userparam.UserParameter$Switch",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lorg/xmlpull/v1/XmlPullParser;Ljava/lang/String;)Lcom/alightcreative/app/motion/scene/userparam/UserParameter$Switch;"
+    },
+    {
+      "name": "readTextureParam",
+      "reported_signature": "readTextureParam(org.xmlpull.v1.XmlPullParser, java.lang.String): com.alightcreative.app.motion.scene.userparam.UserParameter$Texture",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lorg/xmlpull/v1/XmlPullParser;Ljava/lang/String;)Lcom/alightcreative/app/motion/scene/userparam/UserParameter$Texture;"
+    },
+    {
+      "name": "readUserParams",
+      "reported_signature": "readUserParams(org.xmlpull.v1.XmlPullParser, java.lang.String, java.lang.String): java.util.List<com.alightcreative.app.motion.scene.userparam.UserParameter>",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lorg/xmlpull/v1/XmlPullParser;Ljava/lang/String;Ljava/lang/String;)Ljava/util/List;"
+    },
+    {
+      "name": "readXYZParam",
+      "reported_signature": "readXYZParam(org.xmlpull.v1.XmlPullParser, java.lang.String): com.alightcreative.app.motion.scene.userparam.UserParameter$XYZ",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lorg/xmlpull/v1/XmlPullParser;Ljava/lang/String;)Lcom/alightcreative/app/motion/scene/userparam/UserParameter$XYZ;"
+    }
+  ],
+  "fields": [],
+  "inner_classes": [
+    "com.alightcreative.app.motion.scene.userparam.UserParamParserKt.WhenMappings",
+    "com.alightcreative.app.motion.scene.userparam.UserParamParserKt.AnonymousClass1"
+  ]
+}

@@ -1,0 +1,130 @@
+{
+  "engine": {
+    "name": "jadx-headless-mcp",
+    "version": "0.7.1",
+    "artifact_sha256": "6e5eacf500b64292bfb73c49797c1958f6ee44646e43e868039ae7feb573ff75",
+    "source_revision": "5844800a486d2248fa949b74c9896285f5b54de2",
+    "worker_count": 1,
+    "heap_limit_mib": 8192
+  },
+  "class_name": "com.alightcreative.app.motion.scene.visualeffect.ShaderGroup",
+  "methods": [
+    {
+      "name": "<clinit>",
+      "reported_signature": "<clinit>(): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()V"
+    },
+    {
+      "name": "<init>",
+      "reported_signature": "<init>(int, boolean, java.util.Map<com.alightcreative.app.motion.scene.visualeffect.ShaderType, com.alightcreative.app.motion.scene.visualeffect.ShaderInfo>): void",
+      "overload_index": 0,
+      "is_constructor": true,
+      "dex_descriptor": "(IZLjava/util/Map;)V"
+    },
+    {
+      "name": "component1",
+      "reported_signature": "component1(): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()I"
+    },
+    {
+      "name": "component2",
+      "reported_signature": "component2(): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Z"
+    },
+    {
+      "name": "component3",
+      "reported_signature": "component3(): java.util.Map<com.alightcreative.app.motion.scene.visualeffect.ShaderType, com.alightcreative.app.motion.scene.visualeffect.ShaderInfo>",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/util/Map;"
+    },
+    {
+      "name": "copy",
+      "reported_signature": "copy(int, boolean, java.util.Map<com.alightcreative.app.motion.scene.visualeffect.ShaderType, com.alightcreative.app.motion.scene.visualeffect.ShaderInfo>): com.alightcreative.app.motion.scene.visualeffect.ShaderGroup",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(IZLjava/util/Map;)Lcom/alightcreative/app/motion/scene/visualeffect/ShaderGroup;"
+    },
+    {
+      "name": "copy$default",
+      "reported_signature": "copy$default(com.alightcreative.app.motion.scene.visualeffect.ShaderGroup, int, boolean, java.util.Map, int, java.lang.Object): com.alightcreative.app.motion.scene.visualeffect.ShaderGroup",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/visualeffect/ShaderGroup;IZLjava/util/Map;ILjava/lang/Object;)Lcom/alightcreative/app/motion/scene/visualeffect/ShaderGroup;"
+    },
+    {
+      "name": "equals",
+      "reported_signature": "equals(java.lang.Object): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Ljava/lang/Object;)Z"
+    },
+    {
+      "name": "getEnabledByDefault",
+      "reported_signature": "getEnabledByDefault(): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Z"
+    },
+    {
+      "name": "getId",
+      "reported_signature": "getId(): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()I"
+    },
+    {
+      "name": "getShaders",
+      "reported_signature": "getShaders(): java.util.Map<com.alightcreative.app.motion.scene.visualeffect.ShaderType, com.alightcreative.app.motion.scene.visualeffect.ShaderInfo>",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/util/Map;"
+    },
+    {
+      "name": "hashCode",
+      "reported_signature": "hashCode(): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()I"
+    },
+    {
+      "name": "toString",
+      "reported_signature": "toString(): java.lang.String",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/lang/String;"
+    }
+  ],
+  "fields": [
+    {
+      "name": "$stable",
+      "reported_type": "int",
+      "dex_static_value": {
+        "type": "int",
+        "value": 8
+      }
+    },
+    {
+      "name": "enabledByDefault",
+      "reported_type": "boolean",
+      "dex_static_value": null
+    },
+    {
+      "name": "id",
+      "reported_type": "int",
+      "dex_static_value": null
+    },
+    {
+      "name": "shaders",
+      "reported_type": "java.util.Map<com.alightcreative.app.motion.scene.visualeffect.ShaderType, com.alightcreative.app.motion.scene.visualeffect.ShaderInfo>",
+      "dex_static_value": null
+    }
+  ],
+  "inner_classes": []
+}
