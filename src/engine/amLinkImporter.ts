@@ -17,6 +17,7 @@ export interface LinkImportResult {
 }
 
 const CUSTOM_PROXY_STORAGE_KEY = 'am_custom_proxy_url';
+const DEFAULT_CLOUDFLARE_PROXY_URL = 'https://am-proxy.zoronwisyt.workers.dev';
 
 export function getCustomProxyUrl(): string {
   if (typeof window === 'undefined') return '';
@@ -311,6 +312,12 @@ function buildProxyEndpoints(targetUrl: string): { label: string; fetchUrl: stri
       timeoutMs: 45000,
     });
   }
+
+  endpoints.push({
+    label: 'cloudflare proxy',
+    fetchUrl: formatProxyUrl(DEFAULT_CLOUDFLARE_PROXY_URL, targetUrl),
+    timeoutMs: 45000,
+  });
 
   endpoints.push({
     label: 'isteed-cors',
