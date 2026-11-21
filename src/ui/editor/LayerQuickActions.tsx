@@ -8,6 +8,8 @@ import { AmIcon } from '../components/AmIcon';
 export const LayerQuickActions: React.FC = () => {
   const {
     selectedLayerIds,
+    layoutMode,
+    inspectorTab,
     getActiveLayers,
     groupStack,
     mutateProject,
@@ -31,6 +33,8 @@ export const LayerQuickActions: React.FC = () => {
   } = useEditorStore(
     useShallow((s) => ({
       selectedLayerIds: s.selectedLayerIds,
+      layoutMode: s.layoutMode,
+      inspectorTab: s.inspectorTab,
       getActiveLayers: s.getActiveLayers,
       groupStack: s.groupStack,
       mutateProject: s.mutateProject,
@@ -61,6 +65,8 @@ export const LayerQuickActions: React.FC = () => {
   const layers = getActiveLayers();
   const selLayers = layers.filter((l) => selectedLayerIds.includes(l.id));
   if (selLayers.length === 0) return null;
+  // On mobile portrait, keep the preview 100% unobstructed when the bottom Inspector Sheet is open
+  if (layoutMode === 'classic' && inspectorTab !== 'none') return null;
 
   const single = selLayers.length === 1 ? selLayers[0] : null;
   const parentCandidates = single ? layers.filter((l) => l.id !== single.id && l.type !== 'audio') : [];

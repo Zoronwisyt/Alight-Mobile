@@ -2,7 +2,7 @@ import React, { useRef, useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { reparentLayerPreservingPosition } from '../../engine/animation';
 import { replaceMediaOnLayers } from '../../engine/mediaReplace';
-import { useEditorStore, type InspectorTab } from '../../store/useEditorStore';
+import { resolveActiveGroup, useEditorStore, type InspectorTab } from '../../store/useEditorStore';
 import { AmIcon } from '../components/AmIcon';
 import { BlendingOpacityPanel } from './BlendingOpacityPanel';
 import { BorderShadowPanel } from './BorderShadowPanel';
@@ -33,6 +33,14 @@ export const LayerInspector: React.FC = () => {
     selectedLayerIds,
     groupStack,
     currentTimeMs,
+    isPlaying,
+    pastCount,
+    futureCount,
+    setCurrentTimeMs,
+    setIsPlaying,
+    togglePlay,
+    undo,
+    redo,
     getActiveLayers,
     selectLayer,
     trimSelectedLeft,
@@ -57,6 +65,14 @@ export const LayerInspector: React.FC = () => {
       selectedLayerIds: s.selectedLayerIds,
       groupStack: s.groupStack,
       currentTimeMs: s.currentTimeMs,
+      isPlaying: s.isPlaying,
+      pastCount: s.past.length,
+      futureCount: s.future.length,
+      setCurrentTimeMs: s.setCurrentTimeMs,
+      setIsPlaying: s.setIsPlaying,
+      togglePlay: s.togglePlay,
+      undo: s.undo,
+      redo: s.redo,
       getActiveLayers: s.getActiveLayers,
       selectLayer: s.selectLayer,
       trimSelectedLeft: s.trimSelectedLeft,
@@ -73,7 +89,7 @@ export const LayerInspector: React.FC = () => {
     }))
   );
 
-  const { layer, updateLayer } = useSelectedLayer();
+  const { project, layer, updateLayer } = useSelectedLayer();
   const replaceMediaRef = useRef<HTMLInputElement>(null);
   const [showParentMenu, setShowParentMenu] = useState(false);
   const [showMoreMenu, setShowMoreMenu] = useState(false);
@@ -151,9 +167,78 @@ export const LayerInspector: React.FC = () => {
   };
 
   const isRootMenu = !curveTarget && (inspectorTab === 'menu' || inspectorTab === 'none');
+  const isMobileClassic = layoutMode === 'classic';
+  const activeScope = project ? resolveActiveGroup(project, groupStack) : null;
+  const activeDurMs = activeScope?.durationMs ?? project?.durationMs ?? 5000;
+  const frameMs = 1000 / Math.max(1, project?.fps ?? 30);
+
+  const fmtMiniTime = (ms: number) => {
+    const fps = Math.max(1, project?.fps ?? 30);
+    const totalSec = Math.floor(ms / 1000);
+    const m = Math.floor(totalSec / 60);
+    const s = totalSec % 60;
+    const f = Math.floor(((ms % 1000) / 1000) * fps);
+    return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}.${String(f).padStart(2, '0')}`;
+  };
+
+  const handleMobileSheetDrag = (e: React.PointerEvent<HTMLDivElement>) => {
+    e.stopPropagation();
+    const startY = e.clientY;
+    const sheetEl = e.currentTarget.parentElement;
+    const startH = sheetEl ? sheetEl.getBoundingClientRect().height : window.innerHeight * 0.46;
+    const minH = Math.round(window.innerHeight * 0.28);
+    const maxH = Math.round(window.innerHeight * 0.72);
+    try {
+      e.currentTarget.setPointerCapture(e.pointerId);
+    } catch {
+      // ignore
+    }
+    const onMove = (ev: PointerEvent) => {
+      const nextH = Math.max(minH, Math.min(maxH, Math.round(startH - (ev.clientY - startY))));
+      document.documentElement.style.setProperty('--am-mobile-sheet-h', `${nextH}px`);
+    };
+    const onUp = () => {
+      window.removeEventListener('pointermove', onMove);
+      window.removeEventListener('pointerup', onUp);
+      window.removeEventListener('pointercancel', onUp);
+    };
+    window.addEventListener('pointermove', onMove);
+    window.addEventListener('pointerup', onUp);
+    window.addEventListener('pointercancel', onUp);
+  };
+
+  const mobileQuickTabs: { id: InspectorTab; label: string; action?: () => void }[] = [
+    { id: 'moveTransform', label: 'Move' },
+    { id: 'effects', label: layer.effects.length > 0 ? `FX (${layer.effects.length})` : 'Effects' },
+    ...(layer.type !== 'audio' && layer.type !== 'null' && layer.type !== 'camera'
+      ? [{ id: 'blending' as InspectorTab, label: 'Blend' }]
+      : []),
+    ...(layer.type === 'shape' || layer.type === 'vector' || layer.type === 'text'
+      ? [
+          { id: 'colorFill' as InspectorTab, label: 'Color' },
+          { id: 'borderShadow' as InspectorTab, label: 'Border' },
+        ]
+      : []),
+    ...(layer.type === 'text' ? [{ id: 'editText' as InspectorTab, label: 'Text' }] : []),
+    ...(layer.type === 'shape' ? [{ id: 'editShape' as InspectorTab, label: 'Shape' }] : []),
+    ...(layer.type === 'group'
+      ? [{ id: 'menu' as InspectorTab, label: 'Edit Group', action: () => enterGroup(layer.id) }]
+      : []),
+  ];
 
   return (
     <aside className="am-inspector-dock">
+      {isMobileClassic && (
+        <div
+          className="am-mobile-sheet-handle"
+          onPointerDown={handleMobileSheetDrag}
+          onDoubleClick={() => document.documentElement.style.removeProperty('--am-mobile-sheet-h')}
+          title="Drag to resize panel (double-tap to reset)"
+        >
+          <span className="am-mobile-sheet-grip" />
+        </div>
+      )}
+
       <input
         ref={replaceMediaRef}
         type="file"
@@ -340,6 +425,113 @@ export const LayerInspector: React.FC = () => {
           )}
         </div>
       </div>
+
+      {/* Mobile Live Mini-Transport + Scrub Bar + One-Tap Property Switcher */}
+      {isMobileClassic && (
+        <>
+          <div className="am-mobile-mini-transport">
+            <button
+              type="button"
+              className="am-mobile-mini-btn play"
+              onClick={togglePlay}
+              title={isPlaying ? 'Pause' : 'Play'}
+            >
+              <AmIcon name={isPlaying ? 'ic_edit_pause' : 'ic_edit_play'} fallback={isPlaying ? 'pause' : 'play'} size={16} color="#00FFA8" />
+            </button>
+            <button
+              type="button"
+              className="am-mobile-mini-btn"
+              onClick={() => {
+                setIsPlaying(false);
+                setCurrentTimeMs(currentTimeMs - frameMs);
+              }}
+              title="Previous Frame"
+            >
+              <AmIcon name="ic_edit_prevframe" fallback="prevFrame" size={14} />
+            </button>
+            <button
+              type="button"
+              className="am-mobile-mini-btn"
+              onClick={() => {
+                setIsPlaying(false);
+                setCurrentTimeMs(currentTimeMs + frameMs);
+              }}
+              title="Next Frame"
+            >
+              <AmIcon name="ic_edit_nextframe" fallback="nextFrame" size={14} />
+            </button>
+            <input
+              type="range"
+              className="am-mobile-scrub-range"
+              aria-label="Scrub timeline while editing"
+              min={0}
+              max={Math.max(100, activeDurMs)}
+              step={Math.max(1, Math.round(frameMs))}
+              value={Math.min(activeDurMs, Math.max(0, Math.round(currentTimeMs)))}
+              onChange={(e) => {
+                setIsPlaying(false);
+                setCurrentTimeMs(Number(e.target.value));
+              }}
+            />
+            <span className="am-mobile-mini-time">{fmtMiniTime(currentTimeMs)}</span>
+            <button
+              type="button"
+              className="am-mobile-mini-btn"
+              disabled={pastCount === 0}
+              onClick={undo}
+              title="Undo"
+            >
+              <AmIcon name="ic_edit_undo" fallback="undo" size={14} />
+            </button>
+            <button
+              type="button"
+              className="am-mobile-mini-btn"
+              disabled={futureCount === 0}
+              onClick={redo}
+              title="Redo"
+            >
+              <AmIcon name="ic_edit_redo" fallback="redo" size={14} />
+            </button>
+          </div>
+
+          <div className="am-mobile-tab-bar">
+            <div className="am-mobile-tab-strip">
+              {mobileQuickTabs.map((t) => {
+                const active =
+                  !curveTarget &&
+                  (inspectorTab === t.id || (t.id === 'effects' && inspectorTab === 'effectSettings'));
+                return (
+                  <button
+                    key={t.label}
+                    type="button"
+                    className={`am-mobile-tab-pill ${active ? 'active' : ''}`}
+                    onClick={() => {
+                      if (t.action) {
+                        t.action();
+                      } else {
+                        setCurveTarget(null);
+                        setInspectorTab(t.id);
+                      }
+                    }}
+                  >
+                    {t.label}
+                  </button>
+                );
+              })}
+            </div>
+            <button
+              type="button"
+              className="am-mobile-tab-pill timeline-exit"
+              onClick={() => {
+                setCurveTarget(null);
+                setInspectorTab('none');
+              }}
+            >
+              Timeline
+            </button>
+          </div>
+        </>
+      )}
 
       {/* APK fragment_element_edit.xml (#202332) */}
       <div className="am-insp-scroll am-scroll">

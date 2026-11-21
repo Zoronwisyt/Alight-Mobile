@@ -34,6 +34,7 @@ export const EditorScreen: React.FC = () => {
     isPlaying,
     loop,
     layoutMode,
+    inspectorTab,
     selectedLayerIds,
     groupStack,
     previewQuality,
@@ -52,6 +53,7 @@ export const EditorScreen: React.FC = () => {
       isPlaying: s.isPlaying,
       loop: s.loop,
       layoutMode: s.layoutMode,
+      inspectorTab: s.inspectorTab,
       selectedLayerIds: s.selectedLayerIds,
       groupStack: s.groupStack,
       previewQuality: s.previewQuality,
@@ -611,11 +613,13 @@ export const EditorScreen: React.FC = () => {
     })();
   };
 
+  const mobileSheetOpen = layoutMode === 'classic' && selectedLayerIds.length === 1 && inspectorTab !== 'none';
+
   return (
     <div className="am-editor">
       <EditorActionBar />
 
-      <div className={`am-editor-body ${layoutMode}`}>
+      <div className={`am-editor-body ${layoutMode}${mobileSheetOpen ? ' sheet-open' : ''}`}>
         <PreviewCanvas
           canvasRef={canvasRef}
           onVisibilityPauseChange={setVisibilityPaused}
