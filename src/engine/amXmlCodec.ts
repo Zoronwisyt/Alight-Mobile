@@ -140,11 +140,14 @@ function layerToXml(layer: Layer, fps = 30, indent = '  '): string {
           : ` fillType="none"`;
 
   const parentAttr = layer.parentId ? ` parent="${escapeXml(layer.parentId)}"` : '';
-  // B6: export keeps AM's own dialect — mask/clipping-mask become clippingMask="true",
-  // every colour blend is written with its hyphenated 5.0.280 xml id (never a legacy web id).
+  // AM's dialect keeps the two mask concepts on separate attributes:
+  //   clippingMask="true"  -> this layer is the one being clipped (a flag, not a mode)
+  //   blending="mask"      -> this layer is the clipper
+  // `exclude` is a clipper too, and also carries the boolean. Writing the flag from the blend mode
+  // (as the previous writer did) turned every clipper into a clipped layer, so nothing clipped.
   const canonicalBlend = canonicalizeBlendMode(layer.blendMode);
-  const isMask = isMaskBlendMode(canonicalBlend);
-  const clipAttr = isMask || canonicalBlend === 'exclude' ? ' clippingMask="true"' : '';
+  const clipFlag = layer.clippedToMask || canonicalBlend === 'clipping-mask' || canonicalBlend === 'exclude';
+  const clipAttr = clipFlag ? ' clippingMask="true"' : '';
   const blendXmlId = blendModeToXml(canonicalBlend);
   const blendAttr = blendXmlId ? ` blending="${escapeXml(blendXmlId)}"` : '';
   const retimeAttr =
@@ -826,15 +829,16 @@ function parseXmlLayer(
         .map((c, j) => parseXmlLayer(c, j, groupWidth!, groupHeight!, mediaMap))
     : undefined;
 
-  const isClippingMask = el.getAttribute('clippingMask') === 'true';
+  // `clippingMask="true"` is a flag on the layer BEING clipped, never a blend mode. The clipper is
+  // a separate layer carrying `blending="mask"` (or `blending="exclude"`). Conflating the two made
+  // the clipped layer render as a mask over the scene, which is what produced "the rectangle instead
+  // of the video" on shared project i1MwzBcB9D.
+  const clippedToMask = el.getAttribute('clippingMask') === 'true';
   const rawBlending = el.getAttribute('blending');
-  // `blending="clipping-mask"` is a 5.0.280 blend mode, not a wrapper boolean: both spellings
-  // mean "this element clips". See PLAYBACK_PREVIEW_DECOMPILED.md §11.
-  const resolvedBlendMode: BlendModeId = isClippingMask
-    ? canonicalizeBlendMode(rawBlending) === 'exclude'
-      ? 'exclude'
-      : 'mask'
-    : canonicalizeBlendMode(rawBlending);
+  const resolvedBlendMode: BlendModeId = canonicalizeBlendMode(rawBlending);
+  // On a clipper the flag is redundant (blending="mask"/"exclude" already identifies it), so it is
+  // only stored when it marks a layer that is itself being clipped.
+  const storedClipFlag = clippedToMask && resolvedBlendMode !== 'mask' && resolvedBlendMode !== 'exclude';
 
   const parentId = el.getAttribute('parent') || null;
   let cameraData: Layer['cameraData'] = undefined;
@@ -903,6 +907,7 @@ function parseXmlLayer(
     visible: el.getAttribute('hidden') !== 'true' && el.getAttribute('visible') !== 'false',
     locked: false,
     is3D: el.getAttribute('is3D') === 'true' || undefined,
+    clippedToMask: storedClipFlag || undefined,
     parentId,
     blendMode: resolvedBlendMode,
     opacity: parsePropElement(tf?.querySelector(':scope > opacity') ?? null, parseNum, 1),

@@ -28,7 +28,9 @@ visibility flag. A project made in the web build and exported as AM XML came bac
 rectangles at default size — the renderer was fine, the writer was half a document.
 
 This pass rewrites the writer, adds a round-trip gate, and fixes five smaller defects found on the way.
-A second pass the same day read the serializers and closed **O1** and **O2** — see §8.
+A second pass the same day read the serializers and closed **O1** and **O2** — see §8. A third pass
+imported a real shared project and closed **O5**, the clipping-mask binding that made a matte
+rectangle stand in for the video it was supposed to clip — see §9.
 
 | # | Defect | Where | Status |
 | --- | --- | --- | --- |
@@ -49,6 +51,7 @@ A second pass the same day read the serializers and closed **O1** and **O2** —
 | Presets | **250** across 13 packs | `public/am/presets.json` — 250 | ✅ 0 missing, 0 prop drift, 0 keyframe drift |
 | Shapes | 20 XML | `public/am/shapes.json` — 20, real `getPath()` scripts | ✅ (unchanged this pass) |
 | Blend modes | 29 `BlendingMode` constants: 24 effect ids + 5 native (`NORMAL, SCREEN, MASK, CLIPPING_MASK, EXCLUDE`) | `BLEND_MODE_TABLE` (29) + `NATIVE_BLEND_MODES` (5) | ✅ `check_blend_modes.ts` |
+| Clipping mask binding | `clippingMask="true"` marks the layer **being clipped**; the layer above carries `blending="mask"` (or `"exclude"`) | `Layer.clippedToMask` + `blendMode`, kept separate through import and export | ✅ **O5 closed** — §9 |
 | XML **import** | `assets/hometab/beta_anim.xml` + dex attribute names | `amXmlCodec.ts:692` (`parseXmlLayer`), 59 attribute names read | ✅ imports the APK's own sample; 13/13 layers, gradients, nested scene, text |
 | XML **export** | AM writes `fillColor`, `gradient`, `path`, `stroke`, `shadow`, `effect`, `content`, `embedScene` | `amXmlCodec.ts:118`–`:377` | ✅ after F1 — `check_xml_roundtrip.ts` |
 | Fonts | `com.google.android.gms.fonts` tokens, `Roboto Black:…?weight=900` | `fontNames.ts` token codec + `check_font_match.ts` | ✅ gate PASS |
@@ -83,7 +86,7 @@ covers all ten layer types in one project.
 | media `src`, `speed`, `inTime`, `gain`, `muted`, `fillImage` | `:206`–`:233` | `:893`–`:948` |
 | `<gain>` for audio volume keyframes | `:340` | `:947` |
 | camera `fov`, `cameraType`, `fogEnabled`, `<fogColor>`, `<fogNearZ>`, `<fogFarZ>`, `<focusDistance>`, `<focusBlurStrength>` | `:348` | `:1000` |
-| `clippingMask="true"` + `blending="<xml id>"` | `:192` | `:974` |
+| `clippingMask="true"` (clipped layer) / `blending="mask"\|"exclude"` (clipper) | `:149`, `:150` | `:836`–`:910` |
 | `retime`, `cropMode` | `:196` | `:1082` |
 | nested `<scene width height bgcolor fps totalTime>` | `:369` | `:966` |
 | project `title width height exportWidth exportHeight bgcolor totalTime fps modifiedTime` + `<bookmark t>` | `:379` | `:1045`, `:1089` |
@@ -118,7 +121,7 @@ The two intentional normalisations:
 | **O2** | ~~XML spelling for stroke cap / join / dash~~ **CLOSED** | `EdgeDecorationKt.serialize` (jadx, classes7): tag is `path-stroke` (or `border` / `shadow` / `glow`), attributes `direction cap join start end end-size`, and `cap` / `join` / `start` / `end` are written **only** when they differ from the caller's default (butt / miter / none). Ids from `<clinit>`: `StrokeCap` = `butt round square`, `StrokeJoin` = `miter round bevel`, `StrokeEnd` = 13 ids from `none` to `teardrop-filled`. **There is no dash attribute** — the APK's edge decorations carry no dash, so the model's `dash` fields are web-only |
 | **O3** | `.amproj` export (project.xml **and** media bytes) | A scope decision — the writer half exists, the zip half does not |
 | **O4** | Nested-scene reference (`<embedScene>` as a *reference*, not a copy) | The A1 ticket in `FEATURE_GAPS_APK_VS_WEB.md` |
-| **O5** | Which layer a `clippingMask` binds to | Two-shape probe captured from AM at three frames |
+| **O5** | ~~Which layer a `clippingMask` binds to~~ **CLOSED — see §9** | Settled by a real shared project, not a probe: in `i1MwzBcB9D` the video carries `clippingMask="true"` and the rectangle above it carries `blending="mask"` |
 
 ---
 
@@ -161,13 +164,14 @@ Expected: `PASS` from all three `check_*` gates, `EFFECTS {"xml":315,"json":315}
 | PS-01 | Every modelled field survives `import(export(x))` across all ten layer types | ✅ |
 | PS-02 | `export(import(export(x)))` is byte-identical to `export(import(x))` | ✅ |
 | PS-03 | The APK's own `beta_anim.xml` survives export→import→export byte-stable | ✅ |
-| PS-04 | `clippingMask="true"` is emitted for mask/exclude; `blending="mask"` is never emitted | ✅ |
+| PS-04 | The clipper writes `blending="mask"` (or `blending="exclude"`); the clipped layer writes `clippingMask="true"` with no blend mode | ✅ |
 | PS-05 | Keframed effect params and their easing survive | ✅ |
 | PS-06 | Effect and preset corpora show zero drift | ✅ |
 | PS-07 | `tsc --noEmit` and `vite build` exit 0 | ✅ |
 | PS-08 | Stroke exports as `<path-stroke>` with AM's direction/cap/join ids, never as an invented `<stroke endType>` | ✅ |
 | PS-09 | Shadow alpha exports as `<opacity>`, offset as a keyable child | ✅ |
 | PS-10 | The text element writes only AM's five fields — no invented line-height or letter-spacing attribute | ✅ |
+| PS-11 | A clipped layer survives `import(export(x))` as `clippedToMask`, and the flag never lands on a clipper | ✅ |
 
 ---
 
@@ -209,3 +213,69 @@ Two consequences the exporter now honours:
 A keyable value in AM is `<tag value="…"/>` when unkeyed and `<tag><kf t v e s/></tag>` when keyed —
 already the shape this writer used. One small gap noted and left alone: AM can also write a `s`
 (smoothing) attribute on `<kf>`; the codec does not emit it because the model has no smoothing field.
+
+---
+
+## 9. O5, closed by a shared project (third pass)
+
+**Symptom.** Importing a shared link project and pressing play showed the mask *rectangle* where the
+video should be. The video was gone; the matte was on screen.
+
+**Ground truth.** Shared project `i1MwzBcB9D-df4e7c0a0523a237`
+(`share/u/A7E1PHfBOLbjchmAEUBK2IOSYu32/p/i1MwzBcB9D.../projectfiles.zip`, 7,040,080 bytes →
+`4801350B-54BD-4FF0-9371-3166CC342684.xml`, 75.7 KB):
+
+```xml
+<shape id="8"  startTime="0" endTime="633" fillType="media" clippingMask="true" s=".rect">   <!-- the video -->
+<shape id="13" startTime="0" endTime="633" fillType="color" blending="mask"    s=".rect">   <!-- Rectangle 1 -->
+```
+
+The same pair repeats in `Group 1` (`6`/`11`) and in the `Group and Mask 1 Copy` copies (`7`/`12`).
+Video first, clipper second — the clipper sits **above** the thing it clips and composites over the
+accumulated scene.
+
+**The reading.** `clippingMask` and `blending` are two attributes for two concepts, and the codec
+had them fused:
+
+| Attribute | On which layer | Meaning |
+| --- | --- | --- |
+| `clippingMask="true"` | the layer **being** clipped | a flag; it has no blend behaviour of its own |
+| `blending="mask"` | the **clipper** | this layer multiplies what is beneath it by its alpha |
+| `blending="exclude"` | the **clipper** | inverse mask |
+
+**What was wrong.** `parseXmlLayer` mapped `clippingMask="true"` onto `blendMode: 'mask'`, and the
+exporter derived the same attribute back out of the blend mode. So:
+
+1. the **video** became a clipper — it masked the scene by its own alpha instead of drawing;
+2. the **rectangle** was also a clipper, so its opaque alpha passed the scene through the matte,
+   and the rectangle's own fill was what you saw.
+
+That is exactly "the rectangle instead of the video".
+
+**The fix.**
+
+| File | Change |
+| --- | --- |
+| `src/types/project.ts` | `Layer.clippedToMask?: boolean` — the flag, separate from `blendMode` |
+| `src/engine/amXmlCodec.ts` | import stores `clippingMask` in `clippedToMask` and leaves `blendMode` to `blending`; export writes `clipFlag` from `clippedToMask \|\| 'clipping-mask' \|\| 'exclude'` |
+| `src/engine/blendModes.ts` | `isMaskBlendMode` is `mask` only; `blendModeToXml` maps `mask → "mask"`, `exclude → "exclude"`, `clipping-mask → null` |
+| `src/engine/renderer.ts:2297` | `clipping-mask` is no longer a mask composite — it draws normally |
+
+One normalisation falls out of the split: on a clipper the flag is redundant, because `blending`
+already identifies it. The importer therefore stores `clippedToMask` only when
+`blendMode ∉ {mask, exclude}`, which is what makes `export₂ == export₃` hold on real projects.
+
+**Verification.** Round-tripping the shared project's own XML:
+
+```
+original mask lines: 14  exported: 14
+re-imported: clipped layers=6  mask clippers=8  wrongly-masked=0
+```
+
+`scripts/audit/check_xml_roundtrip.ts` now covers it: the fixture carries a `clippedLayer`
+(video, `clippedToMask: true`), the canon includes `clippedToMask`, and PS-08…PS-11 assert the two
+attributes stay on their own layers. `beta_anim.xml` still round-trips byte-stable.
+
+**Still open on masks:** whether AM 5.0.280 treats `Screen` as a no-op needs a device capture, and a
+mask that is itself animated (a keyed matte) has not been compared frame-by-frame against a device
+recording. Neither blocks the fix above.

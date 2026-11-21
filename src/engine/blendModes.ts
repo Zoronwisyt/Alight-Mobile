@@ -2,27 +2,27 @@ import type { BlendModeId } from '../types/project';
 
 /**
  * The 29 `BlendingMode` enum constants of Alight Motion 5.0.280, in ordinal order.
- * Source: `com.alightcreative.app.motion.scene.BlendingMode.<clinit>` — see
- * PLAYBACK_PREVIEW_DECOMPILED.md §10. `xmlId` is the attribute value AM itself writes;
+ * Source: `com.alightcreative.app.motion.scene.BlendingMode.<clinit>` â€” see
+ * PLAYBACK_PREVIEW_DECOMPILED.md Â§10. `xmlId` is the attribute value AM itself writes;
  * `effectId` is the catalogue id, and it is NOT the CSS spelling.
  */
 export interface BlendModeDef {
   /** APK enum constant name. */
   constant: string;
-  /** Value AM writes into `blending="…"`. */
+  /** Value AM writes into `blending="â€¦"`. */
   xmlId: string;
   /**
    * Catalogue effect id, or `null` when the mode carries no `VisualEffectRef` and is therefore
    * composited inline by the renderer.
    *
    * Verified for 5.0.280 (`BlendingMode.<clinit>`): exactly five constants are built with a null
-   * `blendEffect` — NORMAL, SCREEN, MASK, CLIPPING_MASK, EXCLUDE. The other 24 each name an asset
+   * `blendEffect` â€” NORMAL, SCREEN, MASK, CLIPPING_MASK, EXCLUDE. The other 24 each name an asset
    * in `assets/effects/blend-*.xml`, and `public/am/effects.json` carries all 24. `SUBTRACT` is the
    * one whose id is not a plain dex string literal (its clinit reads an obfuscated static field);
    * `assets/effects/blend-subtract.xml` exists, so it is wired and treated as an effect mode.
    */
   effectId: BlendModeId | null;
-  /** APK `usesBackingStore` — the group needs an offline buffer before compositing. */
+  /** APK `usesBackingStore` â€” the group needs an offline buffer before compositing. */
   backingStore: boolean;
   label: string;
   group: BlendGroupName;
@@ -74,7 +74,7 @@ export const BLEND_MODE_TABLE: readonly BlendModeDef[] = [
  * `BlendingMode.<clinit>` builds exactly these five constants with `blendEffect = null`, so
  * `getBlendEffect()` returns null, `renderWithEffectsInternal` injects no `VisualEffectRef`, and
  * the layer reaches the compositor unshaded. `mask` / `clipping-mask` / `exclude` resolve through
- * the stencil pass, `normal` is a premultiplied `over`, and `screen` needs a real blend pass —
+ * the stencil pass, `normal` is a premultiplied `over`, and `screen` needs a real blend pass â€”
  * which is why it is listed here rather than mapped to `com.alightcreative.blend.screen`, an id
  * that does not exist anywhere in the APK.
  */
@@ -120,7 +120,7 @@ const LEGACY_ALIASES: Record<string, BlendModeId> = {
 };
 
 /**
- * Resolve any spelling of a blend mode — AM xml id, catalogue effect id, or legacy web id —
+ * Resolve any spelling of a blend mode â€” AM xml id, catalogue effect id, or legacy web id â€”
  * into the canonical `BlendModeId`. Unknown input resolves to `'normal'`, never to an id the
  * catalogue cannot render.
  */
@@ -143,21 +143,27 @@ export function canonicalizeBlendMode(raw: string | null | undefined): BlendMode
 }
 
 /**
- * Value to write into `blending="…"`. AM writes the hyphenated xml id, never the effect id.
- * Returns `null` for `normal` (attribute omitted) and for the two mask dialects, which the
- * exporter emits as `clippingMask="true"` instead.
+ * Value to write into `blending="â€¦"`. AM writes the hyphenated xml id, never the effect id.
+ * Returns `null` for `normal` (attribute omitted) and for `clipping-mask`, which is not a blend mode
+ * at all: it is the `clippingMask="true"` flag on the layer BEING clipped. Only the clipper writes
+ * `blending="mask"` or `blending="exclude"`.
  */
 export function blendModeToXml(id: BlendModeId): string | null {
-  if (id === 'normal' || id === 'mask' || id === 'clipping-mask') return null;
+  if (id === 'normal' || id === 'clipping-mask') return null;
+  if (id === 'mask') return 'mask';
   if (id === 'exclude') return 'exclude';
   const canonical = canonicalizeBlendMode(id);
   const def = BLEND_MODE_TABLE.find((d) => (d.effectId ?? d.xmlId) === canonical);
   return def ? def.xmlId : null;
 }
 
-/** True when the mode renders as a mask composite rather than a colour blend. */
+/**
+ * True when the mode clips what is beneath it. `clipping-mask` is excluded on purpose: it names the
+ * layer that gets clipped, and treating it as a clipper is what broke shared project i1MwzBcB9D —
+ * the video masked the scene and the clipping rectangle showed through.
+ */
 export function isMaskBlendMode(id: BlendModeId): boolean {
-  return id === 'mask' || id === 'clipping-mask';
+  return id === 'mask';
 }
 
 /** True when the APK asks for an offline group buffer before compositing. */

@@ -261,6 +261,14 @@ export interface Layer {
   locked: boolean;
   /** Enables native 3D X/Y/Z rotations and 3D parenting inheritance with 3D Nulls */
   is3D?: boolean;
+  /**
+   * AM's `clippingMask="true"` flag. It marks the layer that is *being* clipped by a following
+   * `blending="mask"` layer — it is not a blend mode of its own. Injected from the shared project
+   * `i1MwzBcB9D`, where the video carries `clippingMask="true"` and the rectangle that clips it
+   * carries `blending="mask"`; treating the flag as a blend mode made the video mask the scene and
+   * the rectangle show through unmasked.
+   */
+  clippedToMask?: boolean;
   parentId: string | null;
   blendMode: BlendModeId;
   opacity: Animatable<number>;

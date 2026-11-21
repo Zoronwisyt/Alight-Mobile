@@ -2293,9 +2293,11 @@ export class AlightRenderer {
       currentSlot = croppedFbo;
     }
 
-    // Step 3: Composite onto Scene FBO (Mask / Clipping Mask / Exclude / 26 APK Blend Modes / Normal)
+    // Step 3: Composite onto Scene FBO (Mask / Exclude / 26 APK Blend Modes / Normal)
+    // `clipping-mask` is deliberately absent: it means "this layer is the one being clipped" and
+    // must draw normally, letting the following `blending="mask"` layer do the clipping.
     const blendId = canonicalizeBlendMode(layer.blendMode);
-    if (blendId === 'mask' || blendId === 'clipping-mask' || blendId === 'exclude') {
+    if (blendId === 'mask' || blendId === 'exclude') {
       const outFbo = this.acquireFbo(renderW, renderH);
       const gl = this.gl;
       gl.bindFramebuffer(gl.FRAMEBUFFER, outFbo.fbo);

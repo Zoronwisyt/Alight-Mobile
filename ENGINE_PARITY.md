@@ -222,6 +222,25 @@ dispute, or sign off.
   `import(export(x))`, `export₂ == export₃`, and the APK's own `beta_anim.xml` must survive
   export→import→export byte-stable. ✅ passing.
 
+### P0-09 · A clipping mask was read as the thing being clipped
+*(added v1.6, 2026-11-21 — fixed in the same pass)*
+
+- **Where (web):** `src/engine/amXmlCodec.ts:836` mapped `clippingMask="true"` onto
+  `blendMode: 'mask'`, and `src/engine/renderer.ts:2300` composited `clipping-mask` as a mask.
+- **Where (APK):** a real shared project (`i1MwzBcB9D`, exported
+  `4801350B-54BD-4FF0-9371-3166CC342684.xml`) puts the two attributes on two different layers:
+  the video carries `clippingMask="true"` and the rectangle above it carries `blending="mask"`.
+- **Consequence:** the clipped video was treated as a clipper and masked the scene by its own alpha,
+  so it vanished, while the matte rectangle composited over an untouched scene. The user saw the
+  rectangle where the video should be.
+- **Fix:** `Layer.clippedToMask` holds the flag, `blendMode` holds `blending`; the exporter writes
+  `<clipped> clippingMask="true"` and `<clipper> blending="mask"|"exclude"`; `isMaskBlendMode` no
+  longer claims `clipping-mask`; the renderer draws a clipped layer normally. On a clipper the flag
+  is redundant, so it is only stored for layers that are themselves clipped — that is what makes
+  `export₂ == export₃` hold on real projects.
+- **Acceptance:** shared project round-trips 14/14 mask lines; re-import reports
+  `clipped=6 clippers=8 wrongly-masked=0`; PS-11 in `PARITY_SWEEP_5.0.280.md` §9. ✅ passing.
+
 ## 3. P1 — capability gaps that change what the app can do
 
 ### P1-01 · `env.editMode` is hardcoded; selection state is wired in one of two script call sites
@@ -338,9 +357,10 @@ regression, because a mode that silently renders as Normal is the reported bug.
 - 24 modes carry a `com.alightcreative.blend.*` id and are drawn through
   `registry.getEffectProgram(def)` sampling `comp` (the scene FBO) as a uniform — matching
   `blend-*.xml`, whose params are `inputImg` (`srcType="content"`) and `comp` (`srcType="comp"`).
-- 5 modes are in `NATIVE_BLEND_MODES` and never touch `effects.json`: `mask` / `clipping-mask` /
-  `exclude` via the stencil-style `MASK_FRAG` pass, `normal` via premultiplied `over`, `screen` via
-  `SCREEN_FRAG` + `COMPOSITE_BLEND_FRAG`.
+- 5 modes are in `NATIVE_BLEND_MODES` and never touch `effects.json`: `mask` / `exclude` via the
+  stencil-style `MASK_FRAG` pass, `normal` via premultiplied `over`, `screen` via `SCREEN_FRAG` +
+  `COMPOSITE_BLEND_FRAG`. `clipping-mask` is the fifth native constant but has no composite of its
+  own — it names the layer being clipped, so it draws normally (see P0-09).
 - A table row that names an id the catalogue does not carry now logs once instead of silently blitting:
   that fallback is exactly how Screen was rendering as Normal.
 
@@ -541,6 +561,23 @@ Sequenced so every fix is **verifiable before the next** one lands, and so nothi
 ---
 
 ## Changelog
+
+**v1.6 (2026-11-21)** — P0-09: the clipping-mask binding, closed by a real shared project.
+- `clippingMask="true"` is a **flag on the layer being clipped**, not a blend mode. The clipper is a
+  separate layer above it carrying `blending="mask"` (or `"exclude"`). Importing shared project
+  `i1MwzBcB9D` proved it: video `id="8"` has the flag, rectangle `id="13"` has `blending="mask"`.
+- The codec had the two fused, so the clipped video masked the scene and the matte rectangle showed
+  through — "the rectangle instead of the video".
+- **Model:** `Layer.clippedToMask?: boolean`, stored only when `blendMode ∉ {mask, exclude}` (on a
+  clipper the flag is redundant, so the round trip settles).
+- **Codec:** import reads the flag separately; export writes `clippingMask="true"` from
+  `clippedToMask || 'clipping-mask' || 'exclude'` and `blending="mask"|"exclude"` from the blend mode.
+- **Renderer:** `clipping-mask` is no longer a mask composite; only `mask` and `exclude` composite.
+  `isMaskBlendMode` returns true for `mask` alone; `blendModeToXml('mask')` now returns `"mask"`.
+- Gate extended with PS-11 and a `clippedLayer` fixture; the shared project round-trips 14/14 mask
+  lines and re-imports with `clipped=6 clippers=8 wrongly-masked=0`. See `PARITY_SWEEP_5.0.280.md` §9.
+- Still open: whether AM 5.0.280 treats `Screen` as a no-op (needs a device capture), and a keyed
+  matte has not been compared frame-by-frame against a device recording.
 
 **v1.5 (2026-11-21)** — O1 and O2 closed by reading the serializer.
 - **O1 closed — no spelling exists.** `TextElementTypeImpl.serialize` writes `size`, `font`, `wrapWidth`,

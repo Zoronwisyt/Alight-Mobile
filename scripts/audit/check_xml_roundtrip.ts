@@ -2,10 +2,10 @@
 //
 // What this proves: import(export(project)) carries every field the codec claims to model, and
 // export(import(export(project))) is byte-identical to the first export. Before this gate the
-// exporter emitted only transform, text content, camera fov and effects — every shape path,
+// exporter emitted only transform, text content, camera fov and effects â€” every shape path,
 // stroke, shadow, gradient, media reference and audio gain was dropped on save.
 //
-// Run: esbuild → node, same as scripts/audit/check_blend_modes.ts.
+// Run: esbuild â†’ node, same as scripts/audit/check_blend_modes.ts.
 //   node check_xml_roundtrip.mjs
 // Optional argument: path to a real AM XML (e.g. the APK's assets/hometab/beta_anim.xml) for the
 // same byte-stability check against a file the port did not produce.
@@ -169,6 +169,19 @@ const shapeLayer = makeLayer({
 });
 
 const maskLayer = makeLayer({ id: 'mask-1', type: 'shape', label: 'Matte', blendMode: 'mask' });
+const clippedLayer = makeLayer({
+  id: 'clipped-1',
+  type: 'video',
+  label: 'Clipped clip',
+  clippedToMask: true,
+  mediaData: {
+    mediaId: 'media_vid_1',
+    src: 'blob:fixture/vid',
+    naturalWidth: 1280,
+    naturalHeight: 720,
+    durationMs: 6000,
+  },
+});
 const excludeLayer = makeLayer({ id: 'exclude-1', type: 'shape', label: 'Exclude', blendMode: 'exclude' });
 
 const hidden3D = makeLayer({
@@ -331,6 +344,7 @@ const FIXTURE: Project = {
   layers: [
     shapeLayer,
     maskLayer,
+    clippedLayer,
     excludeLayer,
     hidden3D,
     textLayer,
@@ -365,6 +379,7 @@ function canon(layer: Layer): any {
     endTime: layer.endTime,
     visible: layer.visible,
     is3D: layer.is3D ?? false,
+    clippedToMask: layer.clippedToMask ?? false,
     parentId: layer.parentId,
     blendMode: layer.blendMode,
     retime: layer.retime?.method ?? 'none',
@@ -541,7 +556,13 @@ check('stroke exports as AM path-stroke with direction, cap and join', xml1.incl
 check('stroke children stay keyable', xml1.includes('<size value="6.000000"/>'));
 check('shadow exports its alpha as opacity', xml1.includes('<opacity value="0.450000"/>'), xml1.match(/<shadow[^>]*>[\s\S]{0,200}/)?.[0]);
 check('shadow offset is a keyable child, never an attribute', xml1.includes('<offset value="5.000000,-7.000000"/>'));
-check('mask exports as clippingMask, never blending="mask"', xml1.includes('clippingMask="true"') && !xml1.includes('blending="mask"'));
+// AM keeps the two mask concepts on separate attributes: the clipper carries blending="mask", and
+// the layer being clipped carries clippingMask="true" with no blending at all. Conflating them made
+// the clipped video render as a mask and the clipper's rectangle show through (shared project
+// i1MwzBcB9D). See PARITY_SWEEP_5.0.280.md Â§9.
+check('clipper writes blending="mask"', xml1.includes('blending="mask"'), xml1.match(/blending="mask"[^>]*/)?.[0]);
+check('clipper does not carry the clippingMask flag', !/<shape[^>]*clippingMask="true"[^>]*blending="mask"/.test(xml1));
+check('clipped layer writes clippingMask="true" without a blend mode', /<video[^>]*clippingMask="true"[^>]*>/.test(xml1), xml1.match(/<video[^>]*>/)?.[0]);
 check('exclude exports as clippingMask plus blending="exclude"', /clippingMask="true"[^>]*blending="exclude"/.test(xml1));
 check('blend id is hyphenated XML, not the effect id', xml1.includes('blending="multiply"'), xml1.match(/blending="[^"]*"/g)?.slice(0, 4));
 check('hidden layer keeps hidden="true"', xml1.includes('hidden="true"'));
