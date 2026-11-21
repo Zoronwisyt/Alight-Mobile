@@ -29,7 +29,7 @@ import { playbackClock } from './playbackClock';
 
 export type AppScreen = 'home' | 'editor';
 export type HomeTab = 'home' | 'tutorials' | 'projects' | 'elements';
-export type PreviewQuality = 1 | 0.75 | 0.5 | 0.25;
+export type PreviewQuality = 1 | 0.75 | 0.5 | 0.25 | 0.125;
 export type InspectorTab =
   | 'none'
   | 'menu'

@@ -13,6 +13,7 @@ const PREVIEW_QUALITY_OPTIONS: { q: PreviewQuality; label: string; short: string
   { q: 0.75, label: 'High Quality (3/4)', short: '3/4' },
   { q: 0.5, label: 'Half Quality (1/2)', short: '1/2' },
   { q: 0.25, label: 'Quarter Quality (1/4)', short: '1/4' },
+  { q: 0.125, label: 'Ultra-Fast Draft (1/8)', short: '1/8' },
 ];
 
 interface PreviewCanvasProps {
@@ -850,11 +851,11 @@ export const PreviewCanvas: React.FC<PreviewCanvasProps> = ({
         style={{ left: selectedLayerIds.length > 0 ? 58 : undefined }}
         onPointerDown={(e) => e.stopPropagation()}
         onClick={() => {
-          const order: PreviewQuality[] = [1, 0.75, 0.5, 0.25];
+          const order: PreviewQuality[] = [1, 0.75, 0.5, 0.25, 0.125];
           const idx = order.indexOf(previewQuality);
           setPreviewQuality(order[(idx + 1) % order.length]);
         }}
-        title="Tap to cycle Preview Quality (Full → 3/4 → 1/2 → 1/4)"
+        title="Tap to cycle Preview Quality (Full → 3/4 → 1/2 → 1/4 → 1/8)"
       >
         <span>{PREVIEW_QUALITY_OPTIONS.find((o) => o.q === previewQuality)?.short ?? '3/4'}</span>
         <strong>

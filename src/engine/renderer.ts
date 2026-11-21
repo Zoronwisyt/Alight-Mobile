@@ -1392,7 +1392,7 @@ export class AlightRenderer {
     const maxTexDim = this.mobileRender && this.isIos ? 2048 : 4096;
     const texCap = maxTexDim / maxDim;
     const capped = Math.min(previewScale || 1, 1.0);
-    return Math.max(0.25, Math.min(capped, perFrameCap, texCap));
+    return Math.max(0.1, Math.min(capped, perFrameCap, texCap));
   }
 
   private clearOffscreenVideos(): void {
@@ -1704,9 +1704,9 @@ export class AlightRenderer {
       const isOverloadedMobile =
         this.mobileRender && this.isPlaybackActive && this.mobilePlaybackOverloaded;
       const activeScale = isInteractiveMobile
-        ? Math.max(0.25, Math.min(pbScale, this.isIos ? 0.42 : 0.5))
+        ? Math.min(pbScale, Math.max(0.125, this.isIos ? 0.42 : 0.5))
         : isOverloadedMobile
-          ? Math.max(0.25, pbScale * 0.65)
+          ? Math.min(pbScale, Math.max(0.125, pbScale * 0.65))
           : pbScale;
       const rw = Math.max(16, Math.round(project.width * activeScale));
       const rh = Math.max(16, Math.round(project.height * activeScale));
