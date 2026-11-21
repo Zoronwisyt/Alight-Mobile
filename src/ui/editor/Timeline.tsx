@@ -4,7 +4,7 @@ import { canonicalizeBlendMode } from '../../engine/blendModes';
 import { replaceMediaOnLayers } from '../../engine/mediaReplace';
 import { snapTimelineMs } from '../../engine/snapping';
 import type { AlightRenderer } from '../../engine/renderer';
-import { useEditorStore } from '../../store/useEditorStore';
+import { resolveActiveGroup, useEditorStore } from '../../store/useEditorStore';
 import type { Layer } from '../../types/project';
 import { AmIcon } from '../components/AmIcon';
 
@@ -127,11 +127,11 @@ export const Timeline: React.FC<TimelineProps> = ({
   const [showCacheMenu, setShowCacheMenu] = useState(false);
   const [trackViewportW, setTrackViewportW] = useState(600);
 
-  // Compute merged color runs for the AE-style preview RAM cache bar
+  // Compute merged color runs for the AE-style preview RAM cache bar (root scene only)
   const cacheRuns = useMemo(() => {
     void cacheVersion;
     const renderer = rendererRef?.current;
-    if (!renderer || !currentProject) return [] as { startPct: number; widthPct: number; state: number }[];
+    if (!renderer || !currentProject || groupStack.length > 0) return [] as { startPct: number; widthPct: number; state: number }[];
     const totalFrames = Math.max(1, Math.ceil((currentProject.durationMs / 1000) * Math.max(1, currentProject.fps)));
     const map = renderer.getCachedFrameMap(totalFrames, previewQuality);
     const runs: { startPct: number; widthPct: number; state: number }[] = [];
@@ -150,7 +150,7 @@ export const Timeline: React.FC<TimelineProps> = ({
       i = j;
     }
     return runs;
-  }, [rendererRef, currentProject, previewQuality, cacheVersion]);
+  }, [rendererRef, currentProject, groupStack.length, previewQuality, cacheVersion]);
 
   // R-1: Restore persisted timeline height from localStorage
   useEffect(() => {
@@ -179,9 +179,11 @@ export const Timeline: React.FC<TimelineProps> = ({
   }, [currentProject?.id]);
 
   if (!currentProject) return null;
+  const activeGroup = resolveActiveGroup(currentProject, groupStack);
+  const activeDurationMs = activeGroup.durationMs;
   const layers = getActiveLayers();
-  const totalSec = Math.max(2, currentProject.durationMs / 1000 + 1);
-  const trackWidth = Math.max(900, Math.round(totalSec * timelinePxPerSec));
+  const totalSec = Math.max(1, activeDurationMs / 1000 + 0.5);
+  const trackWidth = Math.max(400, Math.round(totalSec * timelinePxPerSec));
   const centreX = trackViewportW * 0.5;
   const contentOffset = centreX - (currentTimeMs / 1000) * timelinePxPerSec;
 
@@ -221,8 +223,8 @@ export const Timeline: React.FC<TimelineProps> = ({
     let lastMs = startTimeMs;
     setIsPlaying(false);
 
-    // Pre-collect timeline snap targets: layer starts/ends, bookmarks, project bounds, selected layer keyframes
-    const snapTargets: number[] = [0, currentProject.durationMs];
+    // Pre-collect timeline snap targets: layer starts/ends, bookmarks, scope bounds, selected layer keyframes
+    const snapTargets: number[] = [0, activeDurationMs];
     for (const l of layers) {
       snapTargets.push(l.startTime, l.endTime);
     }
@@ -242,7 +244,7 @@ export const Timeline: React.FC<TimelineProps> = ({
     const onMove = (ev: PointerEvent) => {
       const dx = ev.clientX - startX;
       if (Math.abs(dx) > 3) moved = true;
-      const rawMs = Math.max(0, Math.min(currentProject.durationMs, startTimeMs - (dx / timelinePxPerSec) * 1000));
+      const rawMs = Math.max(0, Math.min(activeDurationMs, startTimeMs - (dx / timelinePxPerSec) * 1000));
       if (snapEnabled && !ev.altKey) {
         lastMs = snapTimelineMs(rawMs, snapTargets, snapThresholdMs).ms;
       } else {
@@ -275,7 +277,7 @@ export const Timeline: React.FC<TimelineProps> = ({
     } else if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
       e.preventDefault();
       setIsPlaying(false);
-      const nextMs = Math.max(0, Math.min(currentProject.durationMs, currentTimeMs + (e.deltaX / timelinePxPerSec) * 1000));
+      const nextMs = Math.max(0, Math.min(activeDurationMs, currentTimeMs + (e.deltaX / timelinePxPerSec) * 1000));
       setCurrentTimeMs(nextMs);
     }
   };
@@ -288,7 +290,7 @@ export const Timeline: React.FC<TimelineProps> = ({
     const origStart = layer.startTime;
     const origEnd = layer.endTime;
 
-    const snapTargets: number[] = [0, currentProject.durationMs, currentTimeMs];
+    const snapTargets: number[] = [0, activeDurationMs, currentTimeMs];
     for (let i = 0; i < layers.length; i++) {
       if (i === layerIdx) continue;
       snapTargets.push(layers[i].startTime, layers[i].endTime);
@@ -443,7 +445,7 @@ export const Timeline: React.FC<TimelineProps> = ({
                 position: 'absolute',
                 left: 0,
                 top: 0,
-                width: (currentProject.durationMs / 1000) * timelinePxPerSec,
+                width: (activeDurationMs / 1000) * timelinePxPerSec,
                 height: 4,
                 background: 'rgba(255, 95, 115, 0.22)',
                 cursor: 'pointer',

@@ -863,11 +863,24 @@ export class AlightRenderer {
     }
   }
 
-  public syncVideosForPlayback(project: Project, sceneTimeMs: number, isPlaying: boolean): void {
+  public syncVideosForPlayback(
+    project: Project,
+    sceneTimeMs: number,
+    isPlaying: boolean,
+    activeGroupStack?: string[]
+  ): void {
     this.isPlaybackActive = isPlaying;
     const activeKeys = new Set<string>();
     const items: { layer: Layer; localTimeMs: number; parentTimeMs: number }[] = [];
-    this.collectActiveMediaLayers(project.layers, sceneTimeMs, items);
+    let rootLayers = project.layers;
+    if (activeGroupStack && activeGroupStack.length > 0) {
+      for (const gid of activeGroupStack) {
+        const grp = rootLayers.find((l) => l.id === gid && l.type === 'group');
+        if (!grp) break;
+        rootLayers = grp.groupLayers ?? [];
+      }
+    }
+    this.collectActiveMediaLayers(rootLayers, sceneTimeMs, items);
 
     for (const { layer, localTimeMs, parentTimeMs } of items) {
       if (layer.type !== 'video' || !layer.mediaData?.src) continue;
@@ -1378,6 +1391,30 @@ export class AlightRenderer {
     this.usedVideoSrcsThisFrame.clear();
     this.hadStaleVideoThisFrame = false;
 
+    // Resolve isolated group scope when inside Edit Group (renders only the group's children in its own dimensions & local time)
+    const hasGroupIsolation = Boolean(options.activeGroupStack && options.activeGroupStack.length > 0);
+    let activeProject = project;
+    if (hasGroupIsolation && options.activeGroupStack) {
+      let list = project.layers;
+      let isolatedGroup: Layer | null = null;
+      for (const gid of options.activeGroupStack) {
+        const grp = list.find((l) => l.id === gid && l.type === 'group');
+        if (!grp) break;
+        isolatedGroup = grp;
+        list = grp.groupLayers ?? [];
+      }
+      if (isolatedGroup) {
+        const gw = isolatedGroup.groupWidth || project.width;
+        const gh = isolatedGroup.groupHeight || project.height;
+        activeProject = {
+          ...project,
+          width: gw,
+          height: gh,
+          layers: isolatedGroup.groupLayers ?? [],
+        };
+      }
+    }
+
     let renderW: number;
     let renderH: number;
     let scale: number;
@@ -1385,31 +1422,30 @@ export class AlightRenderer {
     if (isExport) {
       renderW = Math.max(16, Math.round(options.renderWidth!));
       renderH = Math.max(16, Math.round(options.renderHeight!));
-      scale = renderW / Math.max(1, project.width);
+      scale = renderW / Math.max(1, activeProject.width);
     } else {
       const q = options.previewScale ?? 1;
       const dpr = typeof window !== 'undefined' ? Math.min(window.devicePixelRatio || 1, 2) : 1;
-      const maxDim = Math.max(project.width, project.height);
+      const maxDim = Math.max(activeProject.width, activeProject.height);
       const effectiveScale = Math.min(q * dpr, 4096 / Math.max(1, maxDim));
       scale = effectiveScale;
-      renderW = Math.max(16, Math.round(project.width * scale));
-      renderH = Math.max(16, Math.round(project.height * scale));
+      renderW = Math.max(16, Math.round(activeProject.width * scale));
+      renderH = Math.max(16, Math.round(activeProject.height * scale));
     }
 
     // Never reallocate the drawing buffer mid-playback (prevents blank-frame flash on quality/DPR changes)
     if (this.canvas.width !== renderW || this.canvas.height !== renderH) {
-      if (!this.isPlaybackActive || this.canvas.width === 0 || this.canvas.height === 0 || isExport) {
+      if (!this.isPlaybackActive || this.canvas.width === 0 || this.canvas.height === 0 || isExport || hasGroupIsolation) {
         this.canvas.width = renderW;
         this.canvas.height = renderH;
       } else {
         renderW = this.canvas.width;
         renderH = this.canvas.height;
-        scale = renderW / Math.max(1, project.width);
+        scale = renderW / Math.max(1, activeProject.width);
       }
     }
 
     // Only bypass cache inside nested group isolation view or exports; selection overlay is DOM-only so playback still hits cache
-    const hasGroupIsolation = Boolean(options.activeGroupStack && options.activeGroupStack.length > 0);
     const cacheEligible = Boolean(options.useCache) && !isExport && !hasGroupIsolation;
     if (cacheEligible) {
       const pbScale = this.syncCacheEpoch(project, options.previewScale ?? 1);
@@ -1449,8 +1485,8 @@ export class AlightRenderer {
     this.clearFbo(sceneFbo, renderW, renderH, br * ba, bg * ba, bb * ba, ba);
 
     this.renderLayerList(
-      project,
-      project.layers,
+      activeProject,
+      activeProject.layers,
       sceneTimeMs,
       sceneFbo,
       renderW,
@@ -3207,10 +3243,14 @@ export class AlightRenderer {
     layout.lines.forEach((lineObj, li) => {
       const y = yStart + li * lineH;
       const { chars, widths, lineW } = lineObj;
-      let cursorX = td.align === 'left' ? -td.wrapWidth * 0.5 : td.align === 'right' ? td.wrapWidth * 0.5 - lineW : -lineW * 0.5;
+      // If a single unbroken line exceeds wrapWidth (e.g. wider fallback font or letterspacing),
+      // scale it down uniformly so the rendered text stays inside wrapWidth * transform.scale.
+      const lineFitScale = Number.isFinite(wrapMax) && lineW > wrapMax && lineW > 0 ? wrapMax / lineW : 1;
+      const fittedW = lineW * lineFitScale;
+      let cursorX = td.align === 'left' ? -td.wrapWidth * 0.5 : td.align === 'right' ? td.wrapWidth * 0.5 - fittedW : -fittedW * 0.5;
 
       chars.forEach((ch, ci) => {
-        const cw = widths[ci];
+        const cw = widths[ci] * lineFitScale;
         const cx = cursorX + cw * 0.5;
         cursorX += cw;
 
@@ -3282,7 +3322,8 @@ export class AlightRenderer {
         ctx.globalAlpha *= alpha;
         ctx.translate(cx + dx, y + dy);
         if (rot !== 0) ctx.rotate((rot * Math.PI) / 180);
-        if (sc !== 1) ctx.scale(sc, sc);
+        const finalSc = sc * lineFitScale;
+        if (finalSc !== 1) ctx.scale(finalSc, finalSc);
         ctx.fillStyle = fillCol;
         ctx.fillText(ch, 0, 0);
         if (layer.stroke.enabled) {

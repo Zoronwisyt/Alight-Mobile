@@ -4,7 +4,7 @@ import { evalAnimatable, evalRemappedTime } from '../../engine/animation';
 import { snapLayerPosition } from '../../engine/snapping';
 import { getShapeById, parseDefaultParamValue } from '../../engine/catalog';
 import { evaluateShapeHandles } from '../../engine/scriptRuntime';
-import { useEditorStore, type PreviewQuality } from '../../store/useEditorStore';
+import { resolveActiveGroup, useEditorStore, type PreviewQuality } from '../../store/useEditorStore';
 import { AmIcon } from '../components/AmIcon';
 import { LayerQuickActions } from './LayerQuickActions';
 
@@ -113,7 +113,11 @@ export const PreviewCanvas: React.FC<PreviewCanvasProps> = ({
     };
   }, [onVisibilityPauseChange]);
 
-  // Fit project aspect cleanly inside stage container
+  const activeScope = currentProject ? resolveActiveGroup(currentProject, groupStack) : null;
+  const activeW = activeScope?.width ?? currentProject?.width ?? 1080;
+  const activeH = activeScope?.height ?? currentProject?.height ?? 1080;
+
+  // Fit project (or isolated group) aspect cleanly inside stage container
   useEffect(() => {
     const el = wrapRef.current;
     if (!el || !currentProject) return;
@@ -122,7 +126,7 @@ export const PreviewCanvas: React.FC<PreviewCanvasProps> = ({
       const rightPad = viewModeOpen ? 68 : 28;
       const padW = Math.max(110, r.width - rightPad);
       const padH = Math.max(110, r.height - 24);
-      const asp = currentProject.width / Math.max(1, currentProject.height);
+      const asp = activeW / Math.max(1, activeH);
       let w = padW;
       let h = w / asp;
       if (h > padH) {
@@ -135,20 +139,20 @@ export const PreviewCanvas: React.FC<PreviewCanvasProps> = ({
     const ro = new ResizeObserver(compute);
     ro.observe(el);
     return () => ro.disconnect();
-  }, [currentProject?.width, currentProject?.height, viewModeOpen]);
+  }, [activeW, activeH, currentProject, viewModeOpen]);
 
   if (!currentProject) return null;
 
   const layers = getActiveLayers();
   const singleLayer = selectedLayerIds.length === 1 ? layers.find((l) => l.id === selectedLayerIds[0]) : undefined;
-  const projScale = stageSize.w / Math.max(1, currentProject.width);
+  const projScale = stageSize.w / Math.max(1, activeW);
 
   const clientToProject = (clientX: number, clientY: number): [number, number] => {
     const canvas = canvasRef.current;
     if (!canvas) return [0, 0];
     const r = canvas.getBoundingClientRect();
-    const px = ((clientX - r.left) / r.width) * currentProject.width;
-    const py = ((clientY - r.top) / r.height) * currentProject.height;
+    const px = ((clientX - r.left) / r.width) * activeW;
+    const py = ((clientY - r.top) / r.height) * activeH;
     return [px, py];
   };
 

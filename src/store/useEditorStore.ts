@@ -75,6 +75,8 @@ interface EditorState {
 
   // Group drill-down stack (layer IDs of nested groups)
   groupStack: string[];
+  // Saved parent playhead positions for each entered group depth
+  groupTimeStack: number[];
 
   // History
   past: HistoryEntry[];
@@ -233,6 +235,47 @@ function getLayersRef(proj: Project, groupStack: string[]): Layer[] {
     list = grp.groupLayers;
   }
   return list;
+}
+
+export interface ActiveGroupContext {
+  groupLayer: Layer | null;
+  layers: Layer[];
+  durationMs: number;
+  width: number;
+  height: number;
+}
+
+/**
+ * Resolves the currently active timeline scope (root project or innermost entered group).
+ * Inside Edit Group, duration is the group's own span (endTime - startTime) and canvas
+ * dimensions are the group's embedScene width/height.
+ */
+export function resolveActiveGroup(proj: Project, groupStack: string[]): ActiveGroupContext {
+  let list = proj.layers;
+  let activeGroup: Layer | null = null;
+  for (const gid of groupStack) {
+    const grp = list.find((l) => l.id === gid && l.type === 'group');
+    if (!grp) break;
+    activeGroup = grp;
+    list = grp.groupLayers ?? [];
+  }
+  if (!activeGroup) {
+    return {
+      groupLayer: null,
+      layers: proj.layers,
+      durationMs: proj.durationMs,
+      width: proj.width,
+      height: proj.height,
+    };
+  }
+  const groupSpan = Math.max(100, Math.round(activeGroup.endTime - activeGroup.startTime));
+  return {
+    groupLayer: activeGroup,
+    layers: activeGroup.groupLayers ?? [],
+    durationMs: groupSpan,
+    width: activeGroup.groupWidth || proj.width,
+    height: activeGroup.groupHeight || proj.height,
+  };
 }
 
 export function getAnimatableByTarget(layer: Layer, t: ActiveCurveTarget): Animatable<any> | null {
@@ -402,6 +445,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   activeProjectId: null,
   currentProject: null,
   groupStack: [],
+  groupTimeStack: [],
   past: [],
   future: [],
   selectedLayerIds: [],
@@ -537,6 +581,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       activeProjectId: id,
       currentProject: cloneProj(p),
       groupStack: [],
+      groupTimeStack: [],
       past: [],
       future: [],
       selectedLayerIds: [],
@@ -571,6 +616,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       activeProjectId: proj.id,
       currentProject: cloneProj(proj),
       groupStack: [],
+      groupTimeStack: [],
       past: [],
       future: [],
       selectedLayerIds: [],
@@ -600,6 +646,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       activeProjectId: proj.id,
       currentProject: cloneProj(proj),
       groupStack: [],
+      groupTimeStack: [],
       past: [],
       future: [],
       selectedLayerIds: [],
@@ -779,19 +826,42 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   clearSelection: () => set({ selectedLayerIds: [], inspectorTab: 'none', activeEffectUid: null, curveTarget: null }),
 
   enterGroup: (groupLayerId) => {
-    set((s) => ({
-      groupStack: [...s.groupStack, groupLayerId],
-      selectedLayerIds: [],
-      inspectorTab: 'none',
-    }));
+    set((s) => {
+      if (!s.currentProject) return {};
+      const activeList = getLayersRef(s.currentProject, s.groupStack);
+      const grp = activeList.find((l) => l.id === groupLayerId && l.type === 'group');
+      if (!grp) return {};
+      const groupDur = Math.max(100, Math.round(grp.endTime - grp.startTime));
+      const inSpan = s.currentTimeMs >= grp.startTime && s.currentTimeMs <= grp.endTime;
+      const localMs = inSpan ? Math.max(0, Math.min(groupDur, s.currentTimeMs - grp.startTime)) : 0;
+      return {
+        groupStack: [...s.groupStack, groupLayerId],
+        groupTimeStack: [...s.groupTimeStack, s.currentTimeMs],
+        currentTimeMs: localMs,
+        isPlaying: false,
+        selectedLayerIds: [],
+        inspectorTab: 'none',
+        curveTarget: null,
+      };
+    });
   },
 
   exitGroup: (depth) => {
-    set((s) => ({
-      groupStack: depth === undefined ? s.groupStack.slice(0, -1) : s.groupStack.slice(0, depth),
-      selectedLayerIds: [],
-      inspectorTab: 'none',
-    }));
+    set((s) => {
+      const nextStack = depth === undefined ? s.groupStack.slice(0, -1) : s.groupStack.slice(0, depth);
+      const savedTime = s.groupTimeStack[nextStack.length];
+      const nextDur = s.currentProject ? resolveActiveGroup(s.currentProject, nextStack).durationMs : 5000;
+      const restoredMs = Number.isFinite(savedTime) ? Math.max(0, Math.min(nextDur, savedTime)) : 0;
+      return {
+        groupStack: nextStack,
+        groupTimeStack: s.groupTimeStack.slice(0, nextStack.length),
+        currentTimeMs: restoredMs,
+        isPlaying: false,
+        selectedLayerIds: [],
+        inspectorTab: 'none',
+        curveTarget: null,
+      };
+    });
   },
 
   addLayer: (layer) => {
@@ -1179,15 +1249,19 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   },
 
   setCurrentTimeMs: (ms) => {
-    const proj = get().currentProject;
-    const clamped = proj ? Math.max(0, Math.min(proj.durationMs, ms)) : Math.max(0, ms);
+    const s = get();
+    const maxDur = s.currentProject ? resolveActiveGroup(s.currentProject, s.groupStack).durationMs : Infinity;
+    const clamped = Number.isFinite(maxDur) ? Math.max(0, Math.min(maxDur, ms)) : Math.max(0, ms);
     set({ currentTimeMs: clamped });
   },
   setIsPlaying: (isPlaying) => set({ isPlaying }),
   togglePlay: () =>
     set((s) => {
-      if (!s.isPlaying && s.currentProject && s.currentTimeMs >= s.currentProject.durationMs - 10) {
-        return { isPlaying: true, currentTimeMs: 0 };
+      if (!s.isPlaying && s.currentProject) {
+        const activeDur = resolveActiveGroup(s.currentProject, s.groupStack).durationMs;
+        if (s.currentTimeMs >= activeDur - 10) {
+          return { isPlaying: true, currentTimeMs: 0 };
+        }
       }
       return { isPlaying: !s.isPlaying };
     }),

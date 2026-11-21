@@ -7,7 +7,7 @@ import {
   type MissingFontEntry,
 } from '../../engine/fontRegistry';
 import { AlightRenderer } from '../../engine/renderer';
-import { useEditorStore } from '../../store/useEditorStore';
+import { resolveActiveGroup, useEditorStore } from '../../store/useEditorStore';
 import { AddLayerPopup } from './AddLayerPopup';
 import { EditorActionBar } from './EditorActionBar';
 import { EffectBrowserDialog } from './EffectBrowserDialog';
@@ -204,7 +204,7 @@ export const EditorScreen: React.FC = () => {
       if (cancelled || isExportingRef.current) return;
       const store = useEditorStore.getState();
       if (store.isPlaying || !store.currentProject) return;
-      renderer.syncVideosForPlayback(store.currentProject, store.currentTimeMs, false);
+      renderer.syncVideosForPlayback(store.currentProject, store.currentTimeMs, false, store.groupStack);
       // FL-1: Use unified playbackScale (useCache: true) on paused render too -> zero 2-3x sharpness pop on play/pause
       renderer.renderProject(store.currentProject, store.currentTimeMs, {
         previewScale: store.previewQuality,
@@ -314,15 +314,18 @@ export const EditorScreen: React.FC = () => {
       return;
     }
 
-    let playheadMs = useEditorStore.getState().currentTimeMs;
-    if (playheadMs >= currentProject.durationMs) {
+    const initStore = useEditorStore.getState();
+    const initScope = resolveActiveGroup(currentProject, initStore.groupStack);
+    const inGroup = initStore.groupStack.length > 0;
+    let playheadMs = initStore.currentTimeMs;
+    if (playheadMs >= initScope.durationMs) {
       playheadMs = 0;
-      useEditorStore.getState().setCurrentTimeMs(0);
+      initStore.setCurrentTimeMs(0);
     }
 
-    const hasAudioTrack = audioEngine.hasAudio(currentProject);
-    renderer.syncVideosForPlayback(currentProject, playheadMs, true);
-    audioEngine.startPlayback(currentProject, playheadMs);
+    const hasAudioTrack = !inGroup && audioEngine.hasAudio(currentProject);
+    renderer.syncVideosForPlayback(currentProject, playheadMs, true, initStore.groupStack);
+    if (!inGroup) audioEngine.startPlayback(currentProject, playheadMs);
     let startSceneMs = playheadMs;
     let startWallMs = performance.now();
     let lastTs = startWallMs;
@@ -352,22 +355,23 @@ export const EditorScreen: React.FC = () => {
         playheadMs = startSceneMs + (now - startWallMs);
       }
 
-      if (playheadMs >= proj.durationMs) {
+      const activeDur = resolveActiveGroup(proj, store.groupStack).durationMs;
+      if (playheadMs >= activeDur) {
         if (store.loop) {
           playheadMs = 0;
           startSceneMs = 0;
           startWallMs = now;
-          audioEngine.startPlayback(proj, 0);
+          if (store.groupStack.length === 0) audioEngine.startPlayback(proj, 0);
         } else {
-          playheadMs = proj.durationMs;
-          renderer.syncVideosForPlayback(proj, playheadMs, false);
+          playheadMs = activeDur;
+          renderer.syncVideosForPlayback(proj, playheadMs, false, store.groupStack);
           renderer.renderProject(proj, playheadMs, {
             previewScale: store.previewQuality,
             selectedIds: store.selectedLayerIds,
             activeGroupStack: store.groupStack,
             useCache: true,
           });
-          store.setCurrentTimeMs(proj.durationMs);
+          store.setCurrentTimeMs(activeDur);
           store.setIsPlaying(false);
           return;
         }
@@ -384,7 +388,7 @@ export const EditorScreen: React.FC = () => {
         }
       } else {
         consecutiveHits = 0;
-        renderer.syncVideosForPlayback(proj, playheadMs, true);
+        renderer.syncVideosForPlayback(proj, playheadMs, true, store.groupStack);
       }
       renderer.renderProject(proj, playheadMs, {
         previewScale: store.previewQuality,
@@ -542,7 +546,7 @@ export const EditorScreen: React.FC = () => {
       } else if (!mod && e.key === 'End') {
         e.preventDefault();
         store.setIsPlaying(false);
-        store.setCurrentTimeMs(proj.durationMs);
+        store.setCurrentTimeMs(resolveActiveGroup(proj, store.groupStack).durationMs);
       } else if (!mod && key === 'i') {
         e.preventDefault();
         store.trimSelectedLeft();
