@@ -81,6 +81,7 @@ export const EditorScreen: React.FC = () => {
   const [showMissingFontsModal, setShowMissingFontsModal] = useState(false);
   const lastAutoPromptProjectIdRef = useRef<string | null>(null);
   const lastModifiedTimeRef = useRef<number>(0);
+  const lastPausedRenderAtRef = useRef<number>(0);
 
   const missingFontLayerIds = useMemo(() => {
     const set = new Set<string>();
@@ -203,6 +204,13 @@ export const EditorScreen: React.FC = () => {
   useEffect(() => {
     const renderer = rendererRef.current;
     if (!renderer || !currentProject || visibilityPaused || isPlaying || isExportingRef.current) return;
+    const now = performance.now();
+    if (now - lastPausedRenderAtRef.current < 75) {
+      // MO-6: Rapid consecutive paused updates (stage drag, timeline scrub, inspector scrubber)
+      // engage the mobile interactive resolution tier and automatically settle 130ms after release.
+      renderer.notifyInteractiveGesture(130);
+    }
+    lastPausedRenderAtRef.current = now;
     let cancelled = false;
     const rafId = requestAnimationFrame(() => {
       if (cancelled || isExportingRef.current) return;
@@ -334,6 +342,7 @@ export const EditorScreen: React.FC = () => {
     }
 
     const hasAudioTrack = audioEngine.hasAudio(currentProject, initScope.layers);
+    renderer.setMobilePlaybackOverloaded(false);
     renderer.syncVideosForPlayback(currentProject, playheadMs, true, initStore.groupStack);
     audioEngine.startPlayback(currentProject, playheadMs, initScope.layers);
     let startSceneMs = playheadMs;
@@ -341,6 +350,7 @@ export const EditorScreen: React.FC = () => {
     let lastTs = startWallMs;
     let lastVuMs = 0;
     let consecutiveHits = 0;
+    let slowMissStreak = 0;
     let rafId = 0;
     let ended = false;
 
@@ -395,11 +405,23 @@ export const EditorScreen: React.FC = () => {
         renderer.hasCachedFrame(proj, playheadMs, store.previewQuality);
       if (isHit) {
         consecutiveHits++;
-        if (consecutiveHits >= 4) {
+        slowMissStreak = 0;
+        if (audioEngine.hasElementOwnedAudio()) {
+          // Keep element-owned video audio synced & playing even across L2 cached frame runs
+          renderer.syncVideosForPlayback(proj, playheadMs, true, store.groupStack);
+        } else if (consecutiveHits >= 4) {
           renderer.pauseAllVideos(true);
         }
       } else {
         consecutiveHits = 0;
+        if (rawDt > 26 && rawDt < 250) {
+          slowMissStreak++;
+          if (slowMissStreak >= 10) {
+            renderer.setMobilePlaybackOverloaded(true);
+          }
+        } else if (rawDt > 0 && rawDt < 19) {
+          slowMissStreak = Math.max(0, slowMissStreak - 1);
+        }
         renderer.syncVideosForPlayback(proj, playheadMs, true, store.groupStack);
       }
       renderer.renderProject(proj, playheadMs, {
@@ -424,6 +446,7 @@ export const EditorScreen: React.FC = () => {
     rafId = requestAnimationFrame(tick);
     return () => {
       cancelAnimationFrame(rafId);
+      renderer.setMobilePlaybackOverloaded(false);
       renderer.pauseAllVideos();
       audioEngine.stopPlayback();
       playbackClock.setAudioLevel(0);
@@ -437,27 +460,30 @@ export const EditorScreen: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isPlaying, visibilityPaused, currentProject?.id]);
 
-  // iOS grants media playback and unmuting per element, per gesture. Every tap or keypress while
-  // paused is therefore a chance to unlock the element-owned tracks before the play button is even
-  // pressed; printing on a tap that is not about playback costs one no-op play/pause.
+  // iOS grants media playback and unmuting per element, per gesture (especially touchend/click on Home Screen WKWebView).
   useEffect(() => {
     const prime = () => {
       const s = useEditorStore.getState();
-      if (!s.currentProject || s.isPlaying) return;
-      // Resume the audio graph from inside the gesture as well: `startPlayback` runs from the rAF
-      // loop, which iOS does not count as a gesture, and a context that never resumed leaves the
-      // playhead on the wall clock and the output silent.
+      if (!s.currentProject) return;
       try {
-        audioEngine.ensureContext();
+        audioEngine.unlockFromGesture();
       } catch {
         // No Web Audio on this browser; the element-owned path carries the sound.
       }
-      rendererRef.current?.primeElementAudio();
+      if (!s.isPlaying) {
+        rendererRef.current?.primeElementAudio();
+      }
     };
-    window.addEventListener('pointerdown', prime, true);
+    window.addEventListener('pointerdown', prime, { capture: true, passive: true });
+    window.addEventListener('touchend', prime, { capture: true, passive: true });
+    window.addEventListener('pointerup', prime, { capture: true, passive: true });
+    window.addEventListener('click', prime, { capture: true, passive: true });
     window.addEventListener('keydown', prime, true);
     return () => {
       window.removeEventListener('pointerdown', prime, true);
+      window.removeEventListener('touchend', prime, true);
+      window.removeEventListener('pointerup', prime, true);
+      window.removeEventListener('click', prime, true);
       window.removeEventListener('keydown', prime, true);
     };
   }, []);
@@ -516,6 +542,8 @@ export const EditorScreen: React.FC = () => {
         store.setShowShortcutOverlay(true);
       } else if (e.code === 'Space') {
         e.preventDefault();
+        audioEngine.unlockFromGesture();
+        rendererRef.current?.primeElementAudio(true);
         store.togglePlay();
       } else if (mod && key === 'z') {
         e.preventDefault();

@@ -503,6 +503,9 @@ export class AlightRenderer {
   /** Phones/tablets: capped DPR, and the element — not Web Audio — may own video sound. */
   private mobileRender = false;
   private isIos = false;
+  private interactiveUntilMs = 0;
+  private interactiveSettleTimer = 0;
+  private mobilePlaybackOverloaded = false;
   public onMediaReady?: () => void;
   public onCacheChange?: () => void;
 
@@ -1001,7 +1004,7 @@ export class AlightRenderer {
         // Web Audio (audioEngine) owns video & audio playback sound so cache hits never stutter/mute
         // audio. The exception is a track Web Audio cannot carry — iOS behind the ring switch, or a
         // container decodeAudioData refuses — where the element keeps its own audio instead.
-        if (audioEngine.isElementAudioOwned(md.src)) {
+        if (audioEngine.isElementAudioOwned(md.src, md.mediaId)) {
           v.muted = md.muted === true;
           v.volume = Math.max(0, Math.min(1, md.volume ?? 1));
         } else {
@@ -1077,6 +1080,11 @@ export class AlightRenderer {
   public pauseAllVideos(keepPlaybackActive = false): void {
     this.isPlaybackActive = keepPlaybackActive;
     for (const entry of this.mediaVideos.values()) {
+      // Never pause an element-owned audio track during L2 cache hit playback (keepPlaybackActive=true),
+      // otherwise hitting 4 cached frames kills the video's sound 66ms into playback.
+      if (keepPlaybackActive && audioEngine.isElementAudioOwned(entry.src, entry.mediaId)) {
+        continue;
+      }
       if (!entry.video.paused) {
         entry.video.pause();
       }
@@ -1084,30 +1092,60 @@ export class AlightRenderer {
   }
 
   /**
+   * MO-6: Marks an active touch/drag/scrub gesture so uncached mobile preview frames render at a fast
+   * interactive resolution tier (~3-4x fewer pixels) and automatically settle to full sharpness 130ms
+   * after the finger stops moving.
+   */
+  public notifyInteractiveGesture(settleMs = 130): void {
+    if (!this.mobileRender || this.disposed) return;
+    this.interactiveUntilMs = performance.now() + settleMs;
+    if (this.interactiveSettleTimer) {
+      window.clearTimeout(this.interactiveSettleTimer);
+    }
+    this.interactiveSettleTimer = window.setTimeout(() => {
+      this.interactiveSettleTimer = 0;
+      this.interactiveUntilMs = 0;
+      if (!this.disposed && !this.isPlaybackActive) {
+        this.onMediaReady?.();
+      }
+    }, settleMs + 12);
+  }
+
+  /** MO-10: Enables/disables automatic mobile live-playback resolution scaling on heavy uncached scenes */
+  public setMobilePlaybackOverloaded(overloaded: boolean): void {
+    this.mobilePlaybackOverloaded = overloaded;
+  }
+
+  /**
    * iOS will not let a `<video>` start from a `requestAnimationFrame` callback, and it will not let
    * one unmute outside a gesture either. Both are per-element grants, so the way through is to
    * start the element *inside* the gesture that begins playback and immediately park it again: after
    * that the element is unlocked for the whole session and the playback loop can drive it.
-   *
-   * Only element-owned tracks are primed - Web Audio owns everything else, and starting those would
-   * be a wasted decode. Call this from a real pointerdown/keydown handler, never from a timer.
    */
-  public primeElementAudio(): void {
+  public primeElementAudio(forceAll = false): void {
     if (this.disposed) return;
     for (const entry of this.mediaVideos.values()) {
-      if (entry.audioUnlocked || !audioEngine.isElementAudioOwned(entry.src)) continue;
+      const isElOwned = audioEngine.isElementAudioOwned(entry.src, entry.mediaId);
+      if (entry.audioUnlocked && !forceAll) continue;
+      if (!isElOwned && !forceAll && !this.isIos) continue;
       const v = entry.video;
-      v.muted = false;
+      const prevMuted = v.muted;
+      if (isElOwned) {
+        v.muted = false;
+      }
       const started = v.play();
       if (!started || typeof started.then !== 'function') continue;
       void started
         .then(() => {
           entry.audioUnlocked = true;
           // Park it again unless playback actually started while the promise was in flight.
-          if (!this.isPlaybackActive && !v.paused) v.pause();
+          if (!this.isPlaybackActive && !v.paused) {
+            v.pause();
+            if (!isElOwned) v.muted = prevMuted;
+          }
         })
         .catch(() => {
-          // Still locked; the next gesture tries again.
+          if (!isElOwned) v.muted = prevMuted;
         });
     }
   }
@@ -1649,16 +1687,35 @@ export class AlightRenderer {
       }
       this.cacheMisses++;
 
-      const sceneFbo = this.acquireFbo(cw, ch);
+      // MO-6 & MO-10: On phones, render uncached interactive drag frames or overloaded live playback
+      // frames at a reduced FBO scale (~3-4x fewer pixels) and skip baking them into the L2 cache.
+      const isInteractiveMobile =
+        this.mobileRender && !this.isPlaybackActive && performance.now() < this.interactiveUntilMs;
+      const isOverloadedMobile =
+        this.mobileRender && this.isPlaybackActive && this.mobilePlaybackOverloaded;
+      const activeScale = isInteractiveMobile
+        ? Math.max(0.25, Math.min(pbScale, this.isIos ? 0.42 : 0.5))
+        : isOverloadedMobile
+          ? Math.max(0.25, pbScale * 0.65)
+          : pbScale;
+      const rw = Math.max(16, Math.round(project.width * activeScale));
+      const rh = Math.max(16, Math.round(project.height * activeScale));
+
+      const sceneFbo = this.acquireFbo(rw, rh);
       const [br, bg, bb, ba] =
         project.bgColor === 'transparent' ? [0, 0, 0, 0] : parseColorArgb(project.bgColor);
-      this.clearFbo(sceneFbo, cw, ch, br * ba, bg * ba, bb * ba, ba);
-      this.renderLayerList(project, project.layers, sceneTimeMs, sceneFbo, cw, ch, pbScale, []);
+      this.clearFbo(sceneFbo, rw, rh, br * ba, bg * ba, bb * ba, ba);
+      this.renderLayerList(project, project.layers, sceneTimeMs, sceneFbo, rw, rh, activeScale, []);
       this.blitTexture(sceneFbo.tex, null, this.canvas.width, this.canvas.height, 1.0, false);
 
-      // ST-3: Playback is read-only against the cache (never run copyTexSubImage2D + LRU sort on the playback thread).
-      // Only store on paused renders when video is clean; idle pump fills remaining playback frames.
-      if (!this.isPlaybackActive && !this.hadStaleVideoThisFrame && !this.hasUnreadySeekingVideoThisFrame()) {
+      // ST-3 + MO-6: Playback & interactive drag tiers are read-only against the cache;
+      // only store full-pbScale paused renders when video is clean.
+      if (
+        !this.isPlaybackActive &&
+        !isInteractiveMobile &&
+        !this.hadStaleVideoThisFrame &&
+        !this.hasUnreadySeekingVideoThisFrame()
+      ) {
         this.storeFrameInCache(frameIdx, sceneFbo, cw, ch, pbScale);
       }
       this.releaseFbo(sceneFbo);
@@ -2079,17 +2136,27 @@ export class AlightRenderer {
         declaredOverdraw = d.maxOverdraw;
       }
     }
+    const maxOverdrawCap = this.mobileRender ? (this.isIos ? 0.4 : 0.6) : 1.25;
     if (declaredOverdraw > 0 && !usesCompTex) {
-      overdrawPad = Math.min(1.25, declaredOverdraw);
+      overdrawPad = Math.min(maxOverdrawCap, declaredOverdraw);
     }
     if (activeShaderDefs.length > 0 && !usesCompTex) {
       const ax = layerToScreen[0], bx = layerToScreen[1], oX = layerToScreen[3];
       const ay = layerToScreen[4], by = layerToScreen[5], oY = layerToScreen[7];
       const minCorner = Math.min(oX, oX + ax, oX + bx, oX + ax + bx, oY, oY + ay, oY + by, oY + ay + by);
       const maxCorner = Math.max(oX, oX + ax, oX + bx, oX + ax + bx, oY, oY + ay, oY + by, oY + ay + by);
-      const neededPad = Math.max(0.5, -minCorner + 0.05, maxCorner - 1.0 + 0.05);
-      const maxPadByGpu = Math.max(0.5, ((Math.min(8192, this.maxTextureSize) / Math.max(1, renderW, renderH)) - 1.0) * 0.5);
-      overdrawPad = Math.max(overdrawPad, Math.min(1.25, maxPadByGpu, neededPad));
+      // Only allocate extra overdraw margin when the layer corners actually extend outside [0,1]
+      // (eliminates the old unconditional 0.5 pad that forced 400% FBO area on centered effect layers).
+      const outLeftBottom = -minCorner > 0.005 ? -minCorner + 0.04 : 0;
+      const outRightTop = maxCorner - 1.0 > 0.005 ? maxCorner - 1.0 + 0.04 : 0;
+      const neededPad = Math.max(0, outLeftBottom, outRightTop);
+      if (neededPad > 0) {
+        const maxPadByGpu = Math.max(
+          0,
+          ((Math.min(this.mobileRender ? 4096 : 8192, this.maxTextureSize) / Math.max(1, renderW, renderH)) - 1.0) * 0.5
+        );
+        overdrawPad = Math.max(overdrawPad, Math.min(maxOverdrawCap, maxPadByGpu, neededPad));
+      }
     }
 
     const overdrawSpan = 1.0 + 2.0 * overdrawPad;
@@ -3174,9 +3241,14 @@ void main() {
     normT: number,
     scale: number
   ): FboSlot {
-    const key = '__internal_border_shadow_v1';
-    let prog = (this as any)._borderShadowProg as ReturnType<ShaderRegistry['compileRaw']> | undefined;
+    const isMobileFast = this.mobileRender;
+    const key = isMobileFast ? '__internal_border_shadow_mob_v1' : '__internal_border_shadow_v1';
+    const propKey = isMobileFast ? '_borderShadowMobProg' : '_borderShadowProg';
+    let prog = (this as any)[propKey] as ReturnType<ShaderRegistry['compileRaw']> | undefined;
     if (!prog) {
+      const strokeSamples = isMobileFast ? 8 : 16;
+      const shadowRings = isMobileFast ? 1 : 2;
+      const shadowSamples = isMobileFast ? 8 : 12;
       prog = this.registry.compileRaw(
         key,
         `#version 300 es
@@ -3214,8 +3286,8 @@ void main() {
             float rad = uStrokePos == 0 ? uStrokeWidth * 0.5 : uStrokeWidth;
             float maxA = base.a;
             float minA = base.a;
-            for (int i = 0; i < 16; i++) {
-              float ang = float(i) * (PI2 / 16.0);
+            for (int i = 0; i < ${strokeSamples}; i++) {
+              float ang = float(i) * (PI2 / ${strokeSamples}.0);
               vec2 off = vec2(cos(ang), sin(ang)) * rad * texel;
               float a = texture(uTex, clamp(vUv + off, 0.0, 1.0)).a;
               maxA = max(maxA, a);
@@ -3242,16 +3314,16 @@ void main() {
             float shRad = max(1.0, uShadowSize);
             float sumA = texture(uTex, clamp(shUv, 0.0, 1.0)).a * 0.2;
             float wSum = 0.2;
-            for (int ring = 1; ring <= 2; ring++) {
-              float rScale = float(ring) * 0.5 * shRad;
+            for (int ring = 1; ring <= ${shadowRings}; ring++) {
+              float rScale = float(ring) * ${shadowRings === 1 ? '0.75' : '0.5'} * shRad;
               float w = ring == 1 ? 0.5 : 0.3;
-              for (int i = 0; i < 12; i++) {
-                float ang = float(i) * (PI2 / 12.0) + float(ring) * 0.26;
+              for (int i = 0; i < ${shadowSamples}; i++) {
+                float ang = float(i) * (PI2 / ${shadowSamples}.0) + float(ring) * 0.26;
                 vec2 off = vec2(cos(ang), sin(ang)) * rScale * texel;
                 vec2 su = shUv + off;
                 float a = (su.x < 0.0 || su.x > 1.0 || su.y < 0.0 || su.y > 1.0) ? 0.0 : texture(uTex, su).a;
-                sumA += a * (w / 12.0);
-                wSum += w / 12.0;
+                sumA += a * (w / ${shadowSamples}.0);
+                wSum += w / ${shadowSamples}.0;
               }
             }
             float shA = clamp(sumA / max(wSum, 0.001), 0.0, 1.0) * uShadowColor.a;
@@ -3262,7 +3334,7 @@ void main() {
           }
         }`
       );
-      (this as any)._borderShadowProg = prog;
+      (this as any)[propKey] = prog;
     }
 
     const dst = this.acquireFbo(src.width, src.height);
@@ -3927,6 +3999,10 @@ void main() {
 
   public dispose(): void {
     this.disposed = true;
+    if (this.interactiveSettleTimer) {
+      window.clearTimeout(this.interactiveSettleTimer);
+      this.interactiveSettleTimer = 0;
+    }
     this.blendProgramCache.clear();
     this.canvas.removeEventListener('webglcontextlost', this.onContextLostHandler);
     this.clearPreviewCache();

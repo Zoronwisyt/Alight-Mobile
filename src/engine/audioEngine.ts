@@ -1,6 +1,77 @@
 import type { Layer, Project } from '../types/project';
 import { evalAnimatable, evalRemappedTime } from './animation';
 import { extractAacAdts } from './mp4Audio';
+import { loadMediaArrayBuffer, loadMediaUrl } from '../store/storage';
+
+function buildSilentWavBlobUrl(): string {
+  // 0.25s 8kHz mono 16-bit PCM silent WAV (2000 samples = 4000 data bytes + 44 header bytes)
+  const numSamples = 2000;
+  const dataBytes = numSamples * 2;
+  const buf = new ArrayBuffer(44 + dataBytes);
+  const v = new DataView(buf);
+  const writeStr = (off: number, s: string) => {
+    for (let i = 0; i < s.length; i++) v.setUint8(off + i, s.charCodeAt(i));
+  };
+  writeStr(0, 'RIFF');
+  v.setUint32(4, 36 + dataBytes, true);
+  writeStr(8, 'WAVE');
+  writeStr(12, 'fmt ');
+  v.setUint32(16, 16, true);
+  v.setUint16(20, 1, true); // PCM
+  v.setUint16(22, 1, true); // mono
+  v.setUint32(24, 8000, true); // 8kHz
+  v.setUint32(28, 16000, true); // byte rate
+  v.setUint16(32, 2, true); // block align
+  v.setUint16(34, 16, true); // bits per sample
+  writeStr(36, 'data');
+  v.setUint32(40, dataBytes, true);
+  return URL.createObjectURL(new Blob([buf], { type: 'audio/wav' }));
+}
+
+function xhrArrayBuffer(url: string): Promise<ArrayBuffer> {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open('GET', url, true);
+    xhr.responseType = 'arraybuffer';
+    xhr.onload = () => {
+      if ((xhr.status >= 200 && xhr.status < 300) || xhr.status === 0) {
+        if (xhr.response instanceof ArrayBuffer) {
+          resolve(xhr.response);
+          return;
+        }
+      }
+      reject(new Error(`XHR failed (${xhr.status})`));
+    };
+    xhr.onerror = () => reject(new Error('XHR network error'));
+    xhr.send();
+  });
+}
+
+function safeDecodeAudioData(ctx: AudioContext, buf: ArrayBuffer): Promise<AudioBuffer> {
+  return new Promise((resolve, reject) => {
+    let settled = false;
+    const onOk = (decoded: AudioBuffer) => {
+      if (!settled) {
+        settled = true;
+        resolve(decoded);
+      }
+    };
+    const onErr = (err: unknown) => {
+      if (!settled) {
+        settled = true;
+        reject(err instanceof Error ? err : new Error(String(err ?? 'decodeAudioData failed')));
+      }
+    };
+    try {
+      const p = ctx.decodeAudioData(buf, onOk, onErr);
+      if (p && typeof p.then === 'function') {
+        p.then(onOk, onErr);
+      }
+    } catch (err) {
+      onErr(err);
+    }
+  });
+}
 
 /**
  * Mobile audio is governed by two platform rules the desktop build never had to care about:
@@ -25,6 +96,8 @@ class AudioEngine {
   /** Sources whose sound is played by their own `<video>` element instead of a buffer source. */
   private elementAudioSrcs = new Set<string>();
   private activeSources: AudioBufferSourceNode[] = [];
+  private fallbackAudioEls = new Map<string, HTMLAudioElement>();
+  private activeFallbackEls: HTMLAudioElement[] = [];
   private loading = new Map<string, Promise<AudioBuffer>>();
   private playbackStartCtxTime = 0;
   private playbackStartSceneMs = 0;
@@ -33,6 +106,7 @@ class AudioEngine {
   private unlockInstalled = false;
   private iosRouteUnlocked = false;
   private silentAudioEl: HTMLAudioElement | null = null;
+  private silentWavUrl: string | null = null;
   private visibilityHooked = false;
 
   /**
@@ -41,8 +115,8 @@ class AudioEngine {
    * inside a group was silent — which is exactly where a shared project spends most of its time.
    */
   public hasAudio(project: Project, layers?: Layer[]): boolean {
-    const out: { layer: Layer; absStart: number; absEnd: number }[] = [];
-    this.collectAudioLayers(layers ?? project.layers, 0, out);
+    const out: { layer: Layer; absStart: number; absEnd: number; localOffsetMs: number }[] = [];
+    this.collectAudioLayers(layers ?? project.layers, 0, Infinity, out);
     return out.length > 0;
   }
 
@@ -57,19 +131,24 @@ class AudioEngine {
    * which happens when `decodeAudioData` refuses the container (common for MP4 with a video track on
    * iOS). The renderer must then leave the element unmuted and apply the layer's volume.
    */
-  public isElementAudioOwned(src: string): boolean {
-    return this.elementAudioSrcs.has(src);
+  public isElementAudioOwned(src: string, mediaId?: string): boolean {
+    return this.elementAudioSrcs.has(src) || (Boolean(mediaId) && this.elementAudioSrcs.has(mediaId!));
+  }
+
+  public hasElementOwnedAudio(): boolean {
+    return this.elementAudioSrcs.size > 0;
   }
 
   /** Pre-decodes audio & video audio tracks in the background so pressing Play has zero audio lag */
   public preloadProjectAudio(project: Project): void {
-    const items: { layer: Layer; absStart: number; absEnd: number }[] = [];
-    this.collectAudioLayers(project.layers, 0, items);
+    const items: { layer: Layer; absStart: number; absEnd: number; localOffsetMs: number }[] = [];
+    this.collectAudioLayers(project.layers, 0, Infinity, items);
     for (const { layer } of items) {
       const src = layer.type === 'audio' ? layer.audioData?.src : layer.mediaData?.src;
+      const mediaId = layer.type === 'audio' ? layer.audioData?.mediaId : layer.mediaData?.mediaId;
       const synth = layer.type === 'audio' ? layer.audioData?.synthPattern : undefined;
-      if (src || synth) {
-        void this.loadAudioBuffer(src || '', synth).catch(() => {});
+      if (src || synth || mediaId) {
+        void this.loadAudioBuffer(src || '', synth, mediaId).catch(() => {});
       }
     }
   }
@@ -86,79 +165,114 @@ class AudioEngine {
     }
   }
 
-  /**
-   * iOS only lets an AudioContext leave `suspended` inside a user gesture, and it hands that grant
-   * per gesture - a call, a background/foreground cycle or a locked screen drops the context back to
-   * `interrupted`. The listener therefore stays installed until the context is actually observed
-   * `running`; removing it after the first tap was wrong, because a tap that happened before the
-   * context existed spent the grant on nothing.
-   */
-  /**
-   * Forces iOS Home Screen standalone PWAs (WKWebView) to switch AVAudioSession from
-   * ambient (silenced by hardware mute switch) to playback by playing a 1-sample silent
-   * WAV via <audio playsinline> synchronously inside a user gesture.
-   */
-  private unlockIosAudioRoute(): void {
-    this.applyAudioSessionType();
-    if (typeof document === 'undefined' || this.iosRouteUnlocked) return;
-    try {
-      if (!this.silentAudioEl) {
-        const a = document.createElement('audio');
-        a.setAttribute('playsinline', '');
-        a.setAttribute('webkit-playsinline', '');
-        a.preload = 'auto';
-        // 1-sample 8kHz mono PCM silent WAV
-        a.src = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA';
-        this.silentAudioEl = a;
+  private ensureSilentAudioEl(): HTMLAudioElement | null {
+    if (typeof document === 'undefined') return null;
+    if (!this.silentAudioEl) {
+      const a = document.createElement('audio');
+      a.setAttribute('playsinline', '');
+      a.setAttribute('webkit-playsinline', '');
+      a.loop = true;
+      a.preload = 'auto';
+      a.volume = 0.01;
+      a.style.display = 'none';
+      if (!this.silentWavUrl) {
+        this.silentWavUrl = buildSilentWavBlobUrl();
       }
-      const p = this.silentAudioEl.play();
-      if (p && typeof p.then === 'function') {
-        p.then(() => {
-          this.iosRouteUnlocked = true;
-        }).catch(() => {});
+      a.src = this.silentWavUrl;
+      if (document.body) {
+        document.body.appendChild(a);
+      }
+      this.silentAudioEl = a;
+    } else if (!this.silentAudioEl.isConnected && document.body) {
+      document.body.appendChild(this.silentAudioEl);
+    }
+    return this.silentAudioEl;
+  }
+
+  /**
+   * Synchronously unlocks both Web Audio (via a 1-sample buffer source) and iOS Home Screen
+   * standalone WKWebView's AVAudioSession playback route (via a looping DOM-attached silent WAV
+   * <audio playsinline>). Must be called directly inside a user gesture handler (touchend/click).
+   */
+  public unlockFromGesture(): void {
+    this.applyAudioSessionType();
+    try {
+      const ctx = this.ensureContext();
+      if (ctx.state !== 'running') {
+        void ctx.resume().catch(() => {});
+      }
+      // Play a 1-frame silent buffer synchronously inside the gesture to wake WebKit's audio output thread
+      const warmBuf = ctx.createBuffer(1, 1, 22050);
+      const warmSrc = ctx.createBufferSource();
+      warmSrc.buffer = warmBuf;
+      warmSrc.connect(ctx.destination);
+      warmSrc.start(0);
+    } catch {
+      // ignore
+    }
+
+    try {
+      const a = this.ensureSilentAudioEl();
+      if (a && (!this.iosRouteUnlocked || this.playbackActive)) {
+        const p = a.play();
+        if (p && typeof p.then === 'function') {
+          p.then(() => {
+            this.iosRouteUnlocked = true;
+            if (!this.playbackActive && !a.paused) {
+              a.pause();
+            }
+          }).catch(() => {});
+        }
       }
     } catch {
       // ignore
+    }
+
+    // Prime any fallback HTMLAudioElements already registered
+    for (const el of this.fallbackAudioEls.values()) {
+      if ((el as HTMLAudioElement & { _unlocked?: boolean })._unlocked) continue;
+      const p = el.play();
+      if (p && typeof p.then === 'function') {
+        void p
+          .then(() => {
+            (el as HTMLAudioElement & { _unlocked?: boolean })._unlocked = true;
+            if (!this.playbackActive && !el.paused) el.pause();
+          })
+          .catch(() => {});
+      }
     }
   }
 
   private installUnlock(): void {
     if (this.unlockInstalled || typeof window === 'undefined') return;
     this.unlockInstalled = true;
-    const unlock = () => {
-      this.unlockIosAudioRoute();
-      let ctx: AudioContext;
-      try {
-        ctx = this.ensureContext();
-      } catch {
-        return;
+    const unlock = (ev?: Event) => {
+      this.unlockFromGesture();
+      const isConfirmingGesture =
+        !ev || ev.type === 'touchend' || ev.type === 'pointerup' || ev.type === 'click' || ev.type === 'keydown';
+      if (isConfirmingGesture && this.ctx && this.ctx.state === 'running' && this.iosRouteUnlocked) {
+        this.removeUnlock();
       }
-      void ctx
-        .resume()
-        .then(() => {
-          if (ctx.state === 'running' && this.iosRouteUnlocked) this.removeUnlock();
-        })
-        .catch(() => {
-          // Still locked; the next gesture tries again.
-        });
     };
     this.unlockHandler = unlock;
-    window.addEventListener('touchstart', unlock, { passive: true });
-    window.addEventListener('pointerdown', unlock, { passive: true });
-    window.addEventListener('touchend', unlock, { passive: true });
-    window.addEventListener('click', unlock, { passive: true });
-    window.addEventListener('keydown', unlock, { passive: true });
+    window.addEventListener('touchstart', unlock, { capture: true, passive: true });
+    window.addEventListener('pointerdown', unlock, { capture: true, passive: true });
+    window.addEventListener('touchend', unlock, { capture: true, passive: true });
+    window.addEventListener('pointerup', unlock, { capture: true, passive: true });
+    window.addEventListener('click', unlock, { capture: true, passive: true });
+    window.addEventListener('keydown', unlock, { capture: true, passive: true });
   }
 
-  private unlockHandler: (() => void) | null = null;
+  private unlockHandler: ((ev?: Event) => void) | null = null;
 
   private removeUnlock(): void {
     if (!this.unlockHandler || typeof window === 'undefined') return;
-    window.removeEventListener('touchstart', this.unlockHandler);
-    window.removeEventListener('pointerdown', this.unlockHandler);
-    window.removeEventListener('touchend', this.unlockHandler);
-    window.removeEventListener('click', this.unlockHandler);
-    window.removeEventListener('keydown', this.unlockHandler);
+    window.removeEventListener('touchstart', this.unlockHandler, true);
+    window.removeEventListener('pointerdown', this.unlockHandler, true);
+    window.removeEventListener('touchend', this.unlockHandler, true);
+    window.removeEventListener('pointerup', this.unlockHandler, true);
+    window.removeEventListener('click', this.unlockHandler, true);
+    window.removeEventListener('keydown', this.unlockHandler, true);
     this.unlockHandler = null;
     this.unlockInstalled = false;
   }
@@ -207,9 +321,36 @@ class AudioEngine {
     return this.ctx;
   }
 
-  public async loadAudioBuffer(src: string, synthPattern?: 'beat' | 'ambient' | 'pulse'): Promise<AudioBuffer> {
-    const key = synthPattern ? `__synth_${synthPattern}` : src;
-    const cached = this.buffers.get(key);
+  private async fetchAudioBytes(src: string, mediaId?: string): Promise<ArrayBuffer> {
+    if (mediaId) {
+      const idbBytes = await loadMediaArrayBuffer(mediaId);
+      if (idbBytes && idbBytes.byteLength > 0) return idbBytes;
+    }
+    if (!src) throw new Error('Missing audio source');
+    try {
+      const res = await fetch(src);
+      if (res.ok) return await res.arrayBuffer();
+    } catch {
+      // iOS Home Screen WKWebView often rejects fetch(blob:...) — fall back to XHR or rehydrated IDB URL
+    }
+    try {
+      return await xhrArrayBuffer(src);
+    } catch (xhrErr) {
+      if (mediaId) {
+        const freshUrl = await loadMediaUrl(mediaId);
+        if (freshUrl) return await xhrArrayBuffer(freshUrl);
+      }
+      throw xhrErr;
+    }
+  }
+
+  public async loadAudioBuffer(
+    src: string,
+    synthPattern?: 'beat' | 'ambient' | 'pulse',
+    mediaId?: string
+  ): Promise<AudioBuffer> {
+    const key = synthPattern ? `__synth_${synthPattern}` : mediaId || src;
+    const cached = this.buffers.get(key) ?? (src ? this.buffers.get(src) : undefined);
     if (cached) return cached;
 
     const ctx = this.ensureContext();
@@ -244,18 +385,19 @@ class AudioEngine {
 
     const promise = (async () => {
       try {
-        const res = await fetch(src);
-        const arr = await res.arrayBuffer();
+        const arr = await this.fetchAudioBytes(src, mediaId);
+        // Keep an in-memory copy before decodeAudioData detaches arr so ADTS rescue never needs a second fetch
+        const backup = arr.slice(0);
         try {
-          const buf = await ctx.decodeAudioData(arr);
+          const buf = await safeDecodeAudioData(ctx, arr);
           this.buffers.set(key, buf);
+          if (src) this.buffers.set(src, buf);
           return buf;
         } catch (firstErr) {
-          // `decodeAudioData` detaches the ArrayBuffer it is handed, so the recovery path re-fetches
-          // rather than keeping a second full copy of a video file alive in memory.
-          const recovered = await this.decodeViaAdts(src, ctx);
+          const recovered = await this.decodeViaAdtsBytes(backup, ctx);
           if (recovered) {
             this.buffers.set(key, recovered);
+            if (src) this.buffers.set(src, recovered);
             return recovered;
           }
           throw firstErr;
@@ -263,7 +405,8 @@ class AudioEngine {
       } catch (err) {
         this.failedAudioSrcs.add(key);
         // A container that will not decode at all still has a usable track inside its element.
-        this.elementAudioSrcs.add(key);
+        if (src) this.elementAudioSrcs.add(src);
+        if (mediaId) this.elementAudioSrcs.add(mediaId);
         throw err;
       } finally {
         this.loading.delete(key);
@@ -275,19 +418,14 @@ class AudioEngine {
 
   /**
    * Second chance for a container the browser's decoder refuses as a whole: pull the AAC track out
-   * of the ISO-BMFF boxes, re-wrap it as ADTS, and let the same decoder read that. This is what makes
-   * an exported MP4 carry sound on a device where the preview only survived because the `<video>`
-   * element owned the track - `OfflineAudioContext` has no element source, but it does have buffers.
+   * of the ISO-BMFF boxes, re-wrap it as ADTS, and let the same decoder read that.
    */
-  private async decodeViaAdts(src: string, ctx: AudioContext): Promise<AudioBuffer | null> {
+  private async decodeViaAdtsBytes(bytes: ArrayBuffer, ctx: AudioContext): Promise<AudioBuffer | null> {
     try {
-      const res = await fetch(src);
-      const bytes = await res.arrayBuffer();
       const track = extractAacAdts(bytes);
       if (!track) return null;
-      // decodeAudioData wants an ArrayBuffer it owns; pass a fresh one over the ADTS window.
       const copy = track.adts.slice().buffer;
-      return await ctx.decodeAudioData(copy);
+      return await safeDecodeAudioData(ctx, copy);
     } catch {
       return null;
     }
@@ -309,56 +447,136 @@ class AudioEngine {
     return peaks;
   }
 
-  private collectAudioLayers(layers: Layer[], offsetMs: number, out: { layer: Layer; absStart: number; absEnd: number }[]) {
+  private collectAudioLayers(
+    layers: Layer[],
+    offsetMs: number,
+    parentEndMs: number,
+    out: { layer: Layer; absStart: number; absEnd: number; localOffsetMs: number }[]
+  ) {
     for (const l of layers) {
       if (!l.visible) continue;
+      const absStart = Math.max(offsetMs, offsetMs + l.startTime);
+      const absEnd = Math.min(parentEndMs, offsetMs + l.endTime);
+      if (absEnd <= absStart) continue;
       if (l.type === 'group' && l.groupLayers?.length) {
-        this.collectAudioLayers(l.groupLayers, offsetMs + l.startTime, out);
+        // If children inside the group are stored in local 0..groupDur time, offset by absStart;
+        // if children are already in parent timeline space (>= l.startTime), preserve their offset.
+        const minChildStart = l.groupLayers.reduce((m, c) => Math.min(m, c.startTime), Infinity);
+        const childOffset = minChildStart >= l.startTime && l.startTime > 0 ? offsetMs : absStart;
+        this.collectAudioLayers(l.groupLayers, childOffset, absEnd, out);
       } else if (l.type === 'audio' && l.audioData && !l.audioData.muted) {
-        out.push({ layer: l, absStart: offsetMs + l.startTime, absEnd: offsetMs + l.endTime });
+        out.push({ layer: l, absStart, absEnd, localOffsetMs: offsetMs });
       } else if (carriesAudio(l)) {
-        out.push({ layer: l, absStart: offsetMs + l.startTime, absEnd: offsetMs + l.endTime });
+        out.push({ layer: l, absStart, absEnd, localOffsetMs: offsetMs });
       }
     }
   }
 
   public startPlayback(project: Project, startMs: number, layers?: Layer[]): void {
     this.stopPlayback();
-    this.unlockIosAudioRoute();
+    this.playbackActive = true;
+    this.unlockFromGesture();
     const ctx = this.ensureContext();
     const sessionId = ++this.playbackSessionId;
     this.playbackStartCtxTime = ctx.currentTime;
     this.playbackStartSceneMs = startMs;
-    this.playbackActive = true;
-    const audioLayers: { layer: Layer; absStart: number; absEnd: number }[] = [];
-    this.collectAudioLayers(layers ?? project.layers, 0, audioLayers);
+    const audioLayers: { layer: Layer; absStart: number; absEnd: number; localOffsetMs: number }[] = [];
+    this.collectAudioLayers(layers ?? project.layers, 0, Infinity, audioLayers);
 
     for (const item of audioLayers) {
-      void this.startLayerAudio(item.layer, item.absStart, item.absEnd, startMs, ctx, sessionId);
+      void this.startLayerAudio(item.layer, item.absStart, item.absEnd, item.localOffsetMs, startMs, ctx, sessionId);
     }
+  }
+
+  private async startFallbackHtmlAudio(
+    layer: Layer,
+    mediaSrc: string,
+    mediaId: string | undefined,
+    absStart: number,
+    absEnd: number,
+    localOffsetMs: number,
+    sceneMs: number,
+    sessionId: number
+  ) {
+    if (typeof document === 'undefined') return;
+    const key = mediaId || mediaSrc;
+    let el = this.fallbackAudioEls.get(key);
+    if (!el) {
+      el = document.createElement('audio');
+      el.setAttribute('playsinline', '');
+      el.setAttribute('webkit-playsinline', '');
+      el.preload = 'auto';
+      el.src = mediaSrc;
+      this.fallbackAudioEls.set(key, el);
+    }
+    if (mediaId && (!el.src || el.error)) {
+      const fresh = await loadMediaUrl(mediaId);
+      if (fresh) el.src = fresh;
+    }
+    if (sessionId !== this.playbackSessionId || !this.playbackActive) return;
+
+    const isVideo = layer.type !== 'audio';
+    const speed = isVideo ? Math.max(0.1, Math.min(4, layer.mediaData?.playbackSpeed || 1)) : 1;
+    const trimSec = Math.max(0, ((isVideo ? layer.mediaData?.trimStartMs : layer.audioData?.trimStartMs) ?? 0) / 1000);
+    const { remappedNormT } = evalRemappedTime(layer, Math.max(layer.startTime, sceneMs - localOffsetMs));
+    const vol = isVideo
+      ? (layer.mediaData?.volume ?? 1)
+      : evalAnimatable(layer.audioData!.volume, remappedNormT, 1);
+
+    el.volume = Math.max(0, Math.min(1, vol));
+    el.playbackRate = speed;
+    const delayMs = Math.max(0, absStart - sceneMs);
+    const elapsedSec = Math.max(0, (sceneMs - absStart) / 1000);
+    const offsetSec = trimSec + elapsedSec * speed;
+
+    const trigger = () => {
+      if (sessionId !== this.playbackSessionId || !this.playbackActive || !el) return;
+      try {
+        if (Math.abs(el.currentTime - offsetSec) > 0.08) {
+          el.currentTime = offsetSec;
+        }
+      } catch {
+        // ignore seek before metadata
+      }
+      this.activeFallbackEls.push(el);
+      void el.play().catch(() => {});
+    };
+
+    if (delayMs <= 16) {
+      trigger();
+    } else {
+      window.setTimeout(trigger, delayMs);
+    }
+    void absEnd;
   }
 
   private async startLayerAudio(
     layer: Layer,
     absStart: number,
     absEnd: number,
+    localOffsetMs: number,
     sceneMs: number,
     ctx: AudioContext,
     sessionId: number
   ) {
     const isVideo = layer.type !== 'audio';
     const mediaSrc = isVideo ? layer.mediaData?.src : layer.audioData?.src;
+    const mediaId = isVideo ? layer.mediaData?.mediaId : layer.audioData?.mediaId;
     const synthPattern = isVideo ? undefined : layer.audioData?.synthPattern;
-    if (!mediaSrc && !synthPattern) return;
+    if (!mediaSrc && !synthPattern && !mediaId) return;
     if (sceneMs > absEnd) return;
-    if (isVideo && mediaSrc && this.elementAudioSrcs.has(mediaSrc)) {
-      // The element owns this track; decoding it again would double the download for nothing.
+    if (isVideo && this.isElementAudioOwned(mediaSrc || '', mediaId)) {
+      // The <video> element owns this track in renderer.ts
       return;
     }
     try {
-      const buf = await this.loadAudioBuffer(mediaSrc || '', synthPattern);
+      const buf = await this.loadAudioBuffer(mediaSrc || '', synthPattern, mediaId);
       // Abort if playback was paused, stopped, or restarted while decoding
       if (sessionId !== this.playbackSessionId || !this.playbackActive) return;
+
+      if (ctx.state !== 'running') {
+        void ctx.resume().catch(() => {});
+      }
 
       // Compensate for any async decode latency so audio locks tightly to the hardware clock
       const decodeElapsedMs = Math.max(0, (ctx.currentTime - this.playbackStartCtxTime) * 1000);
@@ -371,7 +589,7 @@ class AudioEngine {
       src.playbackRate.value = speed;
 
       const gain = ctx.createGain();
-      const { remappedNormT } = evalRemappedTime(layer, effectiveSceneMs);
+      const { remappedNormT } = evalRemappedTime(layer, Math.max(layer.startTime, effectiveSceneMs - localOffsetMs));
       const vol = isVideo
         ? (layer.mediaData?.volume ?? 1)
         : evalAnimatable(layer.audioData!.volume, remappedNormT, 1);
@@ -390,7 +608,10 @@ class AudioEngine {
       src.start(ctx.currentTime + delaySec, offsetSec, Math.min(remainingClipSec, remainingBufSec));
       this.activeSources.push(src);
     } catch {
-      // fetch/decode failure: the source is now element-owned (see loadAudioBuffer), or silent
+      // Decode failed: for standalone <audio> layers, play via HTMLAudioElement fallback
+      if (!isVideo && (mediaSrc || mediaId)) {
+        void this.startFallbackHtmlAudio(layer, mediaSrc || '', mediaId, absStart, absEnd, localOffsetMs, sceneMs, sessionId);
+      }
     }
   }
 
@@ -406,6 +627,21 @@ class AudioEngine {
       }
     }
     this.activeSources = [];
+    for (const el of this.activeFallbackEls) {
+      try {
+        if (!el.paused) el.pause();
+      } catch {
+        // ignore
+      }
+    }
+    this.activeFallbackEls = [];
+    if (this.silentAudioEl && !this.silentAudioEl.paused && this.iosRouteUnlocked) {
+      try {
+        this.silentAudioEl.pause();
+      } catch {
+        // ignore
+      }
+    }
   }
 
   public sampleLevel(): number {

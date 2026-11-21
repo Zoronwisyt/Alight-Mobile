@@ -1,4 +1,4 @@
-import type { CustomEffectRecord, Project, SavedElement } from '../types/project';
+import type { CustomEffectRecord, Layer, Project, SavedElement } from '../types/project';
 
 const DB_NAME = 'alight_motion_web_db';
 const DB_VERSION = 2;
@@ -6,6 +6,9 @@ const STORE_PROJECTS = 'projects';
 const STORE_ELEMENTS = 'elements';
 const STORE_MEDIA = 'media';
 const STORE_CUSTOM_EFFECTS = 'customEffects';
+
+const sessionMediaUrlCache = new Map<string, string>();
+const sessionMediaBlobCache = new Map<string, Blob>();
 
 function openDb(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
@@ -30,19 +33,51 @@ function openDb(): Promise<IDBDatabase> {
   });
 }
 
+async function rehydrateLayerMediaUrls(layers: Layer[]): Promise<void> {
+  const tasks: Promise<void>[] = [];
+  const walk = (list: Layer[]) => {
+    for (const l of list) {
+      if (l.mediaData?.mediaId) {
+        const md = l.mediaData;
+        tasks.push(
+          loadMediaUrl(md.mediaId!).then((fresh) => {
+            if (fresh) md.src = fresh;
+          })
+        );
+      }
+      if (l.audioData?.mediaId) {
+        const ad = l.audioData;
+        tasks.push(
+          loadMediaUrl(ad.mediaId!).then((fresh) => {
+            if (fresh) ad.src = fresh;
+          })
+        );
+      }
+      if (l.groupLayers?.length) walk(l.groupLayers);
+    }
+  };
+  walk(layers);
+  if (tasks.length > 0) {
+    await Promise.all(tasks);
+  }
+}
+
 export async function loadAllProjects(): Promise<Project[]> {
   try {
     const db = await openDb();
-    return await new Promise((resolve, reject) => {
+    const list = await new Promise<Project[]>((resolve, reject) => {
       const tx = db.transaction(STORE_PROJECTS, 'readonly');
       const req = tx.objectStore(STORE_PROJECTS).getAll();
       req.onsuccess = () => {
-        const list = (req.result as Project[]) || [];
-        list.sort((a, b) => (b.modifiedTime ?? 0) - (a.modifiedTime ?? 0));
-        resolve(list);
+        const res = (req.result as Project[]) || [];
+        res.sort((a, b) => (b.modifiedTime ?? 0) - (a.modifiedTime ?? 0));
+        resolve(res);
       };
       req.onerror = () => reject(req.error);
     });
+    // Rehydrate stored mediaId blobs immediately so reopened Home Screen PWA sessions never hold dead blob: URLs
+    await Promise.all(list.map((p) => rehydrateLayerMediaUrls(p.layers)));
+    return list;
   } catch {
     return [];
   }
@@ -110,18 +145,51 @@ export async function saveMediaBlob(id: string, blob: Blob, name: string, mime: 
     tx.oncomplete = () => resolve();
     tx.onerror = () => reject(tx.error);
   });
-  return URL.createObjectURL(blob);
+  const url = URL.createObjectURL(blob);
+  sessionMediaBlobCache.set(id, blob);
+  sessionMediaUrlCache.set(id, url);
+  return url;
+}
+
+export async function loadMediaBlob(id: string): Promise<Blob | null> {
+  const cached = sessionMediaBlobCache.get(id);
+  if (cached) return cached;
+  try {
+    const db = await openDb();
+    const record = await new Promise<{ blob: Blob } | undefined>((resolve, reject) => {
+      const tx = db.transaction(STORE_MEDIA, 'readonly');
+      const req = tx.objectStore(STORE_MEDIA).get(id);
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => reject(req.error);
+    });
+    if (record?.blob) {
+      sessionMediaBlobCache.set(id, record.blob);
+      return record.blob;
+    }
+  } catch {
+    // ignore IDB errors
+  }
+  return null;
+}
+
+export async function loadMediaArrayBuffer(id: string): Promise<ArrayBuffer | null> {
+  const blob = await loadMediaBlob(id);
+  if (!blob) return null;
+  try {
+    return await blob.arrayBuffer();
+  } catch {
+    return null;
+  }
 }
 
 export async function loadMediaUrl(id: string): Promise<string | null> {
-  const db = await openDb();
-  const record = await new Promise<{ blob: Blob } | undefined>((resolve, reject) => {
-    const tx = db.transaction(STORE_MEDIA, 'readonly');
-    const req = tx.objectStore(STORE_MEDIA).get(id);
-    req.onsuccess = () => resolve(req.result);
-    req.onerror = () => reject(req.error);
-  });
-  return record?.blob ? URL.createObjectURL(record.blob) : null;
+  const cachedUrl = sessionMediaUrlCache.get(id);
+  if (cachedUrl) return cachedUrl;
+  const blob = await loadMediaBlob(id);
+  if (!blob) return null;
+  const url = URL.createObjectURL(blob);
+  sessionMediaUrlCache.set(id, url);
+  return url;
 }
 
 export async function loadAllCustomEffects(): Promise<CustomEffectRecord[]> {

@@ -89,6 +89,7 @@ export const PreviewCanvas: React.FC<PreviewCanvasProps> = ({
   const [qualityMenuOpen, setQualityMenuOpen] = useState(false);
   const touchDistRef = useRef<number | null>(null);
   const touchZoomStartRef = useRef<number>(1);
+  const touchZoomRafRef = useRef<number>(0);
 
   // Modern Web Guidance: Pause background WebGL rendering when off-screen via contentvisibilityautostatechange
   useEffect(() => {
@@ -173,11 +174,20 @@ export const PreviewCanvas: React.FC<PreviewCanvasProps> = ({
       const dx = e.touches[0].clientX - e.touches[1].clientX;
       const dy = e.touches[0].clientY - e.touches[1].clientY;
       const dist = Math.hypot(dx, dy);
-      setPreviewZoom(touchZoomStartRef.current * (dist / touchDistRef.current));
+      const nextZoom = touchZoomStartRef.current * (dist / touchDistRef.current);
+      if (touchZoomRafRef.current) return;
+      touchZoomRafRef.current = requestAnimationFrame(() => {
+        touchZoomRafRef.current = 0;
+        setPreviewZoom(nextZoom);
+      });
     }
   };
 
   const handleTouchEnd = () => {
+    if (touchZoomRafRef.current) {
+      cancelAnimationFrame(touchZoomRafRef.current);
+      touchZoomRafRef.current = 0;
+    }
     touchDistRef.current = null;
   };
 

@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';
+import { audioEngine } from '../../engine/audioEngine';
 import { replaceMediaOnLayers } from '../../engine/mediaReplace';
+import type { AlightRenderer } from '../../engine/renderer';
 import { playbackClock } from '../../store/playbackClock';
 import { useEditorStore } from '../../store/useEditorStore';
 import { AmIcon } from '../components/AmIcon';
@@ -129,7 +131,15 @@ export const Playbar: React.FC<PlaybarProps> = ({ viewModeOpen, onToggleViewMode
           <button
             type="button"
             className={`am-playbar-btn am-play-trigger ${isPlaying ? 'playing' : ''}`}
-            onClick={togglePlay}
+            onPointerDown={() => {
+              audioEngine.unlockFromGesture();
+              (window as unknown as { __rendererRef?: React.RefObject<AlightRenderer | null> }).__rendererRef?.current?.primeElementAudio(true);
+            }}
+            onClick={() => {
+              audioEngine.unlockFromGesture();
+              (window as unknown as { __rendererRef?: React.RefObject<AlightRenderer | null> }).__rendererRef?.current?.primeElementAudio(true);
+              togglePlay();
+            }}
             title="Play / Pause (Space)"
           >
             <AmIcon name={isPlaying ? 'ac_ic_pause' : 'ac_ic_play'} fallback={isPlaying ? 'pause' : 'play'} size={24} />

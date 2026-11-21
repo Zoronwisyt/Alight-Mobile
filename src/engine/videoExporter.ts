@@ -129,10 +129,11 @@ async function renderProjectAudioMix(project: Project, durationSec: number): Pro
   for (const { layer, absStart, absEnd } of audioLayers) {
     const isVideo = layer.type !== 'audio';
     const mediaSrc = isVideo ? layer.mediaData?.src : layer.audioData?.src;
+    const mediaId = isVideo ? layer.mediaData?.mediaId : layer.audioData?.mediaId;
     const synth = isVideo ? undefined : layer.audioData?.synthPattern;
-    if (!mediaSrc && !synth) continue;
+    if (!mediaSrc && !synth && !mediaId) continue;
     try {
-      const buf = await audioEngine.loadAudioBuffer(mediaSrc || '', synth);
+      const buf = await audioEngine.loadAudioBuffer(mediaSrc || '', synth, mediaId);
       const src = offline.createBufferSource();
       src.buffer = buf;
       const speed = isVideo ? Math.max(0.1, Math.min(4, layer.mediaData?.playbackSpeed || 1)) : 1;
