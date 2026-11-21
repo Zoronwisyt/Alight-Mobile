@@ -1384,14 +1384,15 @@ export class AlightRenderer {
   }
 
   private computeCacheScale(project: Project, previewScale: number): number {
-    const totalFrames = Math.max(1, Math.ceil((project.durationMs / 1000) * Math.max(1, project.fps)));
+    // Honor the user's explicit Preview Quality preset (1.0 / 0.75 / 0.5 / 0.25) instead of
+    // shrinking every preset to fit the entire timeline in RAM at once — LRU eviction handles budget.
     const singleFrameFullBytes = Math.max(1, project.width * project.height * 4);
-    const fullBytes = Math.max(1, totalFrames * singleFrameFullBytes);
-    const adaptive = Math.sqrt((this.cacheBudgetBytes * 0.85) / fullBytes);
-    // CR-2: Also cap scale so a single 4K frame on mobile (192 MiB budget) fits under budget/12 instead of silently dropping
-    const perFrameCap = Math.sqrt((this.cacheBudgetBytes / 12) / singleFrameFullBytes);
-    const capped = Math.min(previewScale, 1.0);
-    return Math.max(0.25, Math.min(capped, adaptive, perFrameCap));
+    const perFrameCap = Math.sqrt((this.cacheBudgetBytes / 8) / singleFrameFullBytes);
+    const maxDim = Math.max(1, project.width, project.height);
+    const maxTexDim = this.mobileRender && this.isIos ? 2048 : 4096;
+    const texCap = maxTexDim / maxDim;
+    const capped = Math.min(previewScale || 1, 1.0);
+    return Math.max(0.25, Math.min(capped, perFrameCap, texCap));
   }
 
   private clearOffscreenVideos(): void {
@@ -1466,7 +1467,7 @@ export class AlightRenderer {
   private storeFrameInCache(frameIdx: number, srcFbo: FboSlot, srcW: number, srcH: number, cacheScale: number): void {
     const gl = this.gl;
     const bytes = srcW * srcH * 4;
-    if (bytes > this.cacheBudgetBytes / 12) return; // hard per-frame cap
+    if (bytes > this.cacheBudgetBytes / 8) return; // hard per-frame cap
 
     const prev = this.frameCache.get(frameIdx);
     if (prev) {
@@ -1550,7 +1551,7 @@ export class AlightRenderer {
 
     const cw = Math.max(16, Math.round(project.width * cScale));
     const ch = Math.max(16, Math.round(project.height * cScale));
-    if (cw * ch * 4 > this.cacheBudgetBytes / 12) {
+    if (cw * ch * 4 > this.cacheBudgetBytes / 8) {
       this.lastPrecacheResult = 'full';
       return 'full';
     }
@@ -1632,6 +1633,8 @@ export class AlightRenderer {
     let scale: number;
     const isExport = Boolean(options.renderWidth && options.renderHeight);
     const cacheEligible = Boolean(options.useCache) && !isExport && !hasGroupIsolation;
+    const qualityChanged =
+      cacheEligible && this.lastCacheScale !== -1 && this.lastCacheScale !== Math.round((options.previewScale ?? 1) * 100);
     let pbScale = 0;
     if (isExport) {
       renderW = Math.max(16, Math.round(options.renderWidth!));
@@ -1659,9 +1662,16 @@ export class AlightRenderer {
       renderH = Math.max(16, Math.round(activeProject.height * scale));
     }
 
-    // Never reallocate the drawing buffer mid-playback (prevents blank-frame flash on quality/DPR changes)
+    // Never reallocate the drawing buffer mid-playback unless the user explicitly changed Preview Quality
     if (this.canvas.width !== renderW || this.canvas.height !== renderH) {
-      if (!this.isPlaybackActive || this.canvas.width === 0 || this.canvas.height === 0 || isExport || hasGroupIsolation) {
+      if (
+        !this.isPlaybackActive ||
+        qualityChanged ||
+        this.canvas.width === 0 ||
+        this.canvas.height === 0 ||
+        isExport ||
+        hasGroupIsolation
+      ) {
         this.canvas.width = renderW;
         this.canvas.height = renderH;
       } else {
