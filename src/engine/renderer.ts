@@ -2704,7 +2704,7 @@ export class AlightRenderer {
     overdrawPad = 0,
     overdrawSpan = 1
   ): FboSlot {
-    const key = '__internal_3d_persp_v1';
+    const key = '__internal_3d_persp_v2';
     let prog = (this as any)._persp3DProg as ReturnType<ShaderRegistry['compileRaw']> | undefined;
     if (!prog) {
       prog = this.registry.compileRaw(
@@ -2713,48 +2713,77 @@ export class AlightRenderer {
 precision highp float;
 layout(location = 0) in vec4 aPos;
 layout(location = 1) in vec2 aUv;
+out vec2 vScreenUv;
+void main() {
+  vScreenUv = aUv;
+  gl_Position = aPos;
+}`,
+        `#version 300 es
+precision highp float;
+uniform sampler2D uTex;
 uniform vec2 uScreen;
 uniform vec2 uPivot;
 uniform vec2 uRotRad;
 uniform float uFocal;
 uniform float uOverdrawPad;
 uniform float uOverdrawSpan;
-out vec2 vUv;
-void main() {
-  vUv = aUv;
-  // Map texture UV [0,1] -> virtual screen pixels (top-down y)
-  float sx = (aUv.x * uOverdrawSpan - uOverdrawPad) * uScreen.x;
-  float sy = (1.0 - (aUv.y * uOverdrawSpan - uOverdrawPad)) * uScreen.y;
-  // Local coordinates relative to layer world pivot (y-up for 3D rotation)
-  float dx = sx - uPivot.x;
-  float ly = -(sy - uPivot.y);
-  // Pitch around X axis
-  float cx = cos(uRotRad.x);
-  float sxr = sin(uRotRad.x);
-  float y1 = ly * cx;
-  float z1 = ly * sxr;
-  float x1 = dx;
-  // Yaw around Y axis
-  float cy = cos(uRotRad.y);
-  float syr = sin(uRotRad.y);
-  float x2 = x1 * cy + z1 * syr;
-  float z2 = -x1 * syr + z1 * cy;
-  float y2 = y1;
-  // Perspective projection with hardware perspective-correct w
-  float f = max(1.0, uFocal);
-  float w = max(0.05, 1.0 + z2 / f);
-  float clipX = ((uPivot.x * w + x2) / uScreen.x) * 2.0 - w;
-  float clipY = (1.0 - (uPivot.y * w - y2) / uScreen.y) * 2.0 - w;
-  gl_Position = vec4(clipX, clipY, 0.0, w);
-}`,
-        `#version 300 es
-precision highp float;
-uniform sampler2D uTex;
-in vec2 vUv;
+in vec2 vScreenUv;
 out vec4 fragColor;
+
+vec3 rotX(vec3 p, float a) {
+  float c = cos(a), s = sin(a);
+  return vec3(p.x, p.y * c - p.z * s, p.y * s + p.z * c);
+}
+vec3 rotY(vec3 p, float a) {
+  float c = cos(a), s = sin(a);
+  return vec3(p.x * c + p.z * s, p.y, -p.x * s + p.z * c);
+}
+
 void main() {
-  if (vUv.x < 0.0 || vUv.x > 1.0 || vUv.y < 0.0 || vUv.y > 1.0) discard;
-  fragColor = texture(uTex, vUv);
+  // Exact ray-plane intersection from camera at (cx, cy, -f) through screen pixel (fragX, fragY, 0).
+  // Eliminates near-plane vertex singularities / stretching at steep angles (0..360+ deg).
+  vec2 center = uScreen * 0.5;
+  float fragX = vScreenUv.x * uScreen.x;
+  float fragY = (1.0 - vScreenUv.y) * uScreen.y;
+  float f = max(1.0, uFocal);
+
+  vec3 O = vec3(0.0, 0.0, -f);
+  vec3 D = vec3(fragX - center.x, center.y - fragY, f);
+  vec3 P0 = vec3(uPivot.x - center.x, center.y - uPivot.y, 0.0);
+
+  // Orthonormal 3D basis of the tilted layer plane (Rx then Ry)
+  vec3 U = rotY(rotX(vec3(1.0, 0.0, 0.0), uRotRad.x), uRotRad.y);
+  vec3 V = rotY(rotX(vec3(0.0, 1.0, 0.0), uRotRad.x), uRotRad.y);
+  vec3 N = rotY(rotX(vec3(0.0, 0.0, 1.0), uRotRad.x), uRotRad.y);
+
+  float denom = dot(D, N);
+  if (abs(denom) < 1e-4) {
+    fragColor = vec4(0.0);
+    return;
+  }
+  float t = dot(P0 - O, N) / denom;
+  if (t <= 0.0) {
+    fragColor = vec4(0.0);
+    return;
+  }
+
+  vec3 hit = O + t * D;
+  vec3 rel = hit - P0;
+  float localX = dot(rel, U);
+  float localY = dot(rel, V);
+
+  // Convert local plane coords back to source texture UV (accounting for overdraw margin)
+  float srcX = uPivot.x + localX;
+  float srcY = uPivot.y - localY;
+  float normX = srcX / uScreen.x;
+  float normY = 1.0 - (srcY / uScreen.y);
+  vec2 texUv = vec2((normX + uOverdrawPad) / uOverdrawSpan, (normY + uOverdrawPad) / uOverdrawSpan);
+
+  if (texUv.x < 0.0 || texUv.x > 1.0 || texUv.y < 0.0 || texUv.y > 1.0) {
+    fragColor = vec4(0.0);
+    return;
+  }
+  fragColor = texture(uTex, texUv);
 }`
       );
       (this as any)._persp3DProg = prog;

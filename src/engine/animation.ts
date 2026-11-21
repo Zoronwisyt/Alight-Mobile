@@ -592,9 +592,58 @@ function shiftLocationAnim(layer: Layer, dx: number, dy: number, dz: number): vo
   }
 }
 
+function worldToLocalUnderParent(
+  worldPos: { x: number; y: number; z: number },
+  parent: Layer | undefined,
+  childIs3D: boolean,
+  layersMap: Map<string, Layer>,
+  sceneTimeMs: number
+): [number, number, number] {
+  if (!parent) return [worldPos.x, worldPos.y, worldPos.z];
+  const parentIs3D = Boolean(parent.is3D);
+  if (parent.type === 'null' && parentIs3D && !childIs3D) {
+    return [worldPos.x, worldPos.y, worldPos.z];
+  }
+  const pt = resolveLayerWorldTransformSimple(parent, layersMap, sceneTimeMs);
+  const dx = worldPos.x - pt.x;
+  const dy = worldPos.y - pt.y;
+  const dz = worldPos.z - pt.z;
+  const invSx = Math.abs(pt.sx) > 1e-4 ? 1 / pt.sx : 1;
+  const invSy = Math.abs(pt.sy) > 1e-4 ? 1 / pt.sy : 1;
+
+  if (parentIs3D && childIs3D) {
+    // Exact inverse of Rx -> Ry -> Rz is Rz(-rz) -> Ry(-ry) -> Rx(-rx)
+    const rzRad = (-pt.rotation * Math.PI) / 180;
+    const ryRad = (-pt.rotY * Math.PI) / 180;
+    const rxRad = (-pt.rotX * Math.PI) / 180;
+    const cz = Math.cos(rzRad), sz = Math.sin(rzRad);
+    const cy = Math.cos(ryRad), sy = Math.sin(ryRad);
+    const cx = Math.cos(rxRad), sx = Math.sin(rxRad);
+    // Inv Roll (Z)
+    const x1 = dx * cz - dy * sz;
+    const y1 = dx * sz + dy * cz;
+    const z1 = dz;
+    // Inv Yaw (Y)
+    const x2 = x1 * cy + z1 * sy;
+    const z2 = -x1 * sy + z1 * cy;
+    const y2 = y1;
+    // Inv Pitch (X)
+    const x3 = x2;
+    const y3 = y2 * cx - z2 * sx;
+    const z3 = y2 * sx + z2 * cx;
+    return [x3 * invSx, y3 * invSy, z3];
+  } else {
+    const rad = (-pt.rotation * Math.PI) / 180;
+    const c = Math.cos(rad), s = Math.sin(rad);
+    const lx = (dx * c - dy * s) * invSx;
+    const ly = (dx * s + dy * c) * invSy;
+    return [lx, ly, dz];
+  }
+}
+
 /**
- * Reparents `layer` to `newParentId` while converting its coordinates so it stays
- * at the same visual position on screen (never jumping off-canvas by +parentPos).
+ * Reparents `layer` to `newParentId` while converting its coordinates via the exact
+ * inverse parent transform so it stays at the exact same visual world position.
  */
 export function reparentLayerPreservingPosition(
   layer: Layer,
@@ -605,13 +654,22 @@ export function reparentLayerPreservingPosition(
   const layersMap = new Map(layers.map((l) => [l.id, l]));
   layersMap.set(layer.id, layer);
   const before = resolveLayerWorldTransformSimple(layer, layersMap, sceneTimeMs);
+  const { remappedNormT } = evalRemappedTime(layer, sceneTimeMs);
+  const curLocal = evalAnimatable(layer.transform.location, remappedNormT, [0, 0, 0]);
   layer.parentId = newParentId;
-  const after = resolveLayerWorldTransformSimple(layer, layersMap, sceneTimeMs);
-  shiftLocationAnim(layer, before.x - after.x, before.y - after.y, before.z - after.z);
+  const newParent = newParentId ? layersMap.get(newParentId) : undefined;
+  const [targetLx, targetLy, targetLz] = worldToLocalUnderParent(
+    before,
+    newParent,
+    Boolean(layer.is3D),
+    layersMap,
+    sceneTimeMs
+  );
+  shiftLocationAnim(layer, targetLx - curLocal[0], targetLy - curLocal[1], targetLz - (curLocal[2] ?? 0));
 }
 
 /**
- * Toggles `layer.is3D` while preserving visual position if the layer is parented to a 3D Null.
+ * Toggles `layer.is3D` while preserving exact visual world position if parented to a 3D Null.
  */
 export function toggleLayer3DPreservingPosition(
   layer: Layer,
@@ -621,11 +679,20 @@ export function toggleLayer3DPreservingPosition(
   const layersMap = new Map(layers.map((l) => [l.id, l]));
   layersMap.set(layer.id, layer);
   const before = resolveLayerWorldTransformSimple(layer, layersMap, sceneTimeMs);
+  const { remappedNormT } = evalRemappedTime(layer, sceneTimeMs);
+  const curLocal = evalAnimatable(layer.transform.location, remappedNormT, [0, 0, 0]);
   layer.is3D = !layer.is3D;
   if (layer.is3D) {
     if (!layer.transform.rotationX) layer.transform.rotationX = { value: 0, keyframes: [] };
     if (!layer.transform.rotationY) layer.transform.rotationY = { value: 0, keyframes: [] };
   }
-  const after = resolveLayerWorldTransformSimple(layer, layersMap, sceneTimeMs);
-  shiftLocationAnim(layer, before.x - after.x, before.y - after.y, before.z - after.z);
+  const parent = layer.parentId ? layersMap.get(layer.parentId) : undefined;
+  const [targetLx, targetLy, targetLz] = worldToLocalUnderParent(
+    before,
+    parent,
+    Boolean(layer.is3D),
+    layersMap,
+    sceneTimeMs
+  );
+  shiftLocationAnim(layer, targetLx - curLocal[0], targetLy - curLocal[1], targetLz - (curLocal[2] ?? 0));
 }

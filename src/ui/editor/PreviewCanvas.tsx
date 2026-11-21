@@ -404,15 +404,19 @@ export const PreviewCanvas: React.FC<PreviewCanvasProps> = ({
         shapeHandles = evaluateShapeHandles(sDef, sp);
       }
     }
+    const focalProj = Math.max(activeW, activeH) / (2 * Math.tan(Math.PI / 6));
+    const persp = Math.abs(wt.z) > 0.5 ? focalProj / Math.max(10, focalProj + wt.z) : 1;
+    const projX = activeW * 0.5 + (wt.x - activeW * 0.5) * persp;
+    const projY = activeH * 0.5 + (wt.y - activeH * 0.5) * persp;
     gizmo = {
-      x: wt.x * projScale,
-      y: wt.y * projScale,
+      x: projX * projScale,
+      y: projY * projScale,
       rot: wt.rotation,
       rotX: wt.rotX,
       rotY: wt.rotY,
       is3D: Boolean(singleLayer.is3D),
-      sx: wt.sx,
-      sy: wt.sy,
+      sx: wt.sx * persp,
+      sy: wt.sy * persp,
       shapeHandles,
     };
   }
