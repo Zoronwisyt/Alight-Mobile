@@ -1,0 +1,5 @@
+    /* JADX INFO: Access modifiers changed from: private */
+    public static final void f(Function2 onComplete, VolleyError volleyError) {
+        Intrinsics.checkNotNullParameter(onComplete, "$onComplete");
+        onComplete.invoke(null, volleyError);
+    }

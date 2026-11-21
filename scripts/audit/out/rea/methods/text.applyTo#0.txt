@@ -1,0 +1,5 @@
+    public static final void applyTo(StyleParams styleParams, Paint paint2) {
+        Intrinsics.checkNotNullParameter(styleParams, "<this>");
+        Intrinsics.checkNotNullParameter(paint2, "paint");
+        paint2.setLetterSpacing(styleParams.getLetterSpacing());
+    }

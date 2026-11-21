@@ -1,0 +1,12 @@
+    /* JADX WARN: 'super' call moved to the top of the method (can break code semantics) */
+    public SfT(Uri uri, final Function2 onComplete) {
+        super(0, uri.toString(), new com.android.volley.sK.fs() { // from class: com.alightcreative.app.motion.fonts.euv
+            @Override // com.android.volley.sK.fs
+            public final void Rw(VolleyError volleyError) {
+                SfT.f(onComplete, volleyError);
+            }
+        });
+        Intrinsics.checkNotNullParameter(uri, "uri");
+        Intrinsics.checkNotNullParameter(onComplete, "onComplete");
+        this.SmL = onComplete;
+    }

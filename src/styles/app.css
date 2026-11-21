@@ -2068,6 +2068,132 @@ button:active {
   animation: amSheetEnter var(--am-dur-fast) var(--am-ease-standard);
 }
 
+/* Modal shell used by FontPickerModal and MissingFontsDialog.
+   Without these rules the backdrop had no `position`, so it laid out as a flex item
+   of .am-editor (a flex column) and consumed real height — pushing the stage up and
+   shrinking it every time a font dialog opened. Fixed here, it covers the viewport
+   and leaves the editor's flow untouched. */
+.am-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 150;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 0;
+  background: rgba(4, 6, 10, 0.72);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  animation: amFadeIn var(--am-dur-fast) var(--am-ease-standard);
+  overscroll-behavior: contain;
+}
+
+.am-modal-sheet {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: var(--am-a1);
+  color: var(--am-text-primary);
+  border: 1px solid var(--am-border);
+  border-radius: 16px 16px 0 0;
+  box-shadow: 0 -18px 48px rgba(0, 0, 0, 0.72);
+  /* The phone's gesture bar sits under the last row of buttons. */
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  animation: amSheetUp var(--am-dur-base) var(--am-ease-sheet);
+}
+
+.am-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-shrink: 0;
+  padding: 12px 14px;
+  padding-top: calc(12px + env(safe-area-inset-top, 0px));
+  font-size: 14px;
+  border-bottom: 1px solid var(--am-border);
+  background: var(--am-a1);
+  border-radius: 16px 16px 0 0;
+}
+
+.am-modal-header strong {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Secondary action (import a file, import a pack) — accent without the full gradient
+   so it does not compete with the sheet's primary row. */
+.am-btn-accent {
+  background: rgba(0, 255, 168, 0.14);
+  color: var(--am-accent);
+  border: 1px solid rgba(0, 255, 168, 0.42);
+  font-weight: 700;
+}
+
+.am-btn-accent:hover:not(:disabled) {
+  background: rgba(0, 255, 168, 0.22);
+}
+
+/* Touch targets: the sheet is where a thumb works, so every control in it clears 44px. */
+.am-modal-sheet button,
+.am-modal-sheet .am-btn {
+  min-height: 44px;
+}
+
+.am-modal-sheet .am-icon-btn {
+  min-width: 44px;
+}
+
+@media (min-width: 861px) {
+  .am-modal-backdrop {
+    align-items: center;
+    padding: 24px;
+  }
+
+  .am-modal-sheet {
+    border-radius: 16px;
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.66);
+    animation-name: amSheetEnter;
+  }
+
+  .am-modal-header {
+    border-radius: 16px 16px 0 0;
+    padding-top: 12px;
+  }
+}
+
+@keyframes amFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes amSheetUp {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .am-modal-backdrop,
+  .am-modal-sheet {
+    animation: none;
+  }
+}
+
 .am-custom-import-box {
   display: flex;
   flex-direction: column;
@@ -2141,5 +2267,26 @@ button:active {
     content: '';
     position: absolute;
     inset: -16px;
+  }
+}
+
+/* Phone-width playbar fit.
+   The row holds eleven controls (2 undo/redo + 3 transport + a paste, two bookmark
+   pairs and the preview toggle). At 390px they need 389.9px of content box while the
+   4px padding leaves 382 — the last button hung 4px past the viewport edge. Tightening
+   the row padding and the gaps recovers 17px without shrinking any target: the APK's
+   own playbar is a 46dp strip with 40dp buttons, so 40px stays. */
+@media (max-width: 430px) {
+  .am-playbar-row {
+    padding: 0 2px;
+  }
+
+  .am-playbar-section {
+    gap: 1px;
+    min-width: 0;
+  }
+
+  .am-playbar-center {
+    gap: 2px;
   }
 }

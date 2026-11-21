@@ -1,0 +1,129 @@
+{
+  "engine": {
+    "name": "jadx-headless-mcp",
+    "version": "0.7.1",
+    "artifact_sha256": "6e5eacf500b64292bfb73c49797c1958f6ee44646e43e868039ae7feb573ff75",
+    "source_revision": "5844800a486d2248fa949b74c9896285f5b54de2",
+    "worker_count": 1,
+    "heap_limit_mib": 8192
+  },
+  "class_name": "com.alightcreative.app.motion.scene.StyleParams",
+  "methods": [
+    {
+      "name": "<clinit>",
+      "reported_signature": "<clinit>(): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()V"
+    },
+    {
+      "name": "<init>",
+      "reported_signature": "<init>(): void",
+      "overload_index": 0,
+      "is_constructor": true,
+      "dex_descriptor": "()V"
+    },
+    {
+      "name": "<init>",
+      "reported_signature": "<init>(float, float): void",
+      "overload_index": 1,
+      "is_constructor": true,
+      "dex_descriptor": "(FF)V"
+    },
+    {
+      "name": "<init>",
+      "reported_signature": "<init>(float, float, int, kotlin.jvm.internal.DefaultConstructorMarker): void",
+      "overload_index": 2,
+      "is_constructor": true,
+      "dex_descriptor": "(FFILkotlin/jvm/internal/DefaultConstructorMarker;)V"
+    },
+    {
+      "name": "component1",
+      "reported_signature": "component1(): float",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()F"
+    },
+    {
+      "name": "component2",
+      "reported_signature": "component2(): float",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()F"
+    },
+    {
+      "name": "copy",
+      "reported_signature": "copy(float, float): com.alightcreative.app.motion.scene.StyleParams",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(FF)Lcom/alightcreative/app/motion/scene/StyleParams;"
+    },
+    {
+      "name": "copy$default",
+      "reported_signature": "copy$default(com.alightcreative.app.motion.scene.StyleParams, float, float, int, java.lang.Object): com.alightcreative.app.motion.scene.StyleParams",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/StyleParams;FFILjava/lang/Object;)Lcom/alightcreative/app/motion/scene/StyleParams;"
+    },
+    {
+      "name": "equals",
+      "reported_signature": "equals(java.lang.Object): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Ljava/lang/Object;)Z"
+    },
+    {
+      "name": "getLetterSpacing",
+      "reported_signature": "getLetterSpacing(): float",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()F"
+    },
+    {
+      "name": "getLineSpacing",
+      "reported_signature": "getLineSpacing(): float",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()F"
+    },
+    {
+      "name": "hashCode",
+      "reported_signature": "hashCode(): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()I"
+    },
+    {
+      "name": "toString",
+      "reported_signature": "toString(): java.lang.String",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/lang/String;"
+    }
+  ],
+  "fields": [
+    {
+      "name": "$stable",
+      "reported_type": "int",
+      "dex_static_value": null
+    },
+    {
+      "name": "Companion",
+      "reported_type": "com.alightcreative.app.motion.scene.StyleParams$Companion",
+      "dex_static_value": null
+    },
+    {
+      "name": "letterSpacing",
+      "reported_type": "float",
+      "dex_static_value": null
+    },
+    {
+      "name": "lineSpacing",
+      "reported_type": "float",
+      "dex_static_value": null
+    }
+  ],
+  "inner_classes": [
+    "com.alightcreative.app.motion.scene.StyleParams.Companion"
+  ]
+}

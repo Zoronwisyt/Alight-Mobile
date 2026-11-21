@@ -1,0 +1,87 @@
+{
+  "engine": {
+    "name": "jadx-headless-mcp",
+    "version": "0.7.1",
+    "artifact_sha256": "6e5eacf500b64292bfb73c49797c1958f6ee44646e43e868039ae7feb573ff75",
+    "source_revision": "5844800a486d2248fa949b74c9896285f5b54de2",
+    "worker_count": 1,
+    "heap_limit_mib": 8192
+  },
+  "class_name": "com.alightcreative.app.motion.fonts.Bb",
+  "methods": [
+    {
+      "name": "<clinit>",
+      "reported_signature": "<clinit>(): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()V"
+    },
+    {
+      "name": "<init>",
+      "reported_signature": "<init>(com.alightcreative.app.motion.fonts.B8K, com.alightcreative.app.motion.fonts.AMTypefaceError): void",
+      "overload_index": 0,
+      "is_constructor": true,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/fonts/B8K;Lcom/alightcreative/app/motion/fonts/AMTypefaceError;)V"
+    },
+    {
+      "name": "Hfr",
+      "reported_signature": "Hfr(): com.alightcreative.app.motion.fonts.B8K",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/fonts/B8K;"
+    },
+    {
+      "name": "Rw",
+      "reported_signature": "Rw(): com.alightcreative.app.motion.fonts.AMTypefaceError",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/fonts/AMTypefaceError;"
+    },
+    {
+      "name": "equals",
+      "reported_signature": "equals(java.lang.Object): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Ljava/lang/Object;)Z"
+    },
+    {
+      "name": "hashCode",
+      "reported_signature": "hashCode(): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()I"
+    },
+    {
+      "name": "toString",
+      "reported_signature": "toString(): java.lang.String",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/lang/String;"
+    }
+  ],
+  "fields": [
+    {
+      "name": "BWM",
+      "reported_type": "com.alightcreative.app.motion.fonts.Bb$fs",
+      "dex_static_value": null
+    },
+    {
+      "name": "Hfr",
+      "reported_type": "com.alightcreative.app.motion.fonts.AMTypefaceError",
+      "dex_static_value": null
+    },
+    {
+      "name": "Rw",
+      "reported_type": "com.alightcreative.app.motion.fonts.B8K",
+      "dex_static_value": null
+    },
+    {
+      "name": "f18880s",
+      "reported_type": "int",
+      "dex_static_value": null
+    }
+  ],
+  "inner_classes": [
+    "com.alightcreative.app.motion.fonts.Bb.fs"
+  ]
+}

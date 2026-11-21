@@ -1,0 +1,3 @@
+    public final rs Hfr() {
+        return this.Hfr;
+    }

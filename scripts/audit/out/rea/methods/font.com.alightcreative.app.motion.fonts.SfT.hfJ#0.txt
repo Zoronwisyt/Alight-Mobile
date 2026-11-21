@@ -1,0 +1,7 @@
+.method public static synthetic hfJ(Lkotlin/jvm/functions/Function2;Lcom/android/volley/VolleyError;)V
+    .registers 2
+
+    invoke-static {p0, p1}, Lcom/alightcreative/app/motion/fonts/SfT;->f(Lkotlin/jvm/functions/Function2;Lcom/android/volley/VolleyError;)V
+
+    return-void
+.end method

@@ -1,0 +1,163 @@
+.method public static synthetic TextElement$default(Lcom/alightcreative/app/motion/scene/KeyableTransform;IILcom/alightcreative/app/motion/scene/StyledText;Lcom/alightcreative/app/motion/scene/Keyable;Landroid/net/Uri;Landroid/net/Uri;JLjava/lang/String;IILcom/alightcreative/app/motion/scene/FillType;ZLcom/alightcreative/app/motion/scene/BlendingMode;ILjava/lang/Object;)Lcom/alightcreative/app/motion/scene/SceneElement;
+    .registers 34
+
+    move/from16 v0, p15
+
+    and-int/lit8 v1, v0, 0x10
+
+    if-eqz v1, :cond_13
+
+    new-instance v1, Lcom/alightcreative/app/motion/scene/SolidColor;
+
+    const/high16 v2, 0x3f800000    # 1.0f
+
+    invoke-direct {v1, v2, v2, v2, v2}, Lcom/alightcreative/app/motion/scene/SolidColor;-><init>(FFFF)V
+
+    invoke-static {v1}, Lcom/alightcreative/app/motion/scene/KeyableKt;->keyable(Lcom/alightcreative/app/motion/scene/SolidColor;)Lcom/alightcreative/app/motion/scene/KeyableSolidColor;
+
+    move-result-object v1
+
+    move-object v6, v1
+
+    goto :goto_15
+
+    :cond_13
+    move-object/from16 v6, p4
+
+    :goto_15
+    and-int/lit8 v1, v0, 0x20
+
+    const/4 v2, 0x0
+
+    if-eqz v1, :cond_1c
+
+    move-object v7, v2
+
+    goto :goto_1e
+
+    :cond_1c
+    move-object/from16 v7, p5
+
+    :goto_1e
+    and-int/lit8 v1, v0, 0x40
+
+    if-eqz v1, :cond_24
+
+    move-object v8, v2
+
+    goto :goto_26
+
+    :cond_24
+    move-object/from16 v8, p6
+
+    :goto_26
+    and-int/lit16 v1, v0, 0x80
+
+    if-eqz v1, :cond_2e
+
+    const-wide/16 v1, 0x0
+
+    move-wide v9, v1
+
+    goto :goto_30
+
+    :cond_2e
+    move-wide/from16 v9, p7
+
+    :goto_30
+    and-int/lit16 v1, v0, 0x100
+
+    if-eqz v1, :cond_38
+
+    const-string v1, ""
+
+    move-object v11, v1
+
+    goto :goto_3a
+
+    :cond_38
+    move-object/from16 v11, p9
+
+    :goto_3a
+    and-int/lit16 v1, v0, 0x200
+
+    const/4 v2, 0x0
+
+    if-eqz v1, :cond_41
+
+    move v12, v2
+
+    goto :goto_43
+
+    :cond_41
+    move/from16 v12, p10
+
+    :goto_43
+    and-int/lit16 v1, v0, 0x400
+
+    if-eqz v1, :cond_4c
+
+    const v1, 0x7fffffff
+
+    move v13, v1
+
+    goto :goto_4e
+
+    :cond_4c
+    move/from16 v13, p11
+
+    :goto_4e
+    and-int/lit16 v1, v0, 0x800
+
+    if-eqz v1, :cond_56
+
+    sget-object v1, Lcom/alightcreative/app/motion/scene/FillType;->COLOR:Lcom/alightcreative/app/motion/scene/FillType;
+
+    move-object v14, v1
+
+    goto :goto_58
+
+    :cond_56
+    move-object/from16 v14, p12
+
+    :goto_58
+    and-int/lit16 v1, v0, 0x1000
+
+    if-eqz v1, :cond_5e
+
+    move v15, v2
+
+    goto :goto_60
+
+    :cond_5e
+    move/from16 v15, p13
+
+    :goto_60
+    and-int/lit16 v0, v0, 0x2000
+
+    if-eqz v0, :cond_69
+
+    sget-object v0, Lcom/alightcreative/app/motion/scene/BlendingMode;->NORMAL:Lcom/alightcreative/app/motion/scene/BlendingMode;
+
+    move-object/from16 v16, v0
+
+    goto :goto_6b
+
+    :cond_69
+    move-object/from16 v16, p14
+
+    :goto_6b
+    move-object/from16 v2, p0
+
+    move/from16 v3, p1
+
+    move/from16 v4, p2
+
+    move-object/from16 v5, p3
+
+    invoke-static/range {v2 .. v16}, Lcom/alightcreative/app/motion/scene/TextElementKt;->TextElement(Lcom/alightcreative/app/motion/scene/KeyableTransform;IILcom/alightcreative/app/motion/scene/StyledText;Lcom/alightcreative/app/motion/scene/Keyable;Landroid/net/Uri;Landroid/net/Uri;JLjava/lang/String;IILcom/alightcreative/app/motion/scene/FillType;ZLcom/alightcreative/app/motion/scene/BlendingMode;)Lcom/alightcreative/app/motion/scene/SceneElement;
+
+    move-result-object v0
+
+    return-object v0
+.end method

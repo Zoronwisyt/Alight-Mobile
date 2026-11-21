@@ -1,0 +1,9 @@
+    public static final SceneElement TextElement(KeyableTransform transform, int i2, int i3, StyledText text, Keyable<SolidColor> fillColor, Uri uri, Uri uri2, long j2, String label, int i4, int i5, FillType fillType, boolean z2, BlendingMode blendingMode) {
+        Intrinsics.checkNotNullParameter(transform, "transform");
+        Intrinsics.checkNotNullParameter(text, "text");
+        Intrinsics.checkNotNullParameter(fillColor, "fillColor");
+        Intrinsics.checkNotNullParameter(label, "label");
+        Intrinsics.checkNotNullParameter(fillType, "fillType");
+        Intrinsics.checkNotNullParameter(blendingMode, "blendingMode");
+        return new SceneElement(SceneElementType.Text, i2, i3, j2, new EngineState(CD.fs.Rw.Rw()), label, transform, fillColor, uri, uri2, null, fillType, null, null, null, null, null, i4, i5, z2, null, text, blendingMode, SceneKt.getEMPTY_SCENE(), null, null, null, null, null, null, null, null, null, false, null, null, false, null, null, -32377856, 127, null);
+    }

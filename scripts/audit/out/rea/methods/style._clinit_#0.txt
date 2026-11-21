@@ -1,0 +1,13 @@
+.method static constructor <clinit>()V
+    .registers 2
+
+    new-instance v0, Lcom/alightcreative/app/motion/scene/StyleParams$Companion;
+
+    const/4 v1, 0x0
+
+    invoke-direct {v0, v1}, Lcom/alightcreative/app/motion/scene/StyleParams$Companion;-><init>(Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+
+    sput-object v0, Lcom/alightcreative/app/motion/scene/StyleParams;->Companion:Lcom/alightcreative/app/motion/scene/StyleParams$Companion;
+
+    return-void
+.end method

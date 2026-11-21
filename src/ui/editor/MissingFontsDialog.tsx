@@ -3,6 +3,7 @@ import { useShallow } from 'zustand/react/shallow';
 import { downloadGoogleFamily } from '../../engine/fontDownload';
 import { weightToLabel } from '../../engine/fontNames';
 import {
+  familiesMatch,
   getRegisteredFamilies,
   type MissingFontEntry,
 } from '../../engine/fontRegistry';
@@ -90,7 +91,9 @@ export const MissingFontsDialog: React.FC<MissingFontsDialogProps> = ({
     if (!requested) return;
     const buf = await file.arrayBuffer();
     const meta = parseSfntMetadata(buf, file.name);
-    if (meta.family.toLowerCase() !== requested.toLowerCase()) {
+    // "Hind SemiBold" is the same family as "Hind" — do not ask the user to confirm a
+    // substitution over a face-word suffix.
+    if (!familiesMatch(requested, meta.family)) {
       setMismatchPrompt({ requestedFamily: requested, detectedFamily: meta.family, file });
       return;
     }

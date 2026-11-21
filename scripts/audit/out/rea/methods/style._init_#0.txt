@@ -1,0 +1,5 @@
+    /* JADX WARN: Illegal instructions before constructor call */
+    public StyleParams() {
+        float f2 = 0.0f;
+        this(f2, f2, 3, null);
+    }

@@ -1,0 +1,179 @@
+{
+  "engine": {
+    "name": "jadx-headless-mcp",
+    "version": "0.7.1",
+    "artifact_sha256": "6e5eacf500b64292bfb73c49797c1958f6ee44646e43e868039ae7feb573ff75",
+    "source_revision": "5844800a486d2248fa949b74c9896285f5b54de2",
+    "worker_count": 1,
+    "heap_limit_mib": 8192
+  },
+  "class_name": "com.alightcreative.app.motion.scene.StyledText",
+  "methods": [
+    {
+      "name": "<clinit>",
+      "reported_signature": "<clinit>(): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()V"
+    },
+    {
+      "name": "<init>",
+      "reported_signature": "<init>(): void",
+      "overload_index": 0,
+      "is_constructor": true,
+      "dex_descriptor": "()V"
+    },
+    {
+      "name": "<init>",
+      "reported_signature": "<init>(java.lang.String, float, com.alightcreative.app.motion.scene.StyledTextAlign, int, java.lang.String): void",
+      "overload_index": 1,
+      "is_constructor": true,
+      "dex_descriptor": "(Ljava/lang/String;FLcom/alightcreative/app/motion/scene/StyledTextAlign;ILjava/lang/String;)V"
+    },
+    {
+      "name": "<init>",
+      "reported_signature": "<init>(java.lang.String, float, com.alightcreative.app.motion.scene.StyledTextAlign, int, java.lang.String, int, kotlin.jvm.internal.DefaultConstructorMarker): void",
+      "overload_index": 2,
+      "is_constructor": true,
+      "dex_descriptor": "(Ljava/lang/String;FLcom/alightcreative/app/motion/scene/StyledTextAlign;ILjava/lang/String;ILkotlin/jvm/internal/DefaultConstructorMarker;)V"
+    },
+    {
+      "name": "component1",
+      "reported_signature": "component1(): java.lang.String",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/lang/String;"
+    },
+    {
+      "name": "component2",
+      "reported_signature": "component2(): float",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()F"
+    },
+    {
+      "name": "component3",
+      "reported_signature": "component3(): com.alightcreative.app.motion.scene.StyledTextAlign",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/StyledTextAlign;"
+    },
+    {
+      "name": "component4",
+      "reported_signature": "component4(): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()I"
+    },
+    {
+      "name": "component5",
+      "reported_signature": "component5(): java.lang.String",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/lang/String;"
+    },
+    {
+      "name": "copy",
+      "reported_signature": "copy(java.lang.String, float, com.alightcreative.app.motion.scene.StyledTextAlign, int, java.lang.String): com.alightcreative.app.motion.scene.StyledText",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Ljava/lang/String;FLcom/alightcreative/app/motion/scene/StyledTextAlign;ILjava/lang/String;)Lcom/alightcreative/app/motion/scene/StyledText;"
+    },
+    {
+      "name": "copy$default",
+      "reported_signature": "copy$default(com.alightcreative.app.motion.scene.StyledText, java.lang.String, float, com.alightcreative.app.motion.scene.StyledTextAlign, int, java.lang.String, int, java.lang.Object): com.alightcreative.app.motion.scene.StyledText",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/StyledText;Ljava/lang/String;FLcom/alightcreative/app/motion/scene/StyledTextAlign;ILjava/lang/String;ILjava/lang/Object;)Lcom/alightcreative/app/motion/scene/StyledText;"
+    },
+    {
+      "name": "equals",
+      "reported_signature": "equals(java.lang.Object): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Ljava/lang/Object;)Z"
+    },
+    {
+      "name": "getAlign",
+      "reported_signature": "getAlign(): com.alightcreative.app.motion.scene.StyledTextAlign",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/StyledTextAlign;"
+    },
+    {
+      "name": "getFont",
+      "reported_signature": "getFont(): java.lang.String",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/lang/String;"
+    },
+    {
+      "name": "getFontSize",
+      "reported_signature": "getFontSize(): float",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()F"
+    },
+    {
+      "name": "getText",
+      "reported_signature": "getText(): java.lang.String",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/lang/String;"
+    },
+    {
+      "name": "getWrapWidth",
+      "reported_signature": "getWrapWidth(): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()I"
+    },
+    {
+      "name": "hashCode",
+      "reported_signature": "hashCode(): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()I"
+    },
+    {
+      "name": "toString",
+      "reported_signature": "toString(): java.lang.String",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/lang/String;"
+    }
+  ],
+  "fields": [
+    {
+      "name": "$stable",
+      "reported_type": "int",
+      "dex_static_value": null
+    },
+    {
+      "name": "align",
+      "reported_type": "com.alightcreative.app.motion.scene.StyledTextAlign",
+      "dex_static_value": null
+    },
+    {
+      "name": "font",
+      "reported_type": "java.lang.String",
+      "dex_static_value": null
+    },
+    {
+      "name": "fontSize",
+      "reported_type": "float",
+      "dex_static_value": null
+    },
+    {
+      "name": "text",
+      "reported_type": "java.lang.String",
+      "dex_static_value": null
+    },
+    {
+      "name": "wrapWidth",
+      "reported_type": "int",
+      "dex_static_value": null
+    }
+  ],
+  "inner_classes": []
+}

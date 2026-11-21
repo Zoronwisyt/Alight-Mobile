@@ -1,0 +1,9 @@
+    public static /* synthetic */ StyleParams copy$default(StyleParams styleParams, float f2, float f3, int i2, Object obj) {
+        if ((i2 & 1) != 0) {
+            f2 = styleParams.letterSpacing;
+        }
+        if ((i2 & 2) != 0) {
+            f3 = styleParams.lineSpacing;
+        }
+        return styleParams.copy(f2, f3);
+    }

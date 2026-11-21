@@ -1,0 +1,4 @@
+    public StyleParams(float f2, float f3) {
+        this.letterSpacing = f2;
+        this.lineSpacing = f3;
+    }

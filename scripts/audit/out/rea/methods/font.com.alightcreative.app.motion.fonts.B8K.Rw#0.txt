@@ -1,0 +1,3 @@
+    public final Wg.euv Rw() {
+        return this.Rw;
+    }

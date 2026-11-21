@@ -1,0 +1,63 @@
+{
+  "engine": {
+    "name": "jadx-headless-mcp",
+    "version": "0.7.1",
+    "artifact_sha256": "6e5eacf500b64292bfb73c49797c1958f6ee44646e43e868039ae7feb573ff75",
+    "source_revision": "5844800a486d2248fa949b74c9896285f5b54de2",
+    "worker_count": 1,
+    "heap_limit_mib": 8192
+  },
+  "class_name": "com.alightcreative.app.motion.fonts.SfT",
+  "methods": [
+    {
+      "name": "<init>",
+      "reported_signature": "<init>(android.net.Uri, kotlin.jvm.functions.Function2): void",
+      "overload_index": 0,
+      "is_constructor": true,
+      "dex_descriptor": "(Landroid/net/Uri;Lkotlin/jvm/functions/Function2;)V"
+    },
+    {
+      "name": "C",
+      "reported_signature": "C(eXU.Bb): com.android.volley.sK",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(LeXU/Bb;)Lcom/android/volley/sK;"
+    },
+    {
+      "name": "FCL",
+      "reported_signature": "FCL(byte[]): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "([B)V"
+    },
+    {
+      "name": "dZ",
+      "reported_signature": "dZ(java.lang.Object): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Ljava/lang/Object;)V"
+    },
+    {
+      "name": "f",
+      "reported_signature": "f(kotlin.jvm.functions.Function2, com.android.volley.VolleyError): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lkotlin/jvm/functions/Function2;Lcom/android/volley/VolleyError;)V"
+    },
+    {
+      "name": "hfJ",
+      "reported_signature": "hfJ(kotlin.jvm.functions.Function2, com.android.volley.VolleyError): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lkotlin/jvm/functions/Function2;Lcom/android/volley/VolleyError;)V"
+    }
+  ],
+  "fields": [
+    {
+      "name": "SmL",
+      "reported_type": "kotlin.jvm.functions.Function2",
+      "dex_static_value": null
+    }
+  ],
+  "inner_classes": []
+}

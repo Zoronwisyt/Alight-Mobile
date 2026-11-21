@@ -1,0 +1,8 @@
+    public static final void initGlobalFontHandler() {
+        if (globalFontHandler == null && globalFontCallerHandler == null && fontHandlerInitLock.compareAndSet(false, true)) {
+            globalFontCallerHandler = new Handler(Looper.getMainLooper());
+            HandlerThread handlerThread = new HandlerThread("textElementActivityFonts");
+            handlerThread.start();
+            globalFontHandler = new Handler(handlerThread.getLooper());
+        }
+    }

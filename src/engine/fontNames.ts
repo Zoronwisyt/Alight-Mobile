@@ -52,6 +52,35 @@ function normKey(s: string): string {
   return s.toLowerCase().replace(/[^a-z0-9]/g, '');
 }
 
+// Weight/style words that describe a *face*, not a family. Stripped before a family
+// comparison so "Hind SemiBold", "Hind-SemiBold" and "Hind" are one family.
+const FACE_WORD_RE =
+  /\b(extra[\s-]*light|ultra[\s-]*light|semi[\s-]*bold|demi[\s-]*bold|extra[\s-]*bold|ultra[\s-]*bold|thin|hairline|light|book|regular|normal|medium|bold|black|heavy|italic|oblique)\b/gi;
+
+/**
+ * Family identity key: the part of a font name that survives weight, style and
+ * punctuation differences.
+ *
+ * "Roboto Black" → "roboto", "Space Grotesk" → "spacegrotesk",
+ * "PT_Sans-Narrow" → "ptsansnarrow". Deliberately *not* a substring match — "Roboto
+ * Mono" must stay distinct from "Roboto" — so only whole face words are dropped.
+ */
+export function familyKey(family: string): string {
+  const human = humaniseFamily(family)
+    .replace(FACE_WORD_RE, ' ')
+    .replace(/[^A-Za-z0-9]+/g, '');
+  return human.toLowerCase();
+}
+
+/** True when two font names describe the same family regardless of face suffix. */
+export function sameFamily(a: string, b: string): boolean {
+  // humaniseFamily() turns an empty name into Roboto; two blanks are not a match.
+  if (!a.trim() || !b.trim()) return false;
+  const ka = familyKey(a);
+  const kb = familyKey(b);
+  return ka.length > 0 && ka === kb;
+}
+
 for (const fam of INITIAL_CANONICAL) {
   canonicalByKey.set(normKey(fam), fam);
 }
@@ -82,6 +111,37 @@ export interface ParsedFontToken {
   weight: number;
   style: 'normal' | 'italic';
   usedDefault: boolean;
+  /** The raw provider descriptor when the token carried one, e.g.
+   *  `com.google.android.gms.fonts?name=Roboto&weight=900`. */
+  provider?: string;
+}
+
+// AM writes a font as a *pair*: a human display name, a colon, then a provider
+// descriptor. Both halves are real, from shipped AM project files:
+//
+//   font="Roboto Black:com.google.android.gms.fonts?name=Roboto&weight=900"
+//   font="Oswald:com.google.android.gms.fonts?name=Oswald"
+//   font="googlefonts?name=Roboto&weight=400"          (3.6-era, no display half)
+//
+// See assets/hometab/beta_anim.xml and assets/effects/presets/text-presets.xml.
+const PROVIDER_PREFIX_RE = /^(googlefonts|systemfonts|assetfonts|local|file)\?/i;
+
+function parseProviderQuery(descriptor: string): Map<string, string> {
+  const out = new Map<string, string>();
+  const q = descriptor.indexOf('?');
+  if (q < 0) return out;
+  for (const part of descriptor.slice(q + 1).split('&')) {
+    const eq = part.indexOf('=');
+    if (eq <= 0) continue;
+    let value = part.slice(eq + 1);
+    try {
+      value = decodeURIComponent(value.replace(/\+/g, ' '));
+    } catch {
+      // leave the raw value when it is not valid percent-encoding
+    }
+    out.set(part.slice(0, eq).toLowerCase(), value.trim());
+  }
+  return out;
 }
 
 export function parseAmFontToken(token: string | null | undefined): ParsedFontToken {
@@ -89,28 +149,75 @@ export function parseAmFontToken(token: string | null | undefined): ParsedFontTo
   if (!raw) {
     return { family: 'Roboto', weight: 400, style: 'normal', usedDefault: true };
   }
-  const style: 'normal' | 'italic' = /italic|oblique/i.test(raw) ? 'italic' : 'normal';
-  // Strip file extension if present
-  const noExt = raw.replace(/\.(ttf|otf|woff2?|ttc)$/i, '');
-  // Split camelCase before matching weight tokens so "SemiBoldItalic" -> "Semi Bold Italic"
+
+  // 1. Split display name from provider descriptor.
+  let display = raw;
+  let descriptor = '';
+  if (PROVIDER_PREFIX_RE.test(raw)) {
+    display = '';
+    descriptor = raw;
+  } else {
+    const colon = raw.indexOf(':');
+    if (colon > 0) {
+      const right = raw.slice(colon + 1);
+      // A descriptor always carries a query or a path; a bare "Family:Style" pair does not.
+      if (right.includes('?') || right.includes('/')) {
+        display = raw.slice(0, colon);
+        descriptor = right;
+      }
+    }
+  }
+
+  const query = parseProviderQuery(descriptor);
+  const queryName = query.get('name') || query.get('family') || '';
+  const queryWeight = query.get('weight');
+  const queryItalic = query.has('italic') ? /^(1|true|yes)$/i.test(query.get('italic') || '') : undefined;
+
+  // 2. Weight + italic from the display half, when there is one.
+  const noExt = display.replace(/\.(ttf|otf|woff2?|ttc)$/i, '');
   let cleaned = noExt
     .replace(/[-_]+/g, ' ')
     .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
-    .replace(/(italic|oblique)/gi, ' ')
     .replace(/\s+/g, ' ')
     .trim();
 
-  let weight = 400;
+  let displayWeight = 400;
   let familyPart = cleaned;
   for (const [re, w] of WEIGHT_PATTERNS) {
     if (re.test(cleaned)) {
-      weight = w;
+      displayWeight = w;
       familyPart = cleaned.replace(re, ' ').replace(/\s+/g, ' ').trim();
       break;
     }
   }
-  const family = humaniseFamily(familyPart || cleaned);
-  return { family, weight, style, usedDefault: false };
+  // "Space Grotesk Bold Italic" → "Space Grotesk". The style is already captured above.
+  familyPart = familyPart.replace(/\b(italic|oblique)\b/gi, ' ').replace(/\s+/g, ' ').trim();
+
+  const style: 'normal' | 'italic' =
+    queryItalic !== undefined
+      ? queryItalic
+        ? 'italic'
+        : 'normal'
+      : /italic|oblique/i.test(raw)
+        ? 'italic'
+        : 'normal';
+
+  // 3. Family: the provider's own `name` is authoritative (it is what AM resolves
+  //    the face by); the display half is a localised label and only a fallback.
+  const familySource = queryName || familyPart || cleaned || 'Roboto';
+  const family = humaniseFamily(
+    familySource.replace(/\s+/g, ' ').replace(/^[^A-Za-z0-9]+/, '').trim() || 'Roboto'
+  );
+
+  const weight = queryWeight ? normalizeFontWeight(queryWeight) : displayWeight;
+
+  return {
+    family,
+    weight,
+    style,
+    usedDefault: false,
+    provider: descriptor || undefined,
+  };
 }
 
 export function normalizeFontWeight(weight?: number | string): number {

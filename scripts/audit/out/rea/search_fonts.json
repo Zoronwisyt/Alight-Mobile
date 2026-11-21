@@ -1,0 +1,23 @@
+{
+  "engine": {
+    "name": "jadx-headless-mcp",
+    "version": "0.7.1",
+    "artifact_sha256": "6e5eacf500b64292bfb73c49797c1958f6ee44646e43e868039ae7feb573ff75",
+    "source_revision": "5844800a486d2248fa949b74c9896285f5b54de2",
+    "worker_count": 1,
+    "heap_limit_mib": 8192
+  },
+  "query": "fonts",
+  "total_classes": 24194,
+  "matches": [
+    "com.alightcreative.app.motion.fonts.AMTypefaceError",
+    "com.alightcreative.app.motion.fonts.B8K",
+    "com.alightcreative.app.motion.fonts.Bb",
+    "com.alightcreative.app.motion.fonts.SfT",
+    "com.alightcreative.app.motion.fonts.fs",
+    "com.alightcreative.app.motion.fonts.mY0",
+    "com.alightcreative.app.motion.fonts.sK"
+  ],
+  "duplicate_names": [],
+  "coverage": "complete"
+}

@@ -1,0 +1,3 @@
+    public final Map<Integer, String> getF() {
+        return this.f18882f;
+    }

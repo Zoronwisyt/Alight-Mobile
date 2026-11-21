@@ -1,0 +1,3 @@
+    public final List<Integer> getS() {
+        return this.f18883s;
+    }

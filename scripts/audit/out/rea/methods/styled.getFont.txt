@@ -1,0 +1,3 @@
+    public final String getFont() {
+        return this.font;
+    }

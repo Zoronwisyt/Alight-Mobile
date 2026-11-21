@@ -1,0 +1,3 @@
+    public final float getFontSize() {
+        return this.fontSize;
+    }

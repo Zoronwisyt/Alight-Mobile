@@ -1,0 +1,3 @@
+    public final Map<String, fs> getFonts() {
+        return this.fonts;
+    }

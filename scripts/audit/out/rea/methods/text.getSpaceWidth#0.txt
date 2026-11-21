@@ -1,0 +1,10 @@
+    public static final float getSpaceWidth(StyledText styledText, StyleParams params) {
+        Intrinsics.checkNotNullParameter(styledText, "<this>");
+        Intrinsics.checkNotNullParameter(params, "params");
+        TextPaint textPaint = new TextPaint(1);
+        textPaint.setTextSize(styledText.getFontSize() * 3.0f);
+        initGlobalFontHandler();
+        textPaint.setTypeface(sK.R83(B8K.BWM.Rw(styledText.getFont()), 15000L));
+        applyTo(params, textPaint);
+        return textPaint.measureText(" ");
+    }

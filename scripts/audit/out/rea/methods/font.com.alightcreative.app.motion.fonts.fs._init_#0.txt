@@ -1,0 +1,8 @@
+    public fs(List<Integer> s2, int i2, List<Integer> v2, Map<Integer, String> map) {
+        Intrinsics.checkNotNullParameter(s2, "s");
+        Intrinsics.checkNotNullParameter(v2, "v");
+        this.f18883s = s2;
+        this.f18881c = i2;
+        this.f18884v = v2;
+        this.f18882f = map;
+    }

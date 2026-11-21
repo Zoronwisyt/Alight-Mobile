@@ -1,0 +1,4 @@
+    public Bb(B8K b8k, AMTypefaceError aMTypefaceError) {
+        this.Rw = b8k;
+        this.Hfr = aMTypefaceError;
+    }

@@ -1,0 +1,3 @@
+    public final B8K Hfr() {
+        return this.Rw;
+    }

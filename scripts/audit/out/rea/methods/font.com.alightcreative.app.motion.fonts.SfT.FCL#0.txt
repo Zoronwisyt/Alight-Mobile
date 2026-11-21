@@ -1,0 +1,15 @@
+.method protected FCL([B)V
+    .registers 4
+
+    const-string v0, "response"
+
+    invoke-static {p1, v0}, Lkotlin/jvm/internal/Intrinsics;->checkNotNullParameter(Ljava/lang/Object;Ljava/lang/String;)V
+
+    iget-object v0, p0, Lcom/alightcreative/app/motion/fonts/SfT;->SmL:Lkotlin/jvm/functions/Function2;
+
+    const/4 v1, 0x0
+
+    invoke-interface {v0, p1, v1}, Lkotlin/jvm/functions/Function2;->invoke(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+
+    return-void
+.end method

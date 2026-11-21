@@ -1,0 +1,3 @@
+    public final int getC() {
+        return this.f18881c;
+    }

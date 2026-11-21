@@ -1,0 +1,223 @@
+    /* JADX WARN: Code duplicated, block: B:45:0x0107  */
+    /* JADX WARN: Code duplicated, block: B:47:0x012c  */
+    /* JADX WARN: Code duplicated, block: B:50:0x0139  */
+    /* JADX WARN: Code duplicated, block: B:51:0x0176  */
+    /* JADX WARN: Multi-variable type inference failed */
+    /* JADX WARN: Type inference failed for: r9v10 */
+    /* JADX WARN: Type inference failed for: r9v4 */
+    /* JADX WARN: Type inference failed for: r9v5, types: [java.lang.String, kotlin.jvm.internal.DefaultConstructorMarker] */
+    /* JADX WARN: Type inference failed for: r9v9 */
+    public static final jD.mY0 getTextPath(final StyledText styledText, StyleParams params) {
+        Layout.Alignment alignment;
+        ?? r9;
+        Paint.Align align;
+        int wrapWidth;
+        float f2;
+        final float f3;
+        Path path;
+        Path path2;
+        int lineCount;
+        int i2;
+        final float lineBaseline;
+        final int lineStart;
+        final Ref.IntRef intRef;
+        final StaticLayout staticLayout;
+        TextPaint textPaint;
+        int i3;
+        Path path3;
+        Path path4;
+        Intrinsics.checkNotNullParameter(styledText, "<this>");
+        Intrinsics.checkNotNullParameter(params, "params");
+        StyledTextWithParams styledTextWithParams = new StyledTextWithParams(styledText, params);
+        jD.mY0 my0 = textPathCache.get(styledTextWithParams);
+        if (my0 != null) {
+            return new jD.mY0(my0);
+        }
+        int i4 = 1;
+        TextPaint textPaint2 = new TextPaint(1);
+        textPaint2.setTextSize(styledText.getFontSize() * 3.0f);
+        initGlobalFontHandler();
+        textPaint2.setTypeface(sK.R83(B8K.BWM.Rw(styledText.getFont()), 15000L));
+        applyTo(params, textPaint2);
+        String text = styledText.getText();
+        int wrapWidth2 = styledText.getWrapWidth();
+        StyledTextAlign align2 = styledText.getAlign();
+        int[] iArr = WhenMappings.$EnumSwitchMapping$0;
+        int i5 = iArr[align2.ordinal()];
+        String str = null;
+        Object[] objArr = 0;
+        if (i5 == 1) {
+            alignment = Layout.Alignment.ALIGN_NORMAL;
+        } else if (i5 == 2) {
+            alignment = Layout.Alignment.ALIGN_CENTER;
+        } else {
+            if (i5 != 3) {
+                if (i5 != 4) {
+                    throw new NoWhenBranchMatchedException();
+                }
+                throw new NotImplementedError(str, i4, objArr == true ? 1 : 0);
+            }
+            alignment = Layout.Alignment.ALIGN_OPPOSITE;
+        }
+        StaticLayout staticLayout2 = new StaticLayout(text, textPaint2, wrapWidth2, alignment, params.getLineSpacing(), 0.0f, true);
+        int i6 = iArr[styledText.getAlign().ordinal()];
+        if (i6 == 1) {
+            r9 = 0;
+            align = Paint.Align.LEFT;
+        } else if (i6 == 2) {
+            r9 = 0;
+            align = Paint.Align.CENTER;
+        } else {
+            if (i6 != 3) {
+                if (i6 != 4) {
+                    throw new NoWhenBranchMatchedException();
+                }
+                throw new NotImplementedError(null, i4, 0 == true ? 1 : 0);
+            }
+            r9 = 0;
+            align = Paint.Align.RIGHT;
+        }
+        textPaint2.setTextAlign(align);
+        int i7 = iArr[styledText.getAlign().ordinal()];
+        if (i7 != 1) {
+            if (i7 == 2) {
+                f2 = 0.0f;
+            } else {
+                if (i7 != 3) {
+                    if (i7 != 4) {
+                        throw new NoWhenBranchMatchedException();
+                    }
+                    throw new NotImplementedError(r9, i4, r9);
+                }
+                wrapWidth = styledText.getWrapWidth();
+            }
+            f3 = f2;
+            path = new Path();
+            path2 = new Path();
+            lineCount = staticLayout2.getLineCount();
+            i2 = 0;
+            while (i2 < lineCount) {
+                lineBaseline = staticLayout2.getLineBaseline(i2);
+                lineStart = staticLayout2.getLineStart(i2);
+                intRef = new Ref.IntRef();
+                intRef.element = staticLayout2.getLineEnd(i2);
+                if (CharsKt__CharJVMKt.isWhitespace(styledText.getText().charAt(intRef.element - i4))) {
+                    intRef.element--;
+                }
+                path2.rewind();
+                if (intRef.element > lineStart) {
+                    staticLayout = staticLayout2;
+                    textPaint = textPaint2;
+                    euv.dZ(styledText, new Function0<String>() { // from class: com.alightcreative.app.motion.scene.TextElementKt.getTextPath.2
+                        /* JADX WARN: 'super' call moved to the top of the method (can break code semantics) */
+                        {
+                            super(0);
+                        }
+
+                        @Override // kotlin.jvm.functions.Function0
+                        public final String invoke() {
+                            int i8 = lineStart;
+                            int i9 = intRef.element;
+                            float f4 = f3;
+                            float height = lineBaseline - (staticLayout.getHeight() / 2.0f);
+                            int length = styledText.getText().length();
+                            String text2 = styledText.getText();
+                            ArrayList arrayList = new ArrayList(text2.length());
+                            for (int i10 = 0; i10 < text2.length(); i10++) {
+                                String string = Integer.toString(text2.charAt(i10), CharsKt__CharJVMKt.checkRadix(16));
+                                Intrinsics.checkNotNullExpressionValue(string, "toString(...)");
+                                arrayList.add(StringsKt__StringsKt.padStart(string, 2, '0'));
+                            }
+                            return "About to call getTextPath: start=" + i8 + " end=" + i9 + " x=" + f4 + " y=" + height + " textLen=" + length + " textDump=" + CollectionsKt___CollectionsKt.joinToString$default(arrayList, ",", null, null, 0, null, null, 62, null) + " text='" + styledText.getText() + "'";
+                        }
+                    });
+                    i3 = i2;
+                    path3 = path2;
+                    path4 = path;
+                    textPaint.getTextPath(styledText.getText(), lineStart, intRef.element, f3, lineBaseline - (staticLayout.getHeight() / 2.0f), path3);
+                    path4.addPath(path3);
+                } else {
+                    staticLayout = staticLayout2;
+                    textPaint = textPaint2;
+                    i3 = i2;
+                    path3 = path2;
+                    path4 = path;
+                }
+                i2 = i3 + 1;
+                path = path4;
+                lineCount = lineCount;
+                path2 = path3;
+                staticLayout2 = staticLayout;
+                i4 = i4;
+                textPaint2 = textPaint;
+            }
+            jD.mY0 my0S = rs.s(path, 0.1f, 0.0f, 0.0f, 6, null);
+            textPathCache.put(styledTextWithParams, new jD.mY0(my0S));
+            return my0S;
+        }
+        wrapWidth = -styledText.getWrapWidth();
+        f2 = wrapWidth / 2.0f;
+        f3 = f2;
+        path = new Path();
+        path2 = new Path();
+        lineCount = staticLayout2.getLineCount();
+        i2 = 0;
+        while (i2 < lineCount) {
+            lineBaseline = staticLayout2.getLineBaseline(i2);
+            lineStart = staticLayout2.getLineStart(i2);
+            intRef = new Ref.IntRef();
+            intRef.element = staticLayout2.getLineEnd(i2);
+            if (CharsKt__CharJVMKt.isWhitespace(styledText.getText().charAt(intRef.element - i4))) {
+                intRef.element--;
+            }
+            path2.rewind();
+            if (intRef.element > lineStart) {
+                staticLayout = staticLayout2;
+                textPaint = textPaint2;
+                euv.dZ(styledText, new Function0<String>() { // from class: com.alightcreative.app.motion.scene.TextElementKt.getTextPath.2
+                    /* JADX WARN: 'super' call moved to the top of the method (can break code semantics) */
+                    {
+                        super(0);
+                    }
+
+                    @Override // kotlin.jvm.functions.Function0
+                    public final String invoke() {
+                        int i8 = lineStart;
+                        int i9 = intRef.element;
+                        float f4 = f3;
+                        float height = lineBaseline - (staticLayout.getHeight() / 2.0f);
+                        int length = styledText.getText().length();
+                        String text2 = styledText.getText();
+                        ArrayList arrayList = new ArrayList(text2.length());
+                        for (int i10 = 0; i10 < text2.length(); i10++) {
+                            String string = Integer.toString(text2.charAt(i10), CharsKt__CharJVMKt.checkRadix(16));
+                            Intrinsics.checkNotNullExpressionValue(string, "toString(...)");
+                            arrayList.add(StringsKt__StringsKt.padStart(string, 2, '0'));
+                        }
+                        return "About to call getTextPath: start=" + i8 + " end=" + i9 + " x=" + f4 + " y=" + height + " textLen=" + length + " textDump=" + CollectionsKt___CollectionsKt.joinToString$default(arrayList, ",", null, null, 0, null, null, 62, null) + " text='" + styledText.getText() + "'";
+                    }
+                });
+                i3 = i2;
+                path3 = path2;
+                path4 = path;
+                textPaint.getTextPath(styledText.getText(), lineStart, intRef.element, f3, lineBaseline - (staticLayout.getHeight() / 2.0f), path3);
+                path4.addPath(path3);
+            } else {
+                staticLayout = staticLayout2;
+                textPaint = textPaint2;
+                i3 = i2;
+                path3 = path2;
+                path4 = path;
+            }
+            i2 = i3 + 1;
+            path = path4;
+            lineCount = lineCount;
+            path2 = path3;
+            staticLayout2 = staticLayout;
+            i4 = i4;
+            textPaint2 = textPaint;
+        }
+        jD.mY0 my0S2 = rs.s(path, 0.1f, 0.0f, 0.0f, 6, null);
+        textPathCache.put(styledTextWithParams, new jD.mY0(my0S2));
+        return my0S2;
+    }

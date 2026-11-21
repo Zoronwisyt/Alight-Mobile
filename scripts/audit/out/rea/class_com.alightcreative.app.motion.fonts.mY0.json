@@ -1,0 +1,77 @@
+{
+  "engine": {
+    "name": "jadx-headless-mcp",
+    "version": "0.7.1",
+    "artifact_sha256": "6e5eacf500b64292bfb73c49797c1958f6ee44646e43e868039ae7feb573ff75",
+    "source_revision": "5844800a486d2248fa949b74c9896285f5b54de2",
+    "worker_count": 1,
+    "heap_limit_mib": 8192
+  },
+  "class_name": "com.alightcreative.app.motion.fonts.mY0",
+  "methods": [
+    {
+      "name": "<init>",
+      "reported_signature": "<init>(java.util.Map<java.lang.String, com.alightcreative.app.motion.fonts.fs>): void",
+      "overload_index": 0,
+      "is_constructor": true,
+      "dex_descriptor": "(Ljava/util/Map;)V"
+    },
+    {
+      "name": "component1",
+      "reported_signature": "component1(): java.util.Map<java.lang.String, com.alightcreative.app.motion.fonts.fs>",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/util/Map;"
+    },
+    {
+      "name": "copy",
+      "reported_signature": "copy(java.util.Map<java.lang.String, com.alightcreative.app.motion.fonts.fs>): com.alightcreative.app.motion.fonts.mY0",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Ljava/util/Map;)Lcom/alightcreative/app/motion/fonts/mY0;"
+    },
+    {
+      "name": "copy$default",
+      "reported_signature": "copy$default(com.alightcreative.app.motion.fonts.mY0, java.util.Map, int, java.lang.Object): com.alightcreative.app.motion.fonts.mY0",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/fonts/mY0;Ljava/util/Map;ILjava/lang/Object;)Lcom/alightcreative/app/motion/fonts/mY0;"
+    },
+    {
+      "name": "equals",
+      "reported_signature": "equals(java.lang.Object): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Ljava/lang/Object;)Z"
+    },
+    {
+      "name": "getFonts",
+      "reported_signature": "getFonts(): java.util.Map<java.lang.String, com.alightcreative.app.motion.fonts.fs>",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/util/Map;"
+    },
+    {
+      "name": "hashCode",
+      "reported_signature": "hashCode(): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()I"
+    },
+    {
+      "name": "toString",
+      "reported_signature": "toString(): java.lang.String",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/lang/String;"
+    }
+  ],
+  "fields": [
+    {
+      "name": "fonts",
+      "reported_type": "java.util.Map<java.lang.String, com.alightcreative.app.motion.fonts.fs>",
+      "dex_static_value": null
+    }
+  ],
+  "inner_classes": []
+}

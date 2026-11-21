@@ -1,0 +1,85 @@
+    public static final Bitmap getTextBitmap(final StyledText styledText, final int i2, final StyleParams params) {
+        Bitmap orPut;
+        Intrinsics.checkNotNullParameter(styledText, "<this>");
+        Intrinsics.checkNotNullParameter(params, "params");
+        BitmapLruCache<StyledTextWithParams> bitmapLruCache = textBitmapCache;
+        synchronized (bitmapLruCache) {
+            orPut = ImageCacheKt.getOrPut(bitmapLruCache, new StyledTextWithParams(styledText, params), new Function0<Bitmap>() { // from class: com.alightcreative.app.motion.scene.TextElementKt$getTextBitmap$1$1
+
+                /* JADX INFO: loaded from: classes9.dex */
+                @Metadata(k = 3, mv = {1, 9, 0}, xi = 48)
+                public /* synthetic */ class WhenMappings {
+                    public static final /* synthetic */ int[] $EnumSwitchMapping$0;
+
+                    static {
+                        int[] iArr = new int[StyledTextAlign.values().length];
+                        try {
+                            iArr[StyledTextAlign.LEFT.ordinal()] = 1;
+                        } catch (NoSuchFieldError unused) {
+                        }
+                        try {
+                            iArr[StyledTextAlign.CENTER.ordinal()] = 2;
+                        } catch (NoSuchFieldError unused2) {
+                        }
+                        try {
+                            iArr[StyledTextAlign.RIGHT.ordinal()] = 3;
+                        } catch (NoSuchFieldError unused3) {
+                        }
+                        try {
+                            iArr[StyledTextAlign.JUSTIFY.ordinal()] = 4;
+                        } catch (NoSuchFieldError unused4) {
+                        }
+                        $EnumSwitchMapping$0 = iArr;
+                    }
+                }
+
+                /* JADX WARN: 'super' call moved to the top of the method (can break code semantics) */
+                {
+                    super(0);
+                }
+
+                /* JADX WARN: Can't rename method to resolve collision */
+                /* JADX WARN: Multi-variable type inference failed */
+                @Override // kotlin.jvm.functions.Function0
+                public final Bitmap invoke() {
+                    Layout.Alignment alignment;
+                    int i3 = 1;
+                    TextPaint textPaint = new TextPaint(1);
+                    textPaint.setTextSize(styledText.getFontSize() * 3.0f);
+                    TextElementKt.initGlobalFontHandler();
+                    textPaint.setTypeface(sK.R83(B8K.BWM.Rw(styledText.getFont()), 15000L));
+                    TextElementKt.applyTo(params, textPaint);
+                    String text = styledText.getText();
+                    int wrapWidth = styledText.getWrapWidth();
+                    int i4 = WhenMappings.$EnumSwitchMapping$0[styledText.getAlign().ordinal()];
+                    if (i4 == 1) {
+                        alignment = Layout.Alignment.ALIGN_NORMAL;
+                    } else if (i4 == 2) {
+                        alignment = Layout.Alignment.ALIGN_CENTER;
+                    } else {
+                        if (i4 != 3) {
+                            if (i4 != 4) {
+                                throw new NoWhenBranchMatchedException();
+                            }
+                            throw new NotImplementedError(null, i3, 0 == true ? 1 : 0);
+                        }
+                        alignment = Layout.Alignment.ALIGN_OPPOSITE;
+                    }
+                    StaticLayout staticLayout = new StaticLayout(text, textPaint, wrapWidth, alignment, params.getLineSpacing(), 0.0f, true);
+                    int wrapWidth2 = styledText.getWrapWidth();
+                    int height = staticLayout.getHeight();
+                    int i5 = i2;
+                    Pair pairG = nD.fs.g(wrapWidth2, height, i5, i5);
+                    int iIntValue = ((Number) pairG.component1()).intValue();
+                    int iIntValue2 = ((Number) pairG.component2()).intValue();
+                    Bitmap bitmapCreateBitmap = Bitmap.createBitmap(iIntValue, iIntValue2, Bitmap.Config.ARGB_8888);
+                    Intrinsics.checkNotNullExpressionValue(bitmapCreateBitmap, "createBitmap(...)");
+                    Canvas canvas = new Canvas(bitmapCreateBitmap);
+                    canvas.scale(iIntValue / styledText.getWrapWidth(), iIntValue2 / staticLayout.getHeight());
+                    staticLayout.draw(canvas);
+                    return bitmapCreateBitmap;
+                }
+            });
+        }
+        return orPut;
+    }

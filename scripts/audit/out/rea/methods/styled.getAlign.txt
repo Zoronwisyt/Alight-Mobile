@@ -1,0 +1,3 @@
+    public final StyledTextAlign getAlign() {
+        return this.align;
+    }

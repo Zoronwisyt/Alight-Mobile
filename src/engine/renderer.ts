@@ -20,6 +20,7 @@ import { getEffectById, getEffects, getShapeById, parseDefaultParamValue } from 
 import { evaluateShapePath, runEffectScript, type EffectScriptElement, type EffectScriptEnv } from './scriptRuntime';
 import { sanitizeGlslUniformName, ShaderRegistry, type CompiledShaderProgram } from './shaderCompiler';
 import { fontEpoch, resolveFontTriple } from './fontRegistry';
+import { textBlockHeight } from './textMetrics';
 import { loadMediaUrl } from '../store/storage';
 
 interface CachedFrame {
@@ -1779,6 +1780,19 @@ export class AlightRenderer {
     const usesCompTex = activeShaderDefs.some((d) => d.params.some((p) => p.srcType === 'comp'));
 
     let overdrawPad = 0.0;
+    // AM lets an effect declare how far outside the layer rect it needs to sample
+    // (`overdraw="true"` + `max-overdraw`, parsed into effects.json): blur tails,
+    // long shadows, the 3D solids and the tile effect all rely on it. Honour the
+    // declaration as a floor so those effects are not clipped at the layer edge.
+    let declaredOverdraw = 0.0;
+    for (const d of activeShaderDefs) {
+      if (d.overdraw && d.maxOverdraw && d.maxOverdraw > declaredOverdraw) {
+        declaredOverdraw = d.maxOverdraw;
+      }
+    }
+    if (declaredOverdraw > 0 && !usesCompTex) {
+      overdrawPad = Math.min(1.25, declaredOverdraw);
+    }
     if (activeShaderDefs.length > 0 && !usesCompTex) {
       const ax = layerToScreen[0], bx = layerToScreen[1], oX = layerToScreen[3];
       const ay = layerToScreen[4], by = layerToScreen[5], oY = layerToScreen[7];
@@ -1787,7 +1801,7 @@ export class AlightRenderer {
       const neededPad = Math.max(0.5, -minCorner + 0.05, maxCorner - 1.0 + 0.05);
       const maxTex = (this.gl.getParameter(this.gl.MAX_TEXTURE_SIZE) as number) || 4096;
       const maxPadByGpu = Math.max(0.5, ((Math.min(8192, maxTex) / Math.max(1, renderW, renderH)) - 1.0) * 0.5);
-      overdrawPad = Math.min(1.25, maxPadByGpu, neededPad);
+      overdrawPad = Math.max(overdrawPad, Math.min(1.25, maxPadByGpu, neededPad));
     }
 
     const overdrawSpan = 1.0 + 2.0 * overdrawPad;
@@ -2886,8 +2900,16 @@ export class AlightRenderer {
       logicalW = Math.min(4096, Math.max(64, maxX));
       logicalH = Math.min(4096, Math.max(64, maxY));
     } else if (layer.type === 'text' && layer.textData) {
+      // Approximate only — drawTextLayer returns the measured box and overrides this.
       logicalW = Math.max(200, layer.textData.wrapWidth || 800);
-      logicalH = Math.max(120, layer.textData.fontSize * 3);
+      logicalH = Math.max(
+        40,
+        textBlockHeight(
+          layer.textData.fontSize,
+          Math.max(1, (layer.textData.content || '').split('\n').length),
+          layer.textData.lineHeight || 1.2
+        )
+      );
     } else if (layer.type === 'vector' && layer.vectorPath) {
       logicalW = 500;
       logicalH = 500;
@@ -2962,7 +2984,13 @@ export class AlightRenderer {
           }
         }
       } else if (layer.type === 'text' && layer.textData) {
-        this.drawTextLayer(ctx, project, layer, normT, sceneTimeMs);
+        // AM's text box is (wrapWidth, StaticLayout height) — the real laid-out size,
+        // not a fixed multiple of the font size. Taking the measured box back here is
+        // what makes acLayerNorm, and every procedural effect normalised through it,
+        // cover the same rect the app covers.
+        const textDims = this.drawTextLayer(ctx, project, layer, normT, sceneTimeMs);
+        if (textDims.w > 0) logicalW = textDims.w;
+        if (textDims.h > 0) logicalH = textDims.h;
       }
 
       ctx.restore();
@@ -3040,7 +3068,7 @@ export class AlightRenderer {
     }
   }
 
-  private drawTextLayer(ctx: CanvasRenderingContext2D, project: Project, layer: Layer, normT: number, sceneTimeMs: number) {
+  private drawTextLayer(ctx: CanvasRenderingContext2D, project: Project, layer: Layer, normT: number, sceneTimeMs: number): { w: number; h: number } {
     const td = layer.textData!;
     let content = td.content || '';
 
@@ -3088,9 +3116,10 @@ export class AlightRenderer {
       }
     }
 
-    // Text Spacing effect
+    // Text Spacing effect. AM feeds `letterspacing` straight into
+    // Paint.setLetterSpacing, which is measured in ems, so one unit is one font size.
     const spacingFx = layer.effects.find((e) => e.enabled && e.effectId === 'com.alightcreative.effects.textspacing');
-    const extraLetterSpace = spacingFx ? (Number(evalAnimatable(spacingFx.params.letterspacing, normT, 0)) || 0) * td.fontSize * 0.5 : 0;
+    const extraLetterSpace = spacingFx ? (Number(evalAnimatable(spacingFx.params.letterspacing, normT, 0)) || 0) * td.fontSize : 0;
     const extraLineSpace = spacingFx ? (Number(evalAnimatable(spacingFx.params.linespacing, normT, 1)) || 1) : 1;
 
     // Text Transform effect
@@ -3261,6 +3290,14 @@ export class AlightRenderer {
         ctx.restore();
       });
     });
+
+    // The measured box, matching AM's `new Vector2D(wrapWidth, staticLayout.getHeight())`.
+    const lineCount = Math.max(1, layout.lines.length);
+    const measuredW = layout.lines.reduce((m, l) => Math.max(m, l.lineW), 0);
+    return {
+      w: Number.isFinite(wrapMax) ? (wrapMax as number) : measuredW,
+      h: textBlockHeight(fontSize, lineCount, (td.lineHeight || 1.2) * extraLineSpace),
+    };
   }
 
   public verifyAllShaders(): {

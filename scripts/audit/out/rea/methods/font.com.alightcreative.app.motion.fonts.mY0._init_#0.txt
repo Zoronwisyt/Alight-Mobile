@@ -1,0 +1,4 @@
+    public mY0(Map<String, fs> fonts) {
+        Intrinsics.checkNotNullParameter(fonts, "fonts");
+        this.fonts = fonts;
+    }

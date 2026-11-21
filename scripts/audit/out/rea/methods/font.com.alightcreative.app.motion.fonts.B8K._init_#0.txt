@@ -1,0 +1,6 @@
+    public B8K(Wg.euv font, rs variant) {
+        Intrinsics.checkNotNullParameter(font, "font");
+        Intrinsics.checkNotNullParameter(variant, "variant");
+        this.Rw = font;
+        this.Hfr = variant;
+    }

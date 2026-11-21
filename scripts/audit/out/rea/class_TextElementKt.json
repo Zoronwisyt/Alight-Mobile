@@ -1,0 +1,184 @@
+{
+  "engine": {
+    "name": "jadx-headless-mcp",
+    "version": "0.7.1",
+    "artifact_sha256": "6e5eacf500b64292bfb73c49797c1958f6ee44646e43e868039ae7feb573ff75",
+    "source_revision": "5844800a486d2248fa949b74c9896285f5b54de2",
+    "worker_count": 1,
+    "heap_limit_mib": 8192
+  },
+  "class_name": "com.alightcreative.app.motion.scene.TextElementKt",
+  "methods": [
+    {
+      "name": "<clinit>",
+      "reported_signature": "<clinit>(): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()V"
+    },
+    {
+      "name": "TextElement",
+      "reported_signature": "TextElement(com.alightcreative.app.motion.scene.KeyableTransform, int, int, com.alightcreative.app.motion.scene.StyledText, com.alightcreative.app.motion.scene.Keyable<com.alightcreative.app.motion.scene.SolidColor>, android.net.Uri, android.net.Uri, long, java.lang.String, int, int, com.alightcreative.app.motion.scene.FillType, boolean, com.alightcreative.app.motion.scene.BlendingMode): com.alightcreative.app.motion.scene.SceneElement",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/KeyableTransform;IILcom/alightcreative/app/motion/scene/StyledText;Lcom/alightcreative/app/motion/scene/Keyable;Landroid/net/Uri;Landroid/net/Uri;JLjava/lang/String;IILcom/alightcreative/app/motion/scene/FillType;ZLcom/alightcreative/app/motion/scene/BlendingMode;)Lcom/alightcreative/app/motion/scene/SceneElement;"
+    },
+    {
+      "name": "TextElement$default",
+      "reported_signature": "TextElement$default(com.alightcreative.app.motion.scene.KeyableTransform, int, int, com.alightcreative.app.motion.scene.StyledText, com.alightcreative.app.motion.scene.Keyable, android.net.Uri, android.net.Uri, long, java.lang.String, int, int, com.alightcreative.app.motion.scene.FillType, boolean, com.alightcreative.app.motion.scene.BlendingMode, int, java.lang.Object): com.alightcreative.app.motion.scene.SceneElement",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/KeyableTransform;IILcom/alightcreative/app/motion/scene/StyledText;Lcom/alightcreative/app/motion/scene/Keyable;Landroid/net/Uri;Landroid/net/Uri;JLjava/lang/String;IILcom/alightcreative/app/motion/scene/FillType;ZLcom/alightcreative/app/motion/scene/BlendingMode;ILjava/lang/Object;)Lcom/alightcreative/app/motion/scene/SceneElement;"
+    },
+    {
+      "name": "access$getPaint$p",
+      "reported_signature": "access$getPaint$p(): jD.Jb",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()LjD/Jb;"
+    },
+    {
+      "name": "access$getScratchBounds$p",
+      "reported_signature": "access$getScratchBounds$p(): android.graphics.RectF",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Landroid/graphics/RectF;"
+    },
+    {
+      "name": "access$getScratchPath$p",
+      "reported_signature": "access$getScratchPath$p(): jD.mY0",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()LjD/mY0;"
+    },
+    {
+      "name": "access$getScratchRectF$p",
+      "reported_signature": "access$getScratchRectF$p(): android.graphics.RectF",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Landroid/graphics/RectF;"
+    },
+    {
+      "name": "access$getSelectionPaintBase$p",
+      "reported_signature": "access$getSelectionPaintBase$p(): jD.Jb",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()LjD/Jb;"
+    },
+    {
+      "name": "access$getSelectionPaintTop$p",
+      "reported_signature": "access$getSelectionPaintTop$p(): jD.Jb",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()LjD/Jb;"
+    },
+    {
+      "name": "applyTo",
+      "reported_signature": "applyTo(com.alightcreative.app.motion.scene.StyleParams, android.graphics.Paint): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/StyleParams;Landroid/graphics/Paint;)V"
+    },
+    {
+      "name": "getSpaceWidth",
+      "reported_signature": "getSpaceWidth(com.alightcreative.app.motion.scene.StyledText, com.alightcreative.app.motion.scene.StyleParams): float",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/StyledText;Lcom/alightcreative/app/motion/scene/StyleParams;)F"
+    },
+    {
+      "name": "getTextBitmap",
+      "reported_signature": "getTextBitmap(com.alightcreative.app.motion.scene.StyledText, int, com.alightcreative.app.motion.scene.StyleParams): android.graphics.Bitmap",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/StyledText;ILcom/alightcreative/app/motion/scene/StyleParams;)Landroid/graphics/Bitmap;"
+    },
+    {
+      "name": "getTextDimensions",
+      "reported_signature": "getTextDimensions(com.alightcreative.app.motion.scene.StyledText, com.alightcreative.app.motion.scene.StyleParams): com.alightcreative.app.motion.scene.Vector2D",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/StyledText;Lcom/alightcreative/app/motion/scene/StyleParams;)Lcom/alightcreative/app/motion/scene/Vector2D;"
+    },
+    {
+      "name": "getTextPath",
+      "reported_signature": "getTextPath(com.alightcreative.app.motion.scene.StyledText, com.alightcreative.app.motion.scene.StyleParams): jD.mY0",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/StyledText;Lcom/alightcreative/app/motion/scene/StyleParams;)LjD/mY0;"
+    },
+    {
+      "name": "initGlobalFontHandler",
+      "reported_signature": "initGlobalFontHandler(): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()V"
+    }
+  ],
+  "fields": [
+    {
+      "name": "fontHandlerInitLock",
+      "reported_type": "java.util.concurrent.atomic.AtomicBoolean",
+      "dex_static_value": null
+    },
+    {
+      "name": "globalFontCallerHandler",
+      "reported_type": "android.os.Handler",
+      "dex_static_value": null
+    },
+    {
+      "name": "globalFontHandler",
+      "reported_type": "android.os.Handler",
+      "dex_static_value": null
+    },
+    {
+      "name": "paint",
+      "reported_type": "jD.Jb",
+      "dex_static_value": null
+    },
+    {
+      "name": "scratchBounds",
+      "reported_type": "android.graphics.RectF",
+      "dex_static_value": null
+    },
+    {
+      "name": "scratchPath",
+      "reported_type": "jD.mY0",
+      "dex_static_value": null
+    },
+    {
+      "name": "scratchRectF",
+      "reported_type": "android.graphics.RectF",
+      "dex_static_value": null
+    },
+    {
+      "name": "selectionPaintBase",
+      "reported_type": "jD.Jb",
+      "dex_static_value": null
+    },
+    {
+      "name": "selectionPaintTop",
+      "reported_type": "jD.Jb",
+      "dex_static_value": null
+    },
+    {
+      "name": "textBitmapCache",
+      "reported_type": "com.alightcreative.app.motion.scene.BitmapLruCache<com.alightcreative.app.motion.scene.StyledTextWithParams>",
+      "dex_static_value": null
+    },
+    {
+      "name": "textPathCache",
+      "reported_type": "android.util.LruCache<com.alightcreative.app.motion.scene.StyledTextWithParams, jD.mY0>",
+      "dex_static_value": null
+    },
+    {
+      "name": "textSizeCache",
+      "reported_type": "java.util.WeakHashMap<com.alightcreative.app.motion.scene.StyledText, com.alightcreative.app.motion.scene.Vector2D>",
+      "dex_static_value": null
+    }
+  ],
+  "inner_classes": [
+    "com.alightcreative.app.motion.scene.TextElementKt.WhenMappings",
+    "com.alightcreative.app.motion.scene.TextElementKt.AnonymousClass2"
+  ]
+}

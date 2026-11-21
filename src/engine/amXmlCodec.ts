@@ -12,7 +12,10 @@ import { animatable, parseEasingString } from './animation';
 import { blendModeToXml, canonicalizeBlendMode, isMaskBlendMode } from './blendModes';
 import { getEffectById, getShapeById, parseDefaultParamValue } from './catalog';
 import { formatAmFontToken, parseAmFontToken } from './fontNames';
+import { amTextSizeToPx, pxToAmTextSize } from './textMetrics';
 
+// Alight Motion stores a text layer's `size` in units that are 1/3 of the em it paints
+// with — see src/engine/textMetrics.ts for the APK anchors.
 function escapeXml(str: string): string {
   return str
     .replace(/&/g, '&amp;')
@@ -96,8 +99,21 @@ function layerToXml(layer: Layer, indent = '  '): string {
       : '';
 
   const parts: string[] = [];
+  // Text attributes belong on the <text> element in AM's own dialect — its loader reads
+  // `size`, `font`, `wrapWidth`, `align` and `color` from the layer tag, leaving
+  // <content> to hold nothing but the characters.
+  let textAttrs = '';
+  if (layer.type === 'text' && layer.textData) {
+    const td = layer.textData;
+    const amFont = formatAmFontToken(td.fontFamily, td.fontWeight ?? 400, Boolean(td.italic));
+    const amSize = pxToAmTextSize(td.fontSize).toFixed(6);
+    const wrap = Math.round(td.wrapWidth || 800);
+    textAttrs =
+      ` size="${amSize}" font="${escapeXml(amFont)}" wrapWidth="${wrap}"` +
+      ` align="${escapeXml(td.align || 'center')}" color="${escapeXml(td.color || '#FFFFFFFF')}"`;
+  }
   parts.push(
-    `${indent}<${tag} id="${escapeXml(layer.id)}" label="${escapeXml(layer.label)}" startTime="${Math.round(layer.startTime)}" endTime="${Math.round(layer.endTime)}"${fillAttr}${parentAttr}${clipAttr}${blendAttr}${retimeAttr}${cropAttr}>`
+    `${indent}<${tag} id="${escapeXml(layer.id)}" label="${escapeXml(layer.label)}" startTime="${Math.round(layer.startTime)}" endTime="${Math.round(layer.endTime)}"${fillAttr}${textAttrs}${parentAttr}${clipAttr}${blendAttr}${retimeAttr}${cropAttr}>`
   );
 
   parts.push(`${indent}  <transform>`);
@@ -109,14 +125,7 @@ function layerToXml(layer: Layer, indent = '  '): string {
   parts.push(`${indent}  </transform>`);
 
   if (layer.type === 'text' && layer.textData) {
-    const amFont = formatAmFontToken(
-      layer.textData.fontFamily,
-      layer.textData.fontWeight ?? 400,
-      Boolean(layer.textData.italic)
-    );
-    parts.push(
-      `${indent}  <content font="${escapeXml(amFont)}" size="${layer.textData.fontSize}" align="${layer.textData.align}" color="${escapeXml(layer.textData.color)}">${escapeXml(layer.textData.content)}</content>`
-    );
+    parts.push(`${indent}  <content>${escapeXml(layer.textData.content)}</content>`);
   }
 
   if (layer.type === 'camera' && layer.cameraData) {
@@ -690,17 +699,29 @@ function parseXmlLayer(
     textData:
       type === 'text'
         ? (() => {
-            const rawWrap = parseFloat(contentEl?.getAttribute('wrapWidth') || el.getAttribute('wrapWidth') || '');
+            // AM writes text attributes on the <text> element (see
+            // assets/hometab/beta_anim.xml), not on <content>. Read the layer first and
+            // fall back to the child, so both dialects load.
+            const textAttr = (name: string): string | null =>
+              el.getAttribute(name) ?? contentEl?.getAttribute(name) ?? null;
+            const rawWrap = parseFloat(textAttr('wrapWidth') || '');
             const hasExplicitWrap = Number.isFinite(rawWrap) && rawWrap > 0;
-            const parsedFont = parseAmFontToken(contentEl?.getAttribute('font'));
+            const parsedFont = parseAmFontToken(textAttr('font'));
+            const rawSize = parseFloat(textAttr('size') || '');
+            const amSize = Number.isFinite(rawSize) && rawSize > 0 ? rawSize : 72;
+            const rawAlign = (textAttr('align') || '').trim().toLowerCase();
             return {
               content: contentEl?.textContent || 'Text',
               fontFamily: parsedFont.family,
               fontWeight: parsedFont.weight,
               italic: parsedFont.style === 'italic',
-              fontSize: parseFloat(contentEl?.getAttribute('size') || '72') || 72,
-              color: contentEl?.getAttribute('color') || '#FFFFFFFF',
-              align: (contentEl?.getAttribute('align') as 'left' | 'center' | 'right') || 'center',
+              // AM paints at 3× the stored size; the renderer works in pixels.
+              fontSize: Math.max(1, amTextSizeToPx(amSize)),
+              color: textAttr('color') || '#FFFFFFFF',
+              align: (rawAlign === 'left' || rawAlign === 'right' || rawAlign === 'center' ? rawAlign : 'center') as
+                | 'left'
+                | 'center'
+                | 'right',
               lineHeight: 1.2,
               letterSpacing: 0,
               wrapWidth: hasExplicitWrap ? rawWrap : projW * 0.85,

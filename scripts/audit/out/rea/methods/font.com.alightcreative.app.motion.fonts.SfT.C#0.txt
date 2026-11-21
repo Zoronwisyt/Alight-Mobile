@@ -1,0 +1,10 @@
+    @Override // com.android.volley.euv
+    protected com.android.volley.sK C(eXU.Bb bb) {
+        byte[] bArr = bb != null ? bb.Hfr : null;
+        if (bArr == null) {
+            bArr = new byte[0];
+        }
+        com.android.volley.sK sKVarBWM = com.android.volley.sK.BWM(bArr, jz6.euv.dZ(bb));
+        Intrinsics.checkNotNullExpressionValue(sKVarBWM, "success(...)");
+        return sKVarBWM;
+    }

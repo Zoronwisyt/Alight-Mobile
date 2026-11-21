@@ -2,7 +2,13 @@
 // and missing-font detection for Alight Motion Web Studio.
 
 import type { Layer, Project } from '../types/project';
-import { humaniseFamily, normalizeFontWeight, registerCanonicalFamily } from './fontNames';
+import {
+  familyKey,
+  humaniseFamily,
+  normalizeFontWeight,
+  registerCanonicalFamily,
+  sameFamily,
+} from './fontNames';
 
 export type FaceStyle = 'normal' | 'italic';
 
@@ -111,6 +117,64 @@ export function getRegisteredFamilies(): string[] {
   return Array.from(set).sort();
 }
 
+// Family identity index: `familyKey` → the registered families that share it.
+//
+// A project asks for "Hind"; a pack registers "Hind SemiBold" and "Hind Light". The
+// old resolver compared strings, decided "Hind" was uninstalled and opened the
+// substitution dialog while the glyphs sat right there in IndexedDB. The index makes
+// the comparison about the family, not about how a foundry spelled its faces.
+const familyIndex = new Map<string, string[]>();
+let familyIndexStamp = -1;
+
+function rebuildFamilyIndex(): void {
+  familyIndex.clear();
+  for (const { spec } of loadedFaces.values()) {
+    const key = familyKey(spec.family);
+    if (!key) continue;
+    const bucket = familyIndex.get(key);
+    if (!bucket) {
+      familyIndex.set(key, [spec.family]);
+    } else if (!bucket.includes(spec.family)) {
+      bucket.push(spec.family);
+    }
+  }
+  familyIndexStamp = fontEpoch.value;
+}
+
+function getFamilyIndex(): Map<string, string[]> {
+  if (familyIndexStamp !== fontEpoch.value) rebuildFamilyIndex();
+  return familyIndex;
+}
+
+/**
+ * Every registered family that means the same family as `family`.
+ *
+ * Returns the exact spelling first, then same-key variants, sorted so the caller can
+ * take the first as the canonical replacement name.
+ */
+export function findRegisteredFamilies(family: string): string[] {
+  const exact = getRegisteredFamilies().filter((f) => f.toLowerCase() === family.trim().toLowerCase());
+  const key = familyKey(family);
+  const bucket = key ? (getFamilyIndex().get(key) ?? []) : [];
+  const out = [...exact];
+  for (const f of bucket) {
+    if (!out.some((e) => e.toLowerCase() === f.toLowerCase())) out.push(f);
+  }
+  return out;
+}
+
+/** True when the family is installed under any spelling of its name. */
+export function isFamilyAvailable(family: string): boolean {
+  return findRegisteredFamilies(family).length > 0;
+}
+
+/** True when two names mean the same installed family (used by the import prompts). */
+export function familiesMatch(a: string, b: string): boolean {
+  if (a.trim().toLowerCase() === b.trim().toLowerCase()) return true;
+  if (sameFamily(a, b)) return true;
+  return findRegisteredFamilies(a).some((f) => f.toLowerCase() === b.trim().toLowerCase());
+}
+
 export function getRegisteredFacesForFamily(family: string): FaceSpec[] {
   const low = family.toLowerCase();
   const out: FaceSpec[] = [];
@@ -180,6 +244,27 @@ export interface ResolvedFont {
   status: 'exact' | 'nearest' | 'substituted' | 'missing';
 }
 
+/**
+ * Closest installed face to a requested weight/style.
+ *
+ * Exported because it is the whole of AM's "nearest weight" behaviour and is worth
+ * asserting on its own. Style is worth 25 weight units: a genuine 600 beats a
+ * synthesised-italic 600 when the caller asked for regular.
+ */
+export function nearestFace(faces: FaceSpec[], weight: number, style: FaceStyle): FaceSpec | null {
+  let best: FaceSpec | null = null;
+  let bestDiff = Infinity;
+  for (const f of faces) {
+    // An exact weight beats a closer-styled face: style is worth less than the weight.
+    const diff = Math.abs(f.weight - weight) + (f.style === style ? 0 : 25);
+    if (diff < bestDiff) {
+      bestDiff = diff;
+      best = f;
+    }
+  }
+  return best;
+}
+
 export function resolveFontTriple(
   rawFamily: string,
   rawWeight: number | string = 400,
@@ -195,43 +280,59 @@ export function resolveFontTriple(
     return { family, weight, style, status: 'exact' };
   }
 
-  // 2. Same family, weight within 100 units (synthesised italic allowed if family has normal)
+  // 2. Same registered family, any installed weight. AM resolves a family and asks the
+  //    platform for the closest weight, so a missing 600 is not a missing font.
   const familyFaces = getRegisteredFacesForFamily(family);
   if (familyFaces.length > 0) {
-    let best: FaceSpec | null = null;
-    let bestDiff = Infinity;
-    for (const f of familyFaces) {
-      const diff = Math.abs(f.weight - weight) + (f.style === style ? 0 : 25);
-      if (diff < bestDiff) {
-        bestDiff = diff;
-        best = f;
+    const best = nearestFace(familyFaces, weight, style);
+    if (best) return { family: best.family, weight: best.weight, style, status: 'nearest' };
+  }
+
+  // 3. Same family under a different spelling — "Hind" vs a pack that registered
+  //    "Hind SemiBold", or "SpaceGrotesk" vs "Space Grotesk".
+  const aliases = findRegisteredFamilies(family).filter((f) => f.toLowerCase() !== family.toLowerCase());
+  if (aliases.length > 0) {
+    const faces: FaceSpec[] = [];
+    for (const alias of aliases) faces.push(...getRegisteredFacesForFamily(alias));
+    const best = nearestFace(faces, weight, style);
+    if (best) return { family: best.family, weight: best.weight, style, status: 'nearest' };
+  }
+
+  // 4. Project substitution — matched on family identity too, so a substitution
+  //    recorded against "Hind" still applies when the file says "Hind Bold".
+  if (substitutions) {
+    const key = familyKey(family);
+    let target: string | undefined;
+    for (const [from, to] of Object.entries(substitutions)) {
+      if (!to) continue;
+      if (
+        from === family ||
+        from === rawFamily ||
+        (key.length > 0 && familyKey(from) === key)
+      ) {
+        target = to;
+        break;
       }
     }
-    if (best && Math.abs(best.weight - weight) <= 100) {
-      return { family: best.family, weight: best.weight, style, status: 'nearest' };
+    if (target) {
+      const subFaces = getRegisteredFacesForFamily(target);
+      if (subFaces.length > 0) {
+        const best = nearestFace(subFaces, weight, style) ?? subFaces[0];
+        return { family: best.family, weight: best.weight, style, status: 'substituted' };
+      }
+      const aliasFaces: FaceSpec[] = [];
+      for (const alias of findRegisteredFamilies(target)) {
+        aliasFaces.push(...getRegisteredFacesForFamily(alias));
+      }
+      if (aliasFaces.length > 0) {
+        const best = nearestFace(aliasFaces, weight, style) ?? aliasFaces[0];
+        return { family: best.family, weight: best.weight, style, status: 'substituted' };
+      }
+      return { family: target, weight, style, status: 'substituted' };
     }
   }
 
-  // 3. Project substitution
-  const sub = substitutions?.[family] ?? substitutions?.[rawFamily];
-  if (sub) {
-    const subFaces = getRegisteredFacesForFamily(sub);
-    if (subFaces.length > 0) {
-      let best = subFaces[0];
-      let bestDiff = Math.abs(best.weight - weight);
-      for (const f of subFaces) {
-        const d = Math.abs(f.weight - weight);
-        if (d < bestDiff) {
-          bestDiff = d;
-          best = f;
-        }
-      }
-      return { family: best.family, weight: best.weight, style, status: 'substituted' };
-    }
-    return { family: sub, weight, style, status: 'substituted' };
-  }
-
-  // 4. Missing
+  // 5. Missing
   return { family: 'Roboto', weight: Math.min(700, Math.max(400, Math.round(weight / 100) * 100)), style, status: 'missing' };
 }
 

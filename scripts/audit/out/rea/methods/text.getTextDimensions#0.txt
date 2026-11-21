@@ -1,0 +1,34 @@
+    public static final Vector2D getTextDimensions(StyledText styledText, StyleParams params) {
+        Vector2D vector2D;
+        Layout.Alignment alignment;
+        Intrinsics.checkNotNullParameter(styledText, "<this>");
+        Intrinsics.checkNotNullParameter(params, "params");
+        WeakHashMap<StyledText, Vector2D> weakHashMap = textSizeCache;
+        synchronized (weakHashMap) {
+            Vector2D vector2D2 = weakHashMap.get(styledText);
+            if (vector2D2 == null) {
+                TextPaint textPaint = new TextPaint(1);
+                textPaint.setTextSize(styledText.getFontSize() * 3.0f);
+                textPaint.setTypeface(sK.R83(B8K.BWM.Rw(styledText.getFont()), 100L));
+                applyTo(params, textPaint);
+                StaticLayout.Builder includePad = StaticLayout.Builder.obtain(styledText.getText(), 0, styledText.getText().length(), textPaint, styledText.getWrapWidth()).setLineSpacing(0.0f, params.getLineSpacing()).setIncludePad(true);
+                int i2 = WhenMappings.$EnumSwitchMapping$0[styledText.getAlign().ordinal()];
+                if (i2 == 1) {
+                    alignment = Layout.Alignment.ALIGN_NORMAL;
+                } else if (i2 == 2) {
+                    alignment = Layout.Alignment.ALIGN_CENTER;
+                } else {
+                    if (i2 != 3 && i2 != 4) {
+                        throw new NoWhenBranchMatchedException();
+                    }
+                    alignment = Layout.Alignment.ALIGN_OPPOSITE;
+                }
+                StaticLayout staticLayoutBuild = includePad.setAlignment(alignment).build();
+                Intrinsics.checkNotNullExpressionValue(staticLayoutBuild, "build(...)");
+                vector2D2 = new Vector2D(styledText.getWrapWidth(), staticLayoutBuild.getHeight());
+                weakHashMap.put(styledText, vector2D2);
+            }
+            vector2D = vector2D2;
+        }
+        return vector2D;
+    }
