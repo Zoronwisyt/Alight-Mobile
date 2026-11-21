@@ -102,9 +102,7 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({ rendererRef, isExpor
         if (format === 'png') {
           await renderer.prepareMediaAtTime(currentProject, currentTimeMs);
           renderer.renderProject(currentProject, currentTimeMs, { renderWidth: outW, renderHeight: outH });
-          const blob = await new Promise<Blob>((res, rej) =>
-            renderer.canvas.toBlob((b) => (b ? res(b) : rej(new Error('PNG encode failed'))), 'image/png')
-          );
+          const blob = await renderer.captureFrameBlob();
           downloadBlob(blob, `${safeSlug}_${outW}x${outH}_frame.png`);
           setStatusMsg(`Exported ${outW}×${outH} PNG frame!`);
           return;
@@ -121,9 +119,7 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({ rendererRef, isExpor
             const tMs = (f * 1000) / fps;
             await renderer.prepareMediaAtTime(currentProject, tMs);
             renderer.renderProject(currentProject, tMs, { renderWidth: outW, renderHeight: outH });
-            const blob = await new Promise<Blob>((res, rej) =>
-              renderer.canvas.toBlob((b) => (b ? res(b) : rej(new Error('Frame PNG failed'))), 'image/png')
-            );
+            const blob = await renderer.captureFrameBlob();
             zip.file(`frame_${String(f).padStart(4, '0')}.png`, blob);
             setProgress((f + 1) / totalFrames);
             setProgressLabel(`Rendering PNG ${f + 1} / ${totalFrames} (${outW}×${outH} @ ${fps} fps)`);

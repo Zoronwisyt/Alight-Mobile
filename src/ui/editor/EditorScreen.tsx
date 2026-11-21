@@ -318,16 +318,15 @@ export const EditorScreen: React.FC = () => {
 
     const initStore = useEditorStore.getState();
     const initScope = resolveActiveGroup(currentProject, initStore.groupStack);
-    const inGroup = initStore.groupStack.length > 0;
     let playheadMs = initStore.currentTimeMs;
     if (playheadMs >= initScope.durationMs) {
       playheadMs = 0;
       initStore.setCurrentTimeMs(0);
     }
 
-    const hasAudioTrack = !inGroup && audioEngine.hasAudio(currentProject);
+    const hasAudioTrack = audioEngine.hasAudio(currentProject, initScope.layers);
     renderer.syncVideosForPlayback(currentProject, playheadMs, true, initStore.groupStack);
-    if (!inGroup) audioEngine.startPlayback(currentProject, playheadMs);
+    audioEngine.startPlayback(currentProject, playheadMs, initScope.layers);
     let startSceneMs = playheadMs;
     let startWallMs = performance.now();
     let lastTs = startWallMs;
@@ -363,7 +362,7 @@ export const EditorScreen: React.FC = () => {
           playheadMs = 0;
           startSceneMs = 0;
           startWallMs = now;
-          if (store.groupStack.length === 0) audioEngine.startPlayback(proj, 0);
+          audioEngine.startPlayback(proj, 0, resolveActiveGroup(proj, store.groupStack).layers);
         } else {
           playheadMs = activeDur;
           renderer.syncVideosForPlayback(proj, playheadMs, false, store.groupStack);

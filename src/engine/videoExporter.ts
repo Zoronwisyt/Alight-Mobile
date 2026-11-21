@@ -101,8 +101,19 @@ function collectAudioLayers(layers: Layer[], offsetMs: number, out: { layer: Lay
       collectAudioLayers(l.groupLayers, offsetMs + l.startTime, out);
     } else if (l.type === 'audio' && l.audioData && !l.audioData.muted) {
       out.push({ layer: l, absStart: offsetMs + l.startTime, absEnd: offsetMs + l.endTime });
+    } else if (hasMediaAudioTrack(l)) {
+      // A video layer carries its audio inside the same file AM refers to with fillVideo. The mix
+      // used to skip it, so an exported MP4 had picture and no sound while the preview had both.
+      out.push({ layer: l, absStart: offsetMs + l.startTime, absEnd: offsetMs + l.endTime });
     }
   }
+}
+
+function hasMediaAudioTrack(layer: Layer): boolean {
+  const md = layer.mediaData;
+  if (!md?.src || md.muted) return false;
+  const isMediaLayer = layer.type === 'video' || (layer.type === 'shape' && layer.fill?.type === 'media');
+  return isMediaLayer && (md.volume ?? 1) > 0.001;
 }
 
 async function renderProjectAudioMix(project: Project, durationSec: number): Promise<AudioBuffer | null> {
@@ -116,22 +127,31 @@ async function renderProjectAudioMix(project: Project, durationSec: number): Pro
   let attached = 0;
 
   for (const { layer, absStart, absEnd } of audioLayers) {
-    if (!layer.audioData) continue;
+    const isVideo = layer.type !== 'audio';
+    const mediaSrc = isVideo ? layer.mediaData?.src : layer.audioData?.src;
+    const synth = isVideo ? undefined : layer.audioData?.synthPattern;
+    if (!mediaSrc && !synth) continue;
     try {
-      const buf = await audioEngine.loadAudioBuffer(layer.audioData.src, layer.audioData.synthPattern);
+      const buf = await audioEngine.loadAudioBuffer(mediaSrc || '', synth);
       const src = offline.createBufferSource();
       src.buffer = buf;
+      const speed = isVideo ? Math.max(0.1, Math.min(4, layer.mediaData?.playbackSpeed || 1)) : 1;
+      src.playbackRate.value = speed;
       const gain = offline.createGain();
       const { remappedNormT } = evalRemappedTime(layer, absStart);
-      const vol = evalAnimatable(layer.audioData.volume, remappedNormT, 1);
+      const vol = isVideo
+        ? (layer.mediaData?.volume ?? 1)
+        : evalAnimatable(layer.audioData!.volume, remappedNormT, 1);
       gain.gain.value = Math.max(0, Math.min(2, vol));
       src.connect(gain);
       gain.connect(offline.destination);
 
       const startSec = Math.max(0, absStart / 1000);
-      const trimSec = Math.max(0, (layer.audioData.trimStartMs ?? 0) / 1000);
+      const trimSec = Math.max(0, ((isVideo ? layer.mediaData?.trimStartMs : layer.audioData?.trimStartMs) ?? 0) / 1000);
       const safeTrim = buf.duration > 0 ? Math.min(trimSec, Math.max(0, buf.duration - 0.02)) : 0;
-      const playDur = Math.max(0.02, Math.min(durationSec - startSec, (absEnd - absStart) / 1000, Math.max(0.02, buf.duration - safeTrim)));
+      // A retimed video consumes its own audio `speed` times faster.
+      const availableSec = Math.max(0.02, (buf.duration - safeTrim) / speed);
+      const playDur = Math.max(0.02, Math.min(durationSec - startSec, (absEnd - absStart) / 1000, availableSec));
       if (playDur > 0.02 && startSec < durationSec) {
         src.start(startSec, safeTrim, playDur);
         attached++;

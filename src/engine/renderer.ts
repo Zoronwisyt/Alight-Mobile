@@ -16,6 +16,7 @@ import {
   parseColorArgb,
 } from './animation';
 import { canonicalizeBlendMode } from './blendModes';
+import { audioEngine } from './audioEngine';
 import { getEffectById, getEffects, getShapeById, parseDefaultParamValue } from './catalog';
 import { evaluateShapePath, runEffectScript, type EffectScriptElement, type EffectScriptEnv } from './scriptRuntime';
 import { sanitizeGlslUniformName, ShaderRegistry, type CompiledShaderProgram } from './shaderCompiler';
@@ -492,6 +493,8 @@ export class AlightRenderer {
   private dummyBlackTex: WebGLTexture;
   private isPlaybackActive = false;
   private disposed = false;
+  /** Phones/tablets: capped DPR, and the element — not Web Audio — may own video sound. */
+  private mobileRender = false;
   public onMediaReady?: () => void;
   public onCacheChange?: () => void;
 
@@ -522,6 +525,9 @@ export class AlightRenderer {
     // Compute adaptive RAM cache budget based on device class / navigator.deviceMemory
     const navMem = typeof navigator !== 'undefined' ? (navigator as unknown as { deviceMemory?: number }).deviceMemory : undefined;
     const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
+    this.mobileRender =
+      typeof window !== 'undefined' &&
+      (window.innerWidth <= 860 || window.matchMedia?.('(pointer: coarse)').matches === true);
     const classBudget = isMobile ? 192 * 1024 * 1024 : typeof window !== 'undefined' && window.innerWidth <= 1024 ? 384 * 1024 * 1024 : 1536 * 1024 * 1024;
     this.cacheBudgetBytes = navMem
       ? Math.min(classBudget, Math.max(128 * 1024 * 1024, Math.floor(0.12 * navMem * 1024 * 1024 * 1024)))
@@ -532,11 +538,19 @@ export class AlightRenderer {
       this.cacheEpoch++;
     };
     canvas.addEventListener('webglcontextlost', this.onContextLostHandler);
+    // Mobile-safe context: no MSAA (the scene is composited from FBOs through a fullscreen quad, so
+    // multisampling only ever touched the final blit and cost a 4x color buffer), and no preserved
+    // drawing buffer (Safari/Chrome otherwise keep and copy a full-size color buffer every frame, which
+    // is the single biggest per-frame cost on a phone). Both PNG exports read the buffer in the same
+    // task they render in, so nothing depends on preservation.
     const gl = canvas.getContext('webgl2', {
       alpha: true,
       premultipliedAlpha: true,
-      preserveDrawingBuffer: true,
-      antialias: true,
+      preserveDrawingBuffer: false,
+      antialias: false,
+      depth: false,
+      stencil: false,
+      powerPreference: 'high-performance',
     });
     if (!gl) throw new Error('WebGL2 is required for Alight Motion Web Studio.');
     this.gl = gl;
@@ -962,8 +976,15 @@ export class AlightRenderer {
         if (Math.abs(v.playbackRate - speed) > 0.01) {
           v.playbackRate = speed;
         }
-        // Web Audio (audioEngine) owns all video & audio playback sound so cache hits never stutter/mute audio
-        v.muted = true;
+        // Web Audio (audioEngine) owns video & audio playback sound so cache hits never stutter/mute
+        // audio. The exception is a track Web Audio cannot carry — iOS behind the ring switch, or a
+        // container decodeAudioData refuses — where the element keeps its own audio instead.
+        if (audioEngine.isElementAudioOwned(md.src)) {
+          v.muted = md.muted === true;
+          v.volume = Math.max(0, Math.min(1, md.volume ?? 1));
+        } else {
+          v.muted = true;
+        }
 
         if (v.paused) {
           if (v.readyState >= 1 && !v.seeking && Math.abs(v.currentTime - targetSec) > 0.08) {
@@ -1212,6 +1233,20 @@ export class AlightRenderer {
     this.textLayoutCache.clear();
     this.clearPreviewCache();
     this.onCacheChange?.();
+  }
+
+  /**
+   * Encodes the frame that was just rendered as a PNG blob.
+   *
+   * The context runs with `preserveDrawingBuffer: false` for mobile fill-rate reasons, so the colour
+   * buffer is only guaranteed to hold the frame until the browser composites. Call this immediately
+   * after `renderProject` with no `await` in between — `gl.finish()` makes the GPU work visible first.
+   */
+  public captureFrameBlob(): Promise<Blob> {
+    this.gl.finish();
+    return new Promise<Blob>((resolve, reject) => {
+      this.canvas.toBlob((b) => (b ? resolve(b) : reject(new Error('PNG encode failed'))), 'image/png');
+    });
   }
 
   public clearPreviewCache(): void {
@@ -1514,7 +1549,11 @@ export class AlightRenderer {
       scale = renderW / Math.max(1, activeProject.width);
     } else {
       const q = options.previewScale ?? 1;
-      const dpr = typeof window !== 'undefined' ? Math.min(window.devicePixelRatio || 1, 2) : 1;
+      // A phone is not a desktop: at 1.5x the backing store already exceeds the native pixel width of
+      // the preview area, and every extra device pixel is paid twice (blit + compositor copy). The
+      // desktop cap stays at 2 so Retina sharpness is unchanged.
+      const dprCap = this.mobileRender ? 1.5 : 2;
+      const dpr = typeof window !== 'undefined' ? Math.min(window.devicePixelRatio || 1, dprCap) : 1;
       const maxDim = Math.max(activeProject.width, activeProject.height);
       const effectiveScale = Math.min(q * dpr, 4096 / Math.max(1, maxDim));
       scale = effectiveScale;

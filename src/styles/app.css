@@ -2404,6 +2404,15 @@ button:active {
     position: absolute;
     inset: -16px;
   }
+  /* A backdrop-filter sitting above a 60 fps WebGL canvas makes the compositor re-blur the
+     changing canvas every frame — the most expensive thing on a phone after the drawing buffer
+     itself. The stage overlays already carry a translucent fill, so they lose only the blur. */
+  .am-stage-quality-pill,
+  .am-stage-overlay,
+  .am-viewmode-holder {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
 }
 
 /* Phone-width playbar fit.
