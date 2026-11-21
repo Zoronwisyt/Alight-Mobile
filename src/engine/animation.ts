@@ -56,7 +56,8 @@ export function evalEasing(u: number, easing?: EasingSpec): number {
     }
     case 'step': {
       const stepLen = Math.max(1e-4, easing.params?.[0] ?? 0.25);
-      return Math.min(1, Math.floor(t / stepLen) * stepLen);
+      const phase = easing.params?.[1] ?? 0;
+      return clamp01(Math.floor((t + phase) / stepLen) * stepLen);
     }
     case 'elasticStep': {
       const stepLen = Math.max(1e-4, easing.params?.[0] ?? 0.25);
@@ -417,7 +418,9 @@ const EASING_ARITY: Record<string, number | null> = {
   cyclic: 5,
   bounce: null,
   elastic: null,
+  overshoot: null,
   step: null,
+  steps: null,
   elasticStep: null,
   random: null,
 };
@@ -430,18 +433,26 @@ function parseFiniteNum(s: string | undefined): number | null {
 
 export function parseEasingString(eStr?: string): EasingSpec | undefined {
   if (!eStr) return undefined;
-  const parts = eStr.trim().split(/\s+/);
+  let parts = eStr.trim().split(/\s+/);
+  // AM 5+/6+ XML prefixes segment-local easings with `local` (e.g. `local step 0.17 0.0`,
+  // `local cubicBezier 0.2 0 0.8 1`). Unwrap `local` before matching the easing token.
+  let isLocal = false;
+  if (parts[0] === 'local' && parts.length > 1) {
+    isLocal = true;
+    parts = parts.slice(1);
+  }
   const token = parts[0];
   if (!token) return undefined;
+  const preservedToken = isLocal ? `local ${token}` : token;
 
   if (!(token in EASING_ARITY)) {
     console.warn(`[easing] unrecognized token "${token}" in "${eStr}" — held verbatim, rendered linear`);
     const tail = parts.slice(1).map(parseFiniteNum).filter((n): n is number => n !== null);
-    return { type: 'linear', x1: 0, y1: 0, x2: 1, y2: 1, token, params: tail, approximated: true };
+    return { type: 'linear', x1: 0, y1: 0, x2: 1, y2: 1, token: preservedToken, params: tail, approximated: true };
   }
 
   if (token === 'linear') {
-    return { type: 'linear', x1: 0, y1: 0, x2: 1, y2: 1, token };
+    return { type: 'linear', x1: 0, y1: 0, x2: 1, y2: 1, token: preservedToken };
   }
 
   const params = parts.slice(1).map(parseFiniteNum).filter((n): n is number => n !== null);
@@ -449,17 +460,17 @@ export function parseEasingString(eStr?: string): EasingSpec | undefined {
   if (token === 'cubicBezier') {
     if (params.length < 4) {
       console.warn(`[easing] malformed cubicBezier "${eStr}" — rendered linear`);
-      return { type: 'linear', x1: 0, y1: 0, x2: 1, y2: 1, token, params, approximated: true };
+      return { type: 'linear', x1: 0, y1: 0, x2: 1, y2: 1, token: preservedToken, params, approximated: true };
     }
     // Never use `|| 1` here — 0.0 is a legal and common control point for x2/y2.
     const [x1, y1, x2, y2] = params;
-    return { type: 'cubicBezier', x1, y1, x2, y2, token };
+    return { type: 'cubicBezier', x1, y1, x2, y2, token: preservedToken };
   }
 
   const arity = EASING_ARITY[token];
   if (arity !== null && params.length < arity) {
     console.warn(`[easing] "${token}" expected ${arity} params, got ${params.length} — rendered linear`);
-    return { type: 'linear', x1: 0, y1: 0, x2: 1, y2: 1, token, params, approximated: true };
+    return { type: 'linear', x1: 0, y1: 0, x2: 1, y2: 1, token: preservedToken, params, approximated: true };
   }
 
   return {
@@ -468,7 +479,7 @@ export function parseEasingString(eStr?: string): EasingSpec | undefined {
     y1: 0,
     x2: 1,
     y2: 1,
-    token,
+    token: preservedToken,
     params,
     approximated: true,
   };

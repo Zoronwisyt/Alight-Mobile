@@ -93,6 +93,21 @@ function transpileShaderCode(
   code = code.replace(/max\(0\.00001,thickness\/10\.0\)\s*:\s*0\.00001/g, 'max(0.0005, thickness/10.0) : 0.0005');
   // 5) Prevent smoothstep(edge, edge, x) UB/NaN in ribbon when smoothing == 0 on ANGLE/D3D11
   code = code.replace(/\bfloat\s+b\s*=\s*smoothing\s*\/\s*20\.\s*;/g, 'float b = max(smoothing / 20.0, 0.0002);');
+  // 6) Pinch/Bulge (pinchbulge, pinchbulge2, pinchbulgeinside) WebGL2/ANGLE guards:
+  //    - Guard pow(p, 1.0 + strength * 0.75) against overshoot curves pushing exponent <= 0 or p == 0
+  //    - Replace reversed smoothstep(1.0, 1.0 - feather, v) (edge0 >= edge1 is UB in GLSL ES 3.00)
+  code = code.replace(
+    /pow\s*\(\s*p\s*,\s*1\.0\s*\+\s*strength\s*\*\s*0\.75\s*\)/g,
+    'pow(max(p, 0.00001), max(0.001, 1.0 + strength * 0.75))'
+  );
+  code = code.replace(
+    /smoothstep\s*\(\s*0\.0\s*,\s*feather\s*,\s*([^)]+)\)/g,
+    'smoothstep(0.0, max(feather, 0.0002), $1)'
+  );
+  code = code.replace(
+    /smoothstep\s*\(\s*1\.0\s*,\s*1\.0\s*-\s*feather\s*,\s*([^)]+)\)/g,
+    '(1.0 - smoothstep(1.0 - max(feather, 0.0002), 1.0, $1))'
+  );
 
   return code;
 }

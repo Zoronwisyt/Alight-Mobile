@@ -39,7 +39,8 @@ export const EasingCurvePanel: React.FC = () => {
 
   const sorted = [...prop.keyframes].sort((a, b) => a.t - b.t);
   let segIdx = sorted.findIndex((k) => k.t > normT);
-  if (segIdx <= 0) segIdx = 1;
+  if (segIdx === -1) segIdx = sorted.length - 1;
+  else if (segIdx === 0) segIdx = 1;
   const kfTarget = sorted[segIdx];
   const easing: EasingSpec = kfTarget.easing ?? { type: 'linear', x1: 0.25, y1: 0.25, x2: 0.75, y2: 0.75 };
 
