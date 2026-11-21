@@ -169,13 +169,43 @@ export const Timeline: React.FC<TimelineProps> = ({
 
   // R-3: Measure track viewport width so centre-fixed playhead stays exact
   useEffect(() => {
-    const el = scrollerRef.current;
+    const el = scrollerRef.current ?? rulerRef.current;
     if (!el) return;
-    const update = () => setTrackViewportW(Math.max(160, el.clientWidth));
+    const update = () => {
+      const w = scrollerRef.current?.clientWidth || rulerRef.current?.clientWidth || 600;
+      setTrackViewportW(Math.max(160, w));
+    };
     update();
     const ro = new ResizeObserver(update);
-    ro.observe(el);
+    if (scrollerRef.current) ro.observe(scrollerRef.current);
+    if (rulerRef.current && rulerRef.current !== scrollerRef.current) ro.observe(rulerRef.current);
     return () => ro.disconnect();
+  }, [currentProject?.id, groupStack.length]);
+
+  // Attach non-passive native wheel listener so Ctrl+wheel zoom and horizontal trackpad pan
+  // never trigger Chrome's "Unable to preventDefault inside passive event listener" error.
+  useEffect(() => {
+    const targets = [rulerRef.current, scrollerRef.current].filter((x): x is HTMLDivElement => Boolean(x));
+    if (targets.length === 0) return;
+    const onWheel = (e: WheelEvent) => {
+      const st = useEditorStore.getState();
+      if (!st.currentProject) return;
+      if (e.ctrlKey || e.metaKey) {
+        e.preventDefault();
+        const factor = e.deltaY < 0 ? 1.15 : 1 / 1.15;
+        st.setTimelineZoom(st.timelinePxPerSec * factor);
+      } else if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
+        e.preventDefault();
+        st.setIsPlaying(false);
+        const maxDur = resolveActiveGroup(st.currentProject, st.groupStack).durationMs;
+        const nextMs = Math.max(0, Math.min(maxDur, st.currentTimeMs + (e.deltaX / st.timelinePxPerSec) * 1000));
+        st.setCurrentTimeMs(nextMs);
+      }
+    };
+    for (const el of targets) el.addEventListener('wheel', onWheel, { passive: false });
+    return () => {
+      for (const el of targets) el.removeEventListener('wheel', onWheel);
+    };
   }, [currentProject?.id]);
 
   if (!currentProject) return null;
@@ -267,19 +297,6 @@ export const Timeline: React.FC<TimelineProps> = ({
   const handleRulerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     e.stopPropagation();
     handlePanScrubDown(e);
-  };
-
-  const handleTimelineWheel = (e: React.WheelEvent<HTMLDivElement>) => {
-    if (e.ctrlKey || e.metaKey) {
-      e.preventDefault();
-      const factor = e.deltaY < 0 ? 1.15 : 1 / 1.15;
-      setTimelineZoom(timelinePxPerSec * factor);
-    } else if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
-      e.preventDefault();
-      setIsPlaying(false);
-      const nextMs = Math.max(0, Math.min(activeDurationMs, currentTimeMs + (e.deltaX / timelinePxPerSec) * 1000));
-      setCurrentTimeMs(nextMs);
-    }
   };
 
   const handleTrackMove = (e: React.PointerEvent, layerIdx: number, mode: 'move' | 'left' | 'right') => {
@@ -422,7 +439,6 @@ export const Timeline: React.FC<TimelineProps> = ({
           ref={rulerRef}
           className="am-timeline-ruler"
           onPointerDown={handleRulerDown}
-          onWheel={handleTimelineWheel}
         >
           <div
             style={{
@@ -490,8 +506,8 @@ export const Timeline: React.FC<TimelineProps> = ({
               );
             })}
 
-            {/* Beat Bookmarks */}
-            {currentProject.bookmarks.map((bm) => (
+            {/* Beat Bookmarks (root timeline only — don't leak past group duration inside Edit Group) */}
+            {groupStack.length === 0 && currentProject.bookmarks.map((bm) => (
               <div
                 key={bm}
                 className="am-ruler-bookmark"
@@ -506,8 +522,8 @@ export const Timeline: React.FC<TimelineProps> = ({
             ))}
           </div>
 
-          {/* R-3: Fixed Centre Playhead Cap */}
-          <div className="am-centre-playhead-cap" />
+          {/* R-3: Fixed Centre Playhead Cap (locked to exact centreX px so ruler & tracks never desync) */}
+          <div className="am-centre-playhead-cap" style={{ left: centreX }} />
 
           {showCacheMenu && (
             <div
@@ -654,7 +670,6 @@ export const Timeline: React.FC<TimelineProps> = ({
           className="am-timeline-tracks am-scroll"
           style={{ overflowX: 'hidden', position: 'relative' }}
           onPointerDown={handlePanScrubDown}
-          onWheel={handleTimelineWheel}
           onScroll={(e) => {
             if (headersRef.current) headersRef.current.scrollTop = e.currentTarget.scrollTop;
           }}
@@ -787,8 +802,8 @@ export const Timeline: React.FC<TimelineProps> = ({
 
           </div>
 
-          {/* R-3: Fixed Centre Playhead Line */}
-          <div className="am-centre-playhead" />
+          {/* R-3: Fixed Centre Playhead Line (locked to exact centreX px) */}
+          <div className="am-centre-playhead" style={{ left: centreX }} />
         </div>
       </div>
 

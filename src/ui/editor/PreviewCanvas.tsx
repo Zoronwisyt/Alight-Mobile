@@ -786,6 +786,7 @@ export const PreviewCanvas: React.FC<PreviewCanvasProps> = ({
       <button
         type="button"
         className="am-stage-quality-pill"
+        style={{ left: selectedLayerIds.length > 0 ? 58 : undefined }}
         onPointerDown={(e) => e.stopPropagation()}
         onClick={() => {
           const order: PreviewQuality[] = [1, 0.75, 0.5, 0.25];

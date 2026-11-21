@@ -165,11 +165,16 @@ export function parseAmFontToken(token: string | null | undefined): ParsedFontTo
         display = raw.slice(0, colon);
         descriptor = right;
       }
+    } else if (raw.includes('?')) {
+      // iOS/AM 6+ emits colon-less provider tokens like `imported?name=Valorant Font.ttf`
+      display = '';
+      descriptor = raw;
     }
   }
 
   const query = parseProviderQuery(descriptor);
-  const queryName = query.get('name') || query.get('family') || '';
+  const rawQueryName = query.get('name') || query.get('family') || '';
+  const queryName = rawQueryName.replace(/\.(ttf|otf|woff2?|ttc)$/i, '').trim();
   const queryWeight = query.get('weight');
   const queryItalic = query.has('italic') ? /^(1|true|yes)$/i.test(query.get('italic') || '') : undefined;
 
