@@ -49,6 +49,7 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({ rendererRef, isExpor
   const [exportScale, setExportScale] = useState(1);
   const [qualityMbps, setQualityMbps] = useState(12);
   const [includeAudio, setIncludeAudio] = useState(true);
+  const [includeVideoAudio, setIncludeVideoAudio] = useState(true);
   const [progress, setProgress] = useState<number | null>(null);
   const [progressLabel, setProgressLabel] = useState('');
   const [statusMsg, setStatusMsg] = useState('');
@@ -176,6 +177,7 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({ rendererRef, isExpor
             bitrateMbps: qualityMbps,
             container,
             includeAudio,
+            includeVideoAudio,
             signal: ctrl.signal,
             onProgress: (fraction, label) => {
               setProgress(fraction);
@@ -185,7 +187,7 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({ rendererRef, isExpor
           downloadBlob(res.blob, `${safeSlug}_${res.width}x${res.height}_${res.fps}fps.${res.ext}`);
           setProgress(null);
           setStatusMsg(
-            `Exported ${res.ext.toUpperCase()}: ${res.width}×${res.height} @ ${res.fps} fps (${res.totalFrames} frames, ${res.bitrateMbps} Mbps, ${res.codec}${res.hasAudio ? ' + Audio' : ''})`
+            `Exported ${res.ext.toUpperCase()}: ${res.width}×${res.height} @ ${res.fps} fps (${res.totalFrames} frames, ${res.actualBitrateMbps} Mbps actual / ${res.bitrateMbps} Mbps target, ${res.codec}${res.hasAudio ? ' + Audio' : ''})`
           );
         }
       } finally {
@@ -391,6 +393,24 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({ rendererRef, isExpor
                   />
                   Include Audio Track (AAC / Opus)
                 </label>
+
+                {includeAudio && (
+                  <label
+                    htmlFor="export-include-video-audio"
+                    style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, color: 'var(--am-text-secondary)', cursor: 'pointer', marginTop: 6 }}
+                  >
+                    <input
+                      id="export-include-video-audio"
+                      name="exportIncludeVideoAudio"
+                      type="checkbox"
+                      disabled={progress !== null}
+                      checked={includeVideoAudio}
+                      onChange={(e) => setIncludeVideoAudio(e.target.checked)}
+                      style={{ accentColor: 'var(--am-accent)' }}
+                    />
+                    Include Unmuted Video Layer Audio
+                  </label>
+                )}
               </>
             )}
           </div>

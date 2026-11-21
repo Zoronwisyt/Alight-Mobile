@@ -14,6 +14,7 @@ export interface VideoExportOptions {
   bitrateMbps: number;
   container: VideoContainer;
   includeAudio?: boolean;
+  includeVideoAudio?: boolean;
   signal?: AbortSignal;
   onProgress?: (fraction: number, label: string) => void;
 }
@@ -27,6 +28,7 @@ export interface VideoExportResult {
   fps: number;
   totalFrames: number;
   bitrateMbps: number;
+  actualBitrateMbps: number;
   codec: string;
   hasAudio: boolean;
 }
@@ -67,44 +69,63 @@ async function pickSupportedVideoConfig(
   }
   const candidates = container === 'mp4' ? AVC_CANDIDATES : WEBM_CANDIDATES;
   const accelModes: HardwareAcceleration[] = ['prefer-hardware', 'no-preference', 'prefer-software'];
+  // Prefer CBR ('constant') first so hardware encoders (VideoToolbox / MediaFoundation / MediaCodec)
+  // actually honor the slider's requested bitrate instead of defaulting to ~8-9 Mbps VBR.
+  const bitrateModes: VideoEncoderBitrateMode[] = ['constant', 'variable'];
 
-  for (const hardwareAcceleration of accelModes) {
-    for (const codec of candidates) {
-      const base: VideoEncoderConfig = {
-        codec,
-        width,
-        height,
-        bitrate,
-        framerate: fps,
-        bitrateMode: 'variable',
-        hardwareAcceleration,
-        ...(container === 'mp4' ? { avc: { format: 'avc' as const } } : {}),
-      };
-      try {
-        const res = await VideoEncoder.isConfigSupported(base);
-        if (res.supported) {
-          const muxCodec = container === 'mp4' ? 'avc' : codec.startsWith('vp09') ? 'V_VP9' : 'V_VP8';
-          return { config: { ...(res.config ?? base), bitrate }, muxCodec };
+  for (const bitrateMode of bitrateModes) {
+    for (const hardwareAcceleration of accelModes) {
+      for (const codec of candidates) {
+        const base: VideoEncoderConfig = {
+          codec,
+          width,
+          height,
+          bitrate,
+          framerate: fps,
+          bitrateMode,
+          latencyMode: 'quality',
+          hardwareAcceleration,
+          ...(container === 'mp4' ? { avc: { format: 'avc' as const } } : {}),
+        };
+        try {
+          const res = await VideoEncoder.isConfigSupported(base);
+          if (res.supported) {
+            const muxCodec = container === 'mp4' ? 'avc' : codec.startsWith('vp09') ? 'V_VP9' : 'V_VP8';
+            return { config: { ...(res.config ?? base), bitrate, bitrateMode }, muxCodec };
+          }
+        } catch {
+          // try next candidate
         }
-      } catch {
-        // try next candidate
       }
     }
   }
   return null;
 }
 
-function collectAudioLayers(layers: Layer[], offsetMs: number, out: { layer: Layer; absStart: number; absEnd: number }[]) {
+function collectAudioLayers(
+  layers: Layer[],
+  offsetMs: number,
+  parentEndMs: number,
+  includeVideoAudio: boolean,
+  out: { layer: Layer; absStart: number; absEnd: number; localOffsetMs: number }[]
+) {
   for (const l of layers) {
     if (!l.visible) continue;
+    const absStart = Math.max(offsetMs, offsetMs + l.startTime);
+    const absEnd = Math.min(parentEndMs, offsetMs + l.endTime);
+    if (absEnd <= absStart) continue;
     if (l.type === 'group' && l.groupLayers?.length) {
-      collectAudioLayers(l.groupLayers, offsetMs + l.startTime, out);
+      const minChildStart = l.groupLayers.reduce((m, c) => Math.min(m, c.startTime), Infinity);
+      const childOffset = minChildStart >= l.startTime && l.startTime > 0 ? offsetMs : absStart;
+      collectAudioLayers(l.groupLayers, childOffset, absEnd, includeVideoAudio, out);
     } else if (l.type === 'audio' && l.audioData && !l.audioData.muted) {
-      out.push({ layer: l, absStart: offsetMs + l.startTime, absEnd: offsetMs + l.endTime });
-    } else if (hasMediaAudioTrack(l)) {
-      // A video layer carries its audio inside the same file AM refers to with fillVideo. The mix
-      // used to skip it, so an exported MP4 had picture and no sound while the preview had both.
-      out.push({ layer: l, absStart: offsetMs + l.startTime, absEnd: offsetMs + l.endTime });
+      const kfs = l.audioData.volume.keyframes;
+      const maxVol = kfs.length > 0 ? Math.max(...kfs.map((k) => Number(k.v) || 0)) : Number(l.audioData.volume.value) || 0;
+      if (maxVol > 0.001) {
+        out.push({ layer: l, absStart, absEnd, localOffsetMs: offsetMs });
+      }
+    } else if (includeVideoAudio && hasMediaAudioTrack(l)) {
+      out.push({ layer: l, absStart, absEnd, localOffsetMs: offsetMs });
     }
   }
 }
@@ -116,9 +137,13 @@ function hasMediaAudioTrack(layer: Layer): boolean {
   return isMediaLayer && (md.volume ?? 1) > 0.001;
 }
 
-async function renderProjectAudioMix(project: Project, durationSec: number): Promise<AudioBuffer | null> {
-  const audioLayers: { layer: Layer; absStart: number; absEnd: number }[] = [];
-  collectAudioLayers(project.layers, 0, audioLayers);
+async function renderProjectAudioMix(
+  project: Project,
+  durationSec: number,
+  includeVideoAudio = true
+): Promise<AudioBuffer | null> {
+  const audioLayers: { layer: Layer; absStart: number; absEnd: number; localOffsetMs: number }[] = [];
+  collectAudioLayers(project.layers, 0, Math.round(durationSec * 1000), includeVideoAudio, audioLayers);
   if (audioLayers.length === 0) return null;
 
   const sampleRate = 48000;
@@ -126,7 +151,7 @@ async function renderProjectAudioMix(project: Project, durationSec: number): Pro
   const offline = new OfflineAudioContext(2, totalSamples, sampleRate);
   let attached = 0;
 
-  for (const { layer, absStart, absEnd } of audioLayers) {
+  for (const { layer, absStart, absEnd, localOffsetMs } of audioLayers) {
     const isVideo = layer.type !== 'audio';
     const mediaSrc = isVideo ? layer.mediaData?.src : layer.audioData?.src;
     const mediaId = isVideo ? layer.mediaData?.mediaId : layer.audioData?.mediaId;
@@ -139,24 +164,43 @@ async function renderProjectAudioMix(project: Project, durationSec: number): Pro
       const speed = isVideo ? Math.max(0.1, Math.min(4, layer.mediaData?.playbackSpeed || 1)) : 1;
       src.playbackRate.value = speed;
       const gain = offline.createGain();
-      const { remappedNormT } = evalRemappedTime(layer, absStart);
-      const vol = isVideo
-        ? (layer.mediaData?.volume ?? 1)
-        : evalAnimatable(layer.audioData!.volume, remappedNormT, 1);
-      gain.gain.value = Math.max(0, Math.min(2, vol));
-      src.connect(gain);
-      gain.connect(offline.destination);
 
-      const startSec = Math.max(0, absStart / 1000);
-      const trimSec = Math.max(0, ((isVideo ? layer.mediaData?.trimStartMs : layer.audioData?.trimStartMs) ?? 0) / 1000);
+      const clipStartMs = Math.max(0, absStart);
+      const startSec = clipStartMs / 1000;
+      const baseTrimSec = Math.max(0, ((isVideo ? layer.mediaData?.trimStartMs : layer.audioData?.trimStartMs) ?? 0) / 1000);
+      const trimSec = baseTrimSec + Math.max(0, (clipStartMs - absStart) / 1000) * speed;
       const safeTrim = buf.duration > 0 ? Math.min(trimSec, Math.max(0, buf.duration - 0.02)) : 0;
       // A retimed video consumes its own audio `speed` times faster.
       const availableSec = Math.max(0.02, (buf.duration - safeTrim) / speed);
-      const playDur = Math.max(0.02, Math.min(durationSec - startSec, (absEnd - absStart) / 1000, availableSec));
-      if (playDur > 0.02 && startSec < durationSec) {
-        src.start(startSec, safeTrim, playDur);
-        attached++;
+      const playDur = Math.max(0.02, Math.min(durationSec - startSec, (absEnd - clipStartMs) / 1000, availableSec));
+      if (playDur <= 0.02 || startSec >= durationSec) continue;
+
+      if (isVideo) {
+        const vol = Math.max(0, Math.min(2, layer.mediaData?.volume ?? 1));
+        if (vol <= 0.001) continue;
+        gain.gain.setValueAtTime(vol, startSec);
+      } else {
+        const volProp = layer.audioData!.volume;
+        const { remappedNormT } = evalRemappedTime(layer, Math.max(layer.startTime, clipStartMs - localOffsetMs));
+        const initVol = Math.max(0, Math.min(2, evalAnimatable(volProp, remappedNormT, 1)));
+        gain.gain.setValueAtTime(initVol, startSec);
+        if (volProp.keyframes.length >= 2) {
+          const steps = Math.max(4, Math.min(64, Math.ceil(playDur * 12)));
+          for (let s = 1; s <= steps; s++) {
+            const frac = s / steps;
+            const sampleSec = startSec + frac * playDur;
+            const sampleLocalMs = Math.max(layer.startTime, sampleSec * 1000 - localOffsetMs);
+            const { remappedNormT: st } = evalRemappedTime(layer, sampleLocalMs);
+            const sv = Math.max(0, Math.min(2, evalAnimatable(volProp, st, 1)));
+            gain.gain.linearRampToValueAtTime(sv, sampleSec);
+          }
+        }
       }
+
+      src.connect(gain);
+      gain.connect(offline.destination);
+      src.start(startSec, safeTrim, playDur);
+      attached++;
     } catch {
       // skip unreadable audio track
     }
@@ -262,7 +306,7 @@ export async function exportProjectVideo(
   let audioSupported = false;
   if (options.includeAudio !== false && typeof AudioEncoder !== 'undefined') {
     options.onProgress?.(0, 'Mixing audio tracks...');
-    audioBuf = await renderProjectAudioMix(project, durationSec);
+    audioBuf = await renderProjectAudioMix(project, durationSec, options.includeVideoAudio !== false);
     if (audioBuf) {
       try {
         const check = await AudioEncoder.isConfigSupported({
@@ -338,7 +382,7 @@ export async function exportProjectVideo(
   });
 
   videoEncoder.configure(picked.config);
-  const keyFrameInterval = Math.max(1, Math.round(fps * 2));
+  const keyFrameInterval = bitrate >= 25_000_000 ? Math.max(1, Math.round(fps)) : Math.max(1, Math.round(fps * 2));
 
   // X-5: Pre-warm all project shaders, media, and FBO pool before frame 0
   renderer.verifyProjectEffects(project);
@@ -419,6 +463,7 @@ export async function exportProjectVideo(
     }
 
     options.onProgress?.(1, 'Done');
+    const actualBitrateMbps = Math.round(((buffer.byteLength * 8) / durationSec / 1_000_000) * 10) / 10;
     return {
       blob: new Blob([buffer], { type: mimeType }),
       ext: container,
@@ -428,6 +473,7 @@ export async function exportProjectVideo(
       fps,
       totalFrames,
       bitrateMbps: options.bitrateMbps,
+      actualBitrateMbps,
       codec: picked.config.codec,
       hasAudio,
     };
@@ -497,8 +543,11 @@ async function exportViaMediaRecorderFallback(
   recorder.stop();
   await stopped;
 
+  const outBlob = new Blob(chunks, { type: mimeType });
+  const durationSec = Math.max(0.1, project.durationMs / 1000);
+  const actualBitrateMbps = Math.round(((outBlob.size * 8) / durationSec / 1_000_000) * 10) / 10;
   return {
-    blob: new Blob(chunks, { type: mimeType }),
+    blob: outBlob,
     ext,
     mimeType,
     width,
@@ -506,6 +555,7 @@ async function exportViaMediaRecorderFallback(
     fps,
     totalFrames,
     bitrateMbps,
+    actualBitrateMbps,
     codec: mimeType,
     hasAudio: false,
   };
