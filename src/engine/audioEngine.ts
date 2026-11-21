@@ -673,7 +673,17 @@ function carriesAudio(layer: Layer): boolean {
   const isMediaLayer = layer.type === 'video' || (layer.type === 'shape' && layer.fill?.type === 'media');
   if (!isMediaLayer) return false;
   if (md.muted) return false;
-  return (md.volume ?? 1) > 0.001;
+  const vol = md.volume ?? 1;
+  if (vol <= 0.001) return false;
+  // Exclude chromakey/lumakey/screen-blend VFX overlay clips that kept default volume=1 from leaking background noise
+  if (
+    Math.abs(vol - 1) < 1e-4 &&
+    (layer.blendMode === 'screen' ||
+      layer.effects.some((e) => e.enabled && (e.effectId.includes('chromakey') || e.effectId.includes('lumakey'))))
+  ) {
+    return false;
+  }
+  return true;
 }
 
 export const audioEngine = new AudioEngine();

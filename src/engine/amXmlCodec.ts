@@ -785,11 +785,18 @@ function parseXmlLayer(
         ? Math.max(...volAnim.keyframes.map((k) => Number(k.v) || 0))
         : Number(volAnim.value) || 0;
     const parsedVol = Math.max(0, maxGain);
+    const hasExplicitGain = Boolean(volEl || rawVolAttr != null || directProps.gain || directProps.volume);
+    const isVfxOverlayVideo =
+      tag === 'shape' &&
+      !hasExplicitGain &&
+      (el.getAttribute('blending') != null ||
+        effects.some((e) => e.effectId.includes('chromakey') || e.effectId.includes('lumakey')));
     const isMuted =
       el.getAttribute('muted') === 'true' ||
       el.getAttribute('mute') === 'true' ||
       el.getAttribute('audioMuted') === 'true' ||
       el.getAttribute('hasAudio') === 'false' ||
+      isVfxOverlayVideo ||
       maxGain <= 0.001;
     mediaData = {
       mediaId: matchedVideo.mediaId,

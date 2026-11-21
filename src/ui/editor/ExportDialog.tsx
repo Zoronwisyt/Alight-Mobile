@@ -58,6 +58,10 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({ rendererRef, isExpor
   useEffect(() => {
     if (showExportDialog && currentProject) {
       setExportFps(currentProject.fps);
+      const hasDedicatedAudio = currentProject.layers.some(
+        (l) => l.type === 'audio' && l.visible && !l.audioData?.muted
+      );
+      setIncludeVideoAudio(!hasDedicatedAudio);
       setStatusMsg('');
     }
   }, [showExportDialog, currentProject?.id, currentProject?.fps]);
