@@ -1,0 +1,15 @@
+    private static final boolean includesScriptEffects(Map<?, KeyableVisualEffectRef> map) {
+        List<ACScript> scripts;
+        Collection<KeyableVisualEffectRef> collectionValues = map.values();
+        if ((collectionValues instanceof Collection) && collectionValues.isEmpty()) {
+            return false;
+        }
+        Iterator<T> it = collectionValues.iterator();
+        while (it.hasNext()) {
+            VisualEffect visualEffectVisualEffectById = VisualEffectKt.visualEffectById(((KeyableVisualEffectRef) it.next()).getId());
+            if ((visualEffectVisualEffectById == null || (scripts = visualEffectVisualEffectById.getScripts()) == null || !(scripts.isEmpty() ^ true)) ? false : true) {
+                return true;
+            }
+        }
+        return false;
+    }

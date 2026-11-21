@@ -1,0 +1,4 @@
+        public final void R83(Rectangle rectangle) {
+            Intrinsics.checkNotNullParameter(rectangle, "<set-?>");
+            this.Xu = rectangle;
+        }

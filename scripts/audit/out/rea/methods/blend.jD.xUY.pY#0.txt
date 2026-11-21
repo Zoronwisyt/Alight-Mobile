@@ -1,0 +1,37 @@
+    @Override // jD.SfT
+    public void pY(Rectangle layerBounds, Transform layerTransform, Transform layerPrevTransform, List layerEffects, BlendingMode blendingMode, float f2, List edgeDecorations, Vector2D overdrawScale) {
+        Intrinsics.checkNotNullParameter(layerBounds, "layerBounds");
+        Intrinsics.checkNotNullParameter(layerTransform, "layerTransform");
+        Intrinsics.checkNotNullParameter(layerPrevTransform, "layerPrevTransform");
+        Intrinsics.checkNotNullParameter(layerEffects, "layerEffects");
+        Intrinsics.checkNotNullParameter(blendingMode, "blendingMode");
+        Intrinsics.checkNotNullParameter(edgeDecorations, "edgeDecorations");
+        Intrinsics.checkNotNullParameter(overdrawScale, "overdrawScale");
+        if (!(!this.f34928Z)) {
+            throw new IllegalStateException("Must release clip before calling beginLayer()".toString());
+        }
+        R83();
+        this.j4.BWM(this.gOC);
+        this.gOC.dMq(true);
+        this.gOC.sRA(layerEffects);
+        this.gOC.R83(layerBounds);
+        this.gOC.as(layerTransform);
+        this.gOC.eLy(blendingMode);
+        this.gOC.lT(layerPrevTransform);
+        this.gOC.Fcf(f2);
+        this.gOC.oo(overdrawScale);
+        this.gOC.Pl3(edgeDecorations);
+        bYT.HT htAs = this.Rw.as(Y(), "beginLayer");
+        RM.euv.dZ(this, new Jb(layerEffects, blendingMode, f2, htAs));
+        this.gOC.hTJ(htAs);
+        this.Rw.hTJ(htAs);
+        this.Rw.u();
+        GLES20.glColorMask(true, true, true, true);
+        GLES20.glDisable(3042);
+        GLES20.glDisable(2960);
+        GLES20.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+        GLES20.glClearStencil(0);
+        GLES20.glClear(17408);
+        GLES20.glEnable(3042);
+        q2G();
+    }

@@ -1,0 +1,4 @@
+        public final void sRA(List list) {
+            Intrinsics.checkNotNullParameter(list, "<set-?>");
+            this.BWM = list;
+        }

@@ -133,6 +133,30 @@ void main() {
   fragColor = base * m;
 }`;
 
+/**
+ * Native `screen` composite. `BlendingMode.SCREEN` is constructed with `blendEffect = null` in the
+ * APK and no `com.alightcreative.blend.screen` asset or dex string exists, so this mode never
+ * reaches `public/am/effects.json` and is composited here instead.
+ *
+ * Operand convention is copied from the shipped blend shaders (`blend-overlay.xml` and friends):
+ * the backdrop is pre-multiplied by the layer alpha before the blend and the output alpha is the
+ * layer alpha. The result then goes through the same `COMPOSITE_BLEND_FRAG` over-composite as every
+ * effect-based mode, so alpha edges stay consistent across the whole table.
+ */
+const SCREEN_FRAG = `#version 300 es
+precision highp float;
+in vec2 vUv;
+out vec4 fragColor;
+uniform sampler2D uTop;
+uniform sampler2D uBot;
+void main() {
+  vec4 top = texture(uTop, vUv);
+  vec4 bot = texture(uBot, vUv);
+  vec3 b = bot.rgb * top.a;
+  vec3 screened = top.rgb + b - top.rgb * b;
+  fragColor = vec4(screened, top.a);
+}`;
+
 const COMPOSITE_BLEND_FRAG = `#version 300 es
 precision highp float;
 in vec2 vUv;
@@ -443,6 +467,7 @@ export class AlightRenderer {
   private blitProg: ReturnType<ShaderRegistry['compileRaw']>;
   private maskProg: ReturnType<ShaderRegistry['compileRaw']>;
   private compositeBlendProg: ReturnType<ShaderRegistry['compileRaw']>;
+  private screenProg: ReturnType<ShaderRegistry['compileRaw']>;
 
   private fboPool: FboSlot[] = [];
   /**
@@ -451,6 +476,8 @@ export class AlightRenderer {
    * Cleared on dispose so a rebuilt registry is never served a stale program.
    */
   private blendProgramCache = new Map<string, { def: EffectDef | null; prog: CompiledShaderProgram | null }>();
+  /** Blend ids already reported as unresolvable, so the warning fires once per id, not per frame. */
+  private missingBlendWarned = new Set<string>();
   private canvas2d: HTMLCanvasElement;
   private ctx2d: CanvasRenderingContext2D;
 
@@ -545,6 +572,7 @@ export class AlightRenderer {
     this.blitProg = this.registry.compileRaw('__internal_blit', BLIT_VERT, BLIT_FRAG);
     this.maskProg = this.registry.compileRaw('__internal_mask', BLIT_VERT, MASK_FRAG);
     this.compositeBlendProg = this.registry.compileRaw('__internal_comp_blend', BLIT_VERT, COMPOSITE_BLEND_FRAG);
+    this.screenProg = this.registry.compileRaw('__internal_screen', BLIT_VERT, SCREEN_FRAG);
 
     this.tempUploadTex = this.createEmptyTex();
     this.dummyBlackTex = this.createEmptyTex();
@@ -2286,6 +2314,43 @@ export class AlightRenderer {
       this.unbindTextureUnits(2);
       this.blitTexture(outFbo.tex, sceneFbo, renderW, renderH, 1, false);
       this.releaseFbo(outFbo);
+    } else if (blendId === 'screen') {
+      // Native screen: no catalogue effect exists for this mode in the APK, so it is composited
+      // here and then fed through the same over-composite the effect modes use.
+      const gl = this.gl;
+      const screenedFbo = this.acquireFbo(renderW, renderH);
+      gl.bindFramebuffer(gl.FRAMEBUFFER, screenedFbo.fbo);
+      gl.viewport(0, 0, renderW, renderH);
+      gl.disable(gl.BLEND);
+      gl.useProgram(this.screenProg.program);
+      gl.activeTexture(gl.TEXTURE0);
+      gl.bindTexture(gl.TEXTURE_2D, currentSlot.tex);
+      gl.uniform1i(this.screenProg.uniforms.uTop, 0);
+      gl.activeTexture(gl.TEXTURE1);
+      gl.bindTexture(gl.TEXTURE_2D, sceneFbo.tex);
+      gl.uniform1i(this.screenProg.uniforms.uBot, 1);
+      gl.bindVertexArray(this.quadVao);
+      gl.drawArrays(gl.TRIANGLES, 0, 6);
+      this.unbindTextureUnits(2);
+
+      const screenCompFbo = this.acquireFbo(renderW, renderH);
+      gl.bindFramebuffer(gl.FRAMEBUFFER, screenCompFbo.fbo);
+      gl.viewport(0, 0, renderW, renderH);
+      gl.useProgram(this.compositeBlendProg.program);
+      gl.activeTexture(gl.TEXTURE0);
+      gl.bindTexture(gl.TEXTURE_2D, sceneFbo.tex);
+      gl.uniform1i(this.compositeBlendProg.uniforms.uBot, 0);
+      gl.activeTexture(gl.TEXTURE1);
+      gl.bindTexture(gl.TEXTURE_2D, screenedFbo.tex);
+      gl.uniform1i(this.compositeBlendProg.uniforms.uTop, 1);
+      gl.uniform1f(this.compositeBlendProg.uniforms.uAlpha, finalAlpha);
+      gl.bindVertexArray(this.quadVao);
+      gl.drawArrays(gl.TRIANGLES, 0, 6);
+      this.unbindTextureUnits(2);
+
+      this.blitTexture(screenCompFbo.tex, sceneFbo, renderW, renderH, 1, false);
+      this.releaseFbo(screenCompFbo);
+      this.releaseFbo(screenedFbo);
     } else if (blendId !== 'normal') {
       const cachedBlend = this.blendProgramCache.get(blendId);
       const blendDef = cachedBlend !== undefined ? cachedBlend.def : getEffectById(blendId);
@@ -2297,6 +2362,17 @@ export class AlightRenderer {
             : null;
       if (cachedBlend === undefined) {
         this.blendProgramCache.set(blendId, { def: blendDef ?? null, prog: blendProg });
+      }
+      if (!blendDef || !blendProg) {
+        // A table row that names an effect id the catalogue does not carry used to fall through to
+        // a plain blit and render as Normal with no trace. That is exactly how `screen` was silently
+        // broken, so a miss is now reported once per id instead of passing as a normal layer.
+        if (!this.missingBlendWarned.has(blendId)) {
+          this.missingBlendWarned.add(blendId);
+          console.warn(
+            `[renderer] blend mode "${blendId}" has no catalogue effect and is not a native composite; rendering as normal`,
+          );
+        }
       }
       if (blendDef && blendProg) {
         const blendedFbo = this.acquireFbo(renderW, renderH);

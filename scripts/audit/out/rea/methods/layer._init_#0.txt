@@ -1,0 +1,22 @@
+        public fs(boolean z2, boolean z4, List pendingLayerEffects, BlendingMode blendingMode, bYT.HT ht, Rectangle layerBounds, Transform layerTransform, Transform layerPrevTransform, float f2, Vector2D overdrawScale, List edgeDecorations, Matrix matrix) {
+            Intrinsics.checkNotNullParameter(pendingLayerEffects, "pendingLayerEffects");
+            Intrinsics.checkNotNullParameter(blendingMode, "blendingMode");
+            Intrinsics.checkNotNullParameter(layerBounds, "layerBounds");
+            Intrinsics.checkNotNullParameter(layerTransform, "layerTransform");
+            Intrinsics.checkNotNullParameter(layerPrevTransform, "layerPrevTransform");
+            Intrinsics.checkNotNullParameter(overdrawScale, "overdrawScale");
+            Intrinsics.checkNotNullParameter(edgeDecorations, "edgeDecorations");
+            Intrinsics.checkNotNullParameter(matrix, "matrix");
+            this.Rw = z2;
+            this.Hfr = z4;
+            this.BWM = pendingLayerEffects;
+            this.f34959s = blendingMode;
+            this.dZ = ht;
+            this.Xu = layerBounds;
+            this.f34960u = layerTransform;
+            this.f34958g = layerPrevTransform;
+            this.nDH = f2;
+            this.bG = overdrawScale;
+            this.f34957L = edgeDecorations;
+            this.q2G = matrix;
+        }

@@ -1,0 +1,8 @@
+    private static final RenderEnvironmentImpl getRenderEnvFromCache() {
+        RenderEnvironmentImpl renderEnvironmentImpl;
+        List<RenderEnvironmentImpl> list = renderEnvCacheInternal;
+        synchronized (list) {
+            renderEnvironmentImpl = (RenderEnvironmentImpl) RM.SfT.Xu(list);
+        }
+        return renderEnvironmentImpl;
+    }

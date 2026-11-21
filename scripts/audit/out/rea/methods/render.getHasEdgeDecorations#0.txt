@@ -1,0 +1,19 @@
+    private static final boolean getHasEdgeDecorations(SceneElement sceneElement) {
+        boolean z2;
+        if (!sceneElement.getType().getHasBorderAndShadow()) {
+            return false;
+        }
+        List<KeyableEdgeDecoration> edgeDecorations = SceneElementKt.getEdgeDecorations(sceneElement);
+        if ((edgeDecorations instanceof Collection) && edgeDecorations.isEmpty()) {
+            z2 = false;
+        } else {
+            Iterator<T> it = edgeDecorations.iterator();
+            while (it.hasNext()) {
+                if (((KeyableEdgeDecoration) it.next()).getEnabled()) {
+                    z2 = true;
+                }
+            }
+            z2 = false;
+        }
+        return z2;
+    }

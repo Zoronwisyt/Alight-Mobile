@@ -1,0 +1,62 @@
+            private static final void renderWithEffectsNoReverseInterpolation(final SceneElement sceneElement, SfT sfT, final RenderEnvironment renderEnvironment, SceneSelection sceneSelection, Rectangle rectangle) {
+                if (renderEnvironment.getEditMode() == R.id.editmode_no_effects && sceneSelection.isElementDirectlySelected(sceneElement.getId())) {
+                    renderInternal(sceneElement, sfT, renderEnvironment, sceneSelection, rectangle);
+                    return;
+                }
+                if (renderEnvironment.getEditMode() == R.id.editmode_mixed && sceneSelection.isElementDirectlySelected(sceneElement.getId())) {
+                    return;
+                }
+                RM.euv.dZ(sceneElement, new Function0<String>() { // from class: com.alightcreative.app.motion.scene.rendering.SceneElementRenderingKt.renderWithEffectsNoReverseInterpolation.1
+                    /* JADX WARN: 'super' call moved to the top of the method (can break code semantics) */
+                    {
+                        super(0);
+                    }
+
+                    @Override // kotlin.jvm.functions.Function0
+                    public final String invoke() {
+                        return "Begin Render " + sceneElement.getType() + ":" + sceneElement.getId() + " (" + sceneElement.getLabel() + ") [F=" + renderEnvironment.getOverrideFrame() + "]";
+                    }
+                });
+                long jNanoTime = System.nanoTime();
+                Object obj = null;
+                if (renderEnvironment.getUserPreviewMode().s()) {
+                    for (Object obj2 : renderEnvironment.getActiveCamera().getVisualEffects().values()) {
+                        KeyableVisualEffectRef keyableVisualEffectRef = (KeyableVisualEffectRef) obj2;
+                        if (Intrinsics.areEqual(keyableVisualEffectRef.getId(), "com.alightcreative.effects.motionblur4") && !keyableVisualEffectRef.getHidden()) {
+                            obj = obj2;
+                            break;
+                        }
+                    }
+                    obj = (KeyableVisualEffectRef) obj;
+                }
+                if (sceneElement.getType().getHasVisualEffects() && (obj != null || includesScriptEffects(sceneElement.getVisualEffects()))) {
+                    float previousFrameTime = renderEnvironment.getPreviousFrameTime();
+                    int overrideFrame = renderEnvironment.getOverrideFrame() - 1;
+                    int framesPerHundredSeconds = renderEnvironment.getFramesPerHundredSeconds();
+                    Scene scene = renderEnvironment.getScene();
+                    Transform transformValueAtTimeOneFrameEarlier = sceneElement.getTransform().valueAtTimeOneFrameEarlier(renderEnvironment);
+                    int editMode = renderEnvironment.getEditMode();
+                    RenderMode renderMode = renderEnvironment.getRenderMode();
+                    boolean zIsElementDirectlySelected = sceneSelection.isElementDirectlySelected(sceneElement.getId());
+                    ScriptGroup scriptGroup = ScriptGroup.BeforeRepeat;
+                    Transform transformValueAtTimeOneFrameEarlier2 = CameraElementKt.applyCameraAndParenting(ScriptExecutorKt.runScripts(sceneElement, previousFrameTime, overrideFrame, framesPerHundredSeconds, scene, transformValueAtTimeOneFrameEarlier, (992 & 32) != 0 ? previousFrameTime : 0.0f, (992 & 64) != 0 ? null : renderMode, (992 & 128) != 0 ? 0 : Integer.valueOf(editMode), (992 & 256) != 0 ? false : zIsElementDirectlySelected, (992 & ConstantsKt.MINIMUM_BLOCK_SIZE) != 0 ? ScriptGroup.All : scriptGroup), renderEnvironment, renderEnvironment.getPreviousFrameTime()).getTransform().valueAtTimeOneFrameEarlier(renderEnvironment);
+                    float time = renderEnvironment.getTime();
+                    renderWithEffectsInternal(ScriptExecutorKt.runScripts(ScriptExecutorKt.runScripts(sceneElement, time, renderEnvironment.getOverrideFrame(), renderEnvironment.getFramesPerHundredSeconds(), renderEnvironment.getScene(), transformValueAtTimeOneFrameEarlier2, (992 & 32) != 0 ? time : 0.0f, (992 & 64) != 0 ? null : renderEnvironment.getRenderMode(), (992 & 128) != 0 ? 0 : Integer.valueOf(renderEnvironment.getEditMode()), (992 & 256) != 0 ? false : sceneSelection.isElementDirectlySelected(sceneElement.getId()), (992 & ConstantsKt.MINIMUM_BLOCK_SIZE) != 0 ? ScriptGroup.All : scriptGroup), renderEnvironment.getTime(), renderEnvironment.getOverrideFrame(), renderEnvironment.getFramesPerHundredSeconds(), renderEnvironment.getScene(), transformValueAtTimeOneFrameEarlier2, renderEnvironment.getPreviousFrameTime(), renderEnvironment.getRenderMode(), Integer.valueOf(renderEnvironment.getEditMode()), sceneSelection.isElementDirectlySelected(sceneElement.getId()), ScriptGroup.ShaderCoop), sfT, renderEnvironment, sceneSelection, transformValueAtTimeOneFrameEarlier2, rectangle);
+                } else if (sceneElement.getParent() != null) {
+                    renderWithEffectsInternal(sceneElement, sfT, renderEnvironment, sceneSelection, LayerParentingKt.applyLayerParenting(sceneElement, renderEnvironment.getScene(), renderEnvironment.getPreviousFrameTime()).getTransform().valueAtTimeOneFrameEarlier(renderEnvironment), rectangle);
+                } else {
+                    renderWithEffectsInternal(sceneElement, sfT, renderEnvironment, sceneSelection, sceneElement.getTransform().valueAtTimeOneFrameEarlier(renderEnvironment), rectangle);
+                }
+                final long jNanoTime2 = (System.nanoTime() - jNanoTime) / TimeKt.NS_PER_MS;
+                RM.euv.dZ(sceneElement, new Function0<String>() { // from class: com.alightcreative.app.motion.scene.rendering.SceneElementRenderingKt.renderWithEffectsNoReverseInterpolation.2
+                    /* JADX WARN: 'super' call moved to the top of the method (can break code semantics) */
+                    {
+                        super(0);
+                    }
+
+                    @Override // kotlin.jvm.functions.Function0
+                    public final String invoke() {
+                        return "End Render " + sceneElement.getType() + ":" + sceneElement.getId() + " (" + sceneElement.getLabel() + ") ELAPSED=" + jNanoTime2 + "ms [F=" + renderEnvironment.getOverrideFrame() + "]";
+                    }
+                });
+            }

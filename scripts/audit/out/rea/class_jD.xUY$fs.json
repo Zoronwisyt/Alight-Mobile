@@ -1,0 +1,258 @@
+{
+  "engine": {
+    "name": "jadx-headless-mcp",
+    "version": "0.7.1",
+    "artifact_sha256": "6e5eacf500b64292bfb73c49797c1958f6ee44646e43e868039ae7feb573ff75",
+    "source_revision": "5844800a486d2248fa949b74c9896285f5b54de2",
+    "worker_count": 1,
+    "heap_limit_mib": 8192
+  },
+  "class_name": "jD.xUY.fs",
+  "methods": [
+    {
+      "name": "<init>",
+      "reported_signature": "<init>(boolean, boolean, java.util.List, com.alightcreative.app.motion.scene.BlendingMode, bYT.HT, com.alightcreative.app.motion.scene.Rectangle, com.alightcreative.app.motion.scene.Transform, com.alightcreative.app.motion.scene.Transform, float, com.alightcreative.app.motion.scene.Vector2D, java.util.List, android.graphics.Matrix): void",
+      "overload_index": 0,
+      "is_constructor": true,
+      "dex_descriptor": "(ZZLjava/util/List;Lcom/alightcreative/app/motion/scene/BlendingMode;LbYT/HT;Lcom/alightcreative/app/motion/scene/Rectangle;Lcom/alightcreative/app/motion/scene/Transform;Lcom/alightcreative/app/motion/scene/Transform;FLcom/alightcreative/app/motion/scene/Vector2D;Ljava/util/List;Landroid/graphics/Matrix;)V"
+    },
+    {
+      "name": "<init>",
+      "reported_signature": "<init>(boolean, boolean, java.util.List, com.alightcreative.app.motion.scene.BlendingMode, bYT.HT, com.alightcreative.app.motion.scene.Rectangle, com.alightcreative.app.motion.scene.Transform, com.alightcreative.app.motion.scene.Transform, float, com.alightcreative.app.motion.scene.Vector2D, java.util.List, android.graphics.Matrix, int, kotlin.jvm.internal.DefaultConstructorMarker): void",
+      "overload_index": 1,
+      "is_constructor": true,
+      "dex_descriptor": "(ZZLjava/util/List;Lcom/alightcreative/app/motion/scene/BlendingMode;LbYT/HT;Lcom/alightcreative/app/motion/scene/Rectangle;Lcom/alightcreative/app/motion/scene/Transform;Lcom/alightcreative/app/motion/scene/Transform;FLcom/alightcreative/app/motion/scene/Vector2D;Ljava/util/List;Landroid/graphics/Matrix;ILkotlin/jvm/internal/DefaultConstructorMarker;)V"
+    },
+    {
+      "name": "BWM",
+      "reported_signature": "BWM(): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Z"
+    },
+    {
+      "name": "Fcf",
+      "reported_signature": "Fcf(float): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(F)V"
+    },
+    {
+      "name": "Hfr",
+      "reported_signature": "Hfr(): java.util.List",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/util/List;"
+    },
+    {
+      "name": "L",
+      "reported_signature": "L(): java.util.List",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/util/List;"
+    },
+    {
+      "name": "Pl3",
+      "reported_signature": "Pl3(java.util.List): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Ljava/util/List;)V"
+    },
+    {
+      "name": "R83",
+      "reported_signature": "R83(com.alightcreative.app.motion.scene.Rectangle): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/Rectangle;)V"
+    },
+    {
+      "name": "Rw",
+      "reported_signature": "Rw(): com.alightcreative.app.motion.scene.BlendingMode",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/BlendingMode;"
+    },
+    {
+      "name": "VK",
+      "reported_signature": "VK(boolean): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Z)V"
+    },
+    {
+      "name": "Xu",
+      "reported_signature": "Xu(): com.alightcreative.app.motion.scene.Transform",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/Transform;"
+    },
+    {
+      "name": "as",
+      "reported_signature": "as(com.alightcreative.app.motion.scene.Transform): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/Transform;)V"
+    },
+    {
+      "name": "bG",
+      "reported_signature": "bG(): com.alightcreative.app.motion.scene.Vector2D",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/Vector2D;"
+    },
+    {
+      "name": "dMq",
+      "reported_signature": "dMq(boolean): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Z)V"
+    },
+    {
+      "name": "dZ",
+      "reported_signature": "dZ(): com.alightcreative.app.motion.scene.Rectangle",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/Rectangle;"
+    },
+    {
+      "name": "eLy",
+      "reported_signature": "eLy(com.alightcreative.app.motion.scene.BlendingMode): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/BlendingMode;)V"
+    },
+    {
+      "name": "g",
+      "reported_signature": "g(): com.alightcreative.app.motion.scene.Transform",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/Transform;"
+    },
+    {
+      "name": "hTJ",
+      "reported_signature": "hTJ(bYT.HT): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(LbYT/HT;)V"
+    },
+    {
+      "name": "lT",
+      "reported_signature": "lT(com.alightcreative.app.motion.scene.Transform): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/Transform;)V"
+    },
+    {
+      "name": "nDH",
+      "reported_signature": "nDH(): android.graphics.Matrix",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Landroid/graphics/Matrix;"
+    },
+    {
+      "name": "oo",
+      "reported_signature": "oo(com.alightcreative.app.motion.scene.Vector2D): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/Vector2D;)V"
+    },
+    {
+      "name": "pY",
+      "reported_signature": "pY(android.graphics.Matrix): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Landroid/graphics/Matrix;)V"
+    },
+    {
+      "name": "q2G",
+      "reported_signature": "q2G(): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Z"
+    },
+    {
+      "name": "s",
+      "reported_signature": "s(): float",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()F"
+    },
+    {
+      "name": "sRA",
+      "reported_signature": "sRA(java.util.List): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Ljava/util/List;)V"
+    },
+    {
+      "name": "u",
+      "reported_signature": "u(): bYT.HT",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()LbYT/HT;"
+    }
+  ],
+  "fields": [
+    {
+      "name": "BWM",
+      "reported_type": "java.util.List",
+      "dex_static_value": null
+    },
+    {
+      "name": "Hfr",
+      "reported_type": "boolean",
+      "dex_static_value": null
+    },
+    {
+      "name": "Rw",
+      "reported_type": "boolean",
+      "dex_static_value": null
+    },
+    {
+      "name": "Xu",
+      "reported_type": "com.alightcreative.app.motion.scene.Rectangle",
+      "dex_static_value": null
+    },
+    {
+      "name": "bG",
+      "reported_type": "com.alightcreative.app.motion.scene.Vector2D",
+      "dex_static_value": null
+    },
+    {
+      "name": "dZ",
+      "reported_type": "bYT.HT",
+      "dex_static_value": null
+    },
+    {
+      "name": "f34957L",
+      "reported_type": "java.util.List",
+      "dex_static_value": null
+    },
+    {
+      "name": "f34958g",
+      "reported_type": "com.alightcreative.app.motion.scene.Transform",
+      "dex_static_value": null
+    },
+    {
+      "name": "f34959s",
+      "reported_type": "com.alightcreative.app.motion.scene.BlendingMode",
+      "dex_static_value": null
+    },
+    {
+      "name": "f34960u",
+      "reported_type": "com.alightcreative.app.motion.scene.Transform",
+      "dex_static_value": null
+    },
+    {
+      "name": "nDH",
+      "reported_type": "float",
+      "dex_static_value": null
+    },
+    {
+      "name": "q2G",
+      "reported_type": "android.graphics.Matrix",
+      "dex_static_value": null
+    }
+  ],
+  "inner_classes": []
+}

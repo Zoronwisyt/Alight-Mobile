@@ -1,0 +1,29 @@
+{
+  "engine": {
+    "name": "jadx-headless-mcp",
+    "version": "0.7.1",
+    "artifact_sha256": "6e5eacf500b64292bfb73c49797c1958f6ee44646e43e868039ae7feb573ff75",
+    "source_revision": "5844800a486d2248fa949b74c9896285f5b54de2",
+    "worker_count": 1,
+    "heap_limit_mib": 8192
+  },
+  "class_name": "jD.SfT.fs",
+  "methods": [
+    {
+      "name": "Hfr",
+      "reported_signature": "Hfr(jD.SfT, android.graphics.Bitmap, android.graphics.RectF, android.graphics.Matrix, float, jD.Jb, com.alightcreative.app.motion.scene.GradientFill, com.alightcreative.app.motion.scene.rendering.TextureCropMode, int, java.lang.Object): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(LjD/SfT;Landroid/graphics/Bitmap;Landroid/graphics/RectF;Landroid/graphics/Matrix;FLjD/Jb;Lcom/alightcreative/app/motion/scene/GradientFill;Lcom/alightcreative/app/motion/scene/rendering/TextureCropMode;ILjava/lang/Object;)V"
+    },
+    {
+      "name": "Rw",
+      "reported_signature": "Rw(jD.SfT, com.alightcreative.app.motion.scene.Rectangle, com.alightcreative.app.motion.scene.Transform, com.alightcreative.app.motion.scene.Transform, java.util.List, com.alightcreative.app.motion.scene.BlendingMode, float, java.util.List, com.alightcreative.app.motion.scene.Vector2D, int, java.lang.Object): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(LjD/SfT;Lcom/alightcreative/app/motion/scene/Rectangle;Lcom/alightcreative/app/motion/scene/Transform;Lcom/alightcreative/app/motion/scene/Transform;Ljava/util/List;Lcom/alightcreative/app/motion/scene/BlendingMode;FLjava/util/List;Lcom/alightcreative/app/motion/scene/Vector2D;ILjava/lang/Object;)V"
+    }
+  ],
+  "fields": [],
+  "inner_classes": []
+}

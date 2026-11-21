@@ -1,0 +1,220 @@
+{
+  "engine": {
+    "name": "jadx-headless-mcp",
+    "version": "0.7.1",
+    "artifact_sha256": "6e5eacf500b64292bfb73c49797c1958f6ee44646e43e868039ae7feb573ff75",
+    "source_revision": "5844800a486d2248fa949b74c9896285f5b54de2",
+    "worker_count": 1,
+    "heap_limit_mib": 8192
+  },
+  "class_name": "jD.SfT",
+  "methods": [
+    {
+      "name": "BWM",
+      "reported_signature": "BWM(float, float, float, float, jD.Jb): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(FFFFLjD/Jb;)V"
+    },
+    {
+      "name": "Fcf",
+      "reported_signature": "Fcf(): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()V"
+    },
+    {
+      "name": "H",
+      "reported_signature": "H(bYT.R9l, android.graphics.RectF, android.graphics.Matrix, float, com.alightcreative.app.motion.scene.rendering.TextureCropMode): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(LbYT/R9l;Landroid/graphics/RectF;Landroid/graphics/Matrix;FLcom/alightcreative/app/motion/scene/rendering/TextureCropMode;)V"
+    },
+    {
+      "name": "Hfr",
+      "reported_signature": "Hfr(): float",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()F"
+    },
+    {
+      "name": "L",
+      "reported_signature": "L(boolean): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Z)V"
+    },
+    {
+      "name": "PW",
+      "reported_signature": "PW(float, float, float, float, jD.Jb): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(FFFFLjD/Jb;)V"
+    },
+    {
+      "name": "Pl3",
+      "reported_signature": "Pl3(java.util.List, android.graphics.Matrix, jD.Jb): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Ljava/util/List;Landroid/graphics/Matrix;LjD/Jb;)V"
+    },
+    {
+      "name": "R83",
+      "reported_signature": "R83(): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()V"
+    },
+    {
+      "name": "Rw",
+      "reported_signature": "Rw(): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()I"
+    },
+    {
+      "name": "VK",
+      "reported_signature": "VK(jD.A, jD.Jb): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(LjD/A;LjD/Jb;)V"
+    },
+    {
+      "name": "Xu",
+      "reported_signature": "Xu(): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()V"
+    },
+    {
+      "name": "Z",
+      "reported_signature": "Z(android.graphics.Bitmap, android.graphics.RectF, android.graphics.Matrix, float, jD.Jb, com.alightcreative.app.motion.scene.GradientFill, com.alightcreative.app.motion.scene.rendering.TextureCropMode): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Landroid/graphics/Bitmap;Landroid/graphics/RectF;Landroid/graphics/Matrix;FLjD/Jb;Lcom/alightcreative/app/motion/scene/GradientFill;Lcom/alightcreative/app/motion/scene/rendering/TextureCropMode;)V"
+    },
+    {
+      "name": "as",
+      "reported_signature": "as(): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()I"
+    },
+    {
+      "name": "bG",
+      "reported_signature": "bG(jD.A): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(LjD/A;)V"
+    },
+    {
+      "name": "dMq",
+      "reported_signature": "dMq(): com.alightcreative.app.motion.scene.rendering.RenderEnvironment",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/rendering/RenderEnvironment;"
+    },
+    {
+      "name": "dZ",
+      "reported_signature": "dZ(float, float, float, jD.Jb): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(FFFLjD/Jb;)V"
+    },
+    {
+      "name": "eLy",
+      "reported_signature": "eLy(com.alightcreative.app.motion.scene.GradientFill, android.graphics.RectF, android.graphics.Matrix, float): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/GradientFill;Landroid/graphics/RectF;Landroid/graphics/Matrix;F)V"
+    },
+    {
+      "name": "g",
+      "reported_signature": "g(boolean): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Z)V"
+    },
+    {
+      "name": "gOC",
+      "reported_signature": "gOC(android.graphics.Matrix): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Landroid/graphics/Matrix;)V"
+    },
+    {
+      "name": "hTJ",
+      "reported_signature": "hTJ(): android.graphics.Matrix",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Landroid/graphics/Matrix;"
+    },
+    {
+      "name": "j4",
+      "reported_signature": "j4(java.lang.Object, com.alightcreative.app.motion.scene.Rectangle, android.graphics.Matrix, float, jD.fs, kotlin.jvm.functions.Function0): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Ljava/lang/Object;Lcom/alightcreative/app/motion/scene/Rectangle;Landroid/graphics/Matrix;FLjD/fs;Lkotlin/jvm/functions/Function0;)V"
+    },
+    {
+      "name": "lT",
+      "reported_signature": "lT(com.alightcreative.app.motion.scene.Rectangle): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/Rectangle;)V"
+    },
+    {
+      "name": "nDH",
+      "reported_signature": "nDH(): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()I"
+    },
+    {
+      "name": "oo",
+      "reported_signature": "oo(): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()I"
+    },
+    {
+      "name": "pY",
+      "reported_signature": "pY(com.alightcreative.app.motion.scene.Rectangle, com.alightcreative.app.motion.scene.Transform, com.alightcreative.app.motion.scene.Transform, java.util.List, com.alightcreative.app.motion.scene.BlendingMode, float, java.util.List, com.alightcreative.app.motion.scene.Vector2D): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/Rectangle;Lcom/alightcreative/app/motion/scene/Transform;Lcom/alightcreative/app/motion/scene/Transform;Ljava/util/List;Lcom/alightcreative/app/motion/scene/BlendingMode;FLjava/util/List;Lcom/alightcreative/app/motion/scene/Vector2D;)V"
+    },
+    {
+      "name": "q2G",
+      "reported_signature": "q2G(): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()V"
+    },
+    {
+      "name": "s",
+      "reported_signature": "s(): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()V"
+    },
+    {
+      "name": "sRA",
+      "reported_signature": "sRA(java.util.List, android.graphics.Matrix, jD.Jb): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Ljava/util/List;Landroid/graphics/Matrix;LjD/Jb;)V"
+    },
+    {
+      "name": "u",
+      "reported_signature": "u(): bYT.ny6",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()LbYT/ny6;"
+    }
+  ],
+  "fields": [],
+  "inner_classes": [
+    "jD.SfT.fs"
+  ]
+}

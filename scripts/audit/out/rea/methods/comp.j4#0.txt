@@ -1,0 +1,34 @@
+    @Override // jD.SfT
+    public void j4(Object key, Rectangle bounds, Matrix matrix, float f2, jD.fs mode, Function0 renderer) {
+        Intrinsics.checkNotNullParameter(key, "key");
+        Intrinsics.checkNotNullParameter(bounds, "bounds");
+        Intrinsics.checkNotNullParameter(matrix, "matrix");
+        Intrinsics.checkNotNullParameter(mode, "mode");
+        Intrinsics.checkNotNullParameter(renderer, "renderer");
+        if (!(!this.f1k)) {
+            throw new IllegalStateException("Check failed.".toString());
+        }
+        R83();
+        GLES20.glDisable(2960);
+        GLES20.glEnable(3042);
+        GLES20.glBlendFunc(1, 771);
+        GLES20.glBlendEquation(32774);
+        bYT.HT htL = this.Rw.L(key, new B(bounds, this, renderer));
+        int i2 = mY0.$EnumSwitchMapping$3[mode.ordinal()];
+        if (i2 == 1) {
+            GLES20.glBlendFunc(1, 771);
+        } else if (i2 == 2) {
+            GLES20.glBlendFunc(0, 771);
+        }
+        long jCurrentTimeMillis = System.currentTimeMillis();
+        E eBWM = kfX.BWM(this.Rw);
+        vlE vleHfr = vlE.f16838g.Hfr(bounds.getLeft(), bounds.getBottom(), bounds.getRight(), bounds.getTop());
+        bYT.Gv.L(vleHfr, GeometryKt.times(GeometryKt.times(GeometryKt.times(matrix, this.gOC.nDH()), X()), this.Rw.g()));
+        eBWM.render(vleHfr, htL, f2);
+        long jCurrentTimeMillis2 = System.currentTimeMillis() - jCurrentTimeMillis;
+        GLES20.glBlendFunc(1, 771);
+        this.Rw.pY(htL);
+        RM.euv.dZ(this, new rs(jCurrentTimeMillis2));
+        GLES20.glDisable(2960);
+        q2G();
+    }

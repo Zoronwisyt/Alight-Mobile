@@ -11,7 +11,16 @@ export interface BlendModeDef {
   constant: string;
   /** Value AM writes into `blending="…"`. */
   xmlId: string;
-  /** Catalogue effect id, or null when the mode has no effect (evaluated inline). */
+  /**
+   * Catalogue effect id, or `null` when the mode carries no `VisualEffectRef` and is therefore
+   * composited inline by the renderer.
+   *
+   * Verified for 5.0.280 (`BlendingMode.<clinit>`): exactly five constants are built with a null
+   * `blendEffect` — NORMAL, SCREEN, MASK, CLIPPING_MASK, EXCLUDE. The other 24 each name an asset
+   * in `assets/effects/blend-*.xml`, and `public/am/effects.json` carries all 24. `SUBTRACT` is the
+   * one whose id is not a plain dex string literal (its clinit reads an obfuscated static field);
+   * `assets/effects/blend-subtract.xml` exists, so it is wired and treated as an effect mode.
+   */
   effectId: BlendModeId | null;
   /** APK `usesBackingStore` — the group needs an offline buffer before compositing. */
   backingStore: boolean;
@@ -30,7 +39,7 @@ export type BlendGroupName =
 export const BLEND_MODE_TABLE: readonly BlendModeDef[] = [
   { constant: 'NORMAL', xmlId: 'normal', effectId: null, backingStore: false, label: 'Normal', group: 'Normal & Masking' },
   { constant: 'MULTIPLY', xmlId: 'multiply', effectId: 'com.alightcreative.blend.colormultiply', backingStore: true, label: 'Multiply', group: 'Darken' },
-  { constant: 'SCREEN', xmlId: 'screen', effectId: 'com.alightcreative.blend.screen', backingStore: false, label: 'Screen', group: 'Lighten' },
+  { constant: 'SCREEN', xmlId: 'screen', effectId: null, backingStore: false, label: 'Screen', group: 'Lighten' },
   { constant: 'MASK', xmlId: 'mask', effectId: null, backingStore: false, label: 'Mask', group: 'Normal & Masking' },
   { constant: 'CLIPPING_MASK', xmlId: 'clipping-mask', effectId: null, backingStore: false, label: 'Clipping Mask', group: 'Normal & Masking' },
   { constant: 'EXCLUDE', xmlId: 'exclude', effectId: null, backingStore: false, label: 'Exclude', group: 'Normal & Masking' },
@@ -59,9 +68,31 @@ export const BLEND_MODE_TABLE: readonly BlendModeDef[] = [
   { constant: 'DIVIDE', xmlId: 'divide', effectId: 'com.alightcreative.blend.divide', backingStore: false, label: 'Divide', group: 'Difference' },
 ] as const;
 
+/**
+ * Modes the renderer composites itself instead of loading a catalogue effect.
+ *
+ * `BlendingMode.<clinit>` builds exactly these five constants with `blendEffect = null`, so
+ * `getBlendEffect()` returns null, `renderWithEffectsInternal` injects no `VisualEffectRef`, and
+ * the layer reaches the compositor unshaded. `mask` / `clipping-mask` / `exclude` resolve through
+ * the stencil pass, `normal` is a premultiplied `over`, and `screen` needs a real blend pass —
+ * which is why it is listed here rather than mapped to `com.alightcreative.blend.screen`, an id
+ * that does not exist anywhere in the APK.
+ */
+export const NATIVE_BLEND_MODES: readonly BlendModeId[] = [
+  'normal',
+  'screen',
+  'mask',
+  'clipping-mask',
+  'exclude',
+];
+
+/** True when the mode is composited by the renderer rather than by a catalogue effect shader. */
+export function isNativeBlendMode(id: BlendModeId): boolean {
+  return NATIVE_BLEND_MODES.includes(canonicalizeBlendMode(id));
+}
+
 const BY_XML_ID = new Map<string, BlendModeId>();
 const BY_EFFECT_ID = new Map<string, BlendModeId>();
-
 for (const def of BLEND_MODE_TABLE) {
   const canonical: BlendModeId = def.effectId ?? (def.xmlId as BlendModeId);
   BY_XML_ID.set(def.xmlId, canonical);
@@ -76,6 +107,9 @@ const LEGACY_ALIASES: Record<string, BlendModeId> = {
   'com.alightcreative.blend.multiply': 'com.alightcreative.blend.colormultiply',
   'com.alightcreative.blend.difference': 'com.alightcreative.blend.diff',
   'com.alightcreative.blend.luminosity': 'com.alightcreative.blend.luminance',
+  // `screen` is native, not a catalogue effect. Builds before the 5.0.280 blend audit emitted the
+  // catalogue spelling on exported files; fold it back onto the native id.
+  'com.alightcreative.blend.screen': 'screen',
   // CSS spellings on the `blending` attribute
   'color-multiply': 'com.alightcreative.blend.colormultiply',
   difference: 'com.alightcreative.blend.diff',

@@ -52,7 +52,7 @@ parity" section (§5) needs rebuilding — several earlier tickets assumed it wa
 | String resources | **3 274** | — |
 | `com.alightcreative.*` dex literals | **751** | — |
 | Scene element types | **7** | 10 `LayerType` values, but see A1 |
-| Blend mode ids | **23** literals | 27 (`types/project.ts:52-79`) — superset, with id drift, §7 |
+| Blend mode ids | **24** catalogue ids (23 plain dex literals + `subtract`, whose id sits in an obfuscated string pool) + 5 constants with `blendEffect = null` (NORMAL, SCREEN, MASK, CLIPPING_MASK, EXCLUDE) | 24 catalogue + 5 native (`BLEND_MODE_TABLE` + `NATIVE_BLEND_MODES`) — superset of the 24; `screen` corrected to native, see ENGINE_PARITY §P1-09b |
 
 The seven element types, straight out of the dex:
 

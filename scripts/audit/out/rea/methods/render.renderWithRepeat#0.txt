@@ -1,0 +1,10 @@
+            private static final void renderWithRepeat(SceneElement sceneElement, SfT sfT, RenderEnvironment renderEnvironment, SceneSelection sceneSelection, Rectangle rectangle) {
+                Collection<KeyableVisualEffectRef> collectionValues = sceneElement.getVisualEffects().values();
+                ArrayList arrayList = new ArrayList();
+                for (Object obj : collectionValues) {
+                    if (getNeedsSpecialCaseRender((KeyableVisualEffectRef) obj)) {
+                        arrayList.add(obj);
+                    }
+                }
+                renderWithRepeat(sceneElement, arrayList, sfT, renderEnvironment, sceneSelection, rectangle);
+            }

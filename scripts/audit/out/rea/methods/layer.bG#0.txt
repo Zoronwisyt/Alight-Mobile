@@ -1,0 +1,3 @@
+        public final Vector2D bG() {
+            return this.bG;
+        }

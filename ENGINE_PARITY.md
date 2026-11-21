@@ -50,7 +50,7 @@ dispute, or sign off.
 | Pass attributes | `target, effect, blend, src` — `target/effect/src` handled in `runEffectPasses` (`renderer.ts:1680–1720`) | ⚠️ `blend` open → **P0-01** |
 | Presets | 13 XML packs → 250 presets in `presets.json` | ✅ |
 | Shapes | 20 XML → 20 in `shapes.json`, evaluated by real `getPath()` scripts via `evaluateShapePath` | ✅ |
-| Blend modes | 26 modes + `mask` + `exclude` in `BlendModeId` (`types/project.ts:36`) — matches APK's 26 | ✅ |
+| Blend modes | 29 `BlendingMode` constants → 24 catalogue effect ids + 5 native composites (`NATIVE_BLEND_MODES`, `blendModes.ts`) | ✅ verified → §4.5 |
 | Overdraw | 49 `overdraw` + 37 `max-overdraw` + 8 `maxOverdraw` normalized to JSON `maxOverdraw`; applied via `overdrawPad` in `renderer.ts` | ✅ |
 | Keyframe easing | `parseEasingString` + `evalEasing` implement linear / cubicBezier / steps / overshoot / bounce / elastic, and read easing from the **segment-end** keyframe to match APK `KeyableKt.valueAtTime` (`animation.ts:245`) | ✅ |
 | Shader `precision` attr | XML only ever uses `precision="high"` (215 shaders); web hardcodes `highp` | ✅ no-op |
@@ -274,6 +274,63 @@ matches the APK at three rotations.
 `renderer.ts:1681` clamps iterations to `min(10, …)`. AM has no such cap in the XML, and
 `boxblur/boxblur2/fastboxblur/feather/innerblur` expose `iterations`. **Fix:** clamp to a
 memory-derived ceiling instead of a magic 10, and log when clamped.
+
+### P1-09b · Blending modes — what the APK actually does *(added v1.3)*
+
+Full reverse of `com.alightcreative.app.motion.scene.BlendingMode` and the compositor behind it.
+Everything below is from the 5.0.280 APK; the parsing scripts are `scripts/audit/probe_blend_clinit.mjs`,
+`probe_blend_prefix.mjs`, `rea_am_batch28..35.mjs`, and the regression gate is
+`scripts/audit/check_blend_modes.ts`.
+
+**Enum shape** (`BlendingMode.<clinit>`, 29 constants, ordinal order). Constructor is
+`(name, ordinal, id, usesBackingStore, blendEffect)`; the synthesised Kotlin default-args bridge is used
+whenever `blendEffect` is defaulted, which is visible in smali as a 7-arg call whose 5th slot is an `int 0`
+instead of a `const-string`:
+
+| | |
+|---|---|
+| constants with a `blendEffect` | **24** — MULTIPLY, DIFF, EXCLUSION, LIGHTEN, DARKEN, LIGHTER_COLOR, DARKER_COLOR, COLOR_BURN, LINEAR_BURN, COLOR_DODGE, LINEAR_DODGE, OVERLAY, SOFT_LIGHT, HARD_LIGHT, SOFT_OVERLAY, VIVID_LIGHT, LINEAR_LIGHT, PIN_LIGHT, HUE, SATURATION, COLOR, LUMINANCE, SUBTRACT, DIVIDE |
+| constants with `blendEffect = null` | **5** — NORMAL, SCREEN, MASK, CLIPPING_MASK, EXCLUDE |
+| `usesBackingStore = true` | **3** — MULTIPLY, DIFF, EXCLUSION |
+
+`SUBTRACT` is the one constant whose id is not a plain dex string literal: its clinit reads
+`sget-object ... Lkotlin/reflect/jvm/internal/impl/load/kotlin/header/mvrG/AwJYQfheLi;->UNDVzbazpBDML`
+(an obfuscated string pool), and `com.alightcreative.blend.subtract` is **not** a NUL-terminated dex
+pool entry. `assets/effects/blend-subtract.xml` exists and carries the id inside the XML, so the asset
+registry supplies it. ⚠️ *predicted* — the encrypted field was not decrypted.
+
+**SCREEN has no shader anywhere.** Four independent checks:
+1. `<clinit>` builds SCREEN with `blendEffect = null` (`const/4 v6, 0x0` in the 7-arg bridge).
+2. `com.alightcreative.blend.screen` is **not** a NUL-terminated dex string (0 occurrences); the bare
+   prefix `com.alightcreative.blend.` is also absent (0 occurrences), so AM cannot concatenate it either.
+3. No `assets/effects/blend-screen.xml`. The asset set is 24 `blend-*.xml`, matching the 24 wired ids.
+4. Every `glBlendFunc` in the compositor is `(1, 771)` = premultiplied `over` or `(0, 771)` = knockout.
+   `(774, 1)` = `(GL_ONE_MINUS_DST_COLOR, GL_ONE)`, the exact screen formula, appears nowhere.
+
+❌ **open:** whether AM 5.0.280 renders Screen as a no-op (i.e. identical to Normal) or composites it in a
+code path not yet located. Resolving it needs a device capture of a two-layer Screen project. The web port
+implements the standard `top + bot*(1-top.a)`-style screen formula rather than mirroring a suspected AM
+regression, because a mode that silently renders as Normal is the reported bug.
+
+**Web port contract** (`src/engine/blendModes.ts`, `src/engine/renderer.ts`):
+- 24 modes carry a `com.alightcreative.blend.*` id and are drawn through
+  `registry.getEffectProgram(def)` sampling `comp` (the scene FBO) as a uniform — matching
+  `blend-*.xml`, whose params are `inputImg` (`srcType="content"`) and `comp` (`srcType="comp"`).
+- 5 modes are in `NATIVE_BLEND_MODES` and never touch `effects.json`: `mask` / `clipping-mask` /
+  `exclude` via the stencil-style `MASK_FRAG` pass, `normal` via premultiplied `over`, `screen` via
+  `SCREEN_FRAG` + `COMPOSITE_BLEND_FRAG`.
+- A table row that names an id the catalogue does not carry now logs once instead of silently blitting:
+  that fallback is exactly how Screen was rendering as Normal.
+
+**Bug closed:** `BLEND_MODE_TABLE` mapped SCREEN to `com.alightcreative.blend.screen`. That id does not
+exist in `public/am/effects.json`, so `getEffectById()` returned undefined, `blendDef` was null, and
+`renderer.ts` fell to the plain-blit `else` — Screen rendered byte-identical to Normal. SCREEN now carries
+`effectId: null` and routes to the native branch (`blendModes.ts:48`, `renderer.ts:2321`).
+
+**Acceptance:** `scripts/audit/check_blend_modes.ts` asserts 29 rows / 24 effect ids / 5 native, that the
+native set equals `NATIVE_BLEND_MODES`, that no row can reach the plain-blit fallback, and that every
+`effectId` resolves in `effects.json`. Two-layer Screen project must differ from Normal by more than 2/255
+on a mid-grey backdrop.
 
 ### P1-09 · Premultiplied alpha and colour pipeline
 Web: `premultipliedAlpha: true` context (`renderer.ts:414`), RGBA8 FBOs, `top + bot*(1-top.a)` in

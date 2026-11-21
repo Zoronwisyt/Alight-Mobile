@@ -1,0 +1,3 @@
+        public final Matrix nDH() {
+            return this.q2G;
+        }

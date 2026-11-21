@@ -1,0 +1,185 @@
+    public static final boolean renderGeneralElementSelectionAndEditMode(SceneElement sceneElement, SfT canvas, RenderEnvironment env, SceneSelection selection, Rectangle viewport) {
+        List listEmptyList;
+        Vector2D vector2D;
+        SceneElement sceneElement2;
+        RenderEnvironment renderEnvironment;
+        Vector2D vector2D2;
+        SolidColor white;
+        ElementTag tag;
+        ny6 colors;
+        Intrinsics.checkNotNullParameter(sceneElement, "<this>");
+        Intrinsics.checkNotNullParameter(canvas, "canvas");
+        Intrinsics.checkNotNullParameter(env, "env");
+        Intrinsics.checkNotNullParameter(selection, "selection");
+        Intrinsics.checkNotNullParameter(viewport, "viewport");
+        if (!selection.isElementDirectlySelected(sceneElement.getId())) {
+            return false;
+        }
+        switch (env.getEditMode()) {
+            case R.id.editmode_gradient_endpoints /* 2131362658 */:
+                if (sceneElement.getFillType() == FillType.GRADIENT) {
+                    Rectangle rectangleBoundsAtTime = SceneElementKt.boundsAtTime(sceneElement, env.getScene(), env.getTime(), env.getOverrideFrame(), env.getFramesPerHundredSeconds());
+                    float fBG = sK.bG(canvas, R.dimen.gradientGripBgRadius);
+                    float fBG2 = sK.bG(canvas, R.dimen.gradientGripFgRadius);
+                    float fBG3 = sK.bG(canvas, R.dimen.gradientGripColorRadius);
+                    float fBG4 = sK.bG(canvas, R.dimen.multiSelectionStrokeBgWidth);
+                    float fBG5 = sK.bG(canvas, R.dimen.multiSelectionStrokeFgWidth);
+                    float left = rectangleBoundsAtTime.getLeft() + (rectangleBoundsAtTime.getWidth() * sceneElement.getFillGradient().getStartLocation().getX());
+                    float top = rectangleBoundsAtTime.getTop() + (rectangleBoundsAtTime.getHeight() * sceneElement.getFillGradient().getStartLocation().getY());
+                    float left2 = rectangleBoundsAtTime.getLeft() + (rectangleBoundsAtTime.getWidth() * sceneElement.getFillGradient().getEndLocation().getX());
+                    float top2 = rectangleBoundsAtTime.getTop() + (rectangleBoundsAtTime.getHeight() * sceneElement.getFillGradient().getEndLocation().getY());
+                    Jb jb2 = scratchPaint;
+                    Jb.B8K b8k = Jb.B8K.STROKE;
+                    jb2.bG(b8k);
+                    jb2.u(env.getUiColors().getSingleSelectionBg());
+                    jb2.nDH(fBG4);
+                    canvas.BWM(left, top, left2, top2, jb2);
+                    Jb.B8K b8k2 = Jb.B8K.FILL;
+                    jb2.bG(b8k2);
+                    jb2.u(env.getUiColors().getSingleSelectionBg());
+                    canvas.dZ(left, top, fBG, jb2);
+                    canvas.dZ(left2, top2, fBG, jb2);
+                    jb2.bG(b8k);
+                    jb2.u(env.getUiColors().getSingleSelectionFg());
+                    jb2.nDH(fBG5);
+                    canvas.BWM(left, top, left2, top2, jb2);
+                    jb2.bG(b8k2);
+                    jb2.u(env.getUiColors().getSingleSelectionFg());
+                    canvas.dZ(left, top, fBG2, jb2);
+                    canvas.dZ(left2, top2, fBG2, jb2);
+                    jb2.u(sceneElement.getFillGradient().getStartColor());
+                    canvas.dZ(left, top, fBG3, jb2);
+                    jb2.u(sceneElement.getFillGradient().getEndColor());
+                    canvas.dZ(left2, top2, fBG3, jb2);
+                    return true;
+                }
+                return false;
+            case R.id.editmode_motion_path /* 2131362663 */:
+            case R.id.editmode_motion_path_hidden_selection /* 2131362664 */:
+            case R.id.editmode_pivot /* 2131362669 */:
+            case R.id.editmode_pivot_hidden_selection /* 2131362670 */:
+                List<Keyframe> listSortedWith = CollectionsKt___CollectionsKt.sortedWith(sceneElement.getTransform().getLocation().getKeyframes(), new Comparator() { // from class: com.alightcreative.app.motion.scene.rendering.SceneElementRenderingKt$renderGeneralElementSelectionAndEditMode$$inlined$sortedBy$1
+                    /* JADX WARN: Multi-variable type inference failed */
+                    @Override // java.util.Comparator
+                    public final int compare(T t2, T t3) {
+                        return ComparisonsKt__ComparisonsKt.compareValues(Float.valueOf(((Keyframe) t2).getTime()), Float.valueOf(((Keyframe) t3).getTime()));
+                    }
+                });
+                scratchPath.pQ();
+                Vector2D zero = Vector2D.INSTANCE.getZERO();
+                Vector2D vector2D3 = zero;
+                boolean z2 = true;
+                float time = 0.0f;
+                for (Keyframe keyframe : listSortedWith) {
+                    Vector3D vector3DRenderGeneralElementSelectionAndEditMode$posForTime = renderGeneralElementSelectionAndEditMode$posForTime(sceneElement, env, keyframe.getTime());
+                    Vector2D vector2D4 = new Vector2D(vector3DRenderGeneralElementSelectionAndEditMode$posForTime.getX(), vector3DRenderGeneralElementSelectionAndEditMode$posForTime.getY());
+                    if (z2) {
+                        scratchPath.R5h(vector2D4);
+                        vector2D = vector2D4;
+                    } else {
+                        vector2D = vector2D4;
+                        renderGeneralElementSelectionAndEditMode$addPoints(sceneElement, env, time, keyframe.getTime(), vector2D3, vector2D4, 0);
+                        scratchPath.zhF(vector2D);
+                    }
+                    time = keyframe.getTime();
+                    vector2D3 = vector2D;
+                    z2 = false;
+                }
+                canvas.Xu();
+                canvas.lT(viewport);
+                mY0 my0 = scratchPath;
+                euv euvVar = euv.MOTION_PATH;
+                List<Keyframe> list = listSortedWith;
+                ArrayList arrayList = new ArrayList(CollectionsKt__IterablesKt.collectionSizeOrDefault(list, 10));
+                for (Keyframe keyframe2 : list) {
+                    Vector3D vector3D = (Vector3D) KeyableKt.valueAtTime(CameraElementKt.applyCameraAndParenting(sceneElement, env.getScene(), keyframe2.getTime(), env.getUserPreviewMode()).getTransform().getLocation(), keyframe2.getTime());
+                    arrayList.add(new Bb(GeometryKt.plus(new Vector2D(vector3D.getX(), vector3D.getY()), (Vector2D) KeyableKt.valueAtTime(sceneElement.getTransform().getPivot(), keyframe2.getTime())), env.getEditMode() != R.id.editmode_pivot && sceneElement.getTransform().getLocation().getKeyed() && env.getOverrideFrame() == TimeKt.frameNumberFromTime((int) (((double) sceneElement.getStartTime()) + ((((double) keyframe2.getTime()) * env.getDurationInSeconds()) * ((double) 1000.0f))), env.getFramesPerHundredSeconds()), false, false, false, false, 60, null));
+                }
+                if (env.getEditMode() == R.id.editmode_pivot) {
+                    Vector3D vector3D2 = (Vector3D) KeyableKt.valueAtTime(sceneElement.getTransform().getLocation(), env.getTime());
+                    listEmptyList = CollectionsKt__CollectionsJVMKt.listOf(new Bb(GeometryKt.plus(new Vector2D(vector3D2.getX(), vector3D2.getY()), (Vector2D) KeyableKt.valueAtTime(sceneElement.getTransform().getPivot(), env.getTime())), false, false, true, false, false, 54, null));
+                } else {
+                    listEmptyList = CollectionsKt__CollectionsKt.emptyList();
+                }
+                sK.g(canvas, my0, euvVar, CollectionsKt___CollectionsKt.plus((Collection) arrayList, (Iterable) listEmptyList), null, 8, null);
+                canvas.s();
+                return true;
+            default:
+                if (sceneElement.getParent() != null) {
+                    sceneElement2 = sceneElement;
+                    Transform parentTransform = LayerParentingKt.getParentTransform(sceneElement2, env.getScene(), env.getTime());
+                    Vector3D location = parentTransform.getLocation();
+                    Vector2D vector2DPlus = GeometryKt.plus(new Vector2D(location.getX(), location.getY()), parentTransform.getPivot());
+                    renderEnvironment = env;
+                    Vector3D vector3DRenderGeneralElementSelectionAndEditMode$posForTime$3 = renderGeneralElementSelectionAndEditMode$posForTime$3(sceneElement2, renderEnvironment, env.getTime());
+                    Vector2D vector2D5 = new Vector2D(vector3DRenderGeneralElementSelectionAndEditMode$posForTime$3.getX(), vector3DRenderGeneralElementSelectionAndEditMode$posForTime$3.getY());
+                    Vector2D vector2DNormalize = GeometryKt.normalize(GeometryKt.minus(vector2DPlus, vector2D5));
+                    SceneElement sceneElementElementById = SceneKt.elementById(env.getScene(), sceneElement.getParent());
+                    mY0 my1 = scratchPath;
+                    my1.pQ();
+                    my1.R5h(GeometryKt.plus(vector2D5, GeometryKt.times(GeometryKt.times(vector2DNormalize, 20.0f), canvas.Hfr())));
+                    my1.zhF(vector2DPlus);
+                    my1.R5h(vector2DPlus);
+                    my1.zhF(GeometryKt.plus(vector2DPlus, GeometryKt.times(GeometryKt.times(GeometryKt.rot(vector2DNormalize, -145.0f), 20.0f), canvas.Hfr())));
+                    my1.R5h(vector2DPlus);
+                    my1.zhF(GeometryKt.plus(vector2DPlus, GeometryKt.times(GeometryKt.times(GeometryKt.rot(vector2DNormalize, 145.0f), 20.0f), canvas.Hfr())));
+                    canvas.Xu();
+                    canvas.lT(viewport);
+                    euv euvVar2 = euv.PARENT_CONNECTION;
+                    if (sceneElementElementById == null || (tag = sceneElementElementById.getTag()) == null || (colors = tag.getColors()) == null || (white = GeometryKt.mix(colors.Rw(), colors.Hfr(), 0.5f)) == null) {
+                        white = SolidColor.INSTANCE.getWHITE();
+                    }
+                    sK.g(canvas, my1, euvVar2, null, white, 4, null);
+                    my1.pQ();
+                    if (sceneElementElementById != null) {
+                        renderSelection(sceneElementElementById, canvas, RenderEnvironmentKt.withMode(RenderEnvironmentKt.withTimingForElement(renderEnvironment, sceneElementElementById), env.getEditMode() == R.id.editmode_parent ? R.id.editmode_parent_indirect : R.id.editmode_parent), SceneKt.singleElementSelection(sceneElementElementById.getId()), viewport);
+                    }
+                    canvas.s();
+                } else {
+                    sceneElement2 = sceneElement;
+                    renderEnvironment = env;
+                }
+                if (env.getEditMode() != R.id.editmode_parent && env.getEditMode() != R.id.editmode_parent_indirect) {
+                    List<Keyframe> listSortedWith2 = CollectionsKt___CollectionsKt.sortedWith(sceneElement.getTransform().getLocation().getKeyframes(), new Comparator() { // from class: com.alightcreative.app.motion.scene.rendering.SceneElementRenderingKt$renderGeneralElementSelectionAndEditMode$$inlined$sortedBy$2
+                        /* JADX WARN: Multi-variable type inference failed */
+                        @Override // java.util.Comparator
+                        public final int compare(T t2, T t3) {
+                            return ComparisonsKt__ComparisonsKt.compareValues(Float.valueOf(((Keyframe) t2).getTime()), Float.valueOf(((Keyframe) t3).getTime()));
+                        }
+                    });
+                    scratchPath.pQ();
+                    Vector2D zero2 = Vector2D.INSTANCE.getZERO();
+                    Vector2D vector2D6 = zero2;
+                    boolean z4 = true;
+                    float time2 = 0.0f;
+                    for (Keyframe keyframe3 : listSortedWith2) {
+                        Vector3D vector3DRenderGeneralElementSelectionAndEditMode$posForTime$4 = renderGeneralElementSelectionAndEditMode$posForTime$3(sceneElement2, renderEnvironment, keyframe3.getTime());
+                        Vector2D vector2D7 = new Vector2D(vector3DRenderGeneralElementSelectionAndEditMode$posForTime$4.getX(), vector3DRenderGeneralElementSelectionAndEditMode$posForTime$4.getY());
+                        if (z4) {
+                            scratchPath.R5h(vector2D7);
+                            vector2D2 = vector2D7;
+                        } else {
+                            vector2D2 = vector2D7;
+                            renderGeneralElementSelectionAndEditMode$addPoints$6(sceneElement, env, time2, keyframe3.getTime(), vector2D6, vector2D7, 0);
+                            scratchPath.zhF(vector2D2);
+                        }
+                        time2 = keyframe3.getTime();
+                        vector2D6 = vector2D2;
+                        z4 = false;
+                    }
+                    canvas.Xu();
+                    canvas.lT(viewport);
+                    mY0 my2 = scratchPath;
+                    euv euvVar3 = euv.MOTION_PATH_HINT;
+                    List<Keyframe> list2 = listSortedWith2;
+                    ArrayList arrayList2 = new ArrayList(CollectionsKt__IterablesKt.collectionSizeOrDefault(list2, 10));
+                    for (Keyframe keyframe4 : list2) {
+                        Vector3D vector3D3 = (Vector3D) KeyableKt.valueAtTime(CameraElementKt.applyCameraAndParenting(sceneElement2, env.getScene(), keyframe4.getTime(), env.getUserPreviewMode()).getTransform().getLocation(), keyframe4.getTime());
+                        arrayList2.add(new Bb(GeometryKt.plus(new Vector2D(vector3D3.getX(), vector3D3.getY()), (Vector2D) KeyableKt.valueAtTime(sceneElement.getTransform().getPivot(), keyframe4.getTime())), env.getOverrideFrame() == TimeKt.frameNumberFromTime((int) (((double) sceneElement.getStartTime()) + ((((double) keyframe4.getTime()) * env.getDurationInSeconds()) * ((double) 1000.0f))), env.getFramesPerHundredSeconds()), false, false, false, false, 60, null));
+                    }
+                    sK.g(canvas, my2, euvVar3, arrayList2, null, 8, null);
+                    canvas.s();
+                }
+                return false;
+        }
+    }

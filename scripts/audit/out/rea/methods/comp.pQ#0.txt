@@ -1,0 +1,87 @@
+    private final void pQ(List list, Matrix matrix, jD.Jb jb2, boolean z2, boolean z4) {
+        float f2;
+        float f3;
+        Iterator it;
+        float scale = GeometryKt.getScale(matrix);
+        this.dMq.Xu();
+        GLES20.glDisable(2960);
+        GLES20.glEnable(3042);
+        if (z4) {
+            GLES20.glBlendFunc(0, 771);
+        } else {
+            GLES20.glBlendFunc(1, 771);
+        }
+        GLES20.glBlendEquation(32774);
+        float fBWM = this.f1k ? jb2.BWM() : jb2.BWM() * Hfr();
+        float[] gLMat4 = this.f1k ? GeometryKt.toGLMat4(GeometryKt.times(matrix, this.Rw.g())) : GeometryKt.toGLMat4(GeometryKt.times(GeometryKt.times(matrix, X()), this.Rw.g()));
+        List list2 = list;
+        Iterator it2 = list2.iterator();
+        int i2 = 0;
+        Object obj = null;
+        float fMax = 0.0f;
+        while (true) {
+            f2 = 0.01f;
+            if (!it2.hasNext()) {
+                break;
+            }
+            Object next = it2.next();
+            if (obj != null) {
+                StrokePoint strokePoint = (StrokePoint) next;
+                StrokePoint strokePoint2 = (StrokePoint) obj;
+                float length = GeometryKt.getLength(GeometryKt.minus(strokePoint.getLocation(), strokePoint2.getLocation()));
+                float pressure = ((z2 ? strokePoint2.getPressure() : 1.0f) * fBWM) / 2.0f;
+                float pressure2 = (((z2 ? strokePoint.getPressure() : 1.0f) * fBWM) / 2.0f) - pressure;
+                while (fMax < length) {
+                    i2++;
+                    fMax += Math.max(0.01f, Math.max(0.01f, ((fMax / length) * pressure2) + pressure) * 0.25f);
+                }
+                fMax -= length;
+            }
+            obj = next;
+        }
+        bYT.Jb jb3 = new bYT.Jb(i2, 2);
+        bYT.Jb jb4 = new bYT.Jb(i2, 1);
+        Iterator it3 = list2.iterator();
+        Object obj2 = null;
+        float fMax2 = 0.0f;
+        int i3 = 0;
+        while (it3.hasNext()) {
+            Object next2 = it3.next();
+            if (obj2 != null) {
+                StrokePoint strokePoint3 = (StrokePoint) next2;
+                StrokePoint strokePoint4 = (StrokePoint) obj2;
+                Vector2D vector2DMinus = GeometryKt.minus(strokePoint3.getLocation(), strokePoint4.getLocation());
+                float length2 = GeometryKt.getLength(vector2DMinus);
+                float pressure3 = ((z2 ? strokePoint4.getPressure() : 1.0f) * fBWM) / 2.0f;
+                float pressure4 = (((z2 ? strokePoint3.getPressure() : 1.0f) * fBWM) / 2.0f) - pressure3;
+                int i4 = i3;
+                while (fMax2 < length2) {
+                    float f4 = fMax2 / length2;
+                    float f5 = fBWM;
+                    float fMax3 = Math.max(f2, pressure3 + (pressure4 * f4));
+                    Vector2D vector2DPlus = GeometryKt.plus(strokePoint4.getLocation(), GeometryKt.times(vector2DMinus, f4));
+                    int i5 = i4 * 2;
+                    jb3.nDH(i5, vector2DPlus.getX());
+                    jb3.nDH(i5 + 1, vector2DPlus.getY());
+                    jb4.nDH(i4, fMax3 * 2.0f * scale);
+                    i4++;
+                    f2 = 0.01f;
+                    fMax2 += Math.max(0.01f, fMax3 * 0.25f);
+                    fBWM = f5;
+                    it3 = it3;
+                }
+                f3 = fBWM;
+                it = it3;
+                fMax2 -= length2;
+                i3 = i4;
+            } else {
+                f3 = fBWM;
+                it = it3;
+            }
+            fBWM = f3;
+            obj2 = next2;
+            it3 = it;
+        }
+        ((A0W) this.Rw.bG(Reflection.getOrCreateKotlinClass(A0W.class))).render(new qUf(Vlp.Points, jb3, jb4, null, 8, null), jb2.Hfr(), gLMat4);
+        GLES20.glBlendFunc(1, 771);
+    }

@@ -1,0 +1,6 @@
+        public static /* synthetic */ void Rw(SfT sfT, Rectangle rectangle, Transform transform, Transform transform2, List list, BlendingMode blendingMode, float f2, List list2, Vector2D vector2D, int i2, Object obj) {
+            if (obj != null) {
+                throw new UnsupportedOperationException("Super calls with default arguments not supported in this target, function: beginLayer");
+            }
+            sfT.pY((i2 & 1) != 0 ? Rectangle.INSTANCE.getEMPTY() : rectangle, (i2 & 2) != 0 ? Transform.INSTANCE.getIDENTITY() : transform, (i2 & 4) != 0 ? Transform.INSTANCE.getIDENTITY() : transform2, (i2 & 8) != 0 ? CollectionsKt__CollectionsKt.emptyList() : list, (i2 & 16) != 0 ? BlendingMode.NORMAL : blendingMode, (i2 & 32) != 0 ? 1.0f : f2, (i2 & 64) != 0 ? CollectionsKt__CollectionsKt.emptyList() : list2, (i2 & 128) != 0 ? Vector2D.INSTANCE.getONE() : vector2D);
+        }

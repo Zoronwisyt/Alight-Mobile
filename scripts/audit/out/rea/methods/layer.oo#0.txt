@@ -1,0 +1,4 @@
+        public final void oo(Vector2D vector2D) {
+            Intrinsics.checkNotNullParameter(vector2D, "<set-?>");
+            this.bG = vector2D;
+        }

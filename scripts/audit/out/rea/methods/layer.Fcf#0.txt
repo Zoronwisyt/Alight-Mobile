@@ -1,0 +1,3 @@
+        public final void Fcf(float f2) {
+            this.nDH = f2;
+        }

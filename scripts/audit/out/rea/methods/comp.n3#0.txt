@@ -1,0 +1,7 @@
+.method public static final synthetic n3(LjD/xUY;Z)V
+    .registers 2
+
+    iput-boolean p1, p0, LjD/xUY;->f1k:Z
+
+    return-void
+.end method

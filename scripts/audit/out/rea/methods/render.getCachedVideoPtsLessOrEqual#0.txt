@@ -1,0 +1,8 @@
+    public static final Long getCachedVideoPtsLessOrEqual(Uri uri, long j2) {
+        Intrinsics.checkNotNullParameter(uri, "uri");
+        Map<Uri, Object> map = ptsCache;
+        synchronized (map) {
+            mY0.Rw(map.get(uri));
+        }
+        return null;
+    }

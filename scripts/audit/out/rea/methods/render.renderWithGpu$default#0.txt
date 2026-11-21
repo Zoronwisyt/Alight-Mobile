@@ -1,0 +1,287 @@
+.method public static synthetic renderWithGpu$default(Lcom/alightcreative/app/motion/scene/Scene;LpsA/HT;IIIIILbYT/ny6;LbYT/BAQ;Ljava/util/Map;Lcom/alightcreative/app/motion/scene/rendering/RenderMode;Lcom/alightcreative/app/motion/scene/SceneSelection;IILcom/alightcreative/app/motion/scene/SpoidEnv;ZLjava/lang/Long;ZZLcom/alightcreative/app/motion/scene/Rectangle;Ljava/lang/Integer;Lcom/alightcreative/app/motion/scene/Rectangle;ILjava/util/Map;Lcom/alightcreative/app/motion/scene/ExportParams;LKZf/fs;ZLfi/lG;ILjava/lang/Object;)V
+    .registers 60
+
+    move/from16 v0, p28
+
+    and-int/lit16 v1, v0, 0x100
+
+    if-eqz v1, :cond_c
+
+    invoke-static {}, Lkotlin/collections/MapsKt;->emptyMap()Ljava/util/Map;
+
+    move-result-object v1
+
+    move-object v11, v1
+
+    goto :goto_e
+
+    :cond_c
+    move-object/from16 v11, p9
+
+    :goto_e
+    and-int/lit16 v1, v0, 0x200
+
+    if-eqz v1, :cond_16
+
+    sget-object v1, Lcom/alightcreative/app/motion/scene/rendering/RenderMode;->PAUSE:Lcom/alightcreative/app/motion/scene/rendering/RenderMode;
+
+    move-object v12, v1
+
+    goto :goto_18
+
+    :cond_16
+    move-object/from16 v12, p10
+
+    :goto_18
+    and-int/lit16 v1, v0, 0x400
+
+    if-eqz v1, :cond_22
+
+    invoke-static {}, Lcom/alightcreative/app/motion/scene/SceneKt;->getEMPTY_SCENE_SELECTION()Lcom/alightcreative/app/motion/scene/SceneSelection;
+
+    move-result-object v1
+
+    move-object v13, v1
+
+    goto :goto_24
+
+    :cond_22
+    move-object/from16 v13, p11
+
+    :goto_24
+    and-int/lit16 v1, v0, 0x800
+
+    const/4 v2, 0x0
+
+    if-eqz v1, :cond_2b
+
+    move v14, v2
+
+    goto :goto_2d
+
+    :cond_2b
+    move/from16 v14, p12
+
+    :goto_2d
+    and-int/lit16 v1, v0, 0x1000
+
+    if-eqz v1, :cond_33
+
+    move v15, v2
+
+    goto :goto_35
+
+    :cond_33
+    move/from16 v15, p13
+
+    :goto_35
+    and-int/lit16 v1, v0, 0x2000
+
+    if-eqz v1, :cond_49
+
+    new-instance v1, Lcom/alightcreative/app/motion/scene/SpoidEnv;
+
+    const/4 v4, 0x0
+
+    const/4 v5, 0x0
+
+    const/4 v6, 0x0
+
+    const/4 v7, 0x0
+
+    const/16 v8, 0xf
+
+    const/4 v9, 0x0
+
+    move-object v3, v1
+
+    invoke-direct/range {v3 .. v9}, Lcom/alightcreative/app/motion/scene/SpoidEnv;-><init>(Lcom/alightcreative/app/motion/scene/Vector2D;Lcom/alightcreative/app/motion/scene/Vector2D;Lcom/alightcreative/app/motion/scene/Vector2D;Lkotlin/jvm/functions/Function2;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+
+    move-object/from16 v16, v1
+
+    goto :goto_4b
+
+    :cond_49
+    move-object/from16 v16, p14
+
+    :goto_4b
+    and-int/lit16 v1, v0, 0x4000
+
+    if-eqz v1, :cond_52
+
+    move/from16 v17, v2
+
+    goto :goto_54
+
+    :cond_52
+    move/from16 v17, p15
+
+    :goto_54
+    const v1, 0x8000
+
+    and-int/2addr v1, v0
+
+    const/4 v3, 0x0
+
+    if-eqz v1, :cond_5e
+
+    move-object/from16 v18, v3
+
+    goto :goto_60
+
+    :cond_5e
+    move-object/from16 v18, p16
+
+    :goto_60
+    const/high16 v1, 0x10000
+
+    and-int/2addr v1, v0
+
+    if-eqz v1, :cond_68
+
+    move/from16 v19, v2
+
+    goto :goto_6a
+
+    :cond_68
+    move/from16 v19, p17
+
+    :goto_6a
+    const/high16 v1, 0x20000
+
+    and-int/2addr v1, v0
+
+    if-eqz v1, :cond_72
+
+    move/from16 v20, v2
+
+    goto :goto_74
+
+    :cond_72
+    move/from16 v20, p18
+
+    :goto_74
+    const/high16 v1, 0x40000
+
+    and-int/2addr v1, v0
+
+    if-eqz v1, :cond_7c
+
+    move-object/from16 v21, v3
+
+    goto :goto_7e
+
+    :cond_7c
+    move-object/from16 v21, p19
+
+    :goto_7e
+    const/high16 v1, 0x80000
+
+    and-int/2addr v1, v0
+
+    if-eqz v1, :cond_86
+
+    move-object/from16 v22, v3
+
+    goto :goto_88
+
+    :cond_86
+    move-object/from16 v22, p20
+
+    :goto_88
+    const/high16 v1, 0x200000
+
+    and-int/2addr v1, v0
+
+    if-eqz v1, :cond_91
+
+    const/4 v1, 0x1
+
+    move/from16 v24, v1
+
+    goto :goto_93
+
+    :cond_91
+    move/from16 v24, p22
+
+    :goto_93
+    const/high16 v1, 0x400000
+
+    and-int/2addr v1, v0
+
+    if-eqz v1, :cond_9f
+
+    invoke-static {}, Lkotlin/collections/MapsKt;->emptyMap()Ljava/util/Map;
+
+    move-result-object v1
+
+    move-object/from16 v25, v1
+
+    goto :goto_a1
+
+    :cond_9f
+    move-object/from16 v25, p23
+
+    :goto_a1
+    const/high16 v1, 0x2000000
+
+    and-int/2addr v1, v0
+
+    if-eqz v1, :cond_a9
+
+    move/from16 v28, v2
+
+    goto :goto_ab
+
+    :cond_a9
+    move/from16 v28, p26
+
+    :goto_ab
+    const/high16 v1, 0x4000000
+
+    and-int/2addr v0, v1
+
+    if-eqz v0, :cond_b9
+
+    sget-object v0, Lfi/lG;->Fcf:Lfi/lG$fs;
+
+    invoke-virtual {v0}, Lfi/lG$fs;->Rw()Lfi/lG;
+
+    move-result-object v0
+
+    move-object/from16 v29, v0
+
+    goto :goto_bb
+
+    :cond_b9
+    move-object/from16 v29, p27
+
+    :goto_bb
+    move-object/from16 v2, p0
+
+    move-object/from16 v3, p1
+
+    move/from16 v4, p2
+
+    move/from16 v5, p3
+
+    move/from16 v6, p4
+
+    move/from16 v7, p5
+
+    move/from16 v8, p6
+
+    move-object/from16 v9, p7
+
+    move-object/from16 v10, p8
+
+    move-object/from16 v23, p21
+
+    move-object/from16 v26, p24
+
+    move-object/from16 v27, p25
+
+    invoke-static/range {v2 .. v29}, Lcom/alightcreative/app/motion/scene/rendering/SceneRenderingKt;->renderWithGpu(Lcom/alightcreative/app/motion/scene/Scene;LpsA/HT;IIIIILbYT/ny6;LbYT/BAQ;Ljava/util/Map;Lcom/alightcreative/app/motion/scene/rendering/RenderMode;Lcom/alightcreative/app/motion/scene/SceneSelection;IILcom/alightcreative/app/motion/scene/SpoidEnv;ZLjava/lang/Long;ZZLcom/alightcreative/app/motion/scene/Rectangle;Ljava/lang/Integer;Lcom/alightcreative/app/motion/scene/Rectangle;ILjava/util/Map;Lcom/alightcreative/app/motion/scene/ExportParams;LKZf/fs;ZLfi/lG;)V
+
+    return-void
+.end method

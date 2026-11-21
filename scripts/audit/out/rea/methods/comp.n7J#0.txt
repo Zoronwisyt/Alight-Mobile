@@ -1,0 +1,20 @@
+    public void n7J() {
+        RM.euv.dZ(this, new v());
+        if (this.StB == null) {
+            if (!(!this.gOC.BWM())) {
+                throw new IllegalStateException("Check failed.".toString());
+            }
+            R83();
+            bYT.HT htAs = this.Rw.as(this.f34924C, "backingStore");
+            this.StB = htAs;
+            this.Rw.hTJ(htAs);
+            GLES20.glColorMask(true, true, true, true);
+            GLES20.glDisable(3042);
+            GLES20.glDisable(2960);
+            GLES20.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+            GLES20.glClearStencil(0);
+            GLES20.glClear(17408);
+            GLES20.glEnable(3042);
+            q2G();
+        }
+    }

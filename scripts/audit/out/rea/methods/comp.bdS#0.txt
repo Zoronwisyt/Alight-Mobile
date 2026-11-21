@@ -1,0 +1,6 @@
+    private final void bdS() {
+        float[] fArr = new float[9];
+        this.gOC.nDH().getValues(fArr);
+        this.dMq.lT();
+        this.dMq.VK(fArr[0], fArr[3], fArr[1], fArr[4], fArr[2], fArr[5]);
+    }

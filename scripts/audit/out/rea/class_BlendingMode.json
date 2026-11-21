@@ -1,0 +1,256 @@
+{
+  "engine": {
+    "name": "jadx-headless-mcp",
+    "version": "0.7.1",
+    "artifact_sha256": "6e5eacf500b64292bfb73c49797c1958f6ee44646e43e868039ae7feb573ff75",
+    "source_revision": "5844800a486d2248fa949b74c9896285f5b54de2",
+    "worker_count": 1,
+    "heap_limit_mib": 8192
+  },
+  "class_name": "com.alightcreative.app.motion.scene.BlendingMode",
+  "methods": [
+    {
+      "name": "$values",
+      "reported_signature": "$values(): com.alightcreative.app.motion.scene.BlendingMode[]",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()[Lcom/alightcreative/app/motion/scene/BlendingMode;"
+    },
+    {
+      "name": "<clinit>",
+      "reported_signature": "<clinit>(): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()V"
+    },
+    {
+      "name": "<init>",
+      "reported_signature": "<init>(java.lang.String, int, java.lang.String, boolean, java.lang.String): void",
+      "overload_index": 0,
+      "is_constructor": true,
+      "dex_descriptor": "(Ljava/lang/String;ILjava/lang/String;ZLjava/lang/String;)V"
+    },
+    {
+      "name": "<init>",
+      "reported_signature": "<init>(java.lang.String, int, java.lang.String, boolean, java.lang.String, int, kotlin.jvm.internal.DefaultConstructorMarker): void",
+      "overload_index": 1,
+      "is_constructor": true,
+      "dex_descriptor": "(Ljava/lang/String;ILjava/lang/String;ZLjava/lang/String;ILkotlin/jvm/internal/DefaultConstructorMarker;)V"
+    },
+    {
+      "name": "getBlendEffect",
+      "reported_signature": "getBlendEffect(): java.lang.String",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/lang/String;"
+    },
+    {
+      "name": "getEntries",
+      "reported_signature": "getEntries(): kotlin.enums.EnumEntries<com.alightcreative.app.motion.scene.BlendingMode>",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lkotlin/enums/EnumEntries;"
+    },
+    {
+      "name": "getId",
+      "reported_signature": "getId(): java.lang.String",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Ljava/lang/String;"
+    },
+    {
+      "name": "getUsesBackingStore",
+      "reported_signature": "getUsesBackingStore(): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Z"
+    },
+    {
+      "name": "valueOf",
+      "reported_signature": "valueOf(java.lang.String): com.alightcreative.app.motion.scene.BlendingMode",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Ljava/lang/String;)Lcom/alightcreative/app/motion/scene/BlendingMode;"
+    },
+    {
+      "name": "values",
+      "reported_signature": "values(): com.alightcreative.app.motion.scene.BlendingMode[]",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()[Lcom/alightcreative/app/motion/scene/BlendingMode;"
+    }
+  ],
+  "fields": [
+    {
+      "name": "$ENTRIES",
+      "reported_type": "kotlin.enums.EnumEntries",
+      "dex_static_value": null
+    },
+    {
+      "name": "$VALUES",
+      "reported_type": "com.alightcreative.app.motion.scene.BlendingMode[]",
+      "dex_static_value": null
+    },
+    {
+      "name": "CLIPPING_MASK",
+      "reported_type": "com.alightcreative.app.motion.scene.BlendingMode",
+      "dex_static_value": null
+    },
+    {
+      "name": "COLOR",
+      "reported_type": "com.alightcreative.app.motion.scene.BlendingMode",
+      "dex_static_value": null
+    },
+    {
+      "name": "COLOR_BURN",
+      "reported_type": "com.alightcreative.app.motion.scene.BlendingMode",
+      "dex_static_value": null
+    },
+    {
+      "name": "COLOR_DODGE",
+      "reported_type": "com.alightcreative.app.motion.scene.BlendingMode",
+      "dex_static_value": null
+    },
+    {
+      "name": "DARKEN",
+      "reported_type": "com.alightcreative.app.motion.scene.BlendingMode",
+      "dex_static_value": null
+    },
+    {
+      "name": "DARKER_COLOR",
+      "reported_type": "com.alightcreative.app.motion.scene.BlendingMode",
+      "dex_static_value": null
+    },
+    {
+      "name": "DIFF",
+      "reported_type": "com.alightcreative.app.motion.scene.BlendingMode",
+      "dex_static_value": null
+    },
+    {
+      "name": "DIVIDE",
+      "reported_type": "com.alightcreative.app.motion.scene.BlendingMode",
+      "dex_static_value": null
+    },
+    {
+      "name": "EXCLUDE",
+      "reported_type": "com.alightcreative.app.motion.scene.BlendingMode",
+      "dex_static_value": null
+    },
+    {
+      "name": "EXCLUSION",
+      "reported_type": "com.alightcreative.app.motion.scene.BlendingMode",
+      "dex_static_value": null
+    },
+    {
+      "name": "HARD_LIGHT",
+      "reported_type": "com.alightcreative.app.motion.scene.BlendingMode",
+      "dex_static_value": null
+    },
+    {
+      "name": "HUE",
+      "reported_type": "com.alightcreative.app.motion.scene.BlendingMode",
+      "dex_static_value": null
+    },
+    {
+      "name": "LIGHTEN",
+      "reported_type": "com.alightcreative.app.motion.scene.BlendingMode",
+      "dex_static_value": null
+    },
+    {
+      "name": "LIGHTER_COLOR",
+      "reported_type": "com.alightcreative.app.motion.scene.BlendingMode",
+      "dex_static_value": null
+    },
+    {
+      "name": "LINEAR_BURN",
+      "reported_type": "com.alightcreative.app.motion.scene.BlendingMode",
+      "dex_static_value": null
+    },
+    {
+      "name": "LINEAR_DODGE",
+      "reported_type": "com.alightcreative.app.motion.scene.BlendingMode",
+      "dex_static_value": null
+    },
+    {
+      "name": "LINEAR_LIGHT",
+      "reported_type": "com.alightcreative.app.motion.scene.BlendingMode",
+      "dex_static_value": null
+    },
+    {
+      "name": "LUMINANCE",
+      "reported_type": "com.alightcreative.app.motion.scene.BlendingMode",
+      "dex_static_value": null
+    },
+    {
+      "name": "MASK",
+      "reported_type": "com.alightcreative.app.motion.scene.BlendingMode",
+      "dex_static_value": null
+    },
+    {
+      "name": "MULTIPLY",
+      "reported_type": "com.alightcreative.app.motion.scene.BlendingMode",
+      "dex_static_value": null
+    },
+    {
+      "name": "NORMAL",
+      "reported_type": "com.alightcreative.app.motion.scene.BlendingMode",
+      "dex_static_value": null
+    },
+    {
+      "name": "OVERLAY",
+      "reported_type": "com.alightcreative.app.motion.scene.BlendingMode",
+      "dex_static_value": null
+    },
+    {
+      "name": "PIN_LIGHT",
+      "reported_type": "com.alightcreative.app.motion.scene.BlendingMode",
+      "dex_static_value": null
+    },
+    {
+      "name": "SATURATION",
+      "reported_type": "com.alightcreative.app.motion.scene.BlendingMode",
+      "dex_static_value": null
+    },
+    {
+      "name": "SCREEN",
+      "reported_type": "com.alightcreative.app.motion.scene.BlendingMode",
+      "dex_static_value": null
+    },
+    {
+      "name": "SOFT_LIGHT",
+      "reported_type": "com.alightcreative.app.motion.scene.BlendingMode",
+      "dex_static_value": null
+    },
+    {
+      "name": "SOFT_OVERLAY",
+      "reported_type": "com.alightcreative.app.motion.scene.BlendingMode",
+      "dex_static_value": null
+    },
+    {
+      "name": "SUBTRACT",
+      "reported_type": "com.alightcreative.app.motion.scene.BlendingMode",
+      "dex_static_value": null
+    },
+    {
+      "name": "VIVID_LIGHT",
+      "reported_type": "com.alightcreative.app.motion.scene.BlendingMode",
+      "dex_static_value": null
+    },
+    {
+      "name": "blendEffect",
+      "reported_type": "java.lang.String",
+      "dex_static_value": null
+    },
+    {
+      "name": "id",
+      "reported_type": "java.lang.String",
+      "dex_static_value": null
+    },
+    {
+      "name": "usesBackingStore",
+      "reported_type": "boolean",
+      "dex_static_value": null
+    }
+  ],
+  "inner_classes": []
+}

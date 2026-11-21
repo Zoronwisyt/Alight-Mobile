@@ -1,0 +1,577 @@
+            /* JADX INFO: Access modifiers changed from: private */
+            public static final void renderWithRepeat(final SceneElement sceneElement, List<KeyableVisualEffectRef> list, final SfT sfT, final RenderEnvironment renderEnvironment, final SceneSelection sceneSelection, final Rectangle rectangle) {
+                SolidColor white;
+                Vector2D zero;
+                Keyable<Vector2D> vec2DValue;
+                Keyable<SolidColor> colorValue;
+                Keyable<Float> floatValue;
+                Keyable<Float> floatValue2;
+                Keyable<Float> floatValue3;
+                Keyable<Float> floatValue4;
+                Keyable<Float> floatValue5;
+                Keyable<Float> floatValue6;
+                Keyable<Float> floatValue7;
+                Keyable<Float> floatValue8;
+                Vector2D zero2;
+                SolidColor white2;
+                Vector2D zero3;
+                Keyable<Vector2D> vec2DValue2;
+                Keyable<SolidColor> colorValue2;
+                Keyable<Float> floatValue9;
+                Keyable<Float> floatValue10;
+                Keyable<Float> floatValue11;
+                Keyable<Float> floatValue12;
+                Keyable<Float> floatValue13;
+                Keyable<Vector2D> vec2DValue3;
+                Keyable<Float> floatValue14;
+                Vector2D zero4;
+                SolidColor white3;
+                final Vector2D zero5;
+                Keyable<Vector2D> vec2DValue4;
+                Keyable<SolidColor> colorValue3;
+                Keyable<Float> floatValue15;
+                Keyable<Float> floatValue16;
+                Keyable<Float> floatValue17;
+                Keyable<Float> floatValue18;
+                Keyable<Vector2D> vec2DValue5;
+                Keyable<Float> floatValue19;
+                RenderEnvironment renderEnvironment2;
+                float fFloatValue;
+                SolidColor white4;
+                Vector2D zero6;
+                Keyable<Vector2D> vec2DValue6;
+                Keyable<SolidColor> colorValue4;
+                Keyable<Float> floatValue20;
+                Keyable<Float> floatValue21;
+                Keyable<Float> floatValue22;
+                Keyable<Float> floatValue23;
+                Keyable<Float> floatValue24;
+                Keyable<Float> floatValue25;
+                Keyable<Float> floatValue26;
+                Keyable<Float> floatValue27;
+                RenderEnvironment renderEnvironment3;
+                float fFloatValue2;
+                Keyable<Float> floatValue28;
+                Keyable<Float> floatValue29;
+                Keyable<Float> floatValue30;
+                Vector2D zero7;
+                float f2;
+                Vector2D vector2D;
+                Vector2D vector2D2;
+                Keyable<Float> floatValue31;
+                Keyable<Vector2D> vec2DValue7;
+                Keyable<Float> floatValue32;
+                Keyable<Float> floatValue33;
+                Keyable<Float> floatValue34;
+                Keyable<Float> floatValue35;
+                SolidColor white5;
+                Vector2D zero8;
+                Keyable<Vector2D> vec2DValue8;
+                Keyable<SolidColor> colorValue5;
+                Keyable<Float> floatValue36;
+                Keyable<Float> floatValue37;
+                Keyable<Float> floatValue38;
+                Keyable<Float> floatValue39;
+                Keyable<Float> floatValue40;
+                Keyable<Float> floatValue41;
+                Keyable<Float> floatValue42;
+                Keyable<Float> floatValue43;
+                Keyable<Float> floatValue44;
+                Keyable<Float> floatValue45;
+                SceneElement sceneElement2 = sceneElement;
+                RenderEnvironment renderEnvironment4 = renderEnvironment;
+                if (list.isEmpty()) {
+                    renderWithPostRepeatScripts(CameraElementKt.bakeCamera(LayerParentingKt.applyLayerParenting(sceneElement2, renderEnvironment.getScene(), renderEnvironment.getTime()), renderEnvironment4, renderEnvironment.getTime()), sfT, renderEnvironment4, sceneSelection, rectangle);
+                    return;
+                }
+                KeyableVisualEffectRef keyableVisualEffectRef = (KeyableVisualEffectRef) CollectionsKt___CollectionsKt.first((List) list);
+                final List listDrop = CollectionsKt___CollectionsKt.drop(list, 1);
+                if (keyableVisualEffectRef.getHidden()) {
+                    renderWithRepeat(sceneElement, listDrop, sfT, renderEnvironment, sceneSelection, rectangle);
+                    return;
+                }
+                String id = keyableVisualEffectRef.getId();
+                float fFloatValue3 = 0.0f;
+                final float fFloatValue4 = 1.0f;
+                switch (id.hashCode()) {
+                    case -464936364:
+                        float fFloatValue5 = 1.0f;
+                        if (id.equals("com.alightcreative.effects.repeat.scatter")) {
+                            KeyableUserParameterValue keyableUserParameterValue = keyableVisualEffectRef.getParameters().get(JavetError.PARAMETER_COUNT);
+                            int iRoundToInt = MathKt__MathJVMKt.roundToInt((keyableUserParameterValue == null || (floatValue8 = keyableUserParameterValue.getFloatValue()) == null) ? 1.0f : ((Number) KeyableKt.valueAtTime(floatValue8, renderEnvironment4)).floatValue());
+                            KeyableUserParameterValue keyableUserParameterValue2 = keyableVisualEffectRef.getParameters().get("radius");
+                            float fFloatValue6 = (keyableUserParameterValue2 == null || (floatValue7 = keyableUserParameterValue2.getFloatValue()) == null) ? 0.0f : ((Number) KeyableKt.valueAtTime(floatValue7, renderEnvironment4)).floatValue();
+                            KeyableUserParameterValue keyableUserParameterValue3 = keyableVisualEffectRef.getParameters().get("evolution");
+                            float fFloatValue7 = (keyableUserParameterValue3 == null || (floatValue6 = keyableUserParameterValue3.getFloatValue()) == null) ? 0.0f : ((Number) KeyableKt.valueAtTime(floatValue6, renderEnvironment4)).floatValue();
+                            KeyableUserParameterValue keyableUserParameterValue4 = keyableVisualEffectRef.getParameters().get("scatterSeed");
+                            float fFloatValue8 = (keyableUserParameterValue4 == null || (floatValue5 = keyableUserParameterValue4.getFloatValue()) == null) ? 0.0f : ((Number) KeyableKt.valueAtTime(floatValue5, renderEnvironment4)).floatValue();
+                            KeyableUserParameterValue keyableUserParameterValue5 = keyableVisualEffectRef.getParameters().get("angle");
+                            float fFloatValue9 = (keyableUserParameterValue5 == null || (floatValue4 = keyableUserParameterValue5.getFloatValue()) == null) ? 0.0f : ((Number) KeyableKt.valueAtTime(floatValue4, renderEnvironment4)).floatValue();
+                            KeyableUserParameterValue keyableUserParameterValue6 = keyableVisualEffectRef.getParameters().get("scale");
+                            final float fFloatValue10 = (keyableUserParameterValue6 == null || (floatValue3 = keyableUserParameterValue6.getFloatValue()) == null) ? 1.0f : ((Number) KeyableKt.valueAtTime(floatValue3, renderEnvironment4)).floatValue();
+                            KeyableUserParameterValue keyableUserParameterValue7 = keyableVisualEffectRef.getParameters().get("alpha");
+                            if (keyableUserParameterValue7 != null && (floatValue2 = keyableUserParameterValue7.getFloatValue()) != null) {
+                                fFloatValue5 = ((Number) KeyableKt.valueAtTime(floatValue2, renderEnvironment4)).floatValue();
+                            }
+                            KeyableUserParameterValue keyableUserParameterValue8 = keyableVisualEffectRef.getParameters().get("blend");
+                            if (keyableUserParameterValue8 != null && (floatValue = keyableUserParameterValue8.getFloatValue()) != null) {
+                                fFloatValue3 = ((Number) KeyableKt.valueAtTime(floatValue, renderEnvironment4)).floatValue();
+                            }
+                            float f3 = fFloatValue3;
+                            KeyableUserParameterValue keyableUserParameterValue9 = keyableVisualEffectRef.getParameters().get("colorAltCopies");
+                            final boolean booleanValue = keyableUserParameterValue9 != null ? keyableUserParameterValue9.getBooleanValue() : false;
+                            KeyableUserParameterValue keyableUserParameterValue10 = keyableVisualEffectRef.getParameters().get("fillColor");
+                            if (keyableUserParameterValue10 == null || (colorValue = keyableUserParameterValue10.getColorValue()) == null || (white = (SolidColor) KeyableKt.valueAtTime(colorValue, renderEnvironment4)) == null) {
+                                white = SolidColor.INSTANCE.getWHITE();
+                            }
+                            KeyableUserParameterValue keyableUserParameterValue11 = keyableVisualEffectRef.getParameters().get("offset");
+                            if (keyableUserParameterValue11 == null || (vec2DValue = keyableUserParameterValue11.getVec2DValue()) == null || (zero = (Vector2D) KeyableKt.valueAtTime(vec2DValue, renderEnvironment4)) == null) {
+                                zero = Vector2D.INSTANCE.getZERO();
+                            }
+                            final Vector2D vector2D3 = zero;
+                            ColorRange colorRangeComputeRepeatBlend = RepeatEasingKt.computeRepeatBlend(f3, (SolidColor) KeyableKt.valueAtTime(sceneElement.getFillColor(), renderEnvironment4), white);
+                            final SolidColor startColor = colorRangeComputeRepeatBlend.getStartColor();
+                            final SolidColor endColor = colorRangeComputeRepeatBlend.getEndColor();
+                            final float f4 = fFloatValue7;
+                            final float f5 = fFloatValue8;
+                            final float f6 = fFloatValue6;
+                            final float f7 = fFloatValue9;
+                            final float f8 = fFloatValue5;
+                            RepeatEasingKt.repeatWithEasing(iRoundToInt, keyableVisualEffectRef, renderEnvironment, new Function3<Integer, Float, Float, Unit>() { // from class: com.alightcreative.app.motion.scene.rendering.SceneElementRenderingKt.renderWithRepeat.4
+                                /* JADX WARN: 'super' call moved to the top of the method (can break code semantics) */
+                                {
+                                    super(3);
+                                }
+
+                                @Override // kotlin.jvm.functions.Function3
+                                public /* bridge */ /* synthetic */ Unit invoke(Integer num, Float f9, Float f10) {
+                                    invoke(num.intValue(), f9.floatValue(), f10.floatValue());
+                                    return Unit.INSTANCE;
+                                }
+
+                                public final void invoke(int i2, float f9, float f10) {
+                                    float fMix = QuaternionKt.mix(1.0f, fFloatValue10, f10);
+                                    double d2 = i2;
+                                    float fSimplexNoise = (float) SimplexNoiseKt.simplexNoise(((double) f4) * 1.0d, 0.31d + (((double) f5) * 24791.93781d), 231571.93341d * d2);
+                                    float fSimplexNoise2 = (float) SimplexNoiseKt.simplexNoise(((double) f4) * 1.0d, (((double) f5) * 30452.37729d) + 0.25d, d2 * 733243.74533d);
+                                    float f11 = f6;
+                                    Vector2D vector2D4 = new Vector2D(fSimplexNoise * f11, fSimplexNoise2 * f11);
+                                    SceneElement sceneElement3 = sceneElement;
+                                    SceneElementRenderingKt.renderWithRepeat(sceneElement3.copy(((-1) & 1) != 0 ? sceneElement3.type : null, ((-1) & 2) != 0 ? sceneElement3.startTime : 0, ((-1) & 4) != 0 ? sceneElement3.endTime : 0, ((-1) & 8) != 0 ? sceneElement3.id : 0L, ((-1) & 16) != 0 ? sceneElement3.engineState : null, ((-1) & 32) != 0 ? sceneElement3.label : null, ((-1) & 64) != 0 ? sceneElement3.transform : TransformKt.multOpacityBy(TransformKt.rotatedBy(TransformKt.scaledBy$default(TransformKt.translatedBy(sceneElement3.getTransform(), GeometryKt.plus(vector2D4, GeometryKt.times(vector2D3, f10))), fMix, fMix, 0.0f, 0.0f, 12, null), f7 * f10), QuaternionKt.mix(1.0f, f8, f10)), ((-1) & 128) != 0 ? sceneElement3.fillColor : (booleanValue && i2 % 2 == 1) ? sceneElement.getFillColor() : KeyableKt.keyable(GeometryKt.mix(startColor, endColor, f10)), ((-1) & 256) != 0 ? sceneElement3.fillImage : null, ((-1) & ConstantsKt.MINIMUM_BLOCK_SIZE) != 0 ? sceneElement3.fillVideo : null, ((-1) & 1024) != 0 ? sceneElement3.fillGradient : null, ((-1) & 2048) != 0 ? sceneElement3.fillType : null, ((-1) & 4096) != 0 ? sceneElement3.mediaFillMode : null, ((-1) & ConstantsKt.DEFAULT_BUFFER_SIZE) != 0 ? sceneElement3.outline : null, ((-1) & 16384) != 0 ? sceneElement3.src : null, ((-1) & 32768) != 0 ? sceneElement3.speedMap : null, ((-1) & 65536) != 0 ? sceneElement3.liveShape : null, ((-1) & 131072) != 0 ? sceneElement3.inTime : 0, ((-1) & 262144) != 0 ? sceneElement3.outTime : 0, ((-1) & 524288) != 0 ? sceneElement3.loop : false, ((-1) & 1048576) != 0 ? sceneElement3.gain : null, ((-1) & 2097152) != 0 ? sceneElement3.text : null, ((-1) & 4194304) != 0 ? sceneElement3.blendingMode : null, ((-1) & 8388608) != 0 ? sceneElement3.nestedScene : null, ((-1) & 16777216) != 0 ? sceneElement3.linkedSceneUUID : null, ((-1) & 33554432) != 0 ? sceneElement3.visualEffects : null, ((-1) & 67108864) != 0 ? sceneElement3.visualEffectOrder : null, ((-1) & 134217728) != 0 ? sceneElement3.tag : null, ((-1) & 268435456) != 0 ? sceneElement3.drawing : null, ((-1) & 536870912) != 0 ? sceneElement3.userElementParamValues : null, ((-1) & 1073741824) != 0 ? sceneElement3.stroke : null, ((-1) & IntCompanionObject.MIN_VALUE) != 0 ? sceneElement3.borders : null, (125 & 1) != 0 ? sceneElement3.dropShadow : null, (125 & 2) != 0 ? sceneElement3.hidden : false, (125 & 4) != 0 ? sceneElement3.cameraProperties : null, (125 & 8) != 0 ? sceneElement3.parent : null, (125 & 16) != 0 ? sceneElement3.clippingMask : false, (125 & 32) != 0 ? sceneElement3.templatePPId : null, (125 & 64) != 0 ? sceneElement3.presetId : null), listDrop, sfT, ((double) Math.abs(0)) < 1.0E-4d ? renderEnvironment : new RenderEnvironmentTimeOffset(renderEnvironment, 0), sceneSelection, rectangle);
+                                }
+                            });
+                            break;
+                        }
+                        break;
+                    case -356890768:
+                        float fFloatValue11 = 1.0f;
+                        if (id.equals("com.alightcreative.effects.repeat.grid")) {
+                            KeyableUserParameterValue keyableUserParameterValue12 = keyableVisualEffectRef.getParameters().get(JavetError.PARAMETER_COUNT);
+                            final int iRoundToInt2 = MathKt__MathJVMKt.roundToInt((keyableUserParameterValue12 == null || (floatValue14 = keyableUserParameterValue12.getFloatValue()) == null) ? 1.0f : ((Number) KeyableKt.valueAtTime(floatValue14, renderEnvironment4)).floatValue());
+                            KeyableUserParameterValue keyableUserParameterValue13 = keyableVisualEffectRef.getParameters().get("position");
+                            if (keyableUserParameterValue13 == null || (vec2DValue3 = keyableUserParameterValue13.getVec2DValue()) == null || (zero2 = (Vector2D) KeyableKt.valueAtTime(vec2DValue3, renderEnvironment4)) == null) {
+                                zero2 = Vector2D.INSTANCE.getZERO();
+                            }
+                            final Vector2D vector2D4 = zero2;
+                            KeyableUserParameterValue keyableUserParameterValue14 = keyableVisualEffectRef.getParameters().get("stagger");
+                            final float fFloatValue12 = (keyableUserParameterValue14 == null || (floatValue13 = keyableUserParameterValue14.getFloatValue()) == null) ? 0.0f : ((Number) KeyableKt.valueAtTime(floatValue13, renderEnvironment4)).floatValue();
+                            KeyableUserParameterValue keyableUserParameterValue15 = keyableVisualEffectRef.getParameters().get("angle");
+                            float fFloatValue13 = (keyableUserParameterValue15 == null || (floatValue12 = keyableUserParameterValue15.getFloatValue()) == null) ? 0.0f : ((Number) KeyableKt.valueAtTime(floatValue12, renderEnvironment4)).floatValue();
+                            KeyableUserParameterValue keyableUserParameterValue16 = keyableVisualEffectRef.getParameters().get("scale");
+                            final float fFloatValue14 = (keyableUserParameterValue16 == null || (floatValue11 = keyableUserParameterValue16.getFloatValue()) == null) ? 1.0f : ((Number) KeyableKt.valueAtTime(floatValue11, renderEnvironment4)).floatValue();
+                            KeyableUserParameterValue keyableUserParameterValue17 = keyableVisualEffectRef.getParameters().get("alpha");
+                            if (keyableUserParameterValue17 != null && (floatValue10 = keyableUserParameterValue17.getFloatValue()) != null) {
+                                fFloatValue11 = ((Number) KeyableKt.valueAtTime(floatValue10, renderEnvironment4)).floatValue();
+                            }
+                            KeyableUserParameterValue keyableUserParameterValue18 = keyableVisualEffectRef.getParameters().get("blend");
+                            if (keyableUserParameterValue18 != null && (floatValue9 = keyableUserParameterValue18.getFloatValue()) != null) {
+                                fFloatValue3 = ((Number) KeyableKt.valueAtTime(floatValue9, renderEnvironment4)).floatValue();
+                            }
+                            float f9 = fFloatValue3;
+                            KeyableUserParameterValue keyableUserParameterValue19 = keyableVisualEffectRef.getParameters().get("colorAltCopies");
+                            final boolean booleanValue2 = keyableUserParameterValue19 != null ? keyableUserParameterValue19.getBooleanValue() : false;
+                            KeyableUserParameterValue keyableUserParameterValue20 = keyableVisualEffectRef.getParameters().get("fillColor");
+                            if (keyableUserParameterValue20 == null || (colorValue2 = keyableUserParameterValue20.getColorValue()) == null || (white2 = (SolidColor) KeyableKt.valueAtTime(colorValue2, renderEnvironment4)) == null) {
+                                white2 = SolidColor.INSTANCE.getWHITE();
+                            }
+                            KeyableUserParameterValue keyableUserParameterValue21 = keyableVisualEffectRef.getParameters().get("offset");
+                            if (keyableUserParameterValue21 == null || (vec2DValue2 = keyableUserParameterValue21.getVec2DValue()) == null || (zero3 = (Vector2D) KeyableKt.valueAtTime(vec2DValue2, renderEnvironment4)) == null) {
+                                zero3 = Vector2D.INSTANCE.getZERO();
+                            }
+                            final Vector2D vector2D5 = zero3;
+                            ColorRange colorRangeComputeRepeatBlend2 = RepeatEasingKt.computeRepeatBlend(f9, (SolidColor) KeyableKt.valueAtTime(sceneElement.getFillColor(), renderEnvironment4), white2);
+                            final SolidColor startColor2 = colorRangeComputeRepeatBlend2.getStartColor();
+                            final SolidColor endColor2 = colorRangeComputeRepeatBlend2.getEndColor();
+                            final float f10 = fFloatValue13;
+                            final float f11 = fFloatValue11;
+                            RepeatEasingKt.repeatWithEasing(iRoundToInt2 * iRoundToInt2, keyableVisualEffectRef, renderEnvironment, new Function3<Integer, Float, Float, Unit>() { // from class: com.alightcreative.app.motion.scene.rendering.SceneElementRenderingKt.renderWithRepeat.3
+                                /* JADX WARN: 'super' call moved to the top of the method (can break code semantics) */
+                                {
+                                    super(3);
+                                }
+
+                                @Override // kotlin.jvm.functions.Function3
+                                public /* bridge */ /* synthetic */ Unit invoke(Integer num, Float f12, Float f13) {
+                                    invoke(num.intValue(), f12.floatValue(), f13.floatValue());
+                                    return Unit.INSTANCE;
+                                }
+
+                                public final void invoke(int i2, float f12, float f13) {
+                                    int i3 = iRoundToInt2;
+                                    int i4 = i2 / i3;
+                                    float f14 = i4 / i3;
+                                    float f15 = (i2 - (i4 * i3)) / i3;
+                                    float fMix = QuaternionKt.mix(1.0f, fFloatValue14, f13);
+                                    float f16 = fFloatValue12 * (i4 % 2);
+                                    SceneElement sceneElement3 = sceneElement;
+                                    SceneElementRenderingKt.renderWithRepeat(sceneElement3.copy(((-1) & 1) != 0 ? sceneElement3.type : null, ((-1) & 2) != 0 ? sceneElement3.startTime : 0, ((-1) & 4) != 0 ? sceneElement3.endTime : 0, ((-1) & 8) != 0 ? sceneElement3.id : 0L, ((-1) & 16) != 0 ? sceneElement3.engineState : null, ((-1) & 32) != 0 ? sceneElement3.label : null, ((-1) & 64) != 0 ? sceneElement3.transform : TransformKt.multOpacityBy(TransformKt.rotatedBy(TransformKt.scaledBy$default(TransformKt.translatedBy(sceneElement3.getTransform(), GeometryKt.plus(new Vector2D((vector2D4.getX() * f15) + f16, vector2D4.getY() * f14), GeometryKt.times(vector2D5, f13))), fMix, fMix, 0.0f, 0.0f, 12, null), f10 * f13), QuaternionKt.mix(1.0f, f11, f13)), ((-1) & 128) != 0 ? sceneElement3.fillColor : (booleanValue2 && i2 % 2 == 1) ? sceneElement.getFillColor() : KeyableKt.keyable(GeometryKt.mix(startColor2, endColor2, f13)), ((-1) & 256) != 0 ? sceneElement3.fillImage : null, ((-1) & ConstantsKt.MINIMUM_BLOCK_SIZE) != 0 ? sceneElement3.fillVideo : null, ((-1) & 1024) != 0 ? sceneElement3.fillGradient : null, ((-1) & 2048) != 0 ? sceneElement3.fillType : null, ((-1) & 4096) != 0 ? sceneElement3.mediaFillMode : null, ((-1) & ConstantsKt.DEFAULT_BUFFER_SIZE) != 0 ? sceneElement3.outline : null, ((-1) & 16384) != 0 ? sceneElement3.src : null, ((-1) & 32768) != 0 ? sceneElement3.speedMap : null, ((-1) & 65536) != 0 ? sceneElement3.liveShape : null, ((-1) & 131072) != 0 ? sceneElement3.inTime : 0, ((-1) & 262144) != 0 ? sceneElement3.outTime : 0, ((-1) & 524288) != 0 ? sceneElement3.loop : false, ((-1) & 1048576) != 0 ? sceneElement3.gain : null, ((-1) & 2097152) != 0 ? sceneElement3.text : null, ((-1) & 4194304) != 0 ? sceneElement3.blendingMode : null, ((-1) & 8388608) != 0 ? sceneElement3.nestedScene : null, ((-1) & 16777216) != 0 ? sceneElement3.linkedSceneUUID : null, ((-1) & 33554432) != 0 ? sceneElement3.visualEffects : null, ((-1) & 67108864) != 0 ? sceneElement3.visualEffectOrder : null, ((-1) & 134217728) != 0 ? sceneElement3.tag : null, ((-1) & 268435456) != 0 ? sceneElement3.drawing : null, ((-1) & 536870912) != 0 ? sceneElement3.userElementParamValues : null, ((-1) & 1073741824) != 0 ? sceneElement3.stroke : null, ((-1) & IntCompanionObject.MIN_VALUE) != 0 ? sceneElement3.borders : null, (125 & 1) != 0 ? sceneElement3.dropShadow : null, (125 & 2) != 0 ? sceneElement3.hidden : false, (125 & 4) != 0 ? sceneElement3.cameraProperties : null, (125 & 8) != 0 ? sceneElement3.parent : null, (125 & 16) != 0 ? sceneElement3.clippingMask : false, (125 & 32) != 0 ? sceneElement3.templatePPId : null, (125 & 64) != 0 ? sceneElement3.presetId : null), listDrop, sfT, ((double) Math.abs(0)) < 1.0E-4d ? renderEnvironment : new RenderEnvironmentTimeOffset(renderEnvironment, 0), sceneSelection, rectangle);
+                                }
+                            });
+                            break;
+                        }
+                        break;
+                    case -356750306:
+                        float fFloatValue15 = 1.0f;
+                        if (id.equals("com.alightcreative.effects.repeat.line")) {
+                            KeyableUserParameterValue keyableUserParameterValue22 = keyableVisualEffectRef.getParameters().get(JavetError.PARAMETER_COUNT);
+                            int iRoundToInt3 = MathKt__MathJVMKt.roundToInt((keyableUserParameterValue22 == null || (floatValue19 = keyableUserParameterValue22.getFloatValue()) == null) ? 1.0f : ((Number) KeyableKt.valueAtTime(floatValue19, renderEnvironment4)).floatValue());
+                            KeyableUserParameterValue keyableUserParameterValue23 = keyableVisualEffectRef.getParameters().get("position");
+                            if (keyableUserParameterValue23 == null || (vec2DValue5 = keyableUserParameterValue23.getVec2DValue()) == null || (zero4 = (Vector2D) KeyableKt.valueAtTime(vec2DValue5, renderEnvironment4)) == null) {
+                                zero4 = Vector2D.INSTANCE.getZERO();
+                            }
+                            final Vector2D vector2D6 = zero4;
+                            KeyableUserParameterValue keyableUserParameterValue24 = keyableVisualEffectRef.getParameters().get("angle");
+                            float fFloatValue16 = (keyableUserParameterValue24 == null || (floatValue18 = keyableUserParameterValue24.getFloatValue()) == null) ? 0.0f : ((Number) KeyableKt.valueAtTime(floatValue18, renderEnvironment4)).floatValue();
+                            KeyableUserParameterValue keyableUserParameterValue25 = keyableVisualEffectRef.getParameters().get("scale");
+                            final float fFloatValue17 = (keyableUserParameterValue25 == null || (floatValue17 = keyableUserParameterValue25.getFloatValue()) == null) ? 1.0f : ((Number) KeyableKt.valueAtTime(floatValue17, renderEnvironment4)).floatValue();
+                            KeyableUserParameterValue keyableUserParameterValue26 = keyableVisualEffectRef.getParameters().get("alpha");
+                            if (keyableUserParameterValue26 != null && (floatValue16 = keyableUserParameterValue26.getFloatValue()) != null) {
+                                fFloatValue15 = ((Number) KeyableKt.valueAtTime(floatValue16, renderEnvironment4)).floatValue();
+                            }
+                            KeyableUserParameterValue keyableUserParameterValue27 = keyableVisualEffectRef.getParameters().get("blend");
+                            if (keyableUserParameterValue27 != null && (floatValue15 = keyableUserParameterValue27.getFloatValue()) != null) {
+                                fFloatValue3 = ((Number) KeyableKt.valueAtTime(floatValue15, renderEnvironment4)).floatValue();
+                            }
+                            float f12 = fFloatValue3;
+                            KeyableUserParameterValue keyableUserParameterValue28 = keyableVisualEffectRef.getParameters().get("colorAltCopies");
+                            boolean booleanValue3 = keyableUserParameterValue28 != null ? keyableUserParameterValue28.getBooleanValue() : false;
+                            KeyableUserParameterValue keyableUserParameterValue29 = keyableVisualEffectRef.getParameters().get("fillColor");
+                            if (keyableUserParameterValue29 == null || (colorValue3 = keyableUserParameterValue29.getColorValue()) == null || (white3 = (SolidColor) KeyableKt.valueAtTime(colorValue3, renderEnvironment4)) == null) {
+                                white3 = SolidColor.INSTANCE.getWHITE();
+                            }
+                            KeyableUserParameterValue keyableUserParameterValue30 = keyableVisualEffectRef.getParameters().get("offset");
+                            if (keyableUserParameterValue30 == null || (vec2DValue4 = keyableUserParameterValue30.getVec2DValue()) == null || (zero5 = (Vector2D) KeyableKt.valueAtTime(vec2DValue4, renderEnvironment4)) == null) {
+                                zero5 = Vector2D.INSTANCE.getZERO();
+                            }
+                            ColorRange colorRangeComputeRepeatBlend3 = RepeatEasingKt.computeRepeatBlend(f12, (SolidColor) KeyableKt.valueAtTime(sceneElement.getFillColor(), renderEnvironment4), white3);
+                            final SolidColor startColor3 = colorRangeComputeRepeatBlend3.getStartColor();
+                            final SolidColor endColor3 = colorRangeComputeRepeatBlend3.getEndColor();
+                            final float f13 = fFloatValue16;
+                            final float f14 = fFloatValue15;
+                            final boolean z2 = booleanValue3;
+                            RepeatEasingKt.repeatWithEasing(iRoundToInt3, keyableVisualEffectRef, renderEnvironment4, new Function3<Integer, Float, Float, Unit>() { // from class: com.alightcreative.app.motion.scene.rendering.SceneElementRenderingKt.renderWithRepeat.2
+                                /* JADX WARN: 'super' call moved to the top of the method (can break code semantics) */
+                                {
+                                    super(3);
+                                }
+
+                                @Override // kotlin.jvm.functions.Function3
+                                public /* bridge */ /* synthetic */ Unit invoke(Integer num, Float f15, Float f16) {
+                                    invoke(num.intValue(), f15.floatValue(), f16.floatValue());
+                                    return Unit.INSTANCE;
+                                }
+
+                                public final void invoke(int i2, float f15, float f16) {
+                                    float fMix = QuaternionKt.mix(1.0f, fFloatValue17, f16);
+                                    SceneElement sceneElement3 = sceneElement;
+                                    SceneElementRenderingKt.renderWithRepeat(sceneElement3.copy(((-1) & 1) != 0 ? sceneElement3.type : null, ((-1) & 2) != 0 ? sceneElement3.startTime : 0, ((-1) & 4) != 0 ? sceneElement3.endTime : 0, ((-1) & 8) != 0 ? sceneElement3.id : 0L, ((-1) & 16) != 0 ? sceneElement3.engineState : null, ((-1) & 32) != 0 ? sceneElement3.label : null, ((-1) & 64) != 0 ? sceneElement3.transform : TransformKt.multOpacityBy(TransformKt.rotatedBy(TransformKt.scaledBy$default(TransformKt.translatedBy(sceneElement3.getTransform(), GeometryKt.plus(GeometryKt.times(vector2D6, f15), GeometryKt.times(zero5, f16))), fMix, fMix, 0.0f, 0.0f, 12, null), f13 * f16), QuaternionKt.mix(1.0f, f14, f16)), ((-1) & 128) != 0 ? sceneElement3.fillColor : (z2 && i2 % 2 == 1) ? sceneElement.getFillColor() : KeyableKt.keyable(GeometryKt.mix(startColor3, endColor3, f16)), ((-1) & 256) != 0 ? sceneElement3.fillImage : null, ((-1) & ConstantsKt.MINIMUM_BLOCK_SIZE) != 0 ? sceneElement3.fillVideo : null, ((-1) & 1024) != 0 ? sceneElement3.fillGradient : null, ((-1) & 2048) != 0 ? sceneElement3.fillType : null, ((-1) & 4096) != 0 ? sceneElement3.mediaFillMode : null, ((-1) & ConstantsKt.DEFAULT_BUFFER_SIZE) != 0 ? sceneElement3.outline : null, ((-1) & 16384) != 0 ? sceneElement3.src : null, ((-1) & 32768) != 0 ? sceneElement3.speedMap : null, ((-1) & 65536) != 0 ? sceneElement3.liveShape : null, ((-1) & 131072) != 0 ? sceneElement3.inTime : 0, ((-1) & 262144) != 0 ? sceneElement3.outTime : 0, ((-1) & 524288) != 0 ? sceneElement3.loop : false, ((-1) & 1048576) != 0 ? sceneElement3.gain : null, ((-1) & 2097152) != 0 ? sceneElement3.text : null, ((-1) & 4194304) != 0 ? sceneElement3.blendingMode : null, ((-1) & 8388608) != 0 ? sceneElement3.nestedScene : null, ((-1) & 16777216) != 0 ? sceneElement3.linkedSceneUUID : null, ((-1) & 33554432) != 0 ? sceneElement3.visualEffects : null, ((-1) & 67108864) != 0 ? sceneElement3.visualEffectOrder : null, ((-1) & 134217728) != 0 ? sceneElement3.tag : null, ((-1) & 268435456) != 0 ? sceneElement3.drawing : null, ((-1) & 536870912) != 0 ? sceneElement3.userElementParamValues : null, ((-1) & 1073741824) != 0 ? sceneElement3.stroke : null, ((-1) & IntCompanionObject.MIN_VALUE) != 0 ? sceneElement3.borders : null, (125 & 1) != 0 ? sceneElement3.dropShadow : null, (125 & 2) != 0 ? sceneElement3.hidden : false, (125 & 4) != 0 ? sceneElement3.cameraProperties : null, (125 & 8) != 0 ? sceneElement3.parent : null, (125 & 16) != 0 ? sceneElement3.clippingMask : false, (125 & 32) != 0 ? sceneElement3.templatePPId : null, (125 & 64) != 0 ? sceneElement3.presetId : null), listDrop, sfT, ((double) Math.abs(0)) < 1.0E-4d ? renderEnvironment : new RenderEnvironmentTimeOffset(renderEnvironment, 0), sceneSelection, rectangle);
+                                }
+                            });
+                            break;
+                        }
+                        break;
+                    case -356638641:
+                        float fFloatValue18 = 1.0f;
+                        if (id.equals("com.alightcreative.effects.repeat.path")) {
+                            KeyableUserParameterValue keyableUserParameterValue31 = keyableVisualEffectRef.getParameters().get(JavetError.PARAMETER_COUNT);
+                            if (keyableUserParameterValue31 == null || (floatValue27 = keyableUserParameterValue31.getFloatValue()) == null) {
+                                renderEnvironment2 = renderEnvironment;
+                                fFloatValue = 1.0f;
+                            } else {
+                                renderEnvironment2 = renderEnvironment;
+                                fFloatValue = ((Number) KeyableKt.valueAtTime(floatValue27, renderEnvironment2)).floatValue();
+                            }
+                            int iRoundToInt4 = MathKt__MathJVMKt.roundToInt(fFloatValue);
+                            KeyableUserParameterValue keyableUserParameterValue32 = keyableVisualEffectRef.getParameters().get("startPos");
+                            float fFloatValue19 = (keyableUserParameterValue32 == null || (floatValue26 = keyableUserParameterValue32.getFloatValue()) == null) ? 0.0f : ((Number) KeyableKt.valueAtTime(floatValue26, renderEnvironment2)).floatValue();
+                            KeyableUserParameterValue keyableUserParameterValue33 = keyableVisualEffectRef.getParameters().get("pathPhase");
+                            float fFloatValue20 = (keyableUserParameterValue33 == null || (floatValue25 = keyableUserParameterValue33.getFloatValue()) == null) ? 0.0f : ((Number) KeyableKt.valueAtTime(floatValue25, renderEnvironment2)).floatValue();
+                            KeyableUserParameterValue keyableUserParameterValue34 = keyableVisualEffectRef.getParameters().get("endPos");
+                            float fFloatValue21 = (keyableUserParameterValue34 == null || (floatValue24 = keyableUserParameterValue34.getFloatValue()) == null) ? 1.0f : ((Number) KeyableKt.valueAtTime(floatValue24, renderEnvironment2)).floatValue();
+                            KeyableUserParameterValue keyableUserParameterValue35 = keyableVisualEffectRef.getParameters().get("angle");
+                            float fFloatValue22 = (keyableUserParameterValue35 == null || (floatValue23 = keyableUserParameterValue35.getFloatValue()) == null) ? 0.0f : ((Number) KeyableKt.valueAtTime(floatValue23, renderEnvironment2)).floatValue();
+                            KeyableUserParameterValue keyableUserParameterValue36 = keyableVisualEffectRef.getParameters().get("scale");
+                            float fFloatValue23 = (keyableUserParameterValue36 == null || (floatValue22 = keyableUserParameterValue36.getFloatValue()) == null) ? 1.0f : ((Number) KeyableKt.valueAtTime(floatValue22, renderEnvironment2)).floatValue();
+                            KeyableUserParameterValue keyableUserParameterValue37 = keyableVisualEffectRef.getParameters().get("alpha");
+                            if (keyableUserParameterValue37 != null && (floatValue21 = keyableUserParameterValue37.getFloatValue()) != null) {
+                                fFloatValue18 = ((Number) KeyableKt.valueAtTime(floatValue21, renderEnvironment2)).floatValue();
+                            }
+                            KeyableUserParameterValue keyableUserParameterValue38 = keyableVisualEffectRef.getParameters().get("blend");
+                            if (keyableUserParameterValue38 != null && (floatValue20 = keyableUserParameterValue38.getFloatValue()) != null) {
+                                fFloatValue3 = ((Number) KeyableKt.valueAtTime(floatValue20, renderEnvironment2)).floatValue();
+                            }
+                            float f15 = fFloatValue3;
+                            KeyableUserParameterValue keyableUserParameterValue39 = keyableVisualEffectRef.getParameters().get("colorAltCopies");
+                            boolean booleanValue4 = keyableUserParameterValue39 != null ? keyableUserParameterValue39.getBooleanValue() : false;
+                            KeyableUserParameterValue keyableUserParameterValue40 = keyableVisualEffectRef.getParameters().get("tangent");
+                            final boolean booleanValue5 = keyableUserParameterValue40 != null ? keyableUserParameterValue40.getBooleanValue() : false;
+                            KeyableUserParameterValue keyableUserParameterValue41 = keyableVisualEffectRef.getParameters().get("fillColor");
+                            if (keyableUserParameterValue41 == null || (colorValue4 = keyableUserParameterValue41.getColorValue()) == null || (white4 = (SolidColor) KeyableKt.valueAtTime(colorValue4, renderEnvironment2)) == null) {
+                                white4 = SolidColor.INSTANCE.getWHITE();
+                            }
+                            KeyableUserParameterValue keyableUserParameterValue42 = keyableVisualEffectRef.getParameters().get("offset");
+                            if (keyableUserParameterValue42 == null || (vec2DValue6 = keyableUserParameterValue42.getVec2DValue()) == null || (zero6 = (Vector2D) KeyableKt.valueAtTime(vec2DValue6, renderEnvironment2)) == null) {
+                                zero6 = Vector2D.INSTANCE.getZERO();
+                            }
+                            final Vector2D vector2D7 = zero6;
+                            ColorRange colorRangeComputeRepeatBlend4 = RepeatEasingKt.computeRepeatBlend(f15, (SolidColor) KeyableKt.valueAtTime(sceneElement.getFillColor(), renderEnvironment2), white4);
+                            final SolidColor startColor4 = colorRangeComputeRepeatBlend4.getStartColor();
+                            final SolidColor endColor4 = colorRangeComputeRepeatBlend4.getEndColor();
+                            final Transform transformValueAtTime = sceneElement.getTransform().valueAtTime(renderEnvironment2);
+                            Iterator<SceneElement> it = renderEnvironment.getScene().getElements().iterator();
+                            int i2 = 0;
+                            while (true) {
+                                if (!it.hasNext()) {
+                                    i2 = -1;
+                                } else if (!(it.next().getId() == sceneElement.getId())) {
+                                    i2++;
+                                }
+                            }
+                            if (i2 < 1) {
+                                renderWithRepeat(sceneElement, listDrop, sfT, renderEnvironment, sceneSelection, rectangle);
+                            } else {
+                                SceneElement sceneElement3 = renderEnvironment.getScene().getElements().get(i2 - 1);
+                                Path pathBWM = CubicBSplineKt.toPath(LiveShapeScriptKt.getShapeOutline(sceneElement3, renderEnvironment.getTime())).BWM();
+                                TransformKt.transform(pathBWM, sceneElement3.getTransform().valueAtTime(renderEnvironment2));
+                                final PathMeasure pathMeasure = new PathMeasure(pathBWM, false);
+                                final float length = pathMeasure.getLength();
+                                final float f16 = length * (fFloatValue21 - fFloatValue19);
+                                final float f17 = length * fFloatValue19;
+                                final float[] fArr = new float[2];
+                                final float[] fArr2 = new float[2];
+                                final float f18 = fFloatValue23;
+                                final float f19 = fFloatValue20;
+                                final float f20 = fFloatValue22;
+                                final float f21 = fFloatValue18;
+                                final boolean z4 = booleanValue4;
+                                RepeatEasingKt.repeatWithEasing(iRoundToInt4, keyableVisualEffectRef, renderEnvironment, new Function3<Integer, Float, Float, Unit>() { // from class: com.alightcreative.app.motion.scene.rendering.SceneElementRenderingKt.renderWithRepeat.5
+                                    /* JADX WARN: 'super' call moved to the top of the method (can break code semantics) */
+                                    {
+                                        super(3);
+                                    }
+
+                                    @Override // kotlin.jvm.functions.Function3
+                                    public /* bridge */ /* synthetic */ Unit invoke(Integer num, Float f22, Float f23) {
+                                        invoke(num.intValue(), f22.floatValue(), f23.floatValue());
+                                        return Unit.INSTANCE;
+                                    }
+
+                                    public final void invoke(int i3, float f22, float f23) {
+                                        float f24;
+                                        float fMix = QuaternionKt.mix(1.0f, f18, f23);
+                                        PathMeasure pathMeasure2 = pathMeasure;
+                                        float f25 = f17 + (f16 * f22);
+                                        float f26 = f19 + 1000.0f;
+                                        float f27 = length;
+                                        pathMeasure2.getPosTan((f25 + (f26 * f27)) % f27, fArr, fArr2);
+                                        float[] fArr3 = fArr;
+                                        Vector3D vector3D = new Vector3D(fArr3[0], fArr3[1], 0.0f, 4, null);
+                                        if (booleanValue5) {
+                                            float[] fArr4 = fArr2;
+                                            f24 = (-((float) Math.atan2(fArr4[0], fArr4[1]))) * 57.2958f;
+                                        } else {
+                                            f24 = 0.0f;
+                                        }
+                                        SceneElement sceneElement4 = sceneElement;
+                                        SceneElementRenderingKt.renderWithRepeat(sceneElement4.copy(((-1) & 1) != 0 ? sceneElement4.type : null, ((-1) & 2) != 0 ? sceneElement4.startTime : 0, ((-1) & 4) != 0 ? sceneElement4.endTime : 0, ((-1) & 8) != 0 ? sceneElement4.id : 0L, ((-1) & 16) != 0 ? sceneElement4.engineState : null, ((-1) & 32) != 0 ? sceneElement4.label : null, ((-1) & 64) != 0 ? sceneElement4.transform : TransformKt.multOpacityBy(TransformKt.rotatedBy(TransformKt.scaledBy$default(TransformKt.translatedBy(sceneElement4.getTransform(), GeometryKt.plus(GeometryKt.minus(vector3D, transformValueAtTime.getLocation()), GeometryKt.times(vector2D7, f23))), fMix, fMix, 0.0f, 0.0f, 12, null), f24 + (f20 * f23)), QuaternionKt.mix(1.0f, f21, f23)), ((-1) & 128) != 0 ? sceneElement4.fillColor : (z4 && i3 % 2 == 1) ? sceneElement.getFillColor() : KeyableKt.keyable(GeometryKt.mix(startColor4, endColor4, f23)), ((-1) & 256) != 0 ? sceneElement4.fillImage : null, ((-1) & ConstantsKt.MINIMUM_BLOCK_SIZE) != 0 ? sceneElement4.fillVideo : null, ((-1) & 1024) != 0 ? sceneElement4.fillGradient : null, ((-1) & 2048) != 0 ? sceneElement4.fillType : null, ((-1) & 4096) != 0 ? sceneElement4.mediaFillMode : null, ((-1) & ConstantsKt.DEFAULT_BUFFER_SIZE) != 0 ? sceneElement4.outline : null, ((-1) & 16384) != 0 ? sceneElement4.src : null, ((-1) & 32768) != 0 ? sceneElement4.speedMap : null, ((-1) & 65536) != 0 ? sceneElement4.liveShape : null, ((-1) & 131072) != 0 ? sceneElement4.inTime : 0, ((-1) & 262144) != 0 ? sceneElement4.outTime : 0, ((-1) & 524288) != 0 ? sceneElement4.loop : false, ((-1) & 1048576) != 0 ? sceneElement4.gain : null, ((-1) & 2097152) != 0 ? sceneElement4.text : null, ((-1) & 4194304) != 0 ? sceneElement4.blendingMode : null, ((-1) & 8388608) != 0 ? sceneElement4.nestedScene : null, ((-1) & 16777216) != 0 ? sceneElement4.linkedSceneUUID : null, ((-1) & 33554432) != 0 ? sceneElement4.visualEffects : null, ((-1) & 67108864) != 0 ? sceneElement4.visualEffectOrder : null, ((-1) & 134217728) != 0 ? sceneElement4.tag : null, ((-1) & 268435456) != 0 ? sceneElement4.drawing : null, ((-1) & 536870912) != 0 ? sceneElement4.userElementParamValues : null, ((-1) & 1073741824) != 0 ? sceneElement4.stroke : null, ((-1) & IntCompanionObject.MIN_VALUE) != 0 ? sceneElement4.borders : null, (125 & 1) != 0 ? sceneElement4.dropShadow : null, (125 & 2) != 0 ? sceneElement4.hidden : false, (125 & 4) != 0 ? sceneElement4.cameraProperties : null, (125 & 8) != 0 ? sceneElement4.parent : null, (125 & 16) != 0 ? sceneElement4.clippingMask : false, (125 & 32) != 0 ? sceneElement4.templatePPId : null, (125 & 64) != 0 ? sceneElement4.presetId : null), listDrop, sfT, ((double) Math.abs(0)) < 1.0E-4d ? renderEnvironment : new RenderEnvironmentTimeOffset(renderEnvironment, 0), sceneSelection, rectangle);
+                                    }
+                                });
+                            }
+                            break;
+                        }
+                        break;
+                    case 554228714:
+                        float f22 = 1.0f;
+                        if (id.equals("com.alightcreative.effects.repeat.echokf")) {
+                            KeyableUserParameterValue keyableUserParameterValue43 = keyableVisualEffectRef.getParameters().get(JavetError.PARAMETER_COUNT);
+                            if (keyableUserParameterValue43 == null || (floatValue30 = keyableUserParameterValue43.getFloatValue()) == null) {
+                                renderEnvironment3 = renderEnvironment;
+                                fFloatValue2 = 1.0f;
+                            } else {
+                                renderEnvironment3 = renderEnvironment;
+                                fFloatValue2 = ((Number) KeyableKt.valueAtTime(floatValue30, renderEnvironment3)).floatValue();
+                            }
+                            int iRoundToInt5 = MathKt__MathJVMKt.roundToInt(fFloatValue2);
+                            KeyableUserParameterValue keyableUserParameterValue44 = keyableVisualEffectRef.getParameters().get("seconds");
+                            float fFloatValue24 = (keyableUserParameterValue44 == null || (floatValue29 = keyableUserParameterValue44.getFloatValue()) == null) ? 0.5f : ((Number) KeyableKt.valueAtTime(floatValue29, renderEnvironment3)).floatValue();
+                            KeyableUserParameterValue keyableUserParameterValue45 = keyableVisualEffectRef.getParameters().get("alpha");
+                            float fFloatValue25 = (keyableUserParameterValue45 == null || (floatValue28 = keyableUserParameterValue45.getFloatValue()) == null) ? 1.0f : ((Number) KeyableKt.valueAtTime(floatValue28, renderEnvironment3)).floatValue();
+                            KeyableUserParameterValue keyableUserParameterValue46 = keyableVisualEffectRef.getParameters().get("mode");
+                            int intValue = keyableUserParameterValue46 != null ? keyableUserParameterValue46.getIntValue() : 1;
+                            float endTime = 1.0f / ((((sceneElement.getEndTime() - sceneElement.getStartTime()) / 1000.0f) * renderEnvironment.getFramesPerHundredSeconds()) / 100);
+                            if (intValue == 0) {
+                                renderWithRepeat(sceneElement, listDrop, sfT, renderEnvironment, sceneSelection, rectangle);
+                            }
+                            int i3 = 0;
+                            while (i3 < iRoundToInt5) {
+                                float f23 = (intValue == 0 ? (iRoundToInt5 - 1) - i3 : i3) / iRoundToInt5;
+                                float fMix = QuaternionKt.mix(fFloatValue25, f22, f23);
+                                int iSceneTimeSeconds = (int) ((SceneElementKt.sceneTimeSeconds(sceneElement, renderEnvironment.getTime()) - ((double) ((f22 - f23) * fFloatValue24))) * ((double) 1000));
+                                float fFractionalTime = SceneElementKt.fractionalTime(sceneElement, iSceneTimeSeconds);
+                                RenderEnvironmentAdj renderEnvironmentAdj = new RenderEnvironmentAdj(renderEnvironment, fFractionalTime, fFractionalTime - endTime, renderEnvironment.getDurationInSeconds(), TimeKt.frameNumberFromTime(iSceneTimeSeconds, renderEnvironment.getFramesPerHundredSeconds()));
+                                if (fMix > 0.0f) {
+                                    if (fMix < f22) {
+                                        renderWithRepeat(sceneElement.copy(((-1) & 1) != 0 ? sceneElement.type : null, ((-1) & 2) != 0 ? sceneElement.startTime : 0, ((-1) & 4) != 0 ? sceneElement.endTime : 0, ((-1) & 8) != 0 ? sceneElement.id : 0L, ((-1) & 16) != 0 ? sceneElement.engineState : null, ((-1) & 32) != 0 ? sceneElement.label : null, ((-1) & 64) != 0 ? sceneElement.transform : TransformKt.multOpacityBy(sceneElement.getTransform(), fMix), ((-1) & 128) != 0 ? sceneElement.fillColor : null, ((-1) & 256) != 0 ? sceneElement.fillImage : null, ((-1) & ConstantsKt.MINIMUM_BLOCK_SIZE) != 0 ? sceneElement.fillVideo : null, ((-1) & 1024) != 0 ? sceneElement.fillGradient : null, ((-1) & 2048) != 0 ? sceneElement.fillType : null, ((-1) & 4096) != 0 ? sceneElement.mediaFillMode : null, ((-1) & ConstantsKt.DEFAULT_BUFFER_SIZE) != 0 ? sceneElement.outline : null, ((-1) & 16384) != 0 ? sceneElement.src : null, ((-1) & 32768) != 0 ? sceneElement.speedMap : null, ((-1) & 65536) != 0 ? sceneElement.liveShape : null, ((-1) & 131072) != 0 ? sceneElement.inTime : 0, ((-1) & 262144) != 0 ? sceneElement.outTime : 0, ((-1) & 524288) != 0 ? sceneElement.loop : false, ((-1) & 1048576) != 0 ? sceneElement.gain : null, ((-1) & 2097152) != 0 ? sceneElement.text : null, ((-1) & 4194304) != 0 ? sceneElement.blendingMode : null, ((-1) & 8388608) != 0 ? sceneElement.nestedScene : null, ((-1) & 16777216) != 0 ? sceneElement.linkedSceneUUID : null, ((-1) & 33554432) != 0 ? sceneElement.visualEffects : null, ((-1) & 67108864) != 0 ? sceneElement.visualEffectOrder : null, ((-1) & 134217728) != 0 ? sceneElement.tag : null, ((-1) & 268435456) != 0 ? sceneElement.drawing : null, ((-1) & 536870912) != 0 ? sceneElement.userElementParamValues : null, ((-1) & 1073741824) != 0 ? sceneElement.stroke : null, ((-1) & IntCompanionObject.MIN_VALUE) != 0 ? sceneElement.borders : null, (125 & 1) != 0 ? sceneElement.dropShadow : null, (125 & 2) != 0 ? sceneElement.hidden : false, (125 & 4) != 0 ? sceneElement.cameraProperties : null, (125 & 8) != 0 ? sceneElement.parent : null, (125 & 16) != 0 ? sceneElement.clippingMask : false, (125 & 32) != 0 ? sceneElement.templatePPId : null, (125 & 64) != 0 ? sceneElement.presetId : null), listDrop, sfT, renderEnvironmentAdj, sceneSelection, rectangle);
+                                    } else {
+                                        renderWithRepeat(sceneElement, listDrop, sfT, renderEnvironmentAdj, sceneSelection, rectangle);
+                                    }
+                                }
+                                i3++;
+                                fFloatValue25 = fFloatValue25;
+                                iRoundToInt5 = iRoundToInt5;
+                                f22 = f22;
+                                intValue = intValue;
+                            }
+                            if (intValue == 1) {
+                                renderWithRepeat(sceneElement, listDrop, sfT, renderEnvironment, sceneSelection, rectangle);
+                            }
+                            break;
+                        }
+                        break;
+                    case 698322820:
+                        if (id.equals("com.alightcreative.effects.repeat")) {
+                            KeyableUserParameterValue keyableUserParameterValue47 = keyableVisualEffectRef.getParameters().get(JavetError.PARAMETER_COUNT);
+                            int iRoundToInt6 = MathKt__MathJVMKt.roundToInt((keyableUserParameterValue47 == null || (floatValue35 = keyableUserParameterValue47.getFloatValue()) == null) ? 1.0f : ((Number) KeyableKt.valueAtTime(floatValue35, renderEnvironment4)).floatValue());
+                            KeyableUserParameterValue keyableUserParameterValue48 = keyableVisualEffectRef.getParameters().get("time");
+                            float fFloatValue26 = (keyableUserParameterValue48 == null || (floatValue34 = keyableUserParameterValue48.getFloatValue()) == null) ? 0.0f : ((Number) KeyableKt.valueAtTime(floatValue34, renderEnvironment4)).floatValue();
+                            KeyableUserParameterValue keyableUserParameterValue49 = keyableVisualEffectRef.getParameters().get("angle");
+                            float fFloatValue27 = (keyableUserParameterValue49 == null || (floatValue33 = keyableUserParameterValue49.getFloatValue()) == null) ? 0.0f : ((Number) KeyableKt.valueAtTime(floatValue33, renderEnvironment4)).floatValue();
+                            KeyableUserParameterValue keyableUserParameterValue50 = keyableVisualEffectRef.getParameters().get("scale");
+                            float fFloatValue28 = (keyableUserParameterValue50 == null || (floatValue32 = keyableUserParameterValue50.getFloatValue()) == null) ? 1.0f : ((Number) KeyableKt.valueAtTime(floatValue32, renderEnvironment4)).floatValue();
+                            KeyableUserParameterValue keyableUserParameterValue51 = keyableVisualEffectRef.getParameters().get("offset");
+                            if (keyableUserParameterValue51 == null || (vec2DValue7 = keyableUserParameterValue51.getVec2DValue()) == null || (zero7 = (Vector2D) KeyableKt.valueAtTime(vec2DValue7, renderEnvironment4)) == null) {
+                                zero7 = Vector2D.INSTANCE.getZERO();
+                            }
+                            Vector2D vector2D8 = zero7;
+                            KeyableUserParameterValue keyableUserParameterValue52 = keyableVisualEffectRef.getParameters().get("alpha");
+                            float fFloatValue29 = (keyableUserParameterValue52 == null || (floatValue31 = keyableUserParameterValue52.getFloatValue()) == null) ? 1.0f : ((Number) KeyableKt.valueAtTime(floatValue31, renderEnvironment4)).floatValue();
+                            Vector2D zero9 = Vector2D.INSTANCE.getZERO();
+                            float f24 = 1.0f;
+                            float f25 = 1.0f;
+                            float f26 = 0.0f;
+                            float f27 = 0.0f;
+                            int i4 = 0;
+                            while (i4 < iRoundToInt6) {
+                                int iRoundToInt7 = MathKt__MathJVMKt.roundToInt(f27);
+                                int iRoundToInt8 = MathKt__MathJVMKt.roundToInt(((f27 - MathKt__MathJVMKt.truncate(f27)) * renderEnvironment.getFramesPerHundredSeconds()) / 100.0f);
+                                int overrideFrame = renderEnvironment.getOverrideFrame() - iRoundToInt7;
+                                RenderEnvironment renderEnvironmentAdj2 = ((double) f27) < 1.0E-5d ? renderEnvironment4 : new RenderEnvironmentAdj(renderEnvironment, SceneElementKt.fractionalTime(sceneElement2, TimeKt.timeFromFrameNumber(overrideFrame, renderEnvironment.getFramesPerHundredSeconds()) - iRoundToInt8), SceneElementKt.fractionalTime(sceneElement2, TimeKt.timeFromFrameNumber(overrideFrame - 1, renderEnvironment.getFramesPerHundredSeconds()) - iRoundToInt8), renderEnvironment.getDurationInSeconds(), overrideFrame);
+                                if (f24 > 0.0f) {
+                                    float f28 = f24;
+                                    f2 = f28;
+                                    renderWithRepeat(sceneElement.copy(((-1) & 1) != 0 ? sceneElement.type : null, ((-1) & 2) != 0 ? sceneElement.startTime : 0, ((-1) & 4) != 0 ? sceneElement.endTime : 0, ((-1) & 8) != 0 ? sceneElement.id : 0L, ((-1) & 16) != 0 ? sceneElement.engineState : null, ((-1) & 32) != 0 ? sceneElement.label : null, ((-1) & 64) != 0 ? sceneElement.transform : TransformKt.multOpacityBy(TransformKt.rotatedBy(TransformKt.scaledBy$default(TransformKt.translatedBy(sceneElement.getTransform(), zero9), f25, f25, 0.0f, 0.0f, 12, null), f26), f28), ((-1) & 128) != 0 ? sceneElement.fillColor : null, ((-1) & 256) != 0 ? sceneElement.fillImage : null, ((-1) & ConstantsKt.MINIMUM_BLOCK_SIZE) != 0 ? sceneElement.fillVideo : null, ((-1) & 1024) != 0 ? sceneElement.fillGradient : null, ((-1) & 2048) != 0 ? sceneElement.fillType : null, ((-1) & 4096) != 0 ? sceneElement.mediaFillMode : null, ((-1) & ConstantsKt.DEFAULT_BUFFER_SIZE) != 0 ? sceneElement.outline : null, ((-1) & 16384) != 0 ? sceneElement.src : null, ((-1) & 32768) != 0 ? sceneElement.speedMap : null, ((-1) & 65536) != 0 ? sceneElement.liveShape : null, ((-1) & 131072) != 0 ? sceneElement.inTime : 0, ((-1) & 262144) != 0 ? sceneElement.outTime : 0, ((-1) & 524288) != 0 ? sceneElement.loop : false, ((-1) & 1048576) != 0 ? sceneElement.gain : null, ((-1) & 2097152) != 0 ? sceneElement.text : null, ((-1) & 4194304) != 0 ? sceneElement.blendingMode : null, ((-1) & 8388608) != 0 ? sceneElement.nestedScene : null, ((-1) & 16777216) != 0 ? sceneElement.linkedSceneUUID : null, ((-1) & 33554432) != 0 ? sceneElement.visualEffects : null, ((-1) & 67108864) != 0 ? sceneElement.visualEffectOrder : null, ((-1) & 134217728) != 0 ? sceneElement.tag : null, ((-1) & 268435456) != 0 ? sceneElement.drawing : null, ((-1) & 536870912) != 0 ? sceneElement.userElementParamValues : null, ((-1) & 1073741824) != 0 ? sceneElement.stroke : null, ((-1) & IntCompanionObject.MIN_VALUE) != 0 ? sceneElement.borders : null, (125 & 1) != 0 ? sceneElement.dropShadow : null, (125 & 2) != 0 ? sceneElement.hidden : false, (125 & 4) != 0 ? sceneElement.cameraProperties : null, (125 & 8) != 0 ? sceneElement.parent : null, (125 & 16) != 0 ? sceneElement.clippingMask : false, (125 & 32) != 0 ? sceneElement.templatePPId : null, (125 & 64) != 0 ? sceneElement.presetId : null), listDrop, sfT, renderEnvironmentAdj2, sceneSelection, rectangle);
+                                    vector2D = zero9;
+                                    vector2D2 = vector2D8;
+                                } else {
+                                    f2 = f24;
+                                    vector2D = zero9;
+                                    vector2D2 = vector2D8;
+                                }
+                                zero9 = GeometryKt.plus(vector2D, vector2D2);
+                                f25 *= fFloatValue28;
+                                f26 += fFloatValue27;
+                                f27 += fFloatValue26;
+                                f24 = f2 - (1.0f - fFloatValue29);
+                                i4++;
+                                renderEnvironment4 = renderEnvironment;
+                                vector2D8 = vector2D2;
+                                iRoundToInt6 = iRoundToInt6;
+                                sceneElement2 = sceneElement;
+                            }
+                            break;
+                        }
+                        break;
+                    case 924435401:
+                        if (id.equals("com.alightcreative.effects.repeat.radial")) {
+                            KeyableUserParameterValue keyableUserParameterValue53 = keyableVisualEffectRef.getParameters().get(JavetError.PARAMETER_COUNT);
+                            final int iRoundToInt9 = MathKt__MathJVMKt.roundToInt((keyableUserParameterValue53 == null || (floatValue45 = keyableUserParameterValue53.getFloatValue()) == null) ? 1.0f : ((Number) KeyableKt.valueAtTime(floatValue45, renderEnvironment4)).floatValue());
+                            KeyableUserParameterValue keyableUserParameterValue54 = keyableVisualEffectRef.getParameters().get("radius");
+                            final float fFloatValue30 = (keyableUserParameterValue54 == null || (floatValue44 = keyableUserParameterValue54.getFloatValue()) == null) ? 0.0f : ((Number) KeyableKt.valueAtTime(floatValue44, renderEnvironment4)).floatValue();
+                            KeyableUserParameterValue keyableUserParameterValue55 = keyableVisualEffectRef.getParameters().get("baseScale");
+                            float fFloatValue31 = (keyableUserParameterValue55 == null || (floatValue43 = keyableUserParameterValue55.getFloatValue()) == null) ? 1.0f : ((Number) KeyableKt.valueAtTime(floatValue43, renderEnvironment4)).floatValue();
+                            KeyableUserParameterValue keyableUserParameterValue56 = keyableVisualEffectRef.getParameters().get("startAngle");
+                            float fFloatValue32 = (keyableUserParameterValue56 == null || (floatValue42 = keyableUserParameterValue56.getFloatValue()) == null) ? 0.0f : ((Number) KeyableKt.valueAtTime(floatValue42, renderEnvironment4)).floatValue();
+                            KeyableUserParameterValue keyableUserParameterValue57 = keyableVisualEffectRef.getParameters().get("sweep");
+                            float fFloatValue33 = (keyableUserParameterValue57 == null || (floatValue41 = keyableUserParameterValue57.getFloatValue()) == null) ? 0.0f : ((Number) KeyableKt.valueAtTime(floatValue41, renderEnvironment4)).floatValue();
+                            KeyableUserParameterValue keyableUserParameterValue58 = keyableVisualEffectRef.getParameters().get("angle");
+                            float fFloatValue34 = (keyableUserParameterValue58 == null || (floatValue40 = keyableUserParameterValue58.getFloatValue()) == null) ? 0.0f : ((Number) KeyableKt.valueAtTime(floatValue40, renderEnvironment4)).floatValue();
+                            KeyableUserParameterValue keyableUserParameterValue59 = keyableVisualEffectRef.getParameters().get("orientation");
+                            float fFloatValue35 = (keyableUserParameterValue59 == null || (floatValue39 = keyableUserParameterValue59.getFloatValue()) == null) ? 0.0f : ((Number) KeyableKt.valueAtTime(floatValue39, renderEnvironment4)).floatValue();
+                            KeyableUserParameterValue keyableUserParameterValue60 = keyableVisualEffectRef.getParameters().get("scale");
+                            final float fFloatValue36 = (keyableUserParameterValue60 == null || (floatValue38 = keyableUserParameterValue60.getFloatValue()) == null) ? 1.0f : ((Number) KeyableKt.valueAtTime(floatValue38, renderEnvironment4)).floatValue();
+                            KeyableUserParameterValue keyableUserParameterValue61 = keyableVisualEffectRef.getParameters().get("alpha");
+                            if (keyableUserParameterValue61 != null && (floatValue37 = keyableUserParameterValue61.getFloatValue()) != null) {
+                                fFloatValue4 = ((Number) KeyableKt.valueAtTime(floatValue37, renderEnvironment4)).floatValue();
+                            }
+                            KeyableUserParameterValue keyableUserParameterValue62 = keyableVisualEffectRef.getParameters().get("blend");
+                            if (keyableUserParameterValue62 != null && (floatValue36 = keyableUserParameterValue62.getFloatValue()) != null) {
+                                fFloatValue3 = ((Number) KeyableKt.valueAtTime(floatValue36, renderEnvironment4)).floatValue();
+                            }
+                            float f29 = fFloatValue3;
+                            KeyableUserParameterValue keyableUserParameterValue63 = keyableVisualEffectRef.getParameters().get("colorAltCopies");
+                            boolean booleanValue6 = keyableUserParameterValue63 != null ? keyableUserParameterValue63.getBooleanValue() : false;
+                            KeyableUserParameterValue keyableUserParameterValue64 = keyableVisualEffectRef.getParameters().get("fillColor");
+                            if (keyableUserParameterValue64 == null || (colorValue5 = keyableUserParameterValue64.getColorValue()) == null || (white5 = (SolidColor) KeyableKt.valueAtTime(colorValue5, renderEnvironment4)) == null) {
+                                white5 = SolidColor.INSTANCE.getWHITE();
+                            }
+                            KeyableUserParameterValue keyableUserParameterValue65 = keyableVisualEffectRef.getParameters().get("offset");
+                            if (keyableUserParameterValue65 == null || (vec2DValue8 = keyableUserParameterValue65.getVec2DValue()) == null || (zero8 = (Vector2D) KeyableKt.valueAtTime(vec2DValue8, renderEnvironment4)) == null) {
+                                zero8 = Vector2D.INSTANCE.getZERO();
+                            }
+                            final Vector2D vector2D9 = zero8;
+                            ColorRange colorRangeComputeRepeatBlend5 = RepeatEasingKt.computeRepeatBlend(f29, (SolidColor) KeyableKt.valueAtTime(sceneElement.getFillColor(), renderEnvironment4), white5);
+                            final SolidColor startColor5 = colorRangeComputeRepeatBlend5.getStartColor();
+                            final SolidColor endColor5 = colorRangeComputeRepeatBlend5.getEndColor();
+                            final float f30 = fFloatValue35;
+                            final float f31 = fFloatValue34;
+                            final float f32 = fFloatValue31;
+                            final float f33 = fFloatValue32;
+                            final float f34 = fFloatValue33;
+                            final boolean z5 = booleanValue6;
+                            RepeatEasingKt.repeatWithEasing(iRoundToInt9, keyableVisualEffectRef, renderEnvironment, new Function3<Integer, Float, Float, Unit>() { // from class: com.alightcreative.app.motion.scene.rendering.SceneElementRenderingKt.renderWithRepeat.6
+                                /* JADX WARN: 'super' call moved to the top of the method (can break code semantics) */
+                                {
+                                    super(3);
+                                }
+
+                                @Override // kotlin.jvm.functions.Function3
+                                public /* bridge */ /* synthetic */ Unit invoke(Integer num, Float f35, Float f36) {
+                                    invoke(num.intValue(), f35.floatValue(), f36.floatValue());
+                                    return Unit.INSTANCE;
+                                }
+
+                                public final void invoke(int i5, float f35, float f36) {
+                                    float fMix2 = QuaternionKt.mix(1.0f, fFloatValue36, f36);
+                                    SceneElement sceneElement4 = sceneElement;
+                                    KeyableTransform transform = sceneElement4.getTransform();
+                                    KeyableTransform keyableTransformScaledBy$default = TransformKt.scaledBy$default(TransformKt.translatedBy(transform.copy((498 & 1) != 0 ? transform.location : null, (498 & 2) != 0 ? transform.pivot : KeyableKt.translatedBy(sceneElement.getTransform().getPivot(), 0.0f, -fFloatValue30), (498 & 4) != 0 ? transform.scale : null, (498 & 8) != 0 ? transform.rotation : null, (498 & 16) != 0 ? transform.orientation : sceneElement.getTransform().getOrientation() + f30 + (f31 * f36), (498 & 32) != 0 ? transform.size : sceneElement.getTransform().getSize() * f32, (498 & 64) != 0 ? transform.opacity : null, (498 & 128) != 0 ? transform.skew : null, (498 & 256) != 0 ? transform.lockAspectRatio : false), GeometryKt.plus(GeometryKt.times(vector2D9, f36), new Vector2D(0.0f, fFloatValue30))), fMix2, fMix2, 0.0f, 0.0f, 12, null);
+                                    float f37 = f33;
+                                    float f38 = f34;
+                                    SceneElementRenderingKt.renderWithRepeat(sceneElement4.copy(((-1) & 1) != 0 ? sceneElement4.type : null, ((-1) & 2) != 0 ? sceneElement4.startTime : 0, ((-1) & 4) != 0 ? sceneElement4.endTime : 0, ((-1) & 8) != 0 ? sceneElement4.id : 0L, ((-1) & 16) != 0 ? sceneElement4.engineState : null, ((-1) & 32) != 0 ? sceneElement4.label : null, ((-1) & 64) != 0 ? sceneElement4.transform : TransformKt.multOpacityBy(TransformKt.rotatedBy(keyableTransformScaledBy$default, (f37 - (f38 / 2.0f)) + ((f38 - (f38 / iRoundToInt9)) * f35)), QuaternionKt.mix(1.0f, fFloatValue4, f36)), ((-1) & 128) != 0 ? sceneElement4.fillColor : (z5 && i5 % 2 == 1) ? sceneElement.getFillColor() : KeyableKt.keyable(GeometryKt.mix(startColor5, endColor5, f36)), ((-1) & 256) != 0 ? sceneElement4.fillImage : null, ((-1) & ConstantsKt.MINIMUM_BLOCK_SIZE) != 0 ? sceneElement4.fillVideo : null, ((-1) & 1024) != 0 ? sceneElement4.fillGradient : null, ((-1) & 2048) != 0 ? sceneElement4.fillType : null, ((-1) & 4096) != 0 ? sceneElement4.mediaFillMode : null, ((-1) & ConstantsKt.DEFAULT_BUFFER_SIZE) != 0 ? sceneElement4.outline : null, ((-1) & 16384) != 0 ? sceneElement4.src : null, ((-1) & 32768) != 0 ? sceneElement4.speedMap : null, ((-1) & 65536) != 0 ? sceneElement4.liveShape : null, ((-1) & 131072) != 0 ? sceneElement4.inTime : 0, ((-1) & 262144) != 0 ? sceneElement4.outTime : 0, ((-1) & 524288) != 0 ? sceneElement4.loop : false, ((-1) & 1048576) != 0 ? sceneElement4.gain : null, ((-1) & 2097152) != 0 ? sceneElement4.text : null, ((-1) & 4194304) != 0 ? sceneElement4.blendingMode : null, ((-1) & 8388608) != 0 ? sceneElement4.nestedScene : null, ((-1) & 16777216) != 0 ? sceneElement4.linkedSceneUUID : null, ((-1) & 33554432) != 0 ? sceneElement4.visualEffects : null, ((-1) & 67108864) != 0 ? sceneElement4.visualEffectOrder : null, ((-1) & 134217728) != 0 ? sceneElement4.tag : null, ((-1) & 268435456) != 0 ? sceneElement4.drawing : null, ((-1) & 536870912) != 0 ? sceneElement4.userElementParamValues : null, ((-1) & 1073741824) != 0 ? sceneElement4.stroke : null, ((-1) & IntCompanionObject.MIN_VALUE) != 0 ? sceneElement4.borders : null, (125 & 1) != 0 ? sceneElement4.dropShadow : null, (125 & 2) != 0 ? sceneElement4.hidden : false, (125 & 4) != 0 ? sceneElement4.cameraProperties : null, (125 & 8) != 0 ? sceneElement4.parent : null, (125 & 16) != 0 ? sceneElement4.clippingMask : false, (125 & 32) != 0 ? sceneElement4.templatePPId : null, (125 & 64) != 0 ? sceneElement4.presetId : null), listDrop, sfT, ((double) Math.abs(0)) < 1.0E-4d ? renderEnvironment : new RenderEnvironmentTimeOffset(renderEnvironment, 0), sceneSelection, rectangle);
+                                }
+                            });
+                            break;
+                        }
+                        break;
+                }
+            }

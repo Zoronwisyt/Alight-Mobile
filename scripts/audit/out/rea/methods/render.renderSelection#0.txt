@@ -1,0 +1,8 @@
+    public static final void renderSelection(SceneElement sceneElement, SfT canvas, RenderEnvironment env, SceneSelection selection, Rectangle viewport) {
+        Intrinsics.checkNotNullParameter(sceneElement, "<this>");
+        Intrinsics.checkNotNullParameter(canvas, "canvas");
+        Intrinsics.checkNotNullParameter(env, "env");
+        Intrinsics.checkNotNullParameter(selection, "selection");
+        Intrinsics.checkNotNullParameter(viewport, "viewport");
+        sceneElement.getType().renderSelection(sceneElement, canvas, env, selection, viewport);
+    }

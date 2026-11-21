@@ -1,0 +1,3 @@
+    private static final void renderInternal(SceneElement sceneElement, SfT sfT, RenderEnvironment renderEnvironment, SceneSelection sceneSelection, Rectangle rectangle) {
+        sceneElement.getType().render(sceneElement, sfT, renderEnvironment, sceneSelection, rectangle);
+    }

@@ -1,0 +1,3 @@
+    private static final Vector3D renderGeneralElementSelectionAndEditMode$posForTime(SceneElement sceneElement, RenderEnvironment renderEnvironment, float f2) {
+        return GeometryKt.plus((Vector3D) KeyableKt.valueAtTime(CameraElementKt.applyCameraAndParenting(sceneElement, renderEnvironment.getScene(), f2, renderEnvironment.getUserPreviewMode()).getTransform().getLocation(), f2), (Vector2D) KeyableKt.valueAtTime(sceneElement.getTransform().getPivot(), f2));
+    }

@@ -1,0 +1,3 @@
+        public final BlendingMode Rw() {
+            return this.f34959s;
+        }

@@ -1,0 +1,152 @@
+{
+  "engine": {
+    "name": "jadx-headless-mcp",
+    "version": "0.7.1",
+    "artifact_sha256": "6e5eacf500b64292bfb73c49797c1958f6ee44646e43e868039ae7feb573ff75",
+    "source_revision": "5844800a486d2248fa949b74c9896285f5b54de2",
+    "worker_count": 1,
+    "heap_limit_mib": 8192
+  },
+  "class_name": "com.alightcreative.app.motion.scene.rendering.SceneRenderingKt",
+  "methods": [
+    {
+      "name": "<clinit>",
+      "reported_signature": "<clinit>(): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()V"
+    },
+    {
+      "name": "access$getRenderDepth$p",
+      "reported_signature": "access$getRenderDepth$p(): int",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()I"
+    },
+    {
+      "name": "getCachedVideoPtsLessOrEqual",
+      "reported_signature": "getCachedVideoPtsLessOrEqual(android.net.Uri, long): java.lang.Long",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Landroid/net/Uri;J)Ljava/lang/Long;"
+    },
+    {
+      "name": "getRenderEnvFromCache",
+      "reported_signature": "getRenderEnvFromCache(): com.alightcreative.app.motion.scene.rendering.RenderEnvironmentImpl",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()Lcom/alightcreative/app/motion/scene/rendering/RenderEnvironmentImpl;"
+    },
+    {
+      "name": "renderWithGpu",
+      "reported_signature": "renderWithGpu(com.alightcreative.app.motion.scene.Scene, psA.HT, int, int, int, int, int, bYT.ny6, bYT.BAQ, java.util.Map<java.lang.Long, ? extends bYT.R9l>, com.alightcreative.app.motion.scene.rendering.RenderMode, com.alightcreative.app.motion.scene.SceneSelection, int, int, com.alightcreative.app.motion.scene.SpoidEnv, boolean, java.lang.Long, boolean, boolean, com.alightcreative.app.motion.scene.Rectangle, java.lang.Integer, com.alightcreative.app.motion.scene.Rectangle, int, java.util.Map<java.lang.String, com.alightcreative.app.motion.scene.userparam.UserParameterValue>, com.alightcreative.app.motion.scene.ExportParams, KZf.fs, boolean, fi.lG): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/Scene;LpsA/HT;IIIIILbYT/ny6;LbYT/BAQ;Ljava/util/Map;Lcom/alightcreative/app/motion/scene/rendering/RenderMode;Lcom/alightcreative/app/motion/scene/SceneSelection;IILcom/alightcreative/app/motion/scene/SpoidEnv;ZLjava/lang/Long;ZZLcom/alightcreative/app/motion/scene/Rectangle;Ljava/lang/Integer;Lcom/alightcreative/app/motion/scene/Rectangle;ILjava/util/Map;Lcom/alightcreative/app/motion/scene/ExportParams;LKZf/fs;ZLfi/lG;)V"
+    },
+    {
+      "name": "renderWithGpu$default",
+      "reported_signature": "renderWithGpu$default(com.alightcreative.app.motion.scene.Scene, psA.HT, int, int, int, int, int, bYT.ny6, bYT.BAQ, java.util.Map, com.alightcreative.app.motion.scene.rendering.RenderMode, com.alightcreative.app.motion.scene.SceneSelection, int, int, com.alightcreative.app.motion.scene.SpoidEnv, boolean, java.lang.Long, boolean, boolean, com.alightcreative.app.motion.scene.Rectangle, java.lang.Integer, com.alightcreative.app.motion.scene.Rectangle, int, java.util.Map, com.alightcreative.app.motion.scene.ExportParams, KZf.fs, boolean, fi.lG, int, java.lang.Object): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/Scene;LpsA/HT;IIIIILbYT/ny6;LbYT/BAQ;Ljava/util/Map;Lcom/alightcreative/app/motion/scene/rendering/RenderMode;Lcom/alightcreative/app/motion/scene/SceneSelection;IILcom/alightcreative/app/motion/scene/SpoidEnv;ZLjava/lang/Long;ZZLcom/alightcreative/app/motion/scene/Rectangle;Ljava/lang/Integer;Lcom/alightcreative/app/motion/scene/Rectangle;ILjava/util/Map;Lcom/alightcreative/app/motion/scene/ExportParams;LKZf/fs;ZLfi/lG;ILjava/lang/Object;)V"
+    },
+    {
+      "name": "renderWithGpu$lambda$29$adjustMatrix",
+      "reported_signature": "renderWithGpu$lambda$29$adjustMatrix(bYT.ny6, float, float, jD.xUY, com.alightcreative.app.motion.scene.Rectangle): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(LbYT/ny6;FFLjD/xUY;Lcom/alightcreative/app/motion/scene/Rectangle;)V"
+    },
+    {
+      "name": "renderWithGpu$lambda$29$clearBackground",
+      "reported_signature": "renderWithGpu$lambda$29$clearBackground(boolean, boolean, java.lang.Long, boolean, com.alightcreative.app.motion.scene.SolidColor, bYT.ny6, com.alightcreative.app.motion.scene.Rectangle, float, float, fi.K, com.alightcreative.app.motion.scene.rendering.RenderMode, jD.Jb, jD.xUY, com.alightcreative.app.motion.scene.Scene): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(ZZLjava/lang/Long;ZLcom/alightcreative/app/motion/scene/SolidColor;LbYT/ny6;Lcom/alightcreative/app/motion/scene/Rectangle;FFLfi/K;Lcom/alightcreative/app/motion/scene/rendering/RenderMode;LjD/Jb;LjD/xUY;Lcom/alightcreative/app/motion/scene/Scene;)V"
+    },
+    {
+      "name": "renderWithGpu$lambda$29$clearBackgroundInTheBacking",
+      "reported_signature": "renderWithGpu$lambda$29$clearBackgroundInTheBacking(boolean, boolean, java.lang.Long, boolean, com.alightcreative.app.motion.scene.SolidColor, fi.K, com.alightcreative.app.motion.scene.rendering.RenderMode, jD.Jb, jD.xUY, com.alightcreative.app.motion.scene.Scene): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(ZZLjava/lang/Long;ZLcom/alightcreative/app/motion/scene/SolidColor;Lfi/K;Lcom/alightcreative/app/motion/scene/rendering/RenderMode;LjD/Jb;LjD/xUY;Lcom/alightcreative/app/motion/scene/Scene;)V"
+    },
+    {
+      "name": "renderWithGpu$lambda$29$clearToMatteColor",
+      "reported_signature": "renderWithGpu$lambda$29$clearToMatteColor(): void",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "()V"
+    },
+    {
+      "name": "renderWithGpu$lambda$29$sortByZ",
+      "reported_signature": "renderWithGpu$lambda$29$sortByZ(java.util.List<com.alightcreative.app.motion.scene.SceneElement>, int, com.alightcreative.app.motion.scene.Scene): java.util.List<com.alightcreative.app.motion.scene.SceneElement>",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Ljava/util/List;ILcom/alightcreative/app/motion/scene/Scene;)Ljava/util/List;"
+    },
+    {
+      "name": "returnRenderEnvToCache",
+      "reported_signature": "returnRenderEnvToCache(com.alightcreative.app.motion.scene.rendering.RenderEnvironmentImpl): boolean",
+      "overload_index": 0,
+      "is_constructor": false,
+      "dex_descriptor": "(Lcom/alightcreative/app/motion/scene/rendering/RenderEnvironmentImpl;)Z"
+    }
+  ],
+  "fields": [
+    {
+      "name": "CHECK_COLOR_DARK",
+      "reported_type": "com.alightcreative.app.motion.scene.SolidColor",
+      "dex_static_value": null
+    },
+    {
+      "name": "CHECK_COLOR_LIGHT",
+      "reported_type": "com.alightcreative.app.motion.scene.SolidColor",
+      "dex_static_value": null
+    },
+    {
+      "name": "PREVIEW_BACKGROUND_MATTE_COLOR",
+      "reported_type": "com.alightcreative.app.motion.scene.SolidColor",
+      "dex_static_value": null
+    },
+    {
+      "name": "lassoEdgePaint",
+      "reported_type": "jD.Jb",
+      "dex_static_value": null
+    },
+    {
+      "name": "lassoFillPaint",
+      "reported_type": "jD.Jb",
+      "dex_static_value": null
+    },
+    {
+      "name": "ptsCache",
+      "reported_type": "java.util.Map<android.net.Uri, java.lang.Object>",
+      "dex_static_value": null
+    },
+    {
+      "name": "renderDepth",
+      "reported_type": "int",
+      "dex_static_value": null
+    },
+    {
+      "name": "renderEnvCacheInternal",
+      "reported_type": "java.util.List<com.alightcreative.app.motion.scene.rendering.RenderEnvironmentImpl>",
+      "dex_static_value": null
+    },
+    {
+      "name": "snapPaint",
+      "reported_type": "jD.Jb",
+      "dex_static_value": null
+    },
+    {
+      "name": "videoThumbnailMakerCache",
+      "reported_type": "java.util.WeakHashMap<psA.HT, kya.SfT>",
+      "dex_static_value": null
+    }
+  ],
+  "inner_classes": [
+    "com.alightcreative.app.motion.scene.rendering.SceneRenderingKt.WhenMappings"
+  ]
+}

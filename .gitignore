@@ -6,3 +6,6 @@ dist/
 
 __pycache__/
 *.pyc
+
+# esbuild bundles produced by scripts/audit/check_*.ts — regenerated on demand, not source
+scripts/audit/out/*.mjs

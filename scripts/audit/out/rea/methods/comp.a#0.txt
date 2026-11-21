@@ -1,0 +1,193 @@
+    private final bYT.HT a(int i2, String str, VisualEffectRef visualEffectRef, bYT.HT ht, Rectangle rectangle, Transform transform, Transform transform2, int i3, Matrix matrix) throws InterruptedException {
+        boolean z2;
+        bYT.HT ht2;
+        bYT.HT ht3;
+        String str2;
+        Vector2D vector2D;
+        RM.euv.dZ(this, new B8K(str, ht, i2, i3));
+        VisualEffect visualEffectVisualEffectById = VisualEffectKt.visualEffectById(str);
+        if (visualEffectVisualEffectById == null) {
+            E.render$default(kfX.BWM(this.Rw), this.TG, ht, 0.0f, 4, null);
+            RM.euv.eLy(this, new Bb(str));
+            return ht;
+        }
+        List<UserParameter> parameters = visualEffectVisualEffectById.getParameters();
+        ArrayList arrayList = new ArrayList();
+        for (Object obj : parameters) {
+            if (obj instanceof UserParameter.Texture) {
+                arrayList.add(obj);
+            }
+        }
+        ArrayList<UserParameter.Texture> arrayList2 = new ArrayList();
+        for (Object obj2 : arrayList) {
+            if (((UserParameter.Texture) obj2).getSrcType() == TextureSrcType.BUFFER) {
+                arrayList2.add(obj2);
+            }
+        }
+        LinkedHashMap linkedHashMap = new LinkedHashMap(RangesKt___RangesKt.coerceAtLeast(MapsKt__MapsJVMKt.mapCapacity(CollectionsKt__IterablesKt.collectionSizeOrDefault(arrayList2, 10)), 16));
+        for (UserParameter.Texture texture : arrayList2) {
+            bYT.HT htAs = this.Rw.as(bYT.Clo.BWM(Y(), texture.getDownsample()), "layerEffectBuffer");
+            this.Rw.hTJ(htAs);
+            GLES20.glColorMask(true, true, true, true);
+            GLES20.glDisable(3042);
+            GLES20.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+            GLES20.glClear(17408);
+            GLES20.glEnable(3042);
+            GLES20.glBlendFunc(1, 771);
+            this.Rw.R83();
+            Pair pair = new Pair(texture.getName(), htAs);
+            linkedHashMap.put(pair.getFirst(), pair.getSecond());
+        }
+        List<UserParameter> parameters2 = visualEffectVisualEffectById.getParameters();
+        if (!(parameters2 instanceof Collection) || !parameters2.isEmpty()) {
+            Iterator<T> it = parameters2.iterator();
+            while (true) {
+                if (!it.hasNext()) {
+                    z2 = false;
+                    break;
+                }
+                UserParameter userParameter = (UserParameter) it.next();
+                if ((userParameter instanceof UserParameter.Texture) && ((UserParameter.Texture) userParameter).getSrcType() == TextureSrcType.COMPOSITION) {
+                    z2 = true;
+                    break;
+                }
+            }
+        } else {
+            z2 = false;
+            break;
+        }
+        bYT.HT ht4 = this.StB;
+        if (!z2 || ht4 == null) {
+            ht2 = null;
+        } else {
+            bYT.HT htAs2 = this.Rw.as(Y(), "conpBuf");
+            this.Rw.hTJ(htAs2);
+            GLES20.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+            GLES20.glClear(17408);
+            kfX.BWM(this.Rw).render(this.TG, ht4, 1.0f);
+            this.Rw.R83();
+            ht2 = htAs2;
+        }
+        Vector2D vector2D2 = new Vector2D(oo(), nDH());
+        Vector2D vector2D3 = new Vector2D(hs(), J5());
+        String str3 = "none";
+        String str4 = "-";
+        if (i2 >= i3 - 1) {
+            Object obj3 = "-";
+            Object obj4 = "none";
+            GLES20.glBlendFunc(1, 771);
+            int i4 = 0;
+            for (Object obj5 : visualEffectVisualEffectById.getPasses()) {
+                int i5 = i4 + 1;
+                if (i4 < 0) {
+                    CollectionsKt__CollectionsKt.throwIndexOverflow();
+                }
+                EffectRenderPass effectRenderPass = (EffectRenderPass) obj5;
+                Object obj6 = obj3;
+                bYT.HT ht5 = !Intrinsics.areEqual(effectRenderPass.getTarget(), obj6) ? (bYT.HT) linkedHashMap.get(effectRenderPass.getTarget()) : null;
+                if (ht5 == null) {
+                    GLES20.glEnable(3042);
+                } else {
+                    GLES20.glDisable(3042);
+                }
+                bYT.HT ht6 = !Intrinsics.areEqual(effectRenderPass.getSrc(), obj6) ? (bYT.HT) linkedHashMap.get(effectRenderPass.getSrc()) : ht;
+                Map<String, ? extends bYT.HT> mapMinus = MapsKt__MapsKt.minus((Map<? extends String, ? extends V>) ((Map<? extends Object, ? extends V>) linkedHashMap), effectRenderPass.getTarget());
+                Vector2D vector2D4 = new Vector2D(oo(), nDH());
+                Vector2D vector2D5 = vector2D2;
+                LinkedHashMap linkedHashMap2 = linkedHashMap;
+                VisualEffect visualEffect = visualEffectVisualEffectById;
+                RM.euv.dZ(this, new sK(visualEffectVisualEffectById, i4, effectRenderPass, ht5, rectangle, vector2D5, vector2D4, vector2D3));
+                if (ht5 != null) {
+                    this.Rw.hTJ(ht5);
+                }
+                this.Rw.u();
+                Object obj7 = obj4;
+                if (Intrinsics.areEqual(effectRenderPass.getInnerEffect(), obj7)) {
+                    visualEffectVisualEffectById = visualEffect;
+                    this.Rw.nDH(visualEffectVisualEffectById, visualEffectRef.getRenderGroup()).render(this.TG, ht6 == null ? ht : ht6, this.Hfr, this.Rw, rectangle, transform, transform2, vector2D5, vector2D4, vector2D3, i4, visualEffectRef.getParameters(), mapMinus, ht2, v(), matrix);
+                } else {
+                    visualEffectVisualEffectById = visualEffect;
+                    a(0, effectRenderPass.getInnerEffect(), visualEffectRef, ht6 == null ? ht : ht6, rectangle, transform, transform2, 0, matrix);
+                }
+                if (ht5 != null) {
+                    this.Rw.R83();
+                }
+                this.Rw.u();
+                obj4 = obj7;
+                vector2D2 = vector2D5;
+                i4 = i5;
+                obj3 = obj6;
+                linkedHashMap = linkedHashMap2;
+            }
+            LinkedHashMap linkedHashMap3 = linkedHashMap;
+            if (ht2 != null) {
+                ht2.release();
+            }
+            Iterator it2 = linkedHashMap3.values().iterator();
+            while (it2.hasNext()) {
+                ((bYT.HT) it2.next()).release();
+            }
+            RM.euv.dZ(this, new C1692xUY(str, ht));
+            return ht;
+        }
+        bYT.HT htAs3 = this.Rw.as(Y(), "layerEffectTarget");
+        this.Rw.hTJ(htAs3);
+        GLES20.glColorMask(true, true, true, true);
+        GLES20.glDisable(3042);
+        GLES20.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+        GLES20.glClear(17408);
+        GLES20.glBlendFunc(1, 771);
+        int i6 = 0;
+        for (Object obj8 : visualEffectVisualEffectById.getPasses()) {
+            int i7 = i6 + 1;
+            if (i6 < 0) {
+                CollectionsKt__CollectionsKt.throwIndexOverflow();
+            }
+            EffectRenderPass effectRenderPass2 = (EffectRenderPass) obj8;
+            GLES20.glDisable(3042);
+            bYT.HT ht7 = !Intrinsics.areEqual(effectRenderPass2.getTarget(), str4) ? (bYT.HT) linkedHashMap.get(effectRenderPass2.getTarget()) : null;
+            bYT.HT ht8 = !Intrinsics.areEqual(effectRenderPass2.getSrc(), str4) ? (bYT.HT) linkedHashMap.get(effectRenderPass2.getSrc()) : ht;
+            Map<String, ? extends bYT.HT> mapMinus2 = MapsKt__MapsKt.minus((Map<? extends String, ? extends V>) ((Map<? extends Object, ? extends V>) linkedHashMap), effectRenderPass2.getTarget());
+            RM.euv.dZ(this, new euv(visualEffectVisualEffectById, i6, effectRenderPass2, ht7));
+            if (ht7 != null) {
+                this.Rw.hTJ(ht7);
+            }
+            this.Rw.u();
+            if (Intrinsics.areEqual(effectRenderPass2.getInnerEffect(), str3)) {
+                ht3 = htAs3;
+                str2 = str4;
+                vector2D = vector2D3;
+                this.Rw.nDH(visualEffectVisualEffectById, visualEffectRef.getRenderGroup()).render(this.TG, ht8 == null ? ht : ht8, this.Hfr, this.Rw, rectangle, transform, transform2, vector2D2, new Vector2D(oo(), nDH()), vector2D, i6, visualEffectRef.getParameters(), mapMinus2, ht2, v(), matrix);
+            } else {
+                String innerEffect = effectRenderPass2.getInnerEffect();
+                if (ht8 == null) {
+                    ht8 = ht;
+                }
+                ht3 = htAs3;
+                str2 = str4;
+                vector2D = vector2D3;
+                a(0, innerEffect, visualEffectRef, ht8, rectangle, transform, transform2, 0, matrix);
+            }
+            if (ht7 != null) {
+                this.Rw.R83();
+            }
+            this.Rw.u();
+            i6 = i7;
+            str3 = str3;
+            htAs3 = ht3;
+            str4 = str2;
+            vector2D3 = vector2D;
+        }
+        bYT.HT ht9 = htAs3;
+        this.Rw.R83();
+        ht.release();
+        if (ht2 != null) {
+            ht2.release();
+        }
+        Iterator it3 = linkedHashMap.values().iterator();
+        while (it3.hasNext()) {
+            ((bYT.HT) it3.next()).release();
+        }
+        RM.euv.dZ(this, new SfT(str, ht9));
+        return ht9;
+    }

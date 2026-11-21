@@ -1,0 +1,3 @@
+    public final String getBlendEffect() {
+        return this.blendEffect;
+    }

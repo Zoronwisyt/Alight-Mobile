@@ -1,0 +1,6 @@
+    private BlendingMode(String str, int i2, String str2, boolean z2, String str3) {
+        super(str, i2);
+        this.id = str2;
+        this.usesBackingStore = z2;
+        this.blendEffect = str3;
+    }

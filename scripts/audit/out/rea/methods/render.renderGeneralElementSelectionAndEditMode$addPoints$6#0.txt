@@ -1,0 +1,13 @@
+    private static final void renderGeneralElementSelectionAndEditMode$addPoints$6(SceneElement sceneElement, RenderEnvironment renderEnvironment, float f2, float f3, Vector2D vector2D, Vector2D vector2D2, int i2) {
+        Vector2D vector2DDiv = GeometryKt.div(GeometryKt.plus(vector2D, vector2D2), 2);
+        float f4 = (f2 + f3) / 2.0f;
+        Vector3D vector3DRenderGeneralElementSelectionAndEditMode$posForTime$3 = renderGeneralElementSelectionAndEditMode$posForTime$3(sceneElement, renderEnvironment, f4);
+        Vector2D vector2D3 = new Vector2D(vector3DRenderGeneralElementSelectionAndEditMode$posForTime$3.getX(), vector3DRenderGeneralElementSelectionAndEditMode$posForTime$3.getY());
+        if (GeometryKt.getLengthSquared(GeometryKt.minus(vector2DDiv, vector2D3)) <= 1.5f || i2 >= 10) {
+            return;
+        }
+        int i3 = i2 + 1;
+        renderGeneralElementSelectionAndEditMode$addPoints$6(sceneElement, renderEnvironment, f2, f4, vector2D, vector2D3, i3);
+        scratchPath.zhF(vector2D3);
+        renderGeneralElementSelectionAndEditMode$addPoints$6(sceneElement, renderEnvironment, f4, f3, vector2D3, vector2D2, i3);
+    }

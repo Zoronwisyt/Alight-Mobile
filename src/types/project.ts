@@ -71,6 +71,10 @@ export type BlendModeId =
   | 'mask'
   | 'clipping-mask'
   | 'exclude'
+  // `screen` has no catalogue effect: `BlendingMode.SCREEN` is constructed with
+  // `blendEffect = null` in the APK, and no `com.alightcreative.blend.screen` id exists in the
+  // dex or in `assets/effects/`. It is composited natively by the renderer, like the mask family.
+  | 'screen'
   | 'com.alightcreative.blend.colormultiply'
   | 'com.alightcreative.blend.screen'
   | 'com.alightcreative.blend.diff'

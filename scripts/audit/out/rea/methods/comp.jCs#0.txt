@@ -1,0 +1,19 @@
+    public void jCs() {
+        if (!(!this.gOC.BWM())) {
+            throw new IllegalStateException("Check failed.".toString());
+        }
+        bYT.HT ht = this.StB;
+        if (ht != null) {
+            this.StB = null;
+            if (!(!this.f34928Z)) {
+                throw new IllegalStateException("Must release clip before calling releaseBackingStore()".toString());
+            }
+            R83();
+            this.Rw.R83();
+            this.Rw.u();
+            GLES20.glDisable(2960);
+            E.render$default(kfX.BWM(this.Rw), this.kKw, ht, 0.0f, 4, null);
+            ht.release();
+            q2G();
+        }
+    }

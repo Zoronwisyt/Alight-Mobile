@@ -1,0 +1,13 @@
+            private static final void renderWithPostRepeatScripts(SceneElement sceneElement, SfT sfT, RenderEnvironment renderEnvironment, SceneSelection sceneSelection, Rectangle rectangle) {
+                if (sceneElement.getHidden()) {
+                    return;
+                }
+                float time = renderEnvironment.getTime();
+                int overrideFrame = renderEnvironment.getOverrideFrame();
+                int framesPerHundredSeconds = renderEnvironment.getFramesPerHundredSeconds();
+                Scene scene = renderEnvironment.getScene();
+                Transform transformValueAtTime = sceneElement.getTransform().valueAtTime(renderEnvironment.getTime());
+                float previousFrameTime = renderEnvironment.getPreviousFrameTime();
+                int editMode = renderEnvironment.getEditMode();
+                renderInternal(ScriptExecutorKt.runScripts(sceneElement, time, overrideFrame, framesPerHundredSeconds, scene, transformValueAtTime, previousFrameTime, renderEnvironment.getRenderMode(), Integer.valueOf(editMode), sceneSelection.isElementDirectlySelected(sceneElement.getId()), ScriptGroup.AfterRepeat), sfT, renderEnvironment, sceneSelection, rectangle);
+            }

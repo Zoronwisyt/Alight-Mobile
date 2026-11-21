@@ -1,0 +1,4 @@
+        public final void as(Transform transform) {
+            Intrinsics.checkNotNullParameter(transform, "<set-?>");
+            this.f34960u = transform;
+        }

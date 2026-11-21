@@ -1,0 +1,41 @@
+    /* JADX WARN: Code duplicated, block: B:25:0x0066  */
+    private static final boolean includesShaderEffects(Map<?, KeyableVisualEffectRef> map) {
+        boolean z2;
+        Map<Integer, ShaderGroup> shaderGroups;
+        boolean z4;
+        Collection<KeyableVisualEffectRef> collectionValues = map.values();
+        if ((collectionValues instanceof Collection) && collectionValues.isEmpty()) {
+            return false;
+        }
+        for (KeyableVisualEffectRef keyableVisualEffectRef : collectionValues) {
+            VisualEffect visualEffectVisualEffectById = VisualEffectKt.visualEffectById(keyableVisualEffectRef.getId());
+            if (visualEffectVisualEffectById == null || (shaderGroups = visualEffectVisualEffectById.getShaderGroups()) == null) {
+                z2 = false;
+            } else {
+                if (shaderGroups.isEmpty()) {
+                    z4 = false;
+                    break;
+                }
+                Iterator<Map.Entry<Integer, ShaderGroup>> it = shaderGroups.entrySet().iterator();
+                while (true) {
+                    if (!it.hasNext()) {
+                        z4 = false;
+                        break;
+                    }
+                    if (!keyableVisualEffectRef.getDisabledRenderGroups().contains(it.next().getKey())) {
+                        z4 = true;
+                        break;
+                    }
+                }
+                if (z4) {
+                    z2 = true;
+                } else {
+                    z2 = false;
+                }
+            }
+            if (z2) {
+                return true;
+            }
+        }
+        return false;
+    }
