@@ -56,12 +56,16 @@ export const MoveTransformPanel: React.FC = () => {
   );
   const { project, layer, normT, updateLayer, setAnimValue, hasKfHere, readAnim } = useSelectedLayer();
   const [mode, setMode] = useState<Mode>('location');
+  const [rotAxis, setRotAxis] = useState<'x' | 'y' | 'z'>('z');
   const [editPivot, setEditPivot] = useState(false);
 
   if (!layer || !project) return null;
 
+  const is3D = Boolean(layer.is3D);
   const loc = readAnim(layer.transform.location, [project.width / 2, project.height / 2, 0]);
   const rot = readAnim(layer.transform.rotation, 0);
+  const rotX = readAnim(layer.transform.rotationX, 0);
+  const rotY = readAnim(layer.transform.rotationY, 0);
   const scale = readAnim(layer.transform.scale, [1, 1]);
   const [baseW, baseH] = getLayerBaseDimensions(layer, project, normT);
   const resolvedW = Math.max(1, Math.round(baseW * scale[0]));
@@ -69,16 +73,28 @@ export const MoveTransformPanel: React.FC = () => {
   const pivot = readAnim(layer.transform.pivot, [0, 0]);
   const skew = readAnim(layer.transform.skew, [0, 0]);
 
+  const effectiveRotAxis = is3D ? rotAxis : 'z';
   const activeTarget: ActiveCurveTarget =
     mode === 'location' && editPivot
       ? { label: 'Pivot', kind: 'transform', key: 'pivot' }
-      : {
-          label: mode === 'location' ? 'Location' : mode === 'rotation' ? 'Rotation' : mode === 'scale' ? 'Scale' : 'Skew',
-          kind: 'transform',
-          key: mode,
-        };
+      : mode === 'rotation' && effectiveRotAxis === 'x'
+        ? { label: 'Rotation X', kind: 'transform', key: 'rotationX' }
+        : mode === 'rotation' && effectiveRotAxis === 'y'
+          ? { label: 'Rotation Y', kind: 'transform', key: 'rotationY' }
+          : {
+              label: mode === 'location' ? 'Location' : mode === 'rotation' ? (is3D ? 'Rotation Z' : 'Rotation') : mode === 'scale' ? 'Scale' : 'Skew',
+              kind: 'transform',
+              key: mode,
+            };
 
-  const activeProp = mode === 'location' && editPivot ? layer.transform.pivot : layer.transform[mode];
+  const activeProp =
+    mode === 'location' && editPivot
+      ? layer.transform.pivot
+      : mode === 'rotation' && effectiveRotAxis === 'x'
+        ? layer.transform.rotationX ?? { value: 0, keyframes: [] }
+        : mode === 'rotation' && effectiveRotAxis === 'y'
+          ? layer.transform.rotationY ?? { value: 0, keyframes: [] }
+          : layer.transform[mode];
   const kfActive = hasKfHere(activeProp);
 
   const handlePadDown = (e: React.PointerEvent<HTMLDivElement>) => {
@@ -86,6 +102,8 @@ export const MoveTransformPanel: React.FC = () => {
     const startY = e.clientY;
     const sLoc = [...loc] as [number, number, number];
     const sRot = rot;
+    const sRotX = rotX;
+    const sRotY = rotY;
     const sScale = [...scale] as [number, number];
     const sPiv = [...pivot] as [number, number];
     const sSkew = [...skew] as [number, number];
@@ -118,7 +136,15 @@ export const MoveTransformPanel: React.FC = () => {
             setAnimValue(l.transform.location, [nx, ny, sLoc[2]]);
           }
         } else if (mode === 'rotation') {
-          setAnimValue(l.transform.rotation, Math.round((sRot + dx * 0.5) * 10) / 10);
+          if (l.is3D && rotAxis === 'x') {
+            if (!l.transform.rotationX) l.transform.rotationX = { value: 0, keyframes: [] };
+            setAnimValue(l.transform.rotationX, Math.round((sRotX + dx * 0.5) * 10) / 10);
+          } else if (l.is3D && rotAxis === 'y') {
+            if (!l.transform.rotationY) l.transform.rotationY = { value: 0, keyframes: [] };
+            setAnimValue(l.transform.rotationY, Math.round((sRotY + dx * 0.5) * 10) / 10);
+          } else {
+            setAnimValue(l.transform.rotation, Math.round((sRot + dx * 0.5) * 10) / 10);
+          }
         } else if (mode === 'scale') {
           const sx = Math.max(0.05, Math.round((sScale[0] + dx * 0.008) * 100) / 100);
           const sy = l.transform.scaleLinked
@@ -165,6 +191,50 @@ export const MoveTransformPanel: React.FC = () => {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+      {/* 3D Layer Switch (enables native X/Y/Z 3D rotations & 3D Null parenting) */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '6px 10px',
+          borderRadius: 10,
+          background: is3D ? 'rgba(0, 255, 168, 0.12)' : 'rgba(255, 255, 255, 0.04)',
+          border: `1px solid ${is3D ? 'rgba(0, 255, 168, 0.45)' : 'var(--am-border)'}`,
+        }}
+      >
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          <span style={{ fontSize: 12, fontWeight: 700, color: is3D ? '#00FFA8' : 'var(--am-text)' }}>
+            {layer.type === 'null' ? '3D Null' : '3D Layer'}
+          </span>
+          <span style={{ fontSize: 10, color: 'var(--am-text-secondary)' }}>
+            {layer.type === 'null'
+              ? is3D
+                ? 'Moves & rotates parented layers that are also 3D'
+                : 'Enable 3D to drive 3D-enabled child layers'
+              : is3D
+                ? 'Native X / Y / Z rotations active'
+                : 'Enable 3D to unlock X / Y / Z rotations'}
+          </span>
+        </div>
+        <button
+          type="button"
+          className={`am-pill ${is3D ? 'active' : ''}`}
+          style={{ minWidth: 54, fontWeight: 700 }}
+          onClick={() =>
+            updateLayer((l) => {
+              l.is3D = !l.is3D;
+              if (l.is3D) {
+                if (!l.transform.rotationX) l.transform.rotationX = { value: 0, keyframes: [] };
+                if (!l.transform.rotationY) l.transform.rotationY = { value: 0, keyframes: [] };
+              }
+            })
+          }
+        >
+          {is3D ? '3D ON' : '2D'}
+        </button>
+      </div>
+
       {/* APK fragment_move_transform.xml (#262A3C layout: Left Keyframe/Curve Rail + Center ControlPad + Right 4-Mode Tabs) */}
       <div className="am-mt-apk-shell">
         {/* Left Keyframe + Easing Curve Column */}
@@ -231,11 +301,54 @@ export const MoveTransformPanel: React.FC = () => {
                 </div>
               </>
             )}
-            {mode === 'rotation' && (
+            {mode === 'rotation' && !is3D && (
               <div className="am-mt-coord-pill wide">
                 <span>Angle</span>
                 <strong>{rot.toFixed(1)}°</strong>
               </div>
+            )}
+            {mode === 'rotation' && is3D && (
+              <>
+                <button
+                  type="button"
+                  className="am-mt-coord-pill"
+                  style={{
+                    cursor: 'pointer',
+                    border: rotAxis === 'x' ? '1px solid #00FFA8' : undefined,
+                  }}
+                  onClick={() => setRotAxis('x')}
+                  title="Select X Rotation axis"
+                >
+                  <span>X</span>
+                  <strong>{rotX.toFixed(1)}°</strong>
+                </button>
+                <button
+                  type="button"
+                  className="am-mt-coord-pill"
+                  style={{
+                    cursor: 'pointer',
+                    border: rotAxis === 'y' ? '1px solid #00FFA8' : undefined,
+                  }}
+                  onClick={() => setRotAxis('y')}
+                  title="Select Y Rotation axis"
+                >
+                  <span>Y</span>
+                  <strong>{rotY.toFixed(1)}°</strong>
+                </button>
+                <button
+                  type="button"
+                  className="am-mt-coord-pill"
+                  style={{
+                    cursor: 'pointer',
+                    border: rotAxis === 'z' ? '1px solid #00FFA8' : undefined,
+                  }}
+                  onClick={() => setRotAxis('z')}
+                  title="Select Z Rotation axis"
+                >
+                  <span>Z</span>
+                  <strong>{rot.toFixed(1)}°</strong>
+                </button>
+              </>
             )}
             {mode === 'scale' && (
               <>
@@ -295,6 +408,36 @@ export const MoveTransformPanel: React.FC = () => {
               </div>
             </div>
           </div>
+
+          {mode === 'rotation' && is3D && (
+            <div style={{ display: 'flex', gap: 6, justifyContent: 'center' }}>
+              {(['x', 'y', 'z'] as const).map((ax) => (
+                <button
+                  key={ax}
+                  type="button"
+                  className={`am-pill ${rotAxis === ax ? 'active' : ''}`}
+                  onClick={() => setRotAxis(ax)}
+                >
+                  Rot {ax.toUpperCase()}
+                </button>
+              ))}
+              <button
+                type="button"
+                className="am-pill"
+                onClick={() =>
+                  updateLayer((l) => {
+                    if (!l.transform.rotationX) l.transform.rotationX = { value: 0, keyframes: [] };
+                    if (!l.transform.rotationY) l.transform.rotationY = { value: 0, keyframes: [] };
+                    setAnimValue(l.transform.rotationX, 0);
+                    setAnimValue(l.transform.rotationY, 0);
+                    setAnimValue(l.transform.rotation, 0);
+                  })
+                }
+              >
+                Reset
+              </button>
+            </div>
+          )}
 
           {mode === 'location' && (
             <div style={{ display: 'flex', gap: 6, justifyContent: 'center' }}>
@@ -399,9 +542,9 @@ export const MoveTransformPanel: React.FC = () => {
         </>
       )}
 
-      {mode === 'rotation' && (
+      {mode === 'rotation' && !is3D && (
         <SpinnerControl
-          label="Rotation Angle"
+          label="Rotation Angle (Z)"
           value={rot}
           min={-1440}
           max={1440}
@@ -409,6 +552,54 @@ export const MoveTransformPanel: React.FC = () => {
           unit="°"
           onChange={(v) => updateLayer((l) => setAnimValue(l.transform.rotation, v))}
         />
+      )}
+
+      {mode === 'rotation' && is3D && (
+        <>
+          <div onPointerDown={() => setRotAxis('x')}>
+            <SpinnerControl
+              label="X Rotation (Pitch)"
+              value={rotX}
+              min={-1440}
+              max={1440}
+              step={0.5}
+              unit="°"
+              onChange={(v) =>
+                updateLayer((l) => {
+                  if (!l.transform.rotationX) l.transform.rotationX = { value: 0, keyframes: [] };
+                  setAnimValue(l.transform.rotationX, v);
+                })
+              }
+            />
+          </div>
+          <div onPointerDown={() => setRotAxis('y')}>
+            <SpinnerControl
+              label="Y Rotation (Yaw)"
+              value={rotY}
+              min={-1440}
+              max={1440}
+              step={0.5}
+              unit="°"
+              onChange={(v) =>
+                updateLayer((l) => {
+                  if (!l.transform.rotationY) l.transform.rotationY = { value: 0, keyframes: [] };
+                  setAnimValue(l.transform.rotationY, v);
+                })
+              }
+            />
+          </div>
+          <div onPointerDown={() => setRotAxis('z')}>
+            <SpinnerControl
+              label="Z Rotation (Roll)"
+              value={rot}
+              min={-1440}
+              max={1440}
+              step={0.5}
+              unit="°"
+              onChange={(v) => updateLayer((l) => setAnimValue(l.transform.rotation, v))}
+            />
+          </div>
+        </>
       )}
 
       {mode === 'scale' && (

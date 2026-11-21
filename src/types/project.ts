@@ -105,6 +105,10 @@ export type BlendModeId =
 export interface LayerTransform {
   location: Animatable<[number, number, number]>;
   rotation: Animatable<number>;
+  /** Native 3D X-axis (pitch) rotation in degrees — active only when layer.is3D is true */
+  rotationX?: Animatable<number>;
+  /** Native 3D Y-axis (yaw) rotation in degrees — active only when layer.is3D is true */
+  rotationY?: Animatable<number>;
   scale: Animatable<[number, number]>;
   scaleLinked: boolean;
   pivot: Animatable<[number, number]>;
@@ -251,6 +255,8 @@ export interface Layer {
   endTime: number; // ms
   visible: boolean;
   locked: boolean;
+  /** Enables native 3D X/Y/Z rotations and 3D parenting inheritance with 3D Nulls */
+  is3D?: boolean;
   parentId: string | null;
   blendMode: BlendModeId;
   opacity: Animatable<number>;

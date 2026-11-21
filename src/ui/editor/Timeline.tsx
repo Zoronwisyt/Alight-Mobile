@@ -31,6 +31,8 @@ function collectLayerKeyframes(layer: Layer): number[] {
   addProp(layer.opacity.keyframes);
   addProp(layer.transform.location.keyframes);
   addProp(layer.transform.rotation.keyframes);
+  addProp(layer.transform.rotationX?.keyframes);
+  addProp(layer.transform.rotationY?.keyframes);
   addProp(layer.transform.scale.keyframes);
   addProp(layer.transform.pivot.keyframes);
   addProp(layer.transform.skew.keyframes);
@@ -736,6 +738,16 @@ export const Timeline: React.FC<TimelineProps> = ({
                         <span className="am-track-mask-icon">↙︎</span>
                       )}
                       <span className="am-track-label">{layer.label}</span>
+
+                      {layer.is3D && (
+                        <span
+                          className="am-track-fx-pill"
+                          style={{ background: 'rgba(0, 255, 168, 0.22)', color: '#00FFA8', fontWeight: 800 }}
+                          title="3D Layer enabled"
+                        >
+                          3D
+                        </span>
+                      )}
 
                       {layer.effects.length > 0 && (
                         <span className="am-track-fx-pill">{layer.effects.length} fx</span>

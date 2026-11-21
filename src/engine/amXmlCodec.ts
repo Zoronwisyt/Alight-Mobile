@@ -97,6 +97,7 @@ function layerToXml(layer: Layer, indent = '  '): string {
     layer.mediaData?.cropMode && layer.mediaData.cropMode !== 'fill'
       ? ` cropMode="${escapeXml(layer.mediaData.cropMode)}"`
       : '';
+  const is3DAttr = layer.is3D ? ' is3D="true"' : '';
 
   const parts: string[] = [];
   // Text attributes belong on the <text> element in AM's own dialect — its loader reads
@@ -113,12 +114,18 @@ function layerToXml(layer: Layer, indent = '  '): string {
       ` align="${escapeXml(td.align || 'center')}" color="${escapeXml(td.color || '#FFFFFFFF')}"`;
   }
   parts.push(
-    `${indent}<${tag} id="${escapeXml(layer.id)}" label="${escapeXml(layer.label)}" startTime="${Math.round(layer.startTime)}" endTime="${Math.round(layer.endTime)}"${fillAttr}${textAttrs}${parentAttr}${clipAttr}${blendAttr}${retimeAttr}${cropAttr}>`
+    `${indent}<${tag} id="${escapeXml(layer.id)}" label="${escapeXml(layer.label)}" startTime="${Math.round(layer.startTime)}" endTime="${Math.round(layer.endTime)}"${fillAttr}${textAttrs}${parentAttr}${clipAttr}${blendAttr}${retimeAttr}${cropAttr}${is3DAttr}>`
   );
 
   parts.push(`${indent}  <transform>`);
   parts.push(`${indent}    ${emitAnimProp('location', layer.transform.location)}`);
   parts.push(`${indent}    ${emitAnimProp('rotation', layer.transform.rotation)}`);
+  if (layer.transform.rotationX && (layer.transform.rotationX.value !== 0 || layer.transform.rotationX.keyframes.length > 0)) {
+    parts.push(`${indent}    ${emitAnimProp('rotationX', layer.transform.rotationX)}`);
+  }
+  if (layer.transform.rotationY && (layer.transform.rotationY.value !== 0 || layer.transform.rotationY.keyframes.length > 0)) {
+    parts.push(`${indent}    ${emitAnimProp('rotationY', layer.transform.rotationY)}`);
+  }
   parts.push(`${indent}    ${emitAnimProp('scale', layer.transform.scale)}`);
   parts.push(`${indent}    ${emitAnimProp('pivot', layer.transform.pivot)}`);
   parts.push(`${indent}    ${emitAnimProp('opacity', layer.opacity)}`);
@@ -662,12 +669,19 @@ function parseXmlLayer(
     endTime: parseFloat(el.getAttribute('endTime') || '3000'),
     visible: el.getAttribute('hidden') !== 'true' && el.getAttribute('visible') !== 'false',
     locked: false,
+    is3D: el.getAttribute('is3D') === 'true' || undefined,
     parentId,
     blendMode: resolvedBlendMode,
     opacity: parsePropElement(tf?.querySelector(':scope > opacity') ?? null, parseNum, 1),
     transform: {
       location: parsePropElement(tf?.querySelector(':scope > location') ?? null, parseVec3, defaultLoc),
       rotation: parsePropElement(tf?.querySelector(':scope > rotation') ?? null, parseNum, 0),
+      rotationX: tf?.querySelector(':scope > rotationX')
+        ? parsePropElement(tf.querySelector(':scope > rotationX'), parseNum, 0)
+        : undefined,
+      rotationY: tf?.querySelector(':scope > rotationY')
+        ? parsePropElement(tf.querySelector(':scope > rotationY'), parseNum, 0)
+        : undefined,
       scale: parsePropElement(tf?.querySelector(':scope > scale') ?? null, parseVec2, [1, 1]),
       scaleLinked: true,
       pivot: parsePropElement(tf?.querySelector(':scope > pivot') ?? null, parseVec2, [0, 0]),

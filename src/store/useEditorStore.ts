@@ -280,8 +280,12 @@ export function resolveActiveGroup(proj: Project, groupStack: string[]): ActiveG
 
 export function getAnimatableByTarget(layer: Layer, t: ActiveCurveTarget): Animatable<any> | null {
   switch (t.kind) {
-    case 'transform':
+    case 'transform': {
+      if ((t.key === 'rotationX' || t.key === 'rotationY') && !layer.transform[t.key]) {
+        layer.transform[t.key] = { value: 0, keyframes: [] };
+      }
       return (layer.transform as any)[t.key] ?? null;
+    }
     case 'opacity':
       return layer.opacity;
     case 'fillColor':

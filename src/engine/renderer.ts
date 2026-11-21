@@ -1568,6 +1568,8 @@ export class AlightRenderer {
     y: number;
     z: number;
     rotation: number;
+    rotX: number;
+    rotY: number;
     sx: number;
     sy: number;
     px: number;
@@ -1577,7 +1579,7 @@ export class AlightRenderer {
     alphaMul: number;
   } {
     if (visited.has(layer.id)) {
-      return { x: 0, y: 0, z: 0, rotation: 0, sx: 1, sy: 1, px: 0, py: 0, skewX: 0, skewY: 0, alphaMul: 1 };
+      return { x: 0, y: 0, z: 0, rotation: 0, rotX: 0, rotY: 0, sx: 1, sy: 1, px: 0, py: 0, skewX: 0, skewY: 0, alphaMul: 1 };
     }
     visited.add(layer.id);
 
@@ -1585,6 +1587,9 @@ export class AlightRenderer {
     const loc = evalAnimatable(layer.transform.location, remappedNormT, [0, 0, 0]);
     let x = loc[0], y = loc[1], z = loc[2] ?? 0;
     let rotation = evalAnimatable(layer.transform.rotation, remappedNormT, 0);
+    // Native 3D X/Y rotations only activate when layer.is3D is enabled
+    let rotX = layer.is3D ? evalAnimatable(layer.transform.rotationX, remappedNormT, 0) : 0;
+    let rotY = layer.is3D ? evalAnimatable(layer.transform.rotationY, remappedNormT, 0) : 0;
     const sc = evalAnimatable(layer.transform.scale, remappedNormT, [1, 1]);
     let sx = sc[0], sy = sc[1];
     const piv = evalAnimatable(layer.transform.pivot, remappedNormT, [0, 0]);
@@ -1638,22 +1643,61 @@ export class AlightRenderer {
     if (layer.parentId) {
       const parent = layersMap.get(layer.parentId);
       if (parent) {
-        const pt = this.resolveWorldTransform(parent, layersMap, sceneTimeMs, fps, visited);
-        const rad = (pt.rotation * Math.PI) / 180;
-        const c = Math.cos(rad);
-        const s = Math.sin(rad);
-        const rx = x * pt.sx * c - y * pt.sy * s;
-        const ry = x * pt.sx * s + y * pt.sy * c;
-        x = pt.x + rx;
-        y = pt.y + ry;
-        z += pt.z;
-        rotation += pt.rotation;
-        sx *= pt.sx;
-        sy *= pt.sy;
+        const parentIs3D = Boolean(parent.is3D);
+        const childIs3D = Boolean(layer.is3D);
+        // A 3D Null only moves/rotates its children when BOTH the Null and the child layer are 3D.
+        if (parent.type === 'null' && parentIs3D && !childIs3D) {
+          // 2D child ignores 3D Null parent transform
+        } else if (parentIs3D && childIs3D) {
+          const pt = this.resolveWorldTransform(parent, layersMap, sceneTimeMs, fps, visited);
+          // Scale local offset, then rotate in full 3D (Rx -> Ry -> Rz) around parent origin
+          const lx = x * pt.sx;
+          const ly = y * pt.sy;
+          const lz = z;
+          const rxRad = (pt.rotX * Math.PI) / 180;
+          const ryRad = (pt.rotY * Math.PI) / 180;
+          const rzRad = (pt.rotation * Math.PI) / 180;
+          const cx = Math.cos(rxRad), sxr = Math.sin(rxRad);
+          const cy = Math.cos(ryRad), syr = Math.sin(ryRad);
+          const cz = Math.cos(rzRad), szr = Math.sin(rzRad);
+          // Pitch (X)
+          const y1 = ly * cx - lz * sxr;
+          const z1 = ly * sxr + lz * cx;
+          const x1 = lx;
+          // Yaw (Y)
+          const x2 = x1 * cy + z1 * syr;
+          const z2 = -x1 * syr + z1 * cy;
+          const y2 = y1;
+          // Roll (Z)
+          const x3 = x2 * cz - y2 * szr;
+          const y3 = x2 * szr + y2 * cz;
+          const z3 = z2;
+          x = pt.x + x3;
+          y = pt.y + y3;
+          z = pt.z + z3;
+          rotX += pt.rotX;
+          rotY += pt.rotY;
+          rotation += pt.rotation;
+          sx *= pt.sx;
+          sy *= pt.sy;
+        } else {
+          const pt = this.resolveWorldTransform(parent, layersMap, sceneTimeMs, fps, visited);
+          const rad = (pt.rotation * Math.PI) / 180;
+          const c = Math.cos(rad);
+          const s = Math.sin(rad);
+          const rx = x * pt.sx * c - y * pt.sy * s;
+          const ry = x * pt.sx * s + y * pt.sy * c;
+          x = pt.x + rx;
+          y = pt.y + ry;
+          z += pt.z;
+          rotation += pt.rotation;
+          sx *= pt.sx;
+          sy *= pt.sy;
+        }
       }
     }
 
-    return { x, y, z, rotation, sx, sy, px: piv[0], py: piv[1], skewX: skew[0], skewY: skew[1], alphaMul };
+    return { x, y, z, rotation, rotX, rotY, sx, sy, px: piv[0], py: piv[1], skewX: skew[0], skewY: skew[1], alphaMul };
   }
 
   private calcCameraZoom(width: number, height: number, fovDeg: number): number {
@@ -2167,9 +2211,33 @@ export class AlightRenderer {
 
     const finalAlpha = clamp01(layerOpacity * scriptAlpha);
 
+    let effectiveOverdrawPad = overdrawPad;
+    let effectiveInvOverdrawSpan = invOverdrawSpan;
+
+    // Native 3D X/Y perspective rotation pass (only when layer.is3D is enabled)
+    if (layer.is3D && (Math.abs(tf.rotX) > 0.01 || Math.abs(tf.rotY) > 0.01)) {
+      const focalPx = this.calcCameraZoom(renderW, renderH, camState.fov);
+      const perspFbo = this.apply3DPerspectivePass(
+        currentSlot.tex,
+        renderW,
+        renderH,
+        (wx + tf.px) * scale,
+        (wy + tf.py) * scale,
+        tf.rotX,
+        tf.rotY,
+        focalPx,
+        overdrawPad,
+        overdrawSpan
+      );
+      this.releaseFbo(currentSlot);
+      currentSlot = perspFbo;
+      effectiveOverdrawPad = 0;
+      effectiveInvOverdrawSpan = 1;
+    }
+
     // When blendMode !== 'normal' and overdraw margin is active, crop center [0,1] into renderW x renderH
     // so maskProg / blendProg sample sceneFbo and currentSlot in matching [0,1] space.
-    if (layer.blendMode !== 'normal' && overdrawPad > 0) {
+    if (layer.blendMode !== 'normal' && effectiveOverdrawPad > 0) {
       const croppedFbo = this.acquireFbo(renderW, renderH);
       this.blitTexture(
         currentSlot.tex,
@@ -2178,8 +2246,8 @@ export class AlightRenderer {
         renderH,
         1.0,
         false,
-        invOverdrawSpan,
-        overdrawPad * invOverdrawSpan
+        effectiveInvOverdrawSpan,
+        effectiveOverdrawPad * effectiveInvOverdrawSpan
       );
       this.releaseFbo(currentSlot);
       currentSlot = croppedFbo;
@@ -2287,8 +2355,8 @@ export class AlightRenderer {
           renderH,
           finalAlpha,
           true,
-          invOverdrawSpan,
-          overdrawPad * invOverdrawSpan
+          effectiveInvOverdrawSpan,
+          effectiveOverdrawPad * effectiveInvOverdrawSpan
         );
       }
     } else {
@@ -2299,8 +2367,8 @@ export class AlightRenderer {
         renderH,
         finalAlpha,
         true,
-        invOverdrawSpan,
-        overdrawPad * invOverdrawSpan
+        effectiveInvOverdrawSpan,
+        effectiveOverdrawPad * effectiveInvOverdrawSpan
       );
     }
 
@@ -2612,6 +2680,96 @@ export class AlightRenderer {
     if (u.acLayerToScreen) gl.uniformMatrix4fv(u.acLayerToScreen, false, layerToScreen);
     if (u.acVtoRSpace) gl.uniformMatrix4fv(u.acVtoRSpace, false, acVtoRSpace ?? id4);
     if (u.acShowGuides) gl.uniform1i(u.acShowGuides, 0);
+  }
+
+  private apply3DPerspectivePass(
+    srcTex: WebGLTexture,
+    renderW: number,
+    renderH: number,
+    pivotScreenX: number,
+    pivotScreenY: number,
+    rotXDeg: number,
+    rotYDeg: number,
+    focalPx: number,
+    overdrawPad = 0,
+    overdrawSpan = 1
+  ): FboSlot {
+    const key = '__internal_3d_persp_v1';
+    let prog = (this as any)._persp3DProg as ReturnType<ShaderRegistry['compileRaw']> | undefined;
+    if (!prog) {
+      prog = this.registry.compileRaw(
+        key,
+        `#version 300 es
+precision highp float;
+layout(location = 0) in vec4 aPos;
+layout(location = 1) in vec2 aUv;
+uniform vec2 uScreen;
+uniform vec2 uPivot;
+uniform vec2 uRotRad;
+uniform float uFocal;
+uniform float uOverdrawPad;
+uniform float uOverdrawSpan;
+out vec2 vUv;
+void main() {
+  vUv = aUv;
+  // Map texture UV [0,1] -> virtual screen pixels (top-down y)
+  float sx = (aUv.x * uOverdrawSpan - uOverdrawPad) * uScreen.x;
+  float sy = (1.0 - (aUv.y * uOverdrawSpan - uOverdrawPad)) * uScreen.y;
+  // Local coordinates relative to layer world pivot (y-up for 3D rotation)
+  float dx = sx - uPivot.x;
+  float ly = -(sy - uPivot.y);
+  // Pitch around X axis
+  float cx = cos(uRotRad.x);
+  float sxr = sin(uRotRad.x);
+  float y1 = ly * cx;
+  float z1 = ly * sxr;
+  float x1 = dx;
+  // Yaw around Y axis
+  float cy = cos(uRotRad.y);
+  float syr = sin(uRotRad.y);
+  float x2 = x1 * cy + z1 * syr;
+  float z2 = -x1 * syr + z1 * cy;
+  float y2 = y1;
+  // Perspective projection with hardware perspective-correct w
+  float f = max(1.0, uFocal);
+  float w = max(0.05, 1.0 + z2 / f);
+  float clipX = ((uPivot.x * w + x2) / uScreen.x) * 2.0 - w;
+  float clipY = (1.0 - (uPivot.y * w - y2) / uScreen.y) * 2.0 - w;
+  gl_Position = vec4(clipX, clipY, 0.0, w);
+}`,
+        `#version 300 es
+precision highp float;
+uniform sampler2D uTex;
+in vec2 vUv;
+out vec4 fragColor;
+void main() {
+  if (vUv.x < 0.0 || vUv.x > 1.0 || vUv.y < 0.0 || vUv.y > 1.0) discard;
+  fragColor = texture(uTex, vUv);
+}`
+      );
+      (this as any)._persp3DProg = prog;
+    }
+
+    const outFbo = this.acquireFbo(renderW, renderH);
+    this.clearFbo(outFbo, renderW, renderH, 0, 0, 0, 0);
+    const gl = this.gl;
+    gl.bindFramebuffer(gl.FRAMEBUFFER, outFbo.fbo);
+    gl.viewport(0, 0, renderW, renderH);
+    gl.disable(gl.BLEND);
+    gl.useProgram(prog.program);
+    gl.uniform2f(prog.uniforms.uScreen, renderW, renderH);
+    gl.uniform2f(prog.uniforms.uPivot, pivotScreenX, pivotScreenY);
+    gl.uniform2f(prog.uniforms.uRotRad, (rotXDeg * Math.PI) / 180, (rotYDeg * Math.PI) / 180);
+    gl.uniform1f(prog.uniforms.uFocal, Math.max(1, focalPx));
+    gl.uniform1f(prog.uniforms.uOverdrawPad, overdrawPad);
+    gl.uniform1f(prog.uniforms.uOverdrawSpan, overdrawSpan);
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, srcTex);
+    gl.uniform1i(prog.uniforms.uTex, 0);
+    gl.bindVertexArray(this.quadVao);
+    gl.drawArrays(gl.TRIANGLES, 0, 6);
+    this.unbindTextureUnits(1);
+    return outFbo;
   }
 
   private blitTransformedFbo(
