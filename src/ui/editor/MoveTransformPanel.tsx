@@ -68,8 +68,8 @@ export const MoveTransformPanel: React.FC = () => {
   const rotY = readAnim(layer.transform.rotationY, 0);
   const scale = readAnim(layer.transform.scale, [1, 1]);
   const [baseW, baseH] = getLayerBaseDimensions(layer, project, normT);
-  const resolvedW = Math.max(1, Math.round(baseW * scale[0]));
-  const resolvedH = Math.max(1, Math.round(baseH * scale[1]));
+  const resolvedW = Math.round(baseW * scale[0]);
+  const resolvedH = Math.round(baseH * scale[1]);
   const pivot = readAnim(layer.transform.pivot, [0, 0]);
   const skew = readAnim(layer.transform.skew, [0, 0]);
 
@@ -610,6 +610,7 @@ export const MoveTransformPanel: React.FC = () => {
             multiplier={baseW}
             decimals={0}
             unit="px"
+            unclampedInput
             onChange={(v) =>
               updateLayer((l) =>
                 setAnimValue(l.transform.scale, l.transform.scaleLinked ? [v, v] : [v, scale[1]])
@@ -626,6 +627,7 @@ export const MoveTransformPanel: React.FC = () => {
               multiplier={baseH}
               decimals={0}
               unit="px"
+              unclampedInput
               onChange={(v) => updateLayer((l) => setAnimValue(l.transform.scale, [scale[0], v]))}
             />
           )}

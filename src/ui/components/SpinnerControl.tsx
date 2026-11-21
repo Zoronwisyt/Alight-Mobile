@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { AmIcon } from './AmIcon';
 
 interface SpinnerControlProps {
@@ -10,6 +10,7 @@ interface SpinnerControlProps {
   multiplier?: number;
   decimals?: number;
   unit?: string;
+  unclampedInput?: boolean;
   hasKeyframe?: boolean;
   onToggleKeyframe?: () => void;
   onStepKeyframe?: (dir: -1 | 1) => void;
@@ -27,6 +28,7 @@ export const SpinnerControl: React.FC<SpinnerControlProps> = ({
   multiplier = 1,
   decimals,
   unit = '',
+  unclampedInput = false,
   hasKeyframe = false,
   onToggleKeyframe,
   onStepKeyframe,
@@ -36,8 +38,16 @@ export const SpinnerControl: React.FC<SpinnerControlProps> = ({
 }) => {
   const fracDigits = decimals !== undefined ? decimals : step < 0.05 ? 3 : step < 1 ? 2 : 1;
   const displayVal = Number((value * multiplier).toFixed(fracDigits));
+  const [draft, setDraft] = useState<string | null>(null);
   const range = max - min;
   const normPos = range > 0 ? Math.max(0, Math.min(1, (value - min) / range)) : 0.5;
+
+  const commitParsed = (text: string) => {
+    const raw = parseFloat(text);
+    if (!Number.isFinite(raw)) return;
+    const unscaled = raw / (multiplier || 1);
+    onChange(unclampedInput ? unscaled : Math.max(min, Math.min(max, unscaled)));
+  };
 
   const handleScrubDown = (e: React.PointerEvent<HTMLDivElement>) => {
     const startX = e.clientX;
@@ -100,15 +110,31 @@ export const SpinnerControl: React.FC<SpinnerControlProps> = ({
             </button>
           )}
           <input
-            type="number"
+            type="text"
+            inputMode={unclampedInput || min < 0 ? 'text' : 'decimal'}
             className="am-num-input"
-            value={displayVal}
-            step={step * multiplier}
+            value={draft !== null ? draft : String(displayVal)}
+            onFocus={(e) => {
+              setDraft(String(displayVal));
+              e.currentTarget.select();
+            }}
             onChange={(e) => {
-              const raw = parseFloat(e.target.value);
-              if (Number.isFinite(raw)) {
-                const unscaled = raw / (multiplier || 1);
-                onChange(Math.max(min, Math.min(max, unscaled)));
+              const txt = e.target.value;
+              setDraft(txt);
+              commitParsed(txt);
+            }}
+            onBlur={() => {
+              if (draft !== null) {
+                commitParsed(draft);
+                setDraft(null);
+              }
+            }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.currentTarget.blur();
+              } else if (e.key === 'Escape') {
+                setDraft(null);
+                e.currentTarget.blur();
               }
             }}
           />

@@ -135,10 +135,11 @@ out vec4 fragColor;
 uniform sampler2D uBase;
 uniform sampler2D uMask;
 uniform int uExclude;
+uniform float uAlpha;
 void main() {
   vec4 base = texture(uBase, vUv);
   vec4 mask = texture(uMask, vUv);
-  float m = clamp(mask.a, 0.0, 1.0);
+  float m = clamp(mask.a * uAlpha, 0.0, 1.0);
   if (uExclude == 1) m = 1.0 - m;
   fragColor = base * m;
 }`;
@@ -745,6 +746,34 @@ export class AlightRenderer {
     gl.bindVertexArray(this.quadVao);
     gl.drawArrays(gl.TRIANGLES, 0, 6);
     this.unbindTextureUnits(2);
+    gl.disable(gl.BLEND);
+  }
+
+  /** Porter-Duff source-atop blit for Clipping Mask layers: clips premultiplied src to dst.a while preserving dst.a. */
+  private blitTextureSourceAtop(
+    tex: WebGLTexture,
+    dst: FboSlot,
+    w: number,
+    h: number
+  ) {
+    if (tex === dst.tex) return;
+    const gl = this.gl;
+    gl.bindFramebuffer(gl.FRAMEBUFFER, dst.fbo);
+    gl.viewport(0, 0, w, h);
+    gl.enable(gl.BLEND);
+    gl.blendEquation(gl.FUNC_ADD);
+    gl.blendFunc(gl.DST_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+    gl.useProgram(this.blitProg.program);
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, tex);
+    gl.uniform1i(this.blitProg.uniforms.uTex, 0);
+    gl.uniform1f(this.blitProg.uniforms.uAlpha, 1.0);
+    if (this.blitProg.uniforms.uUvXform) {
+      gl.uniform2f(this.blitProg.uniforms.uUvXform, 1, 0);
+    }
+    gl.bindVertexArray(this.quadVao);
+    gl.drawArrays(gl.TRIANGLES, 0, 6);
+    this.unbindTextureUnits(1);
     gl.disable(gl.BLEND);
   }
 
@@ -1690,7 +1719,7 @@ export class AlightRenderer {
       const [br, bg, bb, ba] =
         project.bgColor === 'transparent' ? [0, 0, 0, 0] : parseColorArgb(project.bgColor);
       this.clearFbo(sceneFbo, cw, ch, br * ba, bg * ba, bb * ba, ba);
-      this.renderLayerList(project, project.layers, sceneTimeMs, sceneFbo, cw, ch, cScale, []);
+      this.renderLayerList(project, project.layers, sceneTimeMs, sceneFbo, cw, ch, cScale, [], true);
       let stored = false;
       if (!this.hadStaleVideoThisFrame && !this.hasUnreadySeekingVideoThisFrame()) {
         this.storeFrameInCache(frameIdx, sceneFbo, cw, ch, cScale);
@@ -1835,7 +1864,7 @@ export class AlightRenderer {
       const [br, bg, bb, ba] =
         project.bgColor === 'transparent' ? [0, 0, 0, 0] : parseColorArgb(project.bgColor);
       this.clearFbo(sceneFbo, rw, rh, br * ba, bg * ba, bb * ba, ba);
-      this.renderLayerList(project, project.layers, sceneTimeMs, sceneFbo, rw, rh, activeScale, []);
+      this.renderLayerList(project, project.layers, sceneTimeMs, sceneFbo, rw, rh, activeScale, [], true);
       this.blitTexture(sceneFbo.tex, null, this.canvas.width, this.canvas.height, 1.0, false);
 
       // ST-3 + MO-6: Playback & interactive drag tiers are read-only against the cache;
@@ -1868,7 +1897,8 @@ export class AlightRenderer {
       renderW,
       renderH,
       scale,
-      options.selectedIds ?? []
+      options.selectedIds ?? [],
+      true
     );
 
     this.blitTexture(sceneFbo.tex, null, renderW, renderH, 1.0, false);
@@ -2037,7 +2067,8 @@ export class AlightRenderer {
     renderW: number,
     renderH: number,
     scale: number,
-    selectedIds: string[]
+    selectedIds: string[],
+    isolateForMask = false
   ): void {
     const layersMap = new Map<string, Layer>();
     for (let i = 0; i < layers.length; i++) {
@@ -2121,23 +2152,99 @@ export class AlightRenderer {
       }
     }
 
-    for (const layer of orderedLayers) {
-      // Echo Keyframes effect check
+    const needsRootMaskIsolation =
+      isolateForMask &&
+      orderedLayers.some((l) => {
+        const b = canonicalizeBlendMode(l.blendMode);
+        return b === 'mask' || b === 'exclude';
+      });
+    const listFbo = needsRootMaskIsolation ? this.acquireFbo(renderW, renderH) : targetFbo;
+    if (needsRootMaskIsolation) {
+      this.clearFbo(listFbo, renderW, renderH, 0, 0, 0, 0);
+    }
+
+    const drawLayerWithEcho = (layer: Layer, dstFbo: FboSlot, blendOverride?: BlendModeId) => {
       const echoFx = layer.effects.find((e) => e.enabled && e.effectId === 'com.alightcreative.effects.repeat.echokf');
       if (echoFx) {
         const { remappedNormT } = evalRemappedTime(layer, sceneTimeMs);
         const count = Math.min(12, Math.max(1, Math.round(Number(evalAnimatable(echoFx.params.count, remappedNormT, 3)) || 3)));
         const seconds = Number(evalAnimatable(echoFx.params.seconds, remappedNormT, 0.5)) || 0.5;
         const alphaDecay = Number(evalAnimatable(echoFx.params.alpha, remappedNormT, 0.7)) || 0.7;
-        for (let i = count; i >= 1; i--) {
-          const echoT = sceneTimeMs - (seconds * 1000 * i) / count;
+        for (let k = count; k >= 1; k--) {
+          const echoT = sceneTimeMs - (seconds * 1000 * k) / count;
           if (echoT >= layer.startTime && echoT <= layer.endTime) {
-            this.renderSingleLayer(project, layer, layersMap, camState, echoT, targetFbo, renderW, renderH, scale, selectedIds, Math.pow(alphaDecay, i));
+            this.renderSingleLayer(
+              project,
+              layer,
+              layersMap,
+              camState,
+              echoT,
+              dstFbo,
+              renderW,
+              renderH,
+              scale,
+              selectedIds,
+              Math.pow(alphaDecay, k),
+              blendOverride
+            );
           }
         }
       }
+      this.renderSingleLayer(
+        project,
+        layer,
+        layersMap,
+        camState,
+        sceneTimeMs,
+        dstFbo,
+        renderW,
+        renderH,
+        scale,
+        selectedIds,
+        1,
+        blendOverride
+      );
+    };
 
-      this.renderSingleLayer(project, layer, layersMap, camState, sceneTimeMs, targetFbo, renderW, renderH, scale, selectedIds, 1);
+    for (let i = 0; i < orderedLayers.length; i++) {
+      const layer = orderedLayers[i];
+      const nextLayer = i + 1 < orderedLayers.length ? orderedLayers[i + 1] : null;
+      const nextIsClipMask =
+        nextLayer !== null &&
+        canonicalizeBlendMode(nextLayer.blendMode) === 'clipping-mask' &&
+        canonicalizeBlendMode(layer.blendMode) !== 'mask' &&
+        canonicalizeBlendMode(layer.blendMode) !== 'exclude';
+
+      if (nextIsClipMask) {
+        // Composite base layer + all immediately stacked clipping-mask layers in an isolated FBO
+        // using Porter-Duff source-atop so clipped layers strictly respect the base layer's alpha
+        // without erasing lower layers or the project background.
+        const clipCompFbo = this.acquireFbo(renderW, renderH);
+        this.clearFbo(clipCompFbo, renderW, renderH, 0, 0, 0, 0);
+        drawLayerWithEcho(layer, clipCompFbo, 'normal');
+
+        let j = i + 1;
+        while (j < orderedLayers.length && canonicalizeBlendMode(orderedLayers[j].blendMode) === 'clipping-mask') {
+          const clipLayerFbo = this.acquireFbo(renderW, renderH);
+          this.clearFbo(clipLayerFbo, renderW, renderH, 0, 0, 0, 0);
+          drawLayerWithEcho(orderedLayers[j], clipLayerFbo, 'normal');
+          this.blitTextureSourceAtop(clipLayerFbo.tex, clipCompFbo, renderW, renderH);
+          this.releaseFbo(clipLayerFbo);
+          j++;
+        }
+
+        this.blitTexture(clipCompFbo.tex, listFbo, renderW, renderH, 1.0, true);
+        this.releaseFbo(clipCompFbo);
+        i = j - 1;
+        continue;
+      }
+
+      drawLayerWithEcho(layer, listFbo);
+    }
+
+    if (needsRootMaskIsolation) {
+      this.blitTexture(listFbo.tex, targetFbo, renderW, renderH, 1.0, true);
+      this.releaseFbo(listFbo);
     }
   }
 
@@ -2160,7 +2267,8 @@ export class AlightRenderer {
     renderH: number,
     scale: number,
     selectedIds: string[],
-    extraAlpha = 1
+    extraAlpha = 1,
+    blendOverride?: BlendModeId
   ): void {
     const { localTimeMs, remappedNormT, isBlank } = evalRemappedTime(layer, sceneTimeMs);
     if (isBlank) return; // A2: ReTimingMethod.blank hides layer content while keeping timeline bar
@@ -2199,6 +2307,7 @@ export class AlightRenderer {
 
     const layerOpacity = clamp01(evalAnimatable(layer.opacity, remappedNormT, 1)) * tf.alphaMul * extraAlpha;
     if (layerOpacity <= 0.001) return;
+    if (Math.abs(wsx) < 1e-6 || Math.abs(wsy) < 1e-6) return;
 
     // Pre-resolve logical dimensions and uploaded media so overdrawPad covers shifted/rotated corners
     let logicalW = project.width;
@@ -2297,7 +2406,9 @@ export class AlightRenderer {
     const fboW = Math.max(1, Math.round(renderW * overdrawSpan));
     const fboH = Math.max(1, Math.round(renderH * overdrawSpan));
 
-    const blendId = canonicalizeBlendMode(layer.blendMode);
+    const rawBlendId = blendOverride ?? canonicalizeBlendMode(layer.blendMode);
+    // Standalone clipping-mask (bottom-most layer with nothing beneath it) composites as normal.
+    const blendId: BlendModeId = rawBlendId === 'clipping-mask' ? 'normal' : rawBlendId;
     const has3DTilt = Boolean(layer.is3D && (Math.abs(tf.rotX) > 0.01 || Math.abs(tf.rotY) > 0.01));
     const hasBorderOrShadowMedia =
       (layer.type === 'group' || layer.type === 'image' || layer.type === 'video') &&
@@ -2673,9 +2784,9 @@ export class AlightRenderer {
       effectiveInvOverdrawSpan = 1;
     }
 
-    // When blendMode !== 'normal' and overdraw margin is active, crop center [0,1] into renderW x renderH
+    // When blendId !== 'normal' and overdraw margin is active, crop center [0,1] into renderW x renderH
     // so maskProg / blendProg sample sceneFbo and currentSlot in matching [0,1] space.
-    if (layer.blendMode !== 'normal' && effectiveOverdrawPad > 0) {
+    if (blendId !== 'normal' && effectiveOverdrawPad > 0) {
       const croppedFbo = this.acquireFbo(renderW, renderH);
       this.blitTexture(
         currentSlot.tex,
@@ -2692,8 +2803,6 @@ export class AlightRenderer {
     }
 
     // Step 3: Composite onto Scene FBO (Mask / Exclude / 26 APK Blend Modes / Normal)
-    // `clipping-mask` is deliberately absent: it means "this layer is the one being clipped" and
-    // must draw normally, letting the following `blending="mask"` layer do the clipping.
     if (blendId === 'mask' || blendId === 'exclude') {
       const outFbo = this.acquireFbo(renderW, renderH);
       const gl = this.gl;
@@ -2708,6 +2817,7 @@ export class AlightRenderer {
       gl.bindTexture(gl.TEXTURE_2D, currentSlot.tex);
       gl.uniform1i(this.maskProg.uniforms.uMask, 1);
       gl.uniform1i(this.maskProg.uniforms.uExclude, blendId === 'exclude' ? 1 : 0);
+      if (this.maskProg.uniforms.uAlpha) gl.uniform1f(this.maskProg.uniforms.uAlpha, finalAlpha);
       gl.bindVertexArray(this.quadVao);
       gl.drawArrays(gl.TRIANGLES, 0, 6);
       this.unbindTextureUnits(2);
