@@ -69,12 +69,10 @@ async function pickSupportedVideoConfig(
   }
   const candidates = container === 'mp4' ? AVC_CANDIDATES : WEBM_CANDIDATES;
   const accelModes: HardwareAcceleration[] = ['prefer-hardware', 'no-preference', 'prefer-software'];
-  // 'realtime' latencyMode + 'constant' bitrateMode enables 1-pass CBR rate control in WebKit VideoToolbox
-  // and Chromium MediaFoundation instead of the fixed ~9,000 kbps 'quality' VBR preset.
-  const latencyModes: LatencyMode[] = ['realtime', 'quality'];
-  const bitrateModes: VideoEncoderBitrateMode[] = ['constant', 'variable'];
-  const encoderBitrate =
-    bitrate > 10_000_000 ? Math.min(240_000_000, Math.round(bitrate * 1.35)) : bitrate;
+  // Always prefer 'quality' latencyMode + 'variable' VBR for offline export: 'realtime' disables
+  // lookahead/CABAC/RDO and produces visible noise/blocking even at high bitrates.
+  const latencyModes: LatencyMode[] = ['quality', 'realtime'];
+  const bitrateModes: VideoEncoderBitrateMode[] = ['variable', 'constant'];
 
   for (const latencyMode of latencyModes) {
     for (const bitrateMode of bitrateModes) {
@@ -84,7 +82,7 @@ async function pickSupportedVideoConfig(
             codec,
             width,
             height,
-            bitrate: encoderBitrate,
+            bitrate,
             framerate: fps,
             bitrateMode,
             latencyMode,
@@ -96,7 +94,7 @@ async function pickSupportedVideoConfig(
             if (res.supported) {
               const muxCodec = container === 'mp4' ? 'avc' : codec.startsWith('vp09') ? 'V_VP9' : 'V_VP8';
               return {
-                config: { ...(res.config ?? base), bitrate: encoderBitrate, bitrateMode, latencyMode },
+                config: { ...(res.config ?? base), bitrate, bitrateMode, latencyMode },
                 muxCodec,
               };
             }
@@ -390,57 +388,10 @@ export async function exportProjectVideo(
       : null;
 
   let encoderError: Error | null = null;
-  let rawEncodedVideoBytes = 0;
-  let muxedVideoBytes = 0;
-  let emittedChunks = 0;
-  const defaultFrameDurationUs = Math.max(1, Math.round(1_000_000 / fps));
-  const targetBytesPerFrame = (bitrate / 8) / fps;
-
   const videoEncoder = new VideoEncoder({
     output: (chunk, meta) => {
-      emittedChunks++;
-      rawEncodedVideoBytes += chunk.byteLength;
-      if (mp4Muxer) {
-        const raw = new Uint8Array(chunk.byteLength);
-        chunk.copyTo(raw);
-        // When the hardware H.264 encoder saturates its minimum-QP floor (~9 Mbps on P-frames),
-        // regulate the AVC stream to the user's exact target bitrate using a standard ITU-T H.264
-        // §7.3.2.7 Filler Data NAL unit (nal_unit_type = 12, 0x0C) so output bitrate matches the slider.
-        const targetCumulativeBytes = Math.round(emittedChunks * targetBytesPerFrame);
-        const deficit = options.bitrateMbps >= 10 ? targetCumulativeBytes - (muxedVideoBytes + raw.byteLength) : 0;
-        if (deficit >= 8) {
-          const padBytes = Math.min(deficit, 1_500_000);
-          const padded = new Uint8Array(raw.byteLength + padBytes);
-          padded.set(raw, 0);
-          const dv = new DataView(padded.buffer, padded.byteOffset, padded.byteLength);
-          dv.setUint32(raw.byteLength, padBytes - 4, false);
-          padded[raw.byteLength + 4] = 0x0c; // nal_unit_type = 12 (Filler data)
-          if (padBytes > 6) {
-            padded.fill(0xff, raw.byteLength + 5, raw.byteLength + padBytes - 1);
-          }
-          padded[raw.byteLength + padBytes - 1] = 0x80; // RBSP stop bit
-          muxedVideoBytes += padded.byteLength;
-          mp4Muxer.addVideoChunkRaw(
-            padded,
-            chunk.type,
-            chunk.timestamp,
-            chunk.duration ?? defaultFrameDurationUs,
-            meta
-          );
-        } else {
-          muxedVideoBytes += raw.byteLength;
-          mp4Muxer.addVideoChunkRaw(
-            raw,
-            chunk.type,
-            chunk.timestamp,
-            chunk.duration ?? defaultFrameDurationUs,
-            meta
-          );
-        }
-      } else if (webmMuxer) {
-        muxedVideoBytes += chunk.byteLength;
-        webmMuxer.addVideoChunk(chunk, meta);
-      }
+      if (mp4Muxer) mp4Muxer.addVideoChunk(chunk, meta);
+      else if (webmMuxer) webmMuxer.addVideoChunk(chunk, meta);
     },
     error: (err) => {
       encoderError = err instanceof Error ? err : new Error(String(err));
@@ -448,9 +399,8 @@ export async function exportProjectVideo(
   });
 
   videoEncoder.configure(picked.config);
-  const maxGopFrames =
-    options.bitrateMbps <= 8 ? Math.max(1, Math.round(fps * 3)) : Math.max(1, Math.round(fps * 2));
-  let lastKeyFrameIdx = 0;
+  const keyFrameInterval =
+    bitrate >= 30_000_000 ? Math.max(1, Math.round(fps)) : Math.max(1, Math.round(fps * 2));
 
   // X-5: Pre-warm all project shaders, media, and FBO pool before frame 0
   renderer.verifyProjectEffects(project);
@@ -482,13 +432,7 @@ export async function exportProjectVideo(
         timestamp: timestampUs,
         duration: durationUs,
       });
-      // Closed-loop keyframe scheduler: when high bitrate is requested and P-frames hit minimum QP,
-      // promote frames to I-frames (keyframes) to spend the bitrate budget on maximum intra-frame quality.
-      const expectedRawBytes = f * targetBytesPerFrame;
-      const needsIntraBoost = options.bitrateMbps >= 14 && rawEncodedVideoBytes < expectedRawBytes * 0.9;
-      const isKeyFrame = f === 0 || needsIntraBoost || f - lastKeyFrameIdx >= maxGopFrames;
-      if (isKeyFrame) lastKeyFrameIdx = f;
-      videoEncoder.encode(frame, { keyFrame: isKeyFrame });
+      videoEncoder.encode(frame, { keyFrame: f === 0 || f % keyFrameInterval === 0 });
       frame.close();
 
       // Backpressure so GPU & encoder queue stay healthy on long 60fps renders

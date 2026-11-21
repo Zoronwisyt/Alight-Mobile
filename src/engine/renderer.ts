@@ -1304,6 +1304,7 @@ export class AlightRenderer {
    */
   public async prepareMediaAtTime(project: Project, sceneTimeMs: number): Promise<void> {
     this.pauseAllVideos(false);
+    this.currentMaxVideoUploadDim = Infinity;
     this.frameUploadGen++;
     const items: { layer: Layer; localTimeMs: number; parentTimeMs: number }[] = [];
     this.collectActiveMediaLayers(project.layers, sceneTimeMs, items);
