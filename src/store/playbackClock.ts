@@ -15,7 +15,9 @@
  */
 class PlaybackClock {
   private ms = 0;
+  private audioLevel = 0;
   private listeners = new Set<() => void>();
+  private audioListeners = new Set<() => void>();
 
   public get(): number {
     return this.ms;
@@ -30,6 +32,23 @@ class PlaybackClock {
     this.listeners.add(listener);
     return () => {
       this.listeners.delete(listener);
+    };
+  }
+
+  public getAudioLevel(): number {
+    return this.audioLevel;
+  }
+
+  public setAudioLevel(level: number): void {
+    if (level === this.audioLevel) return;
+    this.audioLevel = level;
+    for (const l of this.audioListeners) l();
+  }
+
+  public subscribeAudio(listener: () => void): () => void {
+    this.audioListeners.add(listener);
+    return () => {
+      this.audioListeners.delete(listener);
     };
   }
 

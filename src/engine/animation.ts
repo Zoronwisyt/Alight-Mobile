@@ -217,6 +217,11 @@ export function interpolateValue<T>(a: T, b: T, alpha: number): T {
   return (alpha < 0.5 ? a : b);
 }
 
+const integratedPropCache = new WeakMap<
+  Animatable<number>,
+  { durSec: number; totalSteps: number; fallback: number; prefix: Float64Array }
+>();
+
 /**
  * Integrates a rate parameter (e.g. type="hz" cycles/sec or type="rpm" * 6 deg/sec)
  * over [0, normT * durSec] to match Alight Motion's native integrated frequency/RPM channels.
@@ -240,13 +245,23 @@ export function integrateAnimatable(
   const totalSteps = Math.round(durSec * STEPS_PER_SEC);
   const curSteps = Math.round(elapsedSec * STEPS_PER_SEC);
   if (curSteps <= 0 || totalSteps <= 0) return 0;
-  let sum = 0;
-  for (let i = 0; i < curSteps; i++) {
-    const u = i / totalSteps;
-    const v = Number(evalAnimatable(prop, u, fallback));
-    sum += ((Number.isFinite(v) ? v : fallback) * scaleFactor) / STEPS_PER_SEC;
+
+  let cached = integratedPropCache.get(prop);
+  if (!cached || cached.durSec !== durSec || cached.totalSteps !== totalSteps || cached.fallback !== fallback) {
+    const prefix = new Float64Array(totalSteps + 1);
+    let sum = 0;
+    for (let i = 0; i < totalSteps; i++) {
+      const u = i / totalSteps;
+      const v = Number(evalAnimatable(prop, u, fallback));
+      sum += (Number.isFinite(v) ? v : fallback) / STEPS_PER_SEC;
+      prefix[i + 1] = sum;
+    }
+    cached = { durSec, totalSteps, fallback, prefix };
+    integratedPropCache.set(prop, cached);
   }
-  return sum;
+
+  const idx = Math.min(curSteps, cached.totalSteps);
+  return cached.prefix[idx] * scaleFactor;
 }
 
 export function evalAnimatable<T>(prop: Animatable<T> | undefined, normT: number, fallback?: T): T {
@@ -264,22 +279,37 @@ export function evalAnimatable<T>(prop: Animatable<T> | undefined, normT: number
     if (normT >= last.t) {
       baseVal = last.v;
     } else {
-      baseVal = last.v;
-      for (let i = 0; i < kfs.length - 1; i++) {
-        const k0 = kfs[i];
-        const k1 = kfs[i + 1];
-        if (normT >= k0.t && normT <= k1.t) {
-          const span = k1.t - k0.t;
-          if (span <= 1e-7) {
-            baseVal = k1.v;
-          } else {
-            const rawU = (normT - k0.t) / span;
-            // APK KeyableKt->valueAtTime reads easing strictly from k1 (segment end keyframe)
-            const e = evalEasing(rawU, k1.easing);
-            baseVal = interpolateValue(k0.v, k1.v, e);
+      let segIdx = kfs.length - 2;
+      if (kfs.length > 8) {
+        let lo = 0;
+        let hi = kfs.length - 2;
+        while (lo <= hi) {
+          const mid = (lo + hi) >> 1;
+          if (normT < kfs[mid].t) hi = mid - 1;
+          else if (normT > kfs[mid + 1].t) lo = mid + 1;
+          else {
+            segIdx = mid;
+            break;
           }
-          break;
         }
+      } else {
+        for (let i = 0; i < kfs.length - 1; i++) {
+          if (normT >= kfs[i].t && normT <= kfs[i + 1].t) {
+            segIdx = i;
+            break;
+          }
+        }
+      }
+      const k0 = kfs[segIdx];
+      const k1 = kfs[segIdx + 1];
+      const span = k1.t - k0.t;
+      if (span <= 1e-7) {
+        baseVal = k1.v;
+      } else {
+        const rawU = (normT - k0.t) / span;
+        // APK KeyableKt->valueAtTime reads easing strictly from k1 (segment end keyframe)
+        const e = evalEasing(rawU, k1.easing);
+        baseVal = interpolateValue(k0.v, k1.v, e);
       }
     }
   }

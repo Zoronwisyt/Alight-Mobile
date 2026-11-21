@@ -44,7 +44,6 @@ export const EditorScreen: React.FC = () => {
     setCurrentTimeMs,
     setIsPlaying,
     togglePlay,
-    setAudioLevel,
     undo,
     redo,
     deleteSelectedLayers,
@@ -63,7 +62,6 @@ export const EditorScreen: React.FC = () => {
       setCurrentTimeMs: s.setCurrentTimeMs,
       setIsPlaying: s.setIsPlaying,
       togglePlay: s.togglePlay,
-      setAudioLevel: s.setAudioLevel,
       undo: s.undo,
       redo: s.redo,
       deleteSelectedLayers: s.deleteSelectedLayers,
@@ -273,12 +271,19 @@ export const EditorScreen: React.FC = () => {
       }
       busy = true;
       let stopSweep = false;
+      const isDesktop =
+        window.innerWidth > 860 && window.matchMedia?.('(pointer: coarse)').matches !== true;
+      const maxStoredPerSlice = isDesktop ? 3 : 1;
+      let storedThisSlice = 0;
       try {
         // ST-1: Distinguish 'stored' / 'present' / 'full' / 'blocked' so pump yields cleanly and never spins
         while (cursor < order.length && !cancelled) {
           const frameIdx = order[cursor++];
           const r = await renderer.precacheFrameAsync(currentProject, frameIdx, previewQuality);
-          if (r === 'stored') break;
+          if (r === 'stored') {
+            storedThisSlice++;
+            if (storedThisSlice >= maxStoredPerSlice || deadline.timeRemaining() <= 5) break;
+          }
           if (r === 'full' || r === 'blocked') {
             stopSweep = true;
             break;
@@ -316,7 +321,7 @@ export const EditorScreen: React.FC = () => {
     if (!isPlaying || !currentProject || visibilityPaused || !renderer) {
       renderer?.pauseAllVideos();
       audioEngine.stopPlayback();
-      setAudioLevel(0);
+      playbackClock.setAudioLevel(0);
       return;
     }
 
@@ -334,7 +339,7 @@ export const EditorScreen: React.FC = () => {
     let startSceneMs = playheadMs;
     let startWallMs = performance.now();
     let lastTs = startWallMs;
-    let lastCommitMs = 0;
+    let lastVuMs = 0;
     let consecutiveHits = 0;
     let rafId = 0;
     let ended = false;
@@ -404,21 +409,14 @@ export const EditorScreen: React.FC = () => {
         useCache: true,
       });
 
-      // The live clock never enters the store per frame. The timeline's `translate3d` is written
-      // straight to the DOM from `playbackClock` at display rate; React gets a 6 Hz commit instead of
-      // the old 15 Hz one, so the timeline, playbar and inspector re-render 2.5x less often while the
-      // playhead still moves at the display's full refresh.
+      // Zero React commits during playback: Timeline, ActionBar, and VU meter read playbackClock
+      // directly in the DOM, and the store receives the exact paused frame on teardown.
       livePlayheadRef.current = playheadMs;
       playbackClock.set(playheadMs);
-      if (now - lastCommitMs >= 166) {
-        lastCommitMs = now;
-        store.setCurrentTimeMs(playheadMs);
-        // Quantised to 1/12: the meter does not need 60 distinguishable heights, and every distinct
-        // value used to be its own store commit and therefore its own React pass.
+      if (now - lastVuMs >= 80) {
+        lastVuMs = now;
         const lvl = Math.round(audioEngine.sampleLevel() * 12) / 12;
-        if (lvl !== store.audioLevel) {
-          store.setAudioLevel(lvl);
-        }
+        playbackClock.setAudioLevel(lvl);
       }
       rafId = requestAnimationFrame(tick);
     };
@@ -428,9 +426,10 @@ export const EditorScreen: React.FC = () => {
       cancelAnimationFrame(rafId);
       renderer.pauseAllVideos();
       audioEngine.stopPlayback();
-      // Pausing must not snap back to the last 6 Hz commit; hand the store the frame the user saw.
+      playbackClock.setAudioLevel(0);
+      // Pausing must not snap back to the pre-play time; hand the store the frame the user saw.
       const s = useEditorStore.getState();
-      if (!ended && s.currentProject?.id === currentProject.id && livePlayheadRef.current > 0) {
+      if (!ended && s.currentProject?.id === currentProject.id && livePlayheadRef.current !== s.currentTimeMs) {
         s.setCurrentTimeMs(livePlayheadRef.current);
       }
     };

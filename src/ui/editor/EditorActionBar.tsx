@@ -1,6 +1,7 @@
-import React, { useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { replaceMediaOnLayers } from '../../engine/mediaReplace';
+import { playbackClock } from '../../store/playbackClock';
 import { useEditorStore } from '../../store/useEditorStore';
 import { AmIcon } from '../components/AmIcon';
 
@@ -16,7 +17,6 @@ function fmtTimecodeShort(ms: number, fps: number): string {
 export const EditorActionBar: React.FC = () => {
   const {
     currentProject,
-    currentTimeMs,
     selectedLayerIds,
     groupStack,
     exitGroup,
@@ -32,7 +32,6 @@ export const EditorActionBar: React.FC = () => {
   } = useEditorStore(
     useShallow((s) => ({
       currentProject: s.currentProject,
-      currentTimeMs: s.currentTimeMs,
       selectedLayerIds: s.selectedLayerIds,
       groupStack: s.groupStack,
       exitGroup: s.exitGroup,
@@ -49,6 +48,22 @@ export const EditorActionBar: React.FC = () => {
   );
 
   const replaceMultiRef = useRef<HTMLInputElement>(null);
+  const timeSpanRef = useRef<HTMLSpanElement>(null);
+  const fps = currentProject?.fps ?? 30;
+
+  useEffect(() => {
+    let lastText = '';
+    const update = () => {
+      if (!timeSpanRef.current) return;
+      const next = fmtTimecodeShort(playbackClock.get(), fps);
+      if (next !== lastText) {
+        lastText = next;
+        timeSpanRef.current.textContent = next;
+      }
+    };
+    update();
+    return playbackClock.subscribe(update);
+  }, [fps]);
 
   if (!currentProject) return null;
 
@@ -176,8 +191,8 @@ export const EditorActionBar: React.FC = () => {
       </div>
 
       <div className="am-actionbar-group">
-        <span className="am-nav-time" title="Playhead / Duration">
-          {fmtTimecodeShort(currentTimeMs, currentProject.fps)}
+        <span ref={timeSpanRef} className="am-nav-time" title="Playhead / Duration">
+          {fmtTimecodeShort(playbackClock.get(), currentProject.fps)}
         </span>
 
         <button

@@ -494,7 +494,10 @@ export class AlightRenderer {
   private isOffscreenPass = false;
   private svgPathCache = new Map<string, { path: Path2D; w: number; h: number }>();
   private tempUploadTex: WebGLTexture;
+  private tempUploadW = 0;
+  private tempUploadH = 0;
   private dummyBlackTex: WebGLTexture;
+  private maxTextureSize = 4096;
   private isPlaybackActive = false;
   private disposed = false;
   /** Phones/tablets: capped DPR, and the element — not Web Audio — may own video sound. */
@@ -549,6 +552,8 @@ export class AlightRenderer {
       : classBudget;
 
     this.onContextLostHandler = () => {
+      this.tempUploadW = 0;
+      this.tempUploadH = 0;
       this.clearPreviewCache();
       this.cacheEpoch++;
     };
@@ -569,6 +574,7 @@ export class AlightRenderer {
     });
     if (!gl) throw new Error('WebGL2 is required for Alight Motion Web Studio.');
     this.gl = gl;
+    this.maxTextureSize = (gl.getParameter(gl.MAX_TEXTURE_SIZE) as number) || 4096;
     this.registry = new ShaderRegistry(gl);
 
     this.canvas2d = document.createElement('canvas');
@@ -1587,10 +1593,19 @@ export class AlightRenderer {
     let renderH: number;
     let scale: number;
     const isExport = Boolean(options.renderWidth && options.renderHeight);
+    const cacheEligible = Boolean(options.useCache) && !isExport && !hasGroupIsolation;
+    let pbScale = 0;
     if (isExport) {
       renderW = Math.max(16, Math.round(options.renderWidth!));
       renderH = Math.max(16, Math.round(options.renderHeight!));
       scale = renderW / Math.max(1, activeProject.width);
+    } else if (cacheEligible) {
+      // Cache-eligible renders always composite sceneFbo at pbScale (<= 1.0), so matching the
+      // canvas backing store to (cw, ch) avoids 4x GPU upscale + compositor copy on 2x PC displays.
+      pbScale = this.syncCacheEpoch(project, options.previewScale ?? 1);
+      scale = pbScale;
+      renderW = Math.max(16, Math.round(project.width * pbScale));
+      renderH = Math.max(16, Math.round(project.height * pbScale));
     } else {
       const q = options.previewScale ?? 1;
       // A phone is not a desktop: at 1.5x the backing store already exceeds the native pixel width of
@@ -1619,9 +1634,7 @@ export class AlightRenderer {
     }
 
     // Only bypass cache inside nested group isolation view or exports; selection overlay is DOM-only so playback still hits cache
-    const cacheEligible = Boolean(options.useCache) && !isExport && !hasGroupIsolation;
     if (cacheEligible) {
-      const pbScale = this.syncCacheEpoch(project, options.previewScale ?? 1);
       const fps = Math.max(1, project.fps);
       const frameIdx = Math.max(0, Math.round((sceneTimeMs / 1000) * fps));
       const cw = Math.max(16, Math.round(project.width * pbScale));
@@ -1712,22 +1725,10 @@ export class AlightRenderer {
     const skew = evalAnimatable(layer.transform.skew, remappedNormT, [0, 0]);
     let alphaMul = 1;
 
-    // Run auto-transform script effects (Oscillate, Swing, Spin, Pulse, Jitter, Shake, etc.)
-    const vels = evalLayerVelocities(layer, sceneTimeMs, fps);
+    // Run auto-transform script effects lazily (Oscillate, Swing, Spin, Pulse, Jitter, Shake, etc.)
+    let vels: { velocity: [number, number]; angularVelocity: number; scaleVelocity: number } | null = null;
+    let env: EffectScriptEnv | null = null;
     const durSec = Math.max(0.001, (layer.endTime - layer.startTime) / 1000);
-    const env: EffectScriptEnv = {
-      time: remappedNormT,
-      absTime: sceneTimeMs / 1000,
-      duration: durSec,
-      inTime: layer.startTime / 1000,
-      fps,
-      frame: Math.floor((sceneTimeMs / 1000) * fps),
-      editMode: 'none',
-      selected,
-      velocity: { x: vels.velocity[0], y: vels.velocity[1] },
-      angularVelocity: vels.angularVelocity,
-      scaleVelocity: vels.scaleVelocity,
-    };
 
     for (const effInst of layer.effects) {
       if (!effInst.enabled) continue;
@@ -1735,6 +1736,22 @@ export class AlightRenderer {
       if (!def || !def.script) continue;
       // S-1: Derive transform mutation from script source as well as autoTransform flag (fixes Scale Assist)
       if (!def.autoTransform && !scriptMutatesTransform(effInst.effectId)) continue;
+      if (!vels || !env) {
+        vels = evalLayerVelocities(layer, sceneTimeMs, fps);
+        env = {
+          time: remappedNormT,
+          absTime: sceneTimeMs / 1000,
+          duration: durSec,
+          inTime: layer.startTime / 1000,
+          fps,
+          frame: Math.floor((sceneTimeMs / 1000) * fps),
+          editMode: 'none',
+          selected,
+          velocity: { x: vels.velocity[0], y: vels.velocity[1] },
+          angularVelocity: vels.angularVelocity,
+          scaleVelocity: vels.scaleVelocity,
+        };
+      }
       const paramsEval = this.evalEffectParams(def, effInst, remappedNormT, durSec);
       const el: EffectScriptElement = {
         alpha: alphaMul,
@@ -1832,7 +1849,10 @@ export class AlightRenderer {
     scale: number,
     selectedIds: string[]
   ): void {
-    const layersMap = new Map(layers.map((l) => [l.id, l]));
+    const layersMap = new Map<string, Layer>();
+    for (let i = 0; i < layers.length; i++) {
+      layersMap.set(layers[i].id, layers[i]);
+    }
     // Matches APK CameraElementKt.getActiveCameraAtTime: last visible camera covering sceneTimeMs
     let activeCam: Layer | undefined;
     if (project.cameraEnabled) {
@@ -2034,10 +2054,18 @@ export class AlightRenderer {
     );
 
     // Allocate dynamic overdraw margin when layer runs shader effects (so stacked oscillate + swing never clips before Tile & Warps)
-    const activeShaderDefs = layer.effects
-      .filter((e) => e.enabled)
-      .map((e) => getEffectById(e.effectId))
-      .filter((d): d is EffectDef => !!d && d.shaders.length > 0);
+    const activeShaderDefs: EffectDef[] = [];
+    let hasNonTransformScript = false;
+    for (const e of layer.effects) {
+      if (!e.enabled) continue;
+      const d = getEffectById(e.effectId);
+      if (!d) continue;
+      if (d.shaders.length > 0) {
+        activeShaderDefs.push(d);
+      } else if (d.script && !d.autoTransform && !scriptMutatesTransform(e.effectId)) {
+        hasNonTransformScript = true;
+      }
+    }
     const usesCompTex = activeShaderDefs.some((d) => d.params.some((p) => p.srcType === 'comp'));
 
     let overdrawPad = 0.0;
@@ -2060,8 +2088,7 @@ export class AlightRenderer {
       const minCorner = Math.min(oX, oX + ax, oX + bx, oX + ax + bx, oY, oY + ay, oY + by, oY + ay + by);
       const maxCorner = Math.max(oX, oX + ax, oX + bx, oX + ax + bx, oY, oY + ay, oY + by, oY + ay + by);
       const neededPad = Math.max(0.5, -minCorner + 0.05, maxCorner - 1.0 + 0.05);
-      const maxTex = (this.gl.getParameter(this.gl.MAX_TEXTURE_SIZE) as number) || 4096;
-      const maxPadByGpu = Math.max(0.5, ((Math.min(8192, maxTex) / Math.max(1, renderW, renderH)) - 1.0) * 0.5);
+      const maxPadByGpu = Math.max(0.5, ((Math.min(8192, this.maxTextureSize) / Math.max(1, renderW, renderH)) - 1.0) * 0.5);
       overdrawPad = Math.max(overdrawPad, Math.min(1.25, maxPadByGpu, neededPad));
     }
 
@@ -2069,6 +2096,83 @@ export class AlightRenderer {
     const invOverdrawSpan = 1.0 / overdrawSpan;
     const fboW = Math.max(1, Math.round(renderW * overdrawSpan));
     const fboH = Math.max(1, Math.round(renderH * overdrawSpan));
+
+    const blendId = canonicalizeBlendMode(layer.blendMode);
+    const has3DTilt = Boolean(layer.is3D && (Math.abs(tf.rotX) > 0.01 || Math.abs(tf.rotY) > 0.01));
+    const hasBorderOrShadowMedia =
+      (layer.type === 'group' || layer.type === 'image' || layer.type === 'video') &&
+      (layer.shadow.enabled || layer.stroke.enabled);
+    const canDirectComposite =
+      activeShaderDefs.length === 0 &&
+      !hasNonTransformScript &&
+      !has3DTilt &&
+      !hasBorderOrShadowMedia &&
+      blendId === 'normal' &&
+      layer.type !== 'group';
+
+    if (canDirectComposite) {
+      if (layer.type === 'image' || layer.type === 'video') {
+        if (!uploadedMedia) return;
+        const srcW = uploadedMedia.w || layer.mediaData?.naturalWidth || 512;
+        const srcH = uploadedMedia.h || layer.mediaData?.naturalHeight || 512;
+        const cropMode = layer.mediaData?.cropMode ?? 'fill';
+        const srcAspect = srcW / Math.max(1, srcH);
+        const boxAspect = logicalW / Math.max(1, logicalH);
+        let drawW = logicalW;
+        let drawH = logicalH;
+        let coverScaleX = 1;
+        let coverScaleY = 1;
+        if (cropMode === 'fill' && Math.abs(srcAspect - boxAspect) > 0.002) {
+          if (srcAspect > boxAspect) coverScaleX = boxAspect / srcAspect;
+          else coverScaleY = srcAspect / boxAspect;
+        } else if (cropMode === 'fit' && Math.abs(srcAspect - boxAspect) > 0.002) {
+          if (srcAspect > boxAspect) drawH = logicalW / srcAspect;
+          else drawW = logicalH * srcAspect;
+        }
+        this.blitTransformedFbo(
+          uploadedMedia.tex,
+          sceneFbo,
+          renderW,
+          renderH,
+          wx * scale,
+          wy * scale,
+          drawW * scale,
+          drawH * scale,
+          wrot,
+          wsx,
+          wsy,
+          layer.type === 'video',
+          tf.px * scale,
+          tf.py * scale,
+          tf.skewX,
+          tf.skewY,
+          coverScaleX,
+          coverScaleY,
+          0,
+          1,
+          layerOpacity,
+          true
+        );
+        return;
+      } else {
+        const repeatInstances = this.computeRepeatInstances(layer, remappedNormT);
+        this.rasterizeLayerToCanvas2D(project, layer, remappedNormT, sceneTimeMs, wx, wy, wrot, wsx, wsy, tf.px, tf.py, tf.skewX, tf.skewY, scale, renderW, renderH, repeatInstances, 0, 1);
+        const gl = this.gl;
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D, this.tempUploadTex);
+        gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
+        gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, 1);
+        if (this.tempUploadW === fboW && this.tempUploadH === fboH) {
+          gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, gl.RGBA, gl.UNSIGNED_BYTE, this.canvas2d);
+        } else {
+          gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this.canvas2d);
+          this.tempUploadW = fboW;
+          this.tempUploadH = fboH;
+        }
+        this.blitTexture(this.tempUploadTex, sceneFbo, renderW, renderH, layerOpacity, true);
+        return;
+      }
+    }
 
     const acTransform = mat4RowMajorToGl([
       overdrawSpan, 0, 0, -overdrawPad,
@@ -2203,7 +2307,13 @@ export class AlightRenderer {
       gl.bindTexture(gl.TEXTURE_2D, this.tempUploadTex);
       gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
       gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, 1);
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this.canvas2d);
+      if (this.tempUploadW === fboW && this.tempUploadH === fboH) {
+        gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, gl.RGBA, gl.UNSIGNED_BYTE, this.canvas2d);
+      } else {
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this.canvas2d);
+        this.tempUploadW = fboW;
+        this.tempUploadH = fboH;
+      }
       this.blitTexture(this.tempUploadTex, contentFbo, fboW, fboH, 1.0, false);
     }
 
@@ -2211,55 +2321,77 @@ export class AlightRenderer {
     let currentSlot = contentFbo;
 
     // Apply Border & Shadow pass for GPU-blitted layers (group / embedScene, image, video)
-    if (
-      (layer.type === 'group' || layer.type === 'image' || layer.type === 'video') &&
-      (layer.shadow.enabled || layer.stroke.enabled)
-    ) {
+    if (hasBorderOrShadowMedia) {
       const styled = this.applyBorderAndShadowPass(currentSlot, layer, remappedNormT, scale);
       if (styled !== currentSlot) {
         this.releaseFbo(currentSlot);
         currentSlot = styled;
       }
     }
-    const frameDtMs = 1000 / Math.max(1, project.fps);
-    const isFirstFrame = sceneTimeMs - layer.startTime < frameDtMs * 0.6;
-    const tfPrev = isFirstFrame
-      ? tf
-      : this.resolveWorldTransform(layer, layersMap, sceneTimeMs - frameDtMs, project.fps);
-    const tfCurr = isFirstFrame
-      ? this.resolveWorldTransform(layer, layersMap, Math.min(layer.endTime, sceneTimeMs + frameDtMs), project.fps)
-      : tf;
-    const vels = {
-      velocity: [tfCurr.x - tfPrev.x, tfCurr.y - tfPrev.y] as [number, number],
-      angularVelocity: tfCurr.rotation - tfPrev.rotation,
-      scaleVelocity:
-        Math.hypot(tfCurr.sx * logicalW, tfCurr.sy * logicalH) -
-        Math.hypot(tfPrev.sx * logicalW, tfPrev.sy * logicalH),
-    };
-    const durSec = Math.max(0.001, (layer.endTime - layer.startTime) / 1000);
-    const envBase: EffectScriptEnv = {
-      time: remappedNormT,
-      absTime: sceneTimeMs / 1000,
-      duration: durSec,
-      inTime: layer.startTime / 1000,
-      fps: project.fps,
-      frame: Math.floor((sceneTimeMs / 1000) * project.fps),
-      editMode: 'none',
-      selected: selectedIds.includes(layer.id),
-      velocity: { x: vels.velocity[0], y: vels.velocity[1] },
-      angularVelocity: vels.angularVelocity,
-      scaleVelocity: vels.scaleVelocity,
-    };
 
     let scriptAlpha = 1;
+    let vels: { velocity: [number, number]; angularVelocity: number; scaleVelocity: number } = {
+      velocity: [0, 0],
+      angularVelocity: 0,
+      scaleVelocity: 0,
+    };
+    if (activeShaderDefs.length > 0 || hasNonTransformScript) {
+      const frameDtMs = 1000 / Math.max(1, project.fps);
+      const isFirstFrame = sceneTimeMs - layer.startTime < frameDtMs * 0.6;
+      const tfPrev = isFirstFrame
+        ? tf
+        : this.resolveWorldTransform(layer, layersMap, sceneTimeMs - frameDtMs, project.fps);
+      const tfCurr = isFirstFrame
+        ? this.resolveWorldTransform(layer, layersMap, Math.min(layer.endTime, sceneTimeMs + frameDtMs), project.fps)
+        : tf;
+      vels = {
+        velocity: [tfCurr.x - tfPrev.x, tfCurr.y - tfPrev.y] as [number, number],
+        angularVelocity: tfCurr.rotation - tfPrev.rotation,
+        scaleVelocity:
+          Math.hypot(tfCurr.sx * logicalW, tfCurr.sy * logicalH) -
+          Math.hypot(tfPrev.sx * logicalW, tfPrev.sy * logicalH),
+      };
+      const durSec = Math.max(0.001, (layer.endTime - layer.startTime) / 1000);
+      const envBase: EffectScriptEnv = {
+        time: remappedNormT,
+        absTime: sceneTimeMs / 1000,
+        duration: durSec,
+        inTime: layer.startTime / 1000,
+        fps: project.fps,
+        frame: Math.floor((sceneTimeMs / 1000) * project.fps),
+        editMode: 'none',
+        selected: selectedIds.includes(layer.id),
+        velocity: { x: vels.velocity[0], y: vels.velocity[1] },
+        angularVelocity: vels.angularVelocity,
+        scaleVelocity: vels.scaleVelocity,
+      };
 
-    for (const effInst of layer.effects) {
-      if (!effInst.enabled) continue;
-      const def = getEffectById(effInst.effectId);
-      if (!def || def.autoTransform || scriptMutatesTransform(effInst.effectId) || def.shaders.length === 0) {
-        // Check non-autoTransform script-only opacity effects (like fade)
-        if (def?.script && def.shaders.length === 0 && !scriptMutatesTransform(effInst.effectId)) {
-          const paramsEval = this.evalEffectParams(def, effInst, remappedNormT, durSec);
+      for (const effInst of layer.effects) {
+        if (!effInst.enabled) continue;
+        const def = getEffectById(effInst.effectId);
+        if (!def || def.autoTransform || scriptMutatesTransform(effInst.effectId) || def.shaders.length === 0) {
+          // Check non-autoTransform script-only opacity effects (like fade)
+          if (def?.script && def.shaders.length === 0 && !scriptMutatesTransform(effInst.effectId)) {
+            const paramsEval = this.evalEffectParams(def, effInst, remappedNormT, durSec);
+            const out = runEffectScript(
+              def,
+              envBase,
+              {
+                alpha: scriptAlpha,
+                shaderGroups: null,
+                text: '',
+                transform: { location: { x: wx, y: wy, z: tf.z }, angle: wrot, scale: { x: wsx, y: wsy } },
+              },
+              paramsEval
+            );
+            scriptAlpha = out.alpha;
+          }
+          continue;
+        }
+
+        const paramsEval = this.evalEffectParams(def, effInst, remappedNormT, durSec);
+        let groupsToRun: (string | null)[] = [null];
+        if (def.script) {
           const out = runEffectScript(
             def,
             envBase,
@@ -2272,63 +2404,45 @@ export class AlightRenderer {
             paramsEval
           );
           scriptAlpha = out.alpha;
+          if (Array.isArray(out.shaderGroups)) {
+            if (out.shaderGroups.length === 0) continue; // bypassed
+            groupsToRun = out.shaderGroups.map((g) => String(g));
+          }
         }
-        continue;
-      }
 
-      const paramsEval = this.evalEffectParams(def, effInst, remappedNormT, durSec);
-      let groupsToRun: (string | null)[] = [null];
-      if (def.script) {
-        const out = runEffectScript(
-          def,
-          envBase,
-          {
-            alpha: scriptAlpha,
-            shaderGroups: null,
-            text: '',
-            transform: { location: { x: wx, y: wy, z: tf.z }, angle: wrot, scale: { x: wsx, y: wsy } },
-          },
-          paramsEval
-        );
-        scriptAlpha = out.alpha;
-        if (Array.isArray(out.shaderGroups)) {
-          if (out.shaderGroups.length === 0) continue; // bypassed
-          groupsToRun = out.shaderGroups.map((g) => String(g));
-        }
-      }
-
-      for (const grp of groupsToRun) {
-        const nextSlot = this.runEffectPasses(
-          def,
-          grp,
-          paramsEval,
-          currentSlot,
-          sceneFbo,
-          renderW,
-          renderH,
-          fboW,
-          fboH,
-          scale,
-          project,
-          layer,
-          wx,
-          wy,
-          logicalW,
-          logicalH,
-          wsx,
-          wsy,
-          tf.px,
-          tf.py,
-          vels,
-          localTimeMs,
-          screenToLayer,
-          layerToScreen,
-          acTransform,
-          acVtoRSpace
-        );
-        if (nextSlot && nextSlot !== currentSlot) {
-          this.releaseFbo(currentSlot);
-          currentSlot = nextSlot;
+        for (const grp of groupsToRun) {
+          const nextSlot = this.runEffectPasses(
+            def,
+            grp,
+            paramsEval,
+            currentSlot,
+            sceneFbo,
+            renderW,
+            renderH,
+            fboW,
+            fboH,
+            scale,
+            project,
+            layer,
+            wx,
+            wy,
+            logicalW,
+            logicalH,
+            wsx,
+            wsy,
+            tf.px,
+            tf.py,
+            vels,
+            localTimeMs,
+            screenToLayer,
+            layerToScreen,
+            acTransform,
+            acVtoRSpace
+          );
+          if (nextSlot && nextSlot !== currentSlot) {
+            this.releaseFbo(currentSlot);
+            currentSlot = nextSlot;
+          }
         }
       }
     }
@@ -2339,7 +2453,7 @@ export class AlightRenderer {
     let effectiveInvOverdrawSpan = invOverdrawSpan;
 
     // Native 3D X/Y perspective rotation pass (only when layer.is3D is enabled)
-    if (layer.is3D && (Math.abs(tf.rotX) > 0.01 || Math.abs(tf.rotY) > 0.01)) {
+    if (has3DTilt) {
       const focalPx = this.calcCameraZoom(renderW, renderH, camState.fov);
       const perspFbo = this.apply3DPerspectivePass(
         currentSlot.tex,
@@ -2380,7 +2494,6 @@ export class AlightRenderer {
     // Step 3: Composite onto Scene FBO (Mask / Exclude / 26 APK Blend Modes / Normal)
     // `clipping-mask` is deliberately absent: it means "this layer is the one being clipped" and
     // must draw normally, letting the following `blending="mask"` layer do the clipping.
-    const blendId = canonicalizeBlendMode(layer.blendMode);
     if (blendId === 'mask' || blendId === 'exclude') {
       const outFbo = this.acquireFbo(renderW, renderH);
       const gl = this.gl;
@@ -2787,10 +2900,6 @@ export class AlightRenderer {
           }
         }
 
-        for (let u = texUnit; u < 8; u++) {
-          gl.activeTexture(gl.TEXTURE0 + u);
-          gl.bindTexture(gl.TEXTURE_2D, null);
-        }
         this.drawQuad(prog.program);
         if (passBlend === 'max') gl.blendEquation(gl.FUNC_ADD);
         this.unbindTextureUnits(Math.max(texUnit, 2));
@@ -2993,9 +3102,11 @@ void main() {
     coverScaleX = 1,
     coverScaleY = 1,
     overdrawPad = 0,
-    overdrawSpan = 1
+    overdrawSpan = 1,
+    alpha = 1,
+    blend = false
   ) {
-    const key = '__internal_tf_blit_v2';
+    const key = '__internal_tf_blit_v3';
     let prog = (this as any)._tfBlitProg as ReturnType<ShaderRegistry['compileRaw']> | undefined;
     if (!prog) {
       prog = this.registry.compileRaw(
@@ -3018,6 +3129,7 @@ void main() {
         uniform int uFlipY;
         uniform vec2 uCoverScale;
         uniform vec2 uOverdraw;
+        uniform float uAlpha;
         void main() {
           vec2 screenUv = vUv * uOverdraw.x + uOverdraw.y;
           vec2 luv = (vec4(screenUv, 0.0, 1.0) * uScreenToLayer).xy;
@@ -3026,7 +3138,7 @@ void main() {
           } else {
             vec2 cuv = (luv - 0.5) * uCoverScale + 0.5;
             vec2 sampleUv = uFlipY == 1 ? vec2(cuv.x, 1.0 - cuv.y) : cuv;
-            fragColor = texture(uTex, sampleUv);
+            fragColor = texture(uTex, sampleUv) * uAlpha;
           }
         }`
       );
@@ -3036,7 +3148,12 @@ void main() {
     const gl = this.gl;
     gl.bindFramebuffer(gl.FRAMEBUFFER, dst.fbo);
     gl.viewport(0, 0, dst.width, dst.height);
-    gl.disable(gl.BLEND);
+    if (blend) {
+      gl.enable(gl.BLEND);
+      gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+    } else {
+      gl.disable(gl.BLEND);
+    }
     gl.useProgram(prog.program);
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, srcTex);
@@ -3045,8 +3162,10 @@ void main() {
     if (prog.uniforms.uFlipY) gl.uniform1i(prog.uniforms.uFlipY, flipY ? 1 : 0);
     if (prog.uniforms.uCoverScale) gl.uniform2f(prog.uniforms.uCoverScale, coverScaleX, coverScaleY);
     if (prog.uniforms.uOverdraw) gl.uniform2f(prog.uniforms.uOverdraw, overdrawSpan, -overdrawPad);
+    if (prog.uniforms.uAlpha) gl.uniform1f(prog.uniforms.uAlpha, alpha);
     this.drawQuad(prog.program);
     this.unbindTextureUnits(2);
+    if (blend) gl.disable(gl.BLEND);
   }
 
   private applyBorderAndShadowPass(

@@ -187,13 +187,36 @@ export const PreviewCanvas: React.FC<PreviewCanvasProps> = ({
       const sx = e.clientX;
       const sy = e.clientY;
       const [opx, opy] = previewPan;
-      const onMove = (ev: PointerEvent) => setPreviewPan([opx + ev.clientX - sx, opy + ev.clientY - sy]);
-      const onUp = () => {
+      try {
+        e.currentTarget.setPointerCapture(e.pointerId);
+      } catch {
+        // ignore
+      }
+      let panRaf = 0;
+      let lastX = sx;
+      let lastY = sy;
+      const onMove = (ev: PointerEvent) => {
+        lastX = ev.clientX;
+        lastY = ev.clientY;
+        if (panRaf) return;
+        panRaf = requestAnimationFrame(() => {
+          panRaf = 0;
+          setPreviewPan([opx + lastX - sx, opy + lastY - sy]);
+        });
+      };
+      const onUp = (ev: PointerEvent) => {
+        if (panRaf) {
+          cancelAnimationFrame(panRaf);
+          panRaf = 0;
+        }
+        setPreviewPan([opx + ev.clientX - sx, opy + ev.clientY - sy]);
         window.removeEventListener('pointermove', onMove);
         window.removeEventListener('pointerup', onUp);
+        window.removeEventListener('pointercancel', onUp);
       };
       window.addEventListener('pointermove', onMove);
       window.addEventListener('pointerup', onUp);
+      window.addEventListener('pointercancel', onUp);
       return;
     }
 
@@ -205,48 +228,63 @@ export const PreviewCanvas: React.FC<PreviewCanvasProps> = ({
         currentProject.height / 2,
         0,
       ]);
+      const layerId = singleLayer.id;
       const pts: { x: number; y: number; pressure: number }[] = [
         { x: Math.round(px - loc[0]), y: Math.round(py - loc[1]), pressure: e.pressure || 0.5 },
       ];
       let strokeIdx = -1;
 
+      try {
+        e.currentTarget.setPointerCapture(e.pointerId);
+      } catch {
+        // ignore
+      }
+
       const pushPoints = (record: boolean) => {
-        mutateProject((proj) => {
-          let list = proj.layers;
-          for (const gid of groupStack) {
-            const g = list.find((l) => l.id === gid);
-            if (g?.groupLayers) list = g.groupLayers;
-          }
-          const target = list.find((l) => l.id === singleLayer.id);
-          if (!target) return;
-          target.freehandStrokes = target.freehandStrokes ?? [];
-          if (strokeIdx >= 0 && target.freehandStrokes[strokeIdx]) {
-            target.freehandStrokes[strokeIdx].points = [...pts];
-          } else {
-            strokeIdx = target.freehandStrokes.length;
-            target.freehandStrokes.push({
-              color: drawingBrushColor,
-              width: drawingBrushWidth,
-              opacity: drawingBrushOpacity,
-              points: [...pts],
-            });
-          }
-        }, record);
+        mutateLayer(
+          layerId,
+          (target) => {
+            target.freehandStrokes = target.freehandStrokes ?? [];
+            if (strokeIdx >= 0 && target.freehandStrokes[strokeIdx]) {
+              target.freehandStrokes[strokeIdx].points = [...pts];
+            } else {
+              strokeIdx = target.freehandStrokes.length;
+              target.freehandStrokes.push({
+                color: drawingBrushColor,
+                width: drawingBrushWidth,
+                opacity: drawingBrushOpacity,
+                points: [...pts],
+              });
+            }
+          },
+          record
+        );
       };
 
       pushPoints(false);
+      let drawRaf = 0;
       const onMove = (ev: PointerEvent) => {
         const [mx, my] = clientToProject(ev.clientX, ev.clientY);
         pts.push({ x: Math.round(mx - loc[0]), y: Math.round(my - loc[1]), pressure: ev.pressure || 0.5 });
-        pushPoints(false);
+        if (drawRaf) return;
+        drawRaf = requestAnimationFrame(() => {
+          drawRaf = 0;
+          pushPoints(false);
+        });
       };
       const onUp = () => {
+        if (drawRaf) {
+          cancelAnimationFrame(drawRaf);
+          drawRaf = 0;
+        }
         pushPoints(true);
         window.removeEventListener('pointermove', onMove);
         window.removeEventListener('pointerup', onUp);
+        window.removeEventListener('pointercancel', onUp);
       };
       window.addEventListener('pointermove', onMove);
       window.addEventListener('pointerup', onUp);
+      window.addEventListener('pointercancel', onUp);
       return;
     }
 

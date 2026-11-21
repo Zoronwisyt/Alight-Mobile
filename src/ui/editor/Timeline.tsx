@@ -70,6 +70,250 @@ function fmtCtsTime(ms: number, fps: number): string {
   return `${String(min).padStart(2, '0')}:${String(sec).padStart(2, '0')}.${String(frame).padStart(2, '0')}`;
 }
 
+interface TimelineHeaderRowProps {
+  layer: Layer;
+  isSelected: boolean;
+  hasMissingFont: boolean;
+  onToggleVisible: (id: string) => void;
+  onSelect: (id: string, additive: boolean) => void;
+  onEnterGroup: (id: string) => void;
+  onOpenMissingFonts?: () => void;
+}
+
+const TimelineHeaderRow = React.memo<TimelineHeaderRowProps>(
+  ({ layer, isSelected, hasMissingFont, onToggleVisible, onSelect, onEnterGroup, onOpenMissingFonts }) => {
+    const tagBg = LAYER_GRADIENTS[layer.colorIndex % LAYER_GRADIENTS.length];
+    return (
+      <div className={`am-track-header ${isSelected ? 'selected' : ''}`}>
+        <div className="am-track-tag" style={{ background: tagBg }} />
+
+        <button
+          type="button"
+          className="am-track-eye-btn"
+          onClick={(e) => {
+            e.stopPropagation();
+            onToggleVisible(layer.id);
+          }}
+          title={layer.visible ? 'Hide Layer' : 'Show Layer'}
+        >
+          <AmIcon
+            name={layer.visible ? 'ic_visibility' : 'ic_visibility_off'}
+            fallback={layer.visible ? 'eye' : 'eyeOff'}
+            size={15}
+            color={layer.visible ? '#D8DCE8' : '#656B7C'}
+          />
+        </button>
+
+        {/* Tapping checkmark toggles layer in multi-selection (exact APK timeline_header behavior) */}
+        <button
+          type="button"
+          className={`am-track-check-btn ${isSelected ? 'checked' : ''}`}
+          onClick={(e) => {
+            e.stopPropagation();
+            onSelect(layer.id, true);
+          }}
+          title="Tap to Multi-Select Layer"
+        >
+          <AmIcon
+            name="ic_selected_layer_checkmark"
+            fallback="check"
+            size={14}
+            color={isSelected ? '#091318' : 'rgba(255,255,255,0.28)'}
+          />
+        </button>
+
+        {/* R-4: Direct chevron to enter any group layer */}
+        {layer.type === 'group' && (
+          <button
+            type="button"
+            className="am-track-enter-group-btn"
+            aria-label="Enter group"
+            title="Enter Group"
+            onClick={(e) => {
+              e.stopPropagation();
+              onEnterGroup(layer.id);
+            }}
+          >
+            ›
+          </button>
+        )}
+
+        {/* M-2: Missing-font warning badge on text layers */}
+        {layer.type === 'text' && hasMissingFont && (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onOpenMissingFonts?.();
+            }}
+            title={`Missing font "${layer.textData?.fontFamily}" — tap to resolve`}
+            style={{
+              background: 'rgba(255, 107, 129, 0.2)',
+              border: '1px solid rgba(255, 107, 129, 0.6)',
+              color: '#FF6B81',
+              borderRadius: 4,
+              fontSize: 10,
+              fontWeight: 700,
+              padding: '1px 4px',
+              cursor: 'pointer',
+              lineHeight: 1.1,
+            }}
+          >
+            ⚠
+          </button>
+        )}
+      </div>
+    );
+  }
+);
+
+interface TimelineTrackRowProps {
+  layer: Layer;
+  idx: number;
+  visualPos: number;
+  totalCount: number;
+  isSelected: boolean;
+  timelinePxPerSec: number;
+  onSelect: (id: string, additive: boolean) => void;
+  onEnterGroup: (id: string) => void;
+  onReorderLayer: (from: number, to: number) => void;
+  onTrackPointerDown: (e: React.PointerEvent, idx: number, mode: 'move' | 'left' | 'right') => void;
+}
+
+const TimelineTrackRow = React.memo<TimelineTrackRowProps>(
+  ({
+    layer,
+    idx,
+    visualPos,
+    totalCount,
+    isSelected,
+    timelinePxPerSec,
+    onSelect,
+    onEnterGroup,
+    onReorderLayer,
+    onTrackPointerDown,
+  }) => {
+    const left = (layer.startTime / 1000) * timelinePxPerSec;
+    const width = Math.max(32, ((layer.endTime - layer.startTime) / 1000) * timelinePxPerSec);
+    const kfs = collectLayerKeyframes(layer);
+
+    return (
+      <div className="am-track-row">
+        {/* APK timeline_item.xml */}
+        <div
+          className={`am-track-bar ${isSelected ? 'selected' : ''}`}
+          style={{
+            left,
+            width,
+            background: LAYER_GRADIENTS[layer.colorIndex % LAYER_GRADIENTS.length],
+            opacity: layer.visible ? 1 : 0.42,
+          }}
+          onClick={(e) => {
+            e.stopPropagation();
+            onSelect(layer.id, e.shiftKey || e.ctrlKey || e.metaKey);
+          }}
+          onDoubleClick={(e) => {
+            e.stopPropagation();
+            if (layer.type === 'group') onEnterGroup(layer.id);
+          }}
+          onPointerDown={(e) => onTrackPointerDown(e, idx, 'move')}
+        >
+          {/* APK @id/trimGripLeft (30dp when selected) */}
+          <div
+            className="am-trim-grip left"
+            onPointerDown={(e) => onTrackPointerDown(e, idx, 'left')}
+            title="Drag to Trim Start"
+          >
+            <span className="am-trim-grip-bar" />
+          </div>
+
+          <div className="am-track-label-wrap">
+            {(canonicalizeBlendMode(layer.blendMode) === 'mask' ||
+              canonicalizeBlendMode(layer.blendMode) === 'clipping-mask' ||
+              layer.blendMode === 'exclude') && (
+              <span className="am-track-mask-icon">↙︎</span>
+            )}
+            <span className="am-track-label">{layer.label}</span>
+
+            {layer.is3D && (
+              <span
+                className="am-track-fx-pill"
+                style={{
+                  background: 'rgba(10, 14, 24, 0.82)',
+                  color: '#00FFA8',
+                  border: '1px solid rgba(0, 255, 168, 0.6)',
+                  fontWeight: 800,
+                }}
+                title="3D Layer enabled"
+              >
+                3D
+              </span>
+            )}
+
+            {layer.effects.length > 0 && (
+              <span className="am-track-fx-pill">{layer.effects.length} fx</span>
+            )}
+
+            {isSelected && (
+              <span className="am-track-z-btns">
+                <button
+                  type="button"
+                  disabled={visualPos === 0}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onReorderLayer(idx, idx + 1);
+                  }}
+                  title="Move Layer Up"
+                >
+                  ▲
+                </button>
+                <button
+                  type="button"
+                  disabled={visualPos === totalCount - 1}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onReorderLayer(idx, idx - 1);
+                  }}
+                  title="Move Layer Down"
+                >
+                  ▼
+                </button>
+              </span>
+            )}
+          </div>
+
+          {/* AudioThumbnailView */}
+          {layer.type === 'audio' && layer.audioData?.waveform && (
+            <div className="am-track-waveform">
+              {layer.audioData.waveform.slice(0, 48).map((v, wi) => (
+                <div key={wi} style={{ flex: 1, height: `${Math.max(15, v * 100)}%`, background: '#081318', borderRadius: 1 }} />
+              ))}
+            </div>
+          )}
+
+          {/* KeyframeView Diamonds */}
+          {kfs.map((kt, ki) => (
+            <div
+              key={ki}
+              className="am-track-kf-diamond"
+              style={{ left: `${Math.max(2, Math.min(98, kt * 100))}%` }}
+            />
+          ))}
+
+          {/* APK @id/trimGripRight */}
+          <div
+            className="am-trim-grip right"
+            onPointerDown={(e) => onTrackPointerDown(e, idx, 'right')}
+            title="Drag to Trim End"
+          >
+            <span className="am-trim-grip-bar" />
+          </div>
+        </div>
+      </div>
+    );
+  }
+);
+
 export const Timeline: React.FC<TimelineProps> = ({
   rendererRef,
   cacheVersion = 0,
@@ -98,6 +342,7 @@ export const Timeline: React.FC<TimelineProps> = ({
     reorderLayer,
     setTimelineZoom,
     mutateProject,
+    mutateLayer,
     setModal,
   } = useEditorStore(
     useShallow((s) => ({
@@ -120,6 +365,7 @@ export const Timeline: React.FC<TimelineProps> = ({
       reorderLayer: s.reorderLayer,
       setTimelineZoom: s.setTimelineZoom,
       mutateProject: s.mutateProject,
+      mutateLayer: s.mutateLayer,
       setModal: s.setModal,
     }))
   );
@@ -130,6 +376,7 @@ export const Timeline: React.FC<TimelineProps> = ({
   /** The two elements that slide under the fixed centre playhead; written directly at 60 fps. */
   const rulerContentRef = useRef<HTMLDivElement>(null);
   const tracksContentRef = useRef<HTMLDivElement>(null);
+  const ctsSpanRef = useRef<HTMLSpanElement>(null);
   const replaceInputRef = useRef<HTMLInputElement>(null);
   const [showOverflowMenu, setShowOverflowMenu] = useState(false);
   const [showCacheMenu, setShowCacheMenu] = useState(false);
@@ -223,11 +470,20 @@ export const Timeline: React.FC<TimelineProps> = ({
   // value always equals the live one at the moment of commit, so there is no jump when it lands.
   useEffect(() => {
     if (!isPlaying) return;
+    const fps = currentProject?.fps ?? 30;
+    let lastCtsText = '';
     const apply = (ms: number) => {
       const x = trackViewportW * 0.5 - (ms / 1000) * timelinePxPerSec;
       const t = `translate3d(${x}px, 0, 0)`;
       if (rulerContentRef.current) rulerContentRef.current.style.transform = t;
       if (tracksContentRef.current) tracksContentRef.current.style.transform = t;
+      if (ctsSpanRef.current) {
+        const nextText = fmtCtsTime(ms, fps);
+        if (nextText !== lastCtsText) {
+          lastCtsText = nextText;
+          ctsSpanRef.current.textContent = nextText;
+        }
+      }
     };
     let raf = 0;
     const loop = () => {
@@ -237,7 +493,7 @@ export const Timeline: React.FC<TimelineProps> = ({
     apply(playbackClock.get());
     raf = requestAnimationFrame(loop);
     return () => cancelAnimationFrame(raf);
-  }, [isPlaying, trackViewportW, timelinePxPerSec]);
+  }, [isPlaying, trackViewportW, timelinePxPerSec, currentProject?.fps]);
 
   if (!currentProject) return null;  const activeGroup = resolveActiveGroup(currentProject, groupStack);
   const activeDurationMs = activeGroup.durationMs;
@@ -274,14 +530,21 @@ export const Timeline: React.FC<TimelineProps> = ({
     window.addEventListener('pointerup', onUp);
   };
 
-  // R-3: Drag ruler or track background to slide timeline under the fixed centre playhead
+  // R-3: Drag ruler or track background to slide timeline under the fixed centre playhead (rAF-coalesced)
   const handlePanScrubDown = (e: React.PointerEvent<HTMLDivElement>) => {
     if ((e.target as HTMLElement).closest('.am-track-bar, .am-ruler-bookmark')) return;
     const startX = e.clientX;
     const startTimeMs = currentTimeMs;
+    const fps = currentProject.fps;
     let moved = false;
     let lastMs = startTimeMs;
     setIsPlaying(false);
+
+    try {
+      e.currentTarget.setPointerCapture(e.pointerId);
+    } catch {
+      // ignore
+    }
 
     // Pre-collect timeline snap targets: layer starts/ends, bookmarks, scope bounds, selected layer keyframes
     const snapTargets: number[] = [0, activeDurationMs];
@@ -301,6 +564,8 @@ export const Timeline: React.FC<TimelineProps> = ({
     }
     const snapThresholdMs = (8 / Math.max(1, timelinePxPerSec)) * 1000;
 
+    let scrubRaf = 0;
+    let pendingMs = startTimeMs;
     const onMove = (ev: PointerEvent) => {
       const dx = ev.clientX - startX;
       if (Math.abs(dx) > 3) moved = true;
@@ -310,18 +575,34 @@ export const Timeline: React.FC<TimelineProps> = ({
       } else {
         lastMs = rawMs;
       }
-      setCurrentTimeMs(lastMs);
+      pendingMs = lastMs;
+      // Instant DOM feedback at display refresh while coalescing React/WebGL commits to 1/frame
+      const x = trackViewportW * 0.5 - (lastMs / 1000) * timelinePxPerSec;
+      const t = `translate3d(${x}px, 0, 0)`;
+      if (rulerContentRef.current) rulerContentRef.current.style.transform = t;
+      if (tracksContentRef.current) tracksContentRef.current.style.transform = t;
+      if (ctsSpanRef.current) ctsSpanRef.current.textContent = fmtCtsTime(lastMs, fps);
+      if (scrubRaf) return;
+      scrubRaf = requestAnimationFrame(() => {
+        scrubRaf = 0;
+        setCurrentTimeMs(pendingMs);
+      });
     };
-    const onUp = (ev: PointerEvent) => {
+    const onUp = () => {
+      if (scrubRaf) {
+        cancelAnimationFrame(scrubRaf);
+        scrubRaf = 0;
+      }
       window.removeEventListener('pointermove', onMove);
       window.removeEventListener('pointerup', onUp);
-      if (moved && snapEnabled && !ev.altKey) {
-        const snapped = snapTimelineMs(lastMs, snapTargets, snapThresholdMs);
-        if (snapped.snapped) setCurrentTimeMs(snapped.ms);
+      window.removeEventListener('pointercancel', onUp);
+      if (moved) {
+        setCurrentTimeMs(lastMs);
       }
     };
     window.addEventListener('pointermove', onMove);
     window.addEventListener('pointerup', onUp);
+    window.addEventListener('pointercancel', onUp);
   };
 
   const handleRulerDown = (e: React.PointerEvent<HTMLDivElement>) => {
@@ -333,9 +614,16 @@ export const Timeline: React.FC<TimelineProps> = ({
     e.stopPropagation();
     const layer = layers[layerIdx];
     if (!layer || layer.locked) return;
+    const layerId = layer.id;
     const startX = e.clientX;
     const origStart = layer.startTime;
     const origEnd = layer.endTime;
+
+    try {
+      e.currentTarget.setPointerCapture(e.pointerId);
+    } catch {
+      // ignore
+    }
 
     const snapTargets: number[] = [0, activeDurationMs, currentTimeMs];
     for (let i = 0; i < layers.length; i++) {
@@ -350,57 +638,80 @@ export const Timeline: React.FC<TimelineProps> = ({
     const update = (dxPx: number, record: boolean, altKey: boolean) => {
       const dMs = Math.round((dxPx / timelinePxPerSec) * 1000);
       const doSnap = snapEnabled && !altKey;
-      mutateProject((proj) => {
-        let list = proj.layers;
-        for (const gid of groupStack) {
-          const g = list.find((x) => x.id === gid);
-          if (g?.groupLayers) list = g.groupLayers;
-        }
-        const target = list[layerIdx];
-        if (!target) return;
-        if (mode === 'move') {
-          const dur = origEnd - origStart;
-          let ns = Math.max(0, origStart + dMs);
-          if (doSnap) {
-            const snapStart = snapTimelineMs(ns, snapTargets, snapThresholdMs);
-            const snapEnd = snapTimelineMs(ns + dur, snapTargets, snapThresholdMs);
-            const distStart = snapStart.snapped ? Math.abs(snapStart.ms - ns) : Infinity;
-            const distEnd = snapEnd.snapped ? Math.abs(snapEnd.ms - (ns + dur)) : Infinity;
-            if (distStart <= distEnd && distStart < Infinity) {
-              ns = Math.max(0, snapStart.ms);
-            } else if (distEnd < Infinity) {
-              ns = Math.max(0, snapEnd.ms - dur);
+      mutateLayer(
+        layerId,
+        (target) => {
+          if (mode === 'move') {
+            const dur = origEnd - origStart;
+            let ns = Math.max(0, origStart + dMs);
+            if (doSnap) {
+              const snapStart = snapTimelineMs(ns, snapTargets, snapThresholdMs);
+              const snapEnd = snapTimelineMs(ns + dur, snapTargets, snapThresholdMs);
+              const distStart = snapStart.snapped ? Math.abs(snapStart.ms - ns) : Infinity;
+              const distEnd = snapEnd.snapped ? Math.abs(snapEnd.ms - (ns + dur)) : Infinity;
+              if (distStart <= distEnd && distStart < Infinity) {
+                ns = Math.max(0, snapStart.ms);
+              } else if (distEnd < Infinity) {
+                ns = Math.max(0, snapEnd.ms - dur);
+              }
             }
+            target.startTime = ns;
+            target.endTime = ns + dur;
+          } else if (mode === 'left') {
+            let ns = Math.max(0, Math.min(origEnd - 120, origStart + dMs));
+            if (doSnap) {
+              const s = snapTimelineMs(ns, snapTargets, snapThresholdMs);
+              if (s.snapped) ns = Math.max(0, Math.min(origEnd - 120, s.ms));
+            }
+            target.startTime = ns;
+          } else {
+            let ne = Math.max(origStart + 120, origEnd + dMs);
+            if (doSnap) {
+              const s = snapTimelineMs(ne, snapTargets, snapThresholdMs);
+              if (s.snapped) ne = Math.max(origStart + 120, s.ms);
+            }
+            target.endTime = ne;
           }
-          target.startTime = ns;
-          target.endTime = ns + dur;
-        } else if (mode === 'left') {
-          let ns = Math.max(0, Math.min(origEnd - 120, origStart + dMs));
-          if (doSnap) {
-            const s = snapTimelineMs(ns, snapTargets, snapThresholdMs);
-            if (s.snapped) ns = Math.max(0, Math.min(origEnd - 120, s.ms));
-          }
-          target.startTime = ns;
-        } else {
-          let ne = Math.max(origStart + 120, origEnd + dMs);
-          if (doSnap) {
-            const s = snapTimelineMs(ne, snapTargets, snapThresholdMs);
-            if (s.snapped) ne = Math.max(origStart + 120, s.ms);
-          }
-          target.endTime = ne;
-        }
-      }, record);
+        },
+        record
+      );
     };
 
-    const onMove = (ev: PointerEvent) => update(ev.clientX - startX, false, ev.altKey);
+    let moveRaf = 0;
+    let lastDx = 0;
+    let lastAlt = false;
+    const onMove = (ev: PointerEvent) => {
+      lastDx = ev.clientX - startX;
+      lastAlt = ev.altKey;
+      if (moveRaf) return;
+      moveRaf = requestAnimationFrame(() => {
+        moveRaf = 0;
+        update(lastDx, false, lastAlt);
+      });
+    };
     const onUp = (ev: PointerEvent) => {
+      if (moveRaf) {
+        cancelAnimationFrame(moveRaf);
+        moveRaf = 0;
+      }
       update(ev.clientX - startX, true, ev.altKey);
       window.removeEventListener('pointermove', onMove);
       window.removeEventListener('pointerup', onUp);
+      window.removeEventListener('pointercancel', onUp);
     };
     window.addEventListener('pointermove', onMove);
     window.addEventListener('pointerup', onUp);
+    window.addEventListener('pointercancel', onUp);
   };
+
+  const handleTrackMoveRef = useRef(handleTrackMove);
+  handleTrackMoveRef.current = handleTrackMove;
+  const onTrackPointerDownStable = React.useCallback(
+    (e: React.PointerEvent, idx: number, mode: 'move' | 'left' | 'right') => {
+      handleTrackMoveRef.current(e, idx, mode);
+    },
+    []
+  );
 
   const selectAllLayers = () => {
     if (layers.length === 0) return;
@@ -413,13 +724,17 @@ export const Timeline: React.FC<TimelineProps> = ({
 
   // Generate ruler ticks every 0.5s or 1s (timeline_tick_sec = 18dp, timeline_tick_halfsec = 12dp)
   const tickStepSec = timelinePxPerSec >= 100 ? 0.5 : 1.0;
-  const ticks: number[] = [];
-  for (let s = 0; s <= totalSec; s += tickStepSec) {
-    ticks.push(Number(s.toFixed(2)));
-  }
+  const ticks = useMemo(() => {
+    const out: number[] = [];
+    for (let s = 0; s <= totalSec; s += tickStepSec) {
+      out.push(Number(s.toFixed(2)));
+    }
+    return out;
+  }, [totalSec, tickStepSec]);
 
   // Render layers top-to-bottom (highest Z-order at top like Alight Motion)
-  const displayIndices = layers.map((_, idx) => idx).reverse();
+  const displayIndices = useMemo(() => layers.map((_, idx) => idx).reverse(), [layers]);
+  const selectedSet = useMemo(() => new Set(selectedLayerIds), [selectedLayerIds]);
 
   return (
     <div className="am-timeline-wrap">
@@ -462,7 +777,7 @@ export const Timeline: React.FC<TimelineProps> = ({
           onClick={() => setLoop(!loop)}
           title="Current Time (tap to toggle loop playback)"
         >
-          <span>{fmtCtsTime(currentTimeMs, currentProject.fps)}</span>
+          <span ref={ctsSpanRef}>{fmtCtsTime(currentTimeMs, currentProject.fps)}</span>
         </button>
 
         <div
@@ -606,91 +921,17 @@ export const Timeline: React.FC<TimelineProps> = ({
         <div ref={headersRef} className="am-timeline-headers">
           {displayIndices.map((idx) => {
             const layer = layers[idx];
-            const isSelected = selectedLayerIds.includes(layer.id);
-            const tagBg = LAYER_GRADIENTS[layer.colorIndex % LAYER_GRADIENTS.length];
             return (
-              <div
+              <TimelineHeaderRow
                 key={layer.id}
-                className={`am-track-header ${isSelected ? 'selected' : ''}`}
-              >
-                <div className="am-track-tag" style={{ background: tagBg }} />
-
-                <button
-                  type="button"
-                  className="am-track-eye-btn"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    toggleLayerVisible(layer.id);
-                  }}
-                  title={layer.visible ? 'Hide Layer' : 'Show Layer'}
-                >
-                  <AmIcon
-                    name={layer.visible ? 'ic_visibility' : 'ic_visibility_off'}
-                    fallback={layer.visible ? 'eye' : 'eyeOff'}
-                    size={15}
-                    color={layer.visible ? '#D8DCE8' : '#656B7C'}
-                  />
-                </button>
-
-                {/* Tapping checkmark toggles layer in multi-selection (exact APK timeline_header behavior) */}
-                <button
-                  type="button"
-                  className={`am-track-check-btn ${isSelected ? 'checked' : ''}`}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    selectLayer(layer.id, true);
-                  }}
-                  title="Tap to Multi-Select Layer"
-                >
-                  <AmIcon
-                    name="ic_selected_layer_checkmark"
-                    fallback="check"
-                    size={14}
-                    color={isSelected ? '#091318' : 'rgba(255,255,255,0.28)'}
-                  />
-                </button>
-
-                {/* R-4: Direct chevron to enter any group layer */}
-                {layer.type === 'group' && (
-                  <button
-                    type="button"
-                    className="am-track-enter-group-btn"
-                    aria-label="Enter group"
-                    title="Enter Group"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      enterGroup(layer.id);
-                    }}
-                  >
-                    ›
-                  </button>
-                )}
-
-                {/* M-2: Missing-font warning badge on text layers */}
-                {layer.type === 'text' && missingFontLayerIds?.has(layer.id) && (
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onOpenMissingFonts?.();
-                    }}
-                    title={`Missing font "${layer.textData?.fontFamily}" — tap to resolve`}
-                    style={{
-                      background: 'rgba(255, 107, 129, 0.2)',
-                      border: '1px solid rgba(255, 107, 129, 0.6)',
-                      color: '#FF6B81',
-                      borderRadius: 4,
-                      fontSize: 10,
-                      fontWeight: 700,
-                      padding: '1px 4px',
-                      cursor: 'pointer',
-                      lineHeight: 1.1,
-                    }}
-                  >
-                    ⚠
-                  </button>
-                )}
-              </div>
+                layer={layer}
+                isSelected={selectedSet.has(layer.id)}
+                hasMissingFont={Boolean(missingFontLayerIds?.has(layer.id))}
+                onToggleVisible={toggleLayerVisible}
+                onSelect={selectLayer}
+                onEnterGroup={enterGroup}
+                onOpenMissingFonts={onOpenMissingFonts}
+              />
             );
           })}
         </div>
@@ -726,124 +967,20 @@ export const Timeline: React.FC<TimelineProps> = ({
 
             {displayIndices.map((idx, visualPos) => {
               const layer = layers[idx];
-              const isSelected = selectedLayerIds.includes(layer.id);
-              const left = (layer.startTime / 1000) * timelinePxPerSec;
-              const width = Math.max(32, ((layer.endTime - layer.startTime) / 1000) * timelinePxPerSec);
-              const kfs = collectLayerKeyframes(layer);
-
               return (
-                <div key={layer.id} className="am-track-row">
-                  {/* APK timeline_item.xml */}
-                  <div
-                    className={`am-track-bar ${isSelected ? 'selected' : ''}`}
-                    style={{
-                      left,
-                      width,
-                      background: LAYER_GRADIENTS[layer.colorIndex % LAYER_GRADIENTS.length],
-                      opacity: layer.visible ? 1 : 0.42,
-                    }}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      selectLayer(layer.id, e.shiftKey || e.ctrlKey || e.metaKey);
-                    }}
-                    onDoubleClick={(e) => {
-                      e.stopPropagation();
-                      if (layer.type === 'group') enterGroup(layer.id);
-                    }}
-                    onPointerDown={(e) => handleTrackMove(e, idx, 'move')}
-                  >
-                    {/* APK @id/trimGripLeft (30dp when selected) */}
-                    <div
-                      className="am-trim-grip left"
-                      onPointerDown={(e) => handleTrackMove(e, idx, 'left')}
-                      title="Drag to Trim Start"
-                    >
-                      <span className="am-trim-grip-bar" />
-                    </div>
-
-                    <div className="am-track-label-wrap">
-                      {(canonicalizeBlendMode(layer.blendMode) === 'mask' ||
-                        canonicalizeBlendMode(layer.blendMode) === 'clipping-mask' ||
-                        layer.blendMode === 'exclude') && (
-                        <span className="am-track-mask-icon">↙︎</span>
-                      )}
-                      <span className="am-track-label">{layer.label}</span>
-
-                      {layer.is3D && (
-                        <span
-                          className="am-track-fx-pill"
-                          style={{
-                            background: 'rgba(10, 14, 24, 0.82)',
-                            color: '#00FFA8',
-                            border: '1px solid rgba(0, 255, 168, 0.6)',
-                            fontWeight: 800,
-                          }}
-                          title="3D Layer enabled"
-                        >
-                          3D
-                        </span>
-                      )}
-
-                      {layer.effects.length > 0 && (
-                        <span className="am-track-fx-pill">{layer.effects.length} fx</span>
-                      )}
-
-                      {isSelected && (
-                        <span className="am-track-z-btns">
-                          <button
-                            type="button"
-                            disabled={visualPos === 0}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              reorderLayer(idx, idx + 1);
-                            }}
-                            title="Move Layer Up"
-                          >
-                            ▲
-                          </button>
-                          <button
-                            type="button"
-                            disabled={visualPos === displayIndices.length - 1}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              reorderLayer(idx, idx - 1);
-                            }}
-                            title="Move Layer Down"
-                          >
-                            ▼
-                          </button>
-                        </span>
-                      )}
-                    </div>
-
-                    {/* AudioThumbnailView */}
-                    {layer.type === 'audio' && layer.audioData?.waveform && (
-                      <div className="am-track-waveform">
-                        {layer.audioData.waveform.slice(0, 48).map((v, wi) => (
-                          <div key={wi} style={{ flex: 1, height: `${Math.max(15, v * 100)}%`, background: '#081318', borderRadius: 1 }} />
-                        ))}
-                      </div>
-                    )}
-
-                    {/* KeyframeView Diamonds */}
-                    {kfs.map((kt, ki) => (
-                      <div
-                        key={ki}
-                        className="am-track-kf-diamond"
-                        style={{ left: `${Math.max(2, Math.min(98, kt * 100))}%` }}
-                      />
-                    ))}
-
-                    {/* APK @id/trimGripRight */}
-                    <div
-                      className="am-trim-grip right"
-                      onPointerDown={(e) => handleTrackMove(e, idx, 'right')}
-                      title="Drag to Trim End"
-                    >
-                      <span className="am-trim-grip-bar" />
-                    </div>
-                  </div>
-                </div>
+                <TimelineTrackRow
+                  key={layer.id}
+                  layer={layer}
+                  idx={idx}
+                  visualPos={visualPos}
+                  totalCount={displayIndices.length}
+                  isSelected={selectedSet.has(layer.id)}
+                  timelinePxPerSec={timelinePxPerSec}
+                  onSelect={selectLayer}
+                  onEnterGroup={enterGroup}
+                  onReorderLayer={reorderLayer}
+                  onTrackPointerDown={onTrackPointerDownStable}
+                />
               );
             })}
 

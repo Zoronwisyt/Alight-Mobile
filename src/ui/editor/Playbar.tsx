@@ -1,6 +1,7 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { replaceMediaOnLayers } from '../../engine/mediaReplace';
+import { playbackClock } from '../../store/playbackClock';
 import { useEditorStore } from '../../store/useEditorStore';
 import { AmIcon } from '../components/AmIcon';
 
@@ -12,15 +13,14 @@ interface PlaybarProps {
 export const Playbar: React.FC<PlaybarProps> = ({ viewModeOpen, onToggleViewMode }) => {
   const {
     currentProject,
-    currentTimeMs,
     isPlaying,
-    audioLevel,
+    hasBookmarkHere,
     selectedLayerIds,
     groupStack,
-    past,
-    future,
-    layerClipboard,
-    effectsClipboard,
+    pastCount,
+    futureCount,
+    hasLayerClipboard,
+    hasEffectsClipboard,
     undo,
     redo,
     setCurrentTimeMs,
@@ -37,15 +37,14 @@ export const Playbar: React.FC<PlaybarProps> = ({ viewModeOpen, onToggleViewMode
   } = useEditorStore(
     useShallow((s) => ({
       currentProject: s.currentProject,
-      currentTimeMs: s.currentTimeMs,
       isPlaying: s.isPlaying,
-      audioLevel: s.audioLevel,
+      hasBookmarkHere: !s.isPlaying && Boolean(s.currentProject?.bookmarks.some((b) => Math.abs(b - s.currentTimeMs) < 35)),
       selectedLayerIds: s.selectedLayerIds,
       groupStack: s.groupStack,
-      past: s.past,
-      future: s.future,
-      layerClipboard: s.layerClipboard,
-      effectsClipboard: s.effectsClipboard,
+      pastCount: s.past.length,
+      futureCount: s.future.length,
+      hasLayerClipboard: Boolean(s.layerClipboard),
+      hasEffectsClipboard: Boolean(s.effectsClipboard),
       undo: s.undo,
       redo: s.redo,
       setCurrentTimeMs: s.setCurrentTimeMs,
@@ -64,17 +63,27 @@ export const Playbar: React.FC<PlaybarProps> = ({ viewModeOpen, onToggleViewMode
 
   const [showCopyMenu, setShowCopyMenu] = useState(false);
   const replaceInputRef = useRef<HTMLInputElement>(null);
+  const vuFillRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const syncVu = () => {
+      if (vuFillRef.current) {
+        vuFillRef.current.style.width = `${Math.round(playbackClock.getAudioLevel() * 100)}%`;
+      }
+    };
+    syncVu();
+    return playbackClock.subscribeAudio(syncVu);
+  }, []);
 
   if (!currentProject) return null;
   const frameMs = 1000 / Math.max(1, currentProject.fps);
   const hasSel = selectedLayerIds.length > 0;
-  const hasBookmarkHere = currentProject.bookmarks.some((b) => Math.abs(b - currentTimeMs) < 35);
 
   return (
     <div className="am-playbar">
       {/* APK LevelMeterView (2dp) */}
       <div className="am-vu-meter" aria-hidden="true">
-        <div className="am-vu-fill" style={{ width: `${Math.round(audioLevel * 100)}%` }} />
+        <div ref={vuFillRef} className="am-vu-fill" style={{ width: '0%' }} />
       </div>
 
       {/* APK activity_edit_playbar.xml (46dp #191B27) */}
@@ -84,7 +93,7 @@ export const Playbar: React.FC<PlaybarProps> = ({ viewModeOpen, onToggleViewMode
           <button
             type="button"
             className="am-playbar-btn"
-            disabled={past.length === 0}
+            disabled={pastCount === 0}
             onClick={undo}
             title="Undo (Ctrl+Z)"
           >
@@ -93,7 +102,7 @@ export const Playbar: React.FC<PlaybarProps> = ({ viewModeOpen, onToggleViewMode
           <button
             type="button"
             className="am-playbar-btn"
-            disabled={future.length === 0}
+            disabled={futureCount === 0}
             onClick={redo}
             title="Redo (Ctrl+Y)"
           >
@@ -107,8 +116,10 @@ export const Playbar: React.FC<PlaybarProps> = ({ viewModeOpen, onToggleViewMode
             type="button"
             className="am-playbar-btn"
             onClick={() => {
+              const st = useEditorStore.getState();
+              const baseMs = st.isPlaying ? playbackClock.get() : st.currentTimeMs;
               setIsPlaying(false);
-              setCurrentTimeMs(currentTimeMs - frameMs);
+              setCurrentTimeMs(baseMs - frameMs);
             }}
             title="Previous Frame (ArrowLeft)"
           >
@@ -128,8 +139,10 @@ export const Playbar: React.FC<PlaybarProps> = ({ viewModeOpen, onToggleViewMode
             type="button"
             className="am-playbar-btn"
             onClick={() => {
+              const st = useEditorStore.getState();
+              const baseMs = st.isPlaying ? playbackClock.get() : st.currentTimeMs;
               setIsPlaying(false);
-              setCurrentTimeMs(currentTimeMs + frameMs);
+              setCurrentTimeMs(baseMs + frameMs);
             }}
             title="Next Frame (ArrowRight)"
           >
@@ -179,7 +192,7 @@ export const Playbar: React.FC<PlaybarProps> = ({ viewModeOpen, onToggleViewMode
               <button
                 type="button"
                 className="am-popup-item"
-                disabled={!layerClipboard}
+                disabled={!hasLayerClipboard}
                 onClick={() => {
                   pasteLayers();
                   setShowCopyMenu(false);
@@ -213,7 +226,7 @@ export const Playbar: React.FC<PlaybarProps> = ({ viewModeOpen, onToggleViewMode
               <button
                 type="button"
                 className="am-popup-item"
-                disabled={!hasSel || !effectsClipboard}
+                disabled={!hasSel || !hasEffectsClipboard}
                 onClick={() => {
                   pasteLayerEffects();
                   setShowCopyMenu(false);

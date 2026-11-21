@@ -25,6 +25,7 @@ import {
   saveElementToDb,
   saveProjectToDb,
 } from './storage';
+import { playbackClock } from './playbackClock';
 
 export type AppScreen = 'home' | 'editor';
 export type HomeTab = 'home' | 'tutorials' | 'projects' | 'elements';
@@ -580,6 +581,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   openProject: (id) => {
     const p = get().projects.find((x) => x.id === id);
     if (!p) return;
+    playbackClock.set(0);
     set({
       screen: 'editor',
       activeProjectId: id,
@@ -614,6 +616,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       modifiedTime: Date.now(),
     };
     saveProjectToDb(proj).catch(() => {});
+    playbackClock.set(0);
     set((s) => ({
       projects: [proj, ...s.projects],
       screen: 'editor',
@@ -644,6 +647,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       ].filter(Boolean);
       get().showToast(`Imported: ${notes.join(' · ')}`);
     }
+    playbackClock.set(0);
     set((s) => ({
       projects: [proj, ...s.projects],
       screen: 'editor',
@@ -838,6 +842,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       const groupDur = Math.max(100, Math.round(grp.endTime - grp.startTime));
       const inSpan = s.currentTimeMs >= grp.startTime && s.currentTimeMs <= grp.endTime;
       const localMs = inSpan ? Math.max(0, Math.min(groupDur, s.currentTimeMs - grp.startTime)) : 0;
+      playbackClock.set(localMs);
       return {
         groupStack: [...s.groupStack, groupLayerId],
         groupTimeStack: [...s.groupTimeStack, s.currentTimeMs],
@@ -856,6 +861,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       const savedTime = s.groupTimeStack[nextStack.length];
       const nextDur = s.currentProject ? resolveActiveGroup(s.currentProject, nextStack).durationMs : 5000;
       const restoredMs = Number.isFinite(savedTime) ? Math.max(0, Math.min(nextDur, savedTime)) : 0;
+      playbackClock.set(restoredMs);
       return {
         groupStack: nextStack,
         groupTimeStack: s.groupTimeStack.slice(0, nextStack.length),
@@ -1227,14 +1233,23 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     const prop = getAnimatableByTarget(l, target);
     if (!prop || prop.keyframes.length === 0) return;
     const dur = Math.max(1, l.endTime - l.startTime);
-    const curNorm = (s.currentTimeMs - l.startTime) / dur;
+    const liveMs = s.isPlaying ? playbackClock.get() : s.currentTimeMs;
+    const curNorm = (liveMs - l.startTime) / dur;
     const sorted = [...prop.keyframes].sort((a, b) => a.t - b.t);
     if (dir < 0) {
       const prev = [...sorted].reverse().find((k) => k.t < curNorm - 0.005);
-      if (prev) set({ currentTimeMs: l.startTime + prev.t * dur, isPlaying: false });
+      if (prev) {
+        const nextMs = l.startTime + prev.t * dur;
+        playbackClock.set(nextMs);
+        set({ currentTimeMs: nextMs, isPlaying: false });
+      }
     } else {
       const next = sorted.find((k) => k.t > curNorm + 0.005);
-      if (next) set({ currentTimeMs: l.startTime + next.t * dur, isPlaying: false });
+      if (next) {
+        const nextMs = l.startTime + next.t * dur;
+        playbackClock.set(nextMs);
+        set({ currentTimeMs: nextMs, isPlaying: false });
+      }
     }
   },
 
@@ -1256,6 +1271,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     const s = get();
     const maxDur = s.currentProject ? resolveActiveGroup(s.currentProject, s.groupStack).durationMs : Infinity;
     const clamped = Number.isFinite(maxDur) ? Math.max(0, Math.min(maxDur, ms)) : Math.max(0, ms);
+    playbackClock.set(clamped);
     set({ currentTimeMs: clamped });
   },
   setIsPlaying: (isPlaying) => set({ isPlaying }),
@@ -1264,6 +1280,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       if (!s.isPlaying && s.currentProject) {
         const activeDur = resolveActiveGroup(s.currentProject, s.groupStack).durationMs;
         if (s.currentTimeMs >= activeDur - 10) {
+          playbackClock.set(0);
           return { isPlaying: true, currentTimeMs: 0 };
         }
       }
@@ -1283,11 +1300,12 @@ export const useEditorStore = create<EditorState>((set, get) => ({
 
   toggleBookmarkAtPlayhead: () => {
     const s = get();
+    const liveMs = s.isPlaying ? playbackClock.get() : s.currentTimeMs;
     s.mutateProject((proj) => {
-      const idx = proj.bookmarks.findIndex((b) => Math.abs(b - s.currentTimeMs) < 35);
+      const idx = proj.bookmarks.findIndex((b) => Math.abs(b - liveMs) < 35);
       if (idx !== -1) proj.bookmarks.splice(idx, 1);
       else {
-        proj.bookmarks.push(Math.round(s.currentTimeMs));
+        proj.bookmarks.push(Math.round(liveMs));
         proj.bookmarks.sort((a, b) => a - b);
       }
     }, false);
@@ -1297,12 +1315,19 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     const s = get();
     const bms = s.currentProject?.bookmarks ?? [];
     if (bms.length === 0) return;
+    const liveMs = s.isPlaying ? playbackClock.get() : s.currentTimeMs;
     if (dir < 0) {
-      const prev = [...bms].reverse().find((b) => b < s.currentTimeMs - 20);
-      if (prev !== undefined) set({ currentTimeMs: prev, isPlaying: false });
+      const prev = [...bms].reverse().find((b) => b < liveMs - 20);
+      if (prev !== undefined) {
+        playbackClock.set(prev);
+        set({ currentTimeMs: prev, isPlaying: false });
+      }
     } else {
-      const next = bms.find((b) => b > s.currentTimeMs + 20);
-      if (next !== undefined) set({ currentTimeMs: next, isPlaying: false });
+      const next = bms.find((b) => b > liveMs + 20);
+      if (next !== undefined) {
+        playbackClock.set(next);
+        set({ currentTimeMs: next, isPlaying: false });
+      }
     }
   },
 
