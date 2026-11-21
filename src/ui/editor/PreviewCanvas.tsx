@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';
-import { evalAnimatable, evalRemappedTime } from '../../engine/animation';
+import { evalAnimatable, evalRemappedTime, resolveLayerWorldTransformSimple } from '../../engine/animation';
 import { snapLayerPosition } from '../../engine/snapping';
 import { getShapeById, parseDefaultParamValue } from '../../engine/catalog';
 import { evaluateShapeHandles } from '../../engine/scriptRuntime';
@@ -381,6 +381,9 @@ export const PreviewCanvas: React.FC<PreviewCanvasProps> = ({
     x: number;
     y: number;
     rot: number;
+    rotX: number;
+    rotY: number;
+    is3D: boolean;
     sx: number;
     sy: number;
     shapeHandles: Record<string, [number, number]>;
@@ -388,9 +391,8 @@ export const PreviewCanvas: React.FC<PreviewCanvasProps> = ({
 
   if (singleLayer && singleLayer.visible && currentTimeMs >= singleLayer.startTime && currentTimeMs <= singleLayer.endTime) {
     const { remappedNormT } = evalRemappedTime(singleLayer, currentTimeMs);
-    const loc = evalAnimatable(singleLayer.transform.location, remappedNormT, [currentProject.width / 2, currentProject.height / 2, 0]);
-    const rot = evalAnimatable(singleLayer.transform.rotation, remappedNormT, 0);
-    const sc = evalAnimatable(singleLayer.transform.scale, remappedNormT, [1, 1]);
+    const layersMap = new Map(layers.map((l) => [l.id, l]));
+    const wt = resolveLayerWorldTransformSimple(singleLayer, layersMap, currentTimeMs);
     let shapeHandles: Record<string, [number, number]> = {};
     if (singleLayer.type === 'shape' && singleLayer.shapeId && inspectorTab === 'editShape') {
       const sDef = getShapeById(singleLayer.shapeId);
@@ -403,11 +405,14 @@ export const PreviewCanvas: React.FC<PreviewCanvasProps> = ({
       }
     }
     gizmo = {
-      x: loc[0] * projScale,
-      y: loc[1] * projScale,
-      rot,
-      sx: sc[0],
-      sy: sc[1],
+      x: wt.x * projScale,
+      y: wt.y * projScale,
+      rot: wt.rotation,
+      rotX: wt.rotX,
+      rotY: wt.rotY,
+      is3D: Boolean(singleLayer.is3D),
+      sx: wt.sx,
+      sy: wt.sy,
       shapeHandles,
     };
   }
@@ -532,7 +537,9 @@ export const PreviewCanvas: React.FC<PreviewCanvasProps> = ({
               top: gizmo.y,
               width: 110,
               height: 110,
-              transform: `translate(-50%, -50%) rotate(${gizmo.rot}deg)`,
+              transform: gizmo.is3D
+                ? `translate(-50%, -50%) perspective(${Math.round(Math.max(stageSize.w, stageSize.h) / (2 * Math.tan(Math.PI / 6)))}px) rotateX(${-gizmo.rotX}deg) rotateY(${gizmo.rotY}deg) rotate(${gizmo.rot}deg)`
+                : `translate(-50%, -50%) rotate(${gizmo.rot}deg)`,
               border: '2px solid #00FFA8',
               borderRadius: 4,
               cursor: 'move',

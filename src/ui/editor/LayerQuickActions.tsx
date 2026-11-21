@@ -1,5 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';
+import { reparentLayerPreservingPosition } from '../../engine/animation';
 import { replaceMediaOnLayers } from '../../engine/mediaReplace';
 import { useEditorStore } from '../../store/useEditorStore';
 import { AmIcon } from '../components/AmIcon';
@@ -73,7 +74,9 @@ export const LayerQuickActions: React.FC = () => {
         if (g?.groupLayers) list = g.groupLayers;
       }
       const target = list.find((x) => x.id === single.id);
-      if (target) target.parentId = pid;
+      if (target) {
+        reparentLayerPreservingPosition(target, pid, list, useEditorStore.getState().currentTimeMs);
+      }
     });
     setShowParentMenu(false);
   };

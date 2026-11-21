@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';
-import { evalAnimatable } from '../../engine/animation';
+import { evalAnimatable, toggleLayer3DPreservingPosition } from '../../engine/animation';
 import { snapLayerPosition } from '../../engine/snapping';
 import { useEditorStore, type ActiveCurveTarget } from '../../store/useEditorStore';
 import type { Layer, Project } from '../../types/project';
@@ -221,15 +221,12 @@ export const MoveTransformPanel: React.FC = () => {
           type="button"
           className={`am-pill ${is3D ? 'active' : ''}`}
           style={{ minWidth: 54, fontWeight: 700 }}
-          onClick={() =>
+          onClick={() => {
+            const activeLayers = getActiveLayers();
             updateLayer((l) => {
-              l.is3D = !l.is3D;
-              if (l.is3D) {
-                if (!l.transform.rotationX) l.transform.rotationX = { value: 0, keyframes: [] };
-                if (!l.transform.rotationY) l.transform.rotationY = { value: 0, keyframes: [] };
-              }
-            })
-          }
+              toggleLayer3DPreservingPosition(l, activeLayers, currentTimeMs);
+            });
+          }}
         >
           {is3D ? '3D ON' : '2D'}
         </button>

@@ -484,3 +484,148 @@ export function parseEasingString(eStr?: string): EasingSpec | undefined {
     approximated: true,
   };
 }
+
+export interface SimpleWorldTransform {
+  x: number;
+  y: number;
+  z: number;
+  rotation: number;
+  rotX: number;
+  rotY: number;
+  sx: number;
+  sy: number;
+}
+
+/**
+ * Resolves a layer's world transform (including 2D and 3D Null parenting rules)
+ * without running effect scripts — shared by PreviewCanvas gizmos and reparenting helpers.
+ */
+export function resolveLayerWorldTransformSimple(
+  layer: Layer,
+  layersMap: Map<string, Layer>,
+  sceneTimeMs: number,
+  visited = new Set<string>()
+): SimpleWorldTransform {
+  if (visited.has(layer.id)) {
+    return { x: 0, y: 0, z: 0, rotation: 0, rotX: 0, rotY: 0, sx: 1, sy: 1 };
+  }
+  visited.add(layer.id);
+
+  const { remappedNormT } = evalRemappedTime(layer, sceneTimeMs);
+  const loc = evalAnimatable(layer.transform.location, remappedNormT, [0, 0, 0]);
+  let x = loc[0], y = loc[1], z = loc[2] ?? 0;
+  let rotation = evalAnimatable(layer.transform.rotation, remappedNormT, 0);
+  let rotX = layer.is3D ? evalAnimatable(layer.transform.rotationX, remappedNormT, 0) : 0;
+  let rotY = layer.is3D ? evalAnimatable(layer.transform.rotationY, remappedNormT, 0) : 0;
+  const sc = evalAnimatable(layer.transform.scale, remappedNormT, [1, 1]);
+  let sx = sc[0], sy = sc[1];
+
+  if (layer.parentId) {
+    const parent = layersMap.get(layer.parentId);
+    if (parent) {
+      const parentIs3D = Boolean(parent.is3D);
+      const childIs3D = Boolean(layer.is3D);
+      if (parent.type === 'null' && parentIs3D && !childIs3D) {
+        // 3D Null does not move/rotate a 2D child
+      } else if (parentIs3D && childIs3D) {
+        const pt = resolveLayerWorldTransformSimple(parent, layersMap, sceneTimeMs, visited);
+        const lx = x * pt.sx;
+        const ly = y * pt.sy;
+        const lz = z;
+        const rxRad = (pt.rotX * Math.PI) / 180;
+        const ryRad = (pt.rotY * Math.PI) / 180;
+        const rzRad = (pt.rotation * Math.PI) / 180;
+        const cx = Math.cos(rxRad), sxr = Math.sin(rxRad);
+        const cy = Math.cos(ryRad), syr = Math.sin(ryRad);
+        const cz = Math.cos(rzRad), szr = Math.sin(rzRad);
+        const y1 = ly * cx - lz * sxr;
+        const z1 = ly * sxr + lz * cx;
+        const x1 = lx;
+        const x2 = x1 * cy + z1 * syr;
+        const z2 = -x1 * syr + z1 * cy;
+        const y2 = y1;
+        const x3 = x2 * cz - y2 * szr;
+        const y3 = x2 * szr + y2 * cz;
+        const z3 = z2;
+        x = pt.x + x3;
+        y = pt.y + y3;
+        z = pt.z + z3;
+        rotX += pt.rotX;
+        rotY += pt.rotY;
+        rotation += pt.rotation;
+        sx *= pt.sx;
+        sy *= pt.sy;
+      } else {
+        const pt = resolveLayerWorldTransformSimple(parent, layersMap, sceneTimeMs, visited);
+        const rad = (pt.rotation * Math.PI) / 180;
+        const c = Math.cos(rad);
+        const s = Math.sin(rad);
+        const rx = x * pt.sx * c - y * pt.sy * s;
+        const ry = x * pt.sx * s + y * pt.sy * c;
+        x = pt.x + rx;
+        y = pt.y + ry;
+        z += pt.z;
+        rotation += pt.rotation;
+        sx *= pt.sx;
+        sy *= pt.sy;
+      }
+    }
+  }
+
+  return { x, y, z, rotation, rotX, rotY, sx, sy };
+}
+
+function shiftLocationAnim(layer: Layer, dx: number, dy: number, dz: number): void {
+  if (Math.abs(dx) < 1e-4 && Math.abs(dy) < 1e-4 && Math.abs(dz) < 1e-4) return;
+  const loc = layer.transform.location;
+  loc.value = [
+    Math.round((loc.value[0] + dx) * 100) / 100,
+    Math.round((loc.value[1] + dy) * 100) / 100,
+    Math.round(((loc.value[2] ?? 0) + dz) * 100) / 100,
+  ];
+  for (const kf of loc.keyframes) {
+    kf.v = [
+      Math.round((kf.v[0] + dx) * 100) / 100,
+      Math.round((kf.v[1] + dy) * 100) / 100,
+      Math.round(((kf.v[2] ?? 0) + dz) * 100) / 100,
+    ];
+  }
+}
+
+/**
+ * Reparents `layer` to `newParentId` while converting its coordinates so it stays
+ * at the same visual position on screen (never jumping off-canvas by +parentPos).
+ */
+export function reparentLayerPreservingPosition(
+  layer: Layer,
+  newParentId: string | null,
+  layers: Layer[],
+  sceneTimeMs: number
+): void {
+  const layersMap = new Map(layers.map((l) => [l.id, l]));
+  layersMap.set(layer.id, layer);
+  const before = resolveLayerWorldTransformSimple(layer, layersMap, sceneTimeMs);
+  layer.parentId = newParentId;
+  const after = resolveLayerWorldTransformSimple(layer, layersMap, sceneTimeMs);
+  shiftLocationAnim(layer, before.x - after.x, before.y - after.y, before.z - after.z);
+}
+
+/**
+ * Toggles `layer.is3D` while preserving visual position if the layer is parented to a 3D Null.
+ */
+export function toggleLayer3DPreservingPosition(
+  layer: Layer,
+  layers: Layer[],
+  sceneTimeMs: number
+): void {
+  const layersMap = new Map(layers.map((l) => [l.id, l]));
+  layersMap.set(layer.id, layer);
+  const before = resolveLayerWorldTransformSimple(layer, layersMap, sceneTimeMs);
+  layer.is3D = !layer.is3D;
+  if (layer.is3D) {
+    if (!layer.transform.rotationX) layer.transform.rotationX = { value: 0, keyframes: [] };
+    if (!layer.transform.rotationY) layer.transform.rotationY = { value: 0, keyframes: [] };
+  }
+  const after = resolveLayerWorldTransformSimple(layer, layersMap, sceneTimeMs);
+  shiftLocationAnim(layer, before.x - after.x, before.y - after.y, before.z - after.z);
+}

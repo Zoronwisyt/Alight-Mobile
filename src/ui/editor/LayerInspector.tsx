@@ -1,5 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';
+import { reparentLayerPreservingPosition } from '../../engine/animation';
 import { replaceMediaOnLayers } from '../../engine/mediaReplace';
 import { useEditorStore, type InspectorTab } from '../../store/useEditorStore';
 import { AmIcon } from '../components/AmIcon';
@@ -105,8 +106,10 @@ export const LayerInspector: React.FC = () => {
   const parentCandidates = layers.filter((l) => l.id !== layer.id && l.type !== 'audio');
 
   const setParent = (pid: string | null) => {
+    const tMs = useEditorStore.getState().currentTimeMs;
+    const activeLayers = getActiveLayers();
     updateLayer((l) => {
-      l.parentId = pid;
+      reparentLayerPreservingPosition(l, pid, activeLayers, tMs);
     });
     setShowParentMenu(false);
   };

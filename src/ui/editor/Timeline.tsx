@@ -742,7 +742,12 @@ export const Timeline: React.FC<TimelineProps> = ({
                       {layer.is3D && (
                         <span
                           className="am-track-fx-pill"
-                          style={{ background: 'rgba(0, 255, 168, 0.22)', color: '#00FFA8', fontWeight: 800 }}
+                          style={{
+                            background: 'rgba(10, 14, 24, 0.82)',
+                            color: '#00FFA8',
+                            border: '1px solid rgba(0, 255, 168, 0.6)',
+                            fontWeight: 800,
+                          }}
                           title="3D Layer enabled"
                         >
                           3D

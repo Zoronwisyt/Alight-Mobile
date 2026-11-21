@@ -156,6 +156,10 @@ function mulberry32(seed: number) {
   };
 }
 
+/** Singleton identity matrices — avoids per-pass Float32Array allocations in bindBuiltinUniforms */
+const IDENTITY_MAT4 = new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
+const IDENTITY_MAT3 = new Float32Array([1, 0, 0, 0, 1, 0, 0, 0, 1]);
+
 /** Build 4x4 row-major matrix passed with transpose=false for row-vector `vec4(v,0,1) * M` */
 function mat4RowMajorToGl(m: number[]): Float32Array {
   // For `vec4 * M` where GLSL reads column-major `m[col][row]`,
@@ -1773,18 +1777,26 @@ export class AlightRenderer {
         sceneTimeMs <= layer.endTime
     );
 
-    // Depth-sort layers by world Z when any layer uses 3D Z space.
-    // Matches APK CameraElementKt: camZ defaults to -focal, dz = layerZ - camZ,
-    // so larger +Z is further away (drawn first) and smaller -Z is closer to camera (drawn on top).
+    // Depth-sort layers by world Z only when at least one layer uses 3D Z space or 3D parenting
+    // (avoids redundant resolveWorldTransform evaluations on pure 2D scenes).
     let orderedLayers = activeLayers;
-    const zEntries = activeLayers.map((layer, idx) => ({
-      layer,
-      idx,
-      z: this.resolveWorldTransform(layer, layersMap, sceneTimeMs, project.fps).z,
-    }));
-    if (zEntries.some((e) => Math.abs(e.z) > 0.5)) {
-      zEntries.sort((a, b) => (Math.abs(a.z - b.z) > 0.5 ? b.z - a.z : a.idx - b.idx));
-      orderedLayers = zEntries.map((e) => e.layer);
+    const any3DOrZ = activeLayers.some(
+      (l) =>
+        l.is3D ||
+        l.parentId !== null ||
+        Math.abs(l.transform.location.value[2] ?? 0) > 0.5 ||
+        l.transform.location.keyframes.some((k) => Math.abs(k.v[2] ?? 0) > 0.5)
+    );
+    if (any3DOrZ && activeLayers.length > 1) {
+      const zEntries = activeLayers.map((layer, idx) => ({
+        layer,
+        idx,
+        z: this.resolveWorldTransform(layer, layersMap, sceneTimeMs, project.fps).z,
+      }));
+      if (zEntries.some((e) => Math.abs(e.z) > 0.5)) {
+        zEntries.sort((a, b) => (Math.abs(a.z - b.z) > 0.5 ? b.z - a.z : a.idx - b.idx));
+        orderedLayers = zEntries.map((e) => e.layer);
+      }
     }
 
     for (const layer of orderedLayers) {
@@ -2654,8 +2666,6 @@ export class AlightRenderer {
     acVtoRSpace?: Float32Array
   ) {
     const gl = this.gl;
-    const id4 = new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
-    const id3 = new Float32Array([1, 0, 0, 0, 1, 0, 0, 0, 1]);
 
     if (u.acProjectSize) gl.uniform2f(u.acProjectSize, project.width, project.height);
     if (u.acScreenSize) gl.uniform2f(u.acScreenSize, project.width, project.height);
@@ -2674,11 +2684,11 @@ export class AlightRenderer {
     if (u.acEndTime) gl.uniform1f(u.acEndTime, layer.endTime / 1000);
     if (u.acPass) gl.uniform1i(u.acPass, passIdx);
     if (u.acIter) gl.uniform1i(u.acIter, iterIdx);
-    if (u.acLayerTransform) gl.uniformMatrix3fv(u.acLayerTransform, false, id3);
-    if (u.acTransform) gl.uniformMatrix4fv(u.acTransform, false, acTransform ?? id4);
+    if (u.acLayerTransform) gl.uniformMatrix3fv(u.acLayerTransform, false, IDENTITY_MAT3);
+    if (u.acTransform) gl.uniformMatrix4fv(u.acTransform, false, acTransform ?? IDENTITY_MAT4);
     if (u.acScreenToLayer) gl.uniformMatrix4fv(u.acScreenToLayer, false, screenToLayer);
     if (u.acLayerToScreen) gl.uniformMatrix4fv(u.acLayerToScreen, false, layerToScreen);
-    if (u.acVtoRSpace) gl.uniformMatrix4fv(u.acVtoRSpace, false, acVtoRSpace ?? id4);
+    if (u.acVtoRSpace) gl.uniformMatrix4fv(u.acVtoRSpace, false, acVtoRSpace ?? IDENTITY_MAT4);
     if (u.acShowGuides) gl.uniform1i(u.acShowGuides, 0);
   }
 
