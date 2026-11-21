@@ -325,13 +325,37 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({ rendererRef, isExpor
                     id="export-bitrate"
                     name="exportBitrate"
                     type="range"
+                    className="am-export-range"
                     min={2}
                     max={100}
                     step={1}
                     disabled={progress !== null}
                     value={qualityMbps}
+                    onInput={(e) => setQualityMbps(Number((e.target as HTMLInputElement).value))}
                     onChange={(e) => setQualityMbps(Number(e.target.value))}
-                    style={{ accentColor: 'var(--am-accent)' }}
+                    onPointerDown={(e) => {
+                      if (progress !== null) return;
+                      const el = e.currentTarget;
+                      const updateFromClientX = (clientX: number) => {
+                        const rect = el.getBoundingClientRect();
+                        const pad = 11;
+                        const span = Math.max(1, rect.width - pad * 2);
+                        const frac = Math.max(0, Math.min(1, (clientX - (rect.left + pad)) / span));
+                        setQualityMbps(Math.round(2 + frac * 98));
+                      };
+                      el.setPointerCapture(e.pointerId);
+                      updateFromClientX(e.clientX);
+                      const onMove = (ev: PointerEvent) => updateFromClientX(ev.clientX);
+                      const onUp = () => {
+                        window.removeEventListener('pointermove', onMove);
+                        window.removeEventListener('pointerup', onUp);
+                        window.removeEventListener('pointercancel', onUp);
+                      };
+                      window.addEventListener('pointermove', onMove);
+                      window.addEventListener('pointerup', onUp);
+                      window.addEventListener('pointercancel', onUp);
+                    }}
+                    style={{ '--range-pct': `${((qualityMbps - 2) / 98) * 100}%` } as React.CSSProperties}
                   />
                   <div style={{ display: 'flex', gap: 6, marginTop: 6, alignItems: 'center' }}>
                     {[12, 40, 100].map((mbps) => (

@@ -84,7 +84,7 @@ async function pickSupportedVideoConfig(
         const res = await VideoEncoder.isConfigSupported(base);
         if (res.supported) {
           const muxCodec = container === 'mp4' ? 'avc' : codec.startsWith('vp09') ? 'V_VP9' : 'V_VP8';
-          return { config: res.config ?? base, muxCodec };
+          return { config: { ...(res.config ?? base), bitrate }, muxCodec };
         }
       } catch {
         // try next candidate
