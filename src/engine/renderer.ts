@@ -499,6 +499,7 @@ export class AlightRenderer {
   private disposed = false;
   /** Phones/tablets: capped DPR, and the element — not Web Audio — may own video sound. */
   private mobileRender = false;
+  private isIos = false;
   public onMediaReady?: () => void;
   public onCacheChange?: () => void;
 
@@ -532,9 +533,19 @@ export class AlightRenderer {
     this.mobileRender =
       typeof window !== 'undefined' &&
       (window.innerWidth <= 860 || window.matchMedia?.('(pointer: coarse)').matches === true);
-    const classBudget = isMobile ? 192 * 1024 * 1024 : typeof window !== 'undefined' && window.innerWidth <= 1024 ? 384 * 1024 * 1024 : 1536 * 1024 * 1024;
+    const isIos =
+      typeof navigator !== 'undefined' &&
+      (/iPad|iPhone|iPod/.test(navigator.userAgent) ||
+        (navigator.platform === 'MacIntel' && (navigator.maxTouchPoints || 0) > 1));
+    this.isIos = isIos;
+    // iOS standalone PWAs & Safari jetsam tabs aggressively above ~128 MiB GPU memory; cap iPhone at 96 MiB
+    const classBudget = isMobile
+      ? (isIos ? 96 : 192) * 1024 * 1024
+      : typeof window !== 'undefined' && window.innerWidth <= 1024
+        ? (isIos ? 192 : 384) * 1024 * 1024
+        : 1536 * 1024 * 1024;
     this.cacheBudgetBytes = navMem
-      ? Math.min(classBudget, Math.max(128 * 1024 * 1024, Math.floor(0.12 * navMem * 1024 * 1024 * 1024)))
+      ? Math.min(classBudget, Math.max(96 * 1024 * 1024, Math.floor(0.12 * navMem * 1024 * 1024 * 1024)))
       : classBudget;
 
     this.onContextLostHandler = () => {
@@ -1038,9 +1049,8 @@ export class AlightRenderer {
       }
     }
 
-    // Cap live HTMLVideoElement pool to 14 decoders (LRU) so multi-group projects never exhaust
-    // Chrome's hardware video decoder limit and drop/flicker frames.
-    const MAX_LIVE_VIDEOS = 14;
+    // Cap live HTMLVideoElement pool (6 on iOS WebKit AVPlayer limit, 14 on desktop/Android)
+    const MAX_LIVE_VIDEOS = this.isIos ? 6 : 14;
     if (this.mediaVideos.size > MAX_LIVE_VIDEOS) {
       for (const [key, entry] of Array.from(this.mediaVideos.entries())) {
         if (this.mediaVideos.size <= MAX_LIVE_VIDEOS) break;
@@ -1586,10 +1596,11 @@ export class AlightRenderer {
       // A phone is not a desktop: at 1.5x the backing store already exceeds the native pixel width of
       // the preview area, and every extra device pixel is paid twice (blit + compositor copy). The
       // desktop cap stays at 2 so Retina sharpness is unchanged.
-      const dprCap = this.mobileRender ? 1.5 : 2;
+      const dprCap = this.mobileRender ? (this.isIos ? 1.25 : 1.5) : 2;
       const dpr = typeof window !== 'undefined' ? Math.min(window.devicePixelRatio || 1, dprCap) : 1;
       const maxDim = Math.max(activeProject.width, activeProject.height);
-      const effectiveScale = Math.min(q * dpr, 4096 / Math.max(1, maxDim));
+      const maxTexDim = this.mobileRender && this.isIos ? 2048 : 4096;
+      const effectiveScale = Math.min(q * dpr, maxTexDim / Math.max(1, maxDim));
       scale = effectiveScale;
       renderW = Math.max(16, Math.round(activeProject.width * scale));
       renderH = Math.max(16, Math.round(activeProject.height * scale));

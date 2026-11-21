@@ -31,6 +31,9 @@ class AudioEngine {
   private playbackActive = false;
   private playbackSessionId = 0;
   private unlockInstalled = false;
+  private iosRouteUnlocked = false;
+  private silentAudioEl: HTMLAudioElement | null = null;
+  private visibilityHooked = false;
 
   /**
    * `layers` scopes the scan to the group currently open in the editor: AM plays a group as its own
@@ -90,10 +93,40 @@ class AudioEngine {
    * `running`; removing it after the first tap was wrong, because a tap that happened before the
    * context existed spent the grant on nothing.
    */
+  /**
+   * Forces iOS Home Screen standalone PWAs (WKWebView) to switch AVAudioSession from
+   * ambient (silenced by hardware mute switch) to playback by playing a 1-sample silent
+   * WAV via <audio playsinline> synchronously inside a user gesture.
+   */
+  private unlockIosAudioRoute(): void {
+    this.applyAudioSessionType();
+    if (typeof document === 'undefined' || this.iosRouteUnlocked) return;
+    try {
+      if (!this.silentAudioEl) {
+        const a = document.createElement('audio');
+        a.setAttribute('playsinline', '');
+        a.setAttribute('webkit-playsinline', '');
+        a.preload = 'auto';
+        // 1-sample 8kHz mono PCM silent WAV
+        a.src = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA';
+        this.silentAudioEl = a;
+      }
+      const p = this.silentAudioEl.play();
+      if (p && typeof p.then === 'function') {
+        p.then(() => {
+          this.iosRouteUnlocked = true;
+        }).catch(() => {});
+      }
+    } catch {
+      // ignore
+    }
+  }
+
   private installUnlock(): void {
     if (this.unlockInstalled || typeof window === 'undefined') return;
     this.unlockInstalled = true;
     const unlock = () => {
+      this.unlockIosAudioRoute();
       let ctx: AudioContext;
       try {
         ctx = this.ensureContext();
@@ -103,15 +136,17 @@ class AudioEngine {
       void ctx
         .resume()
         .then(() => {
-          if (ctx.state === 'running') this.removeUnlock();
+          if (ctx.state === 'running' && this.iosRouteUnlocked) this.removeUnlock();
         })
         .catch(() => {
           // Still locked; the next gesture tries again.
         });
     };
     this.unlockHandler = unlock;
+    window.addEventListener('touchstart', unlock, { passive: true });
     window.addEventListener('pointerdown', unlock, { passive: true });
     window.addEventListener('touchend', unlock, { passive: true });
+    window.addEventListener('click', unlock, { passive: true });
     window.addEventListener('keydown', unlock, { passive: true });
   }
 
@@ -119,10 +154,13 @@ class AudioEngine {
 
   private removeUnlock(): void {
     if (!this.unlockHandler || typeof window === 'undefined') return;
+    window.removeEventListener('touchstart', this.unlockHandler);
     window.removeEventListener('pointerdown', this.unlockHandler);
     window.removeEventListener('touchend', this.unlockHandler);
+    window.removeEventListener('click', this.unlockHandler);
     window.removeEventListener('keydown', this.unlockHandler);
     this.unlockHandler = null;
+    this.unlockInstalled = false;
   }
 
   public ensureContext(): AudioContext {
@@ -139,6 +177,26 @@ class AudioEngine {
       this.analyser.fftSize = 256;
       this.analyser.connect(this.ctx.destination);
       this.dataArr = new Uint8Array(new ArrayBuffer(this.analyser.frequencyBinCount));
+      // Re-arm unlock when iOS Home Screen PWA drops AudioContext to 'interrupted' on app switch
+      this.ctx.addEventListener('statechange', () => {
+        if (this.ctx && this.ctx.state !== 'running') {
+          this.iosRouteUnlocked = false;
+          this.installUnlock();
+        }
+      });
+      if (!this.visibilityHooked && typeof document !== 'undefined') {
+        this.visibilityHooked = true;
+        document.addEventListener('visibilitychange', () => {
+          if (document.visibilityState === 'visible') {
+            this.applyAudioSessionType();
+            if (this.ctx && this.ctx.state !== 'running') {
+              this.iosRouteUnlocked = false;
+              this.installUnlock();
+              this.ctx.resume().catch(() => {});
+            }
+          }
+        });
+      }
     }
     // Registered outside the creation guard: the listener must exist even when the context was made
     // during a preload (no gesture), which is the normal path on a cold project load.
@@ -266,6 +324,7 @@ class AudioEngine {
 
   public startPlayback(project: Project, startMs: number, layers?: Layer[]): void {
     this.stopPlayback();
+    this.unlockIosAudioRoute();
     const ctx = this.ensureContext();
     const sessionId = ++this.playbackSessionId;
     this.playbackStartCtxTime = ctx.currentTime;
