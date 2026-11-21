@@ -1,7 +1,10 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { reparentLayerPreservingPosition } from '../../engine/animation';
+import { audioEngine } from '../../engine/audioEngine';
 import { replaceMediaOnLayers } from '../../engine/mediaReplace';
+import type { AlightRenderer } from '../../engine/renderer';
+import { playbackClock } from '../../store/playbackClock';
 import { resolveActiveGroup, useEditorStore, type InspectorTab } from '../../store/useEditorStore';
 import { AmIcon } from '../components/AmIcon';
 import { BlendingOpacityPanel } from './BlendingOpacityPanel';
@@ -91,8 +94,54 @@ export const LayerInspector: React.FC = () => {
 
   const { project, layer, updateLayer } = useSelectedLayer();
   const replaceMediaRef = useRef<HTMLInputElement>(null);
+  const miniRangeRef = useRef<HTMLInputElement>(null);
+  const miniTimeRef = useRef<HTMLSpanElement>(null);
   const [showParentMenu, setShowParentMenu] = useState(false);
   const [showMoreMenu, setShowMoreMenu] = useState(false);
+  const [sheetPeek, setSheetPeek] = useState(false);
+
+  const isMobileClassic = layoutMode === 'classic';
+  const fps = Math.max(1, project?.fps ?? 30);
+
+  // Keep mobile mini-transport timecode & scrub bar live at 60fps during playback without React commits
+  useEffect(() => {
+    if (!isMobileClassic || !isPlaying) return;
+    let lastText = '';
+    let raf = 0;
+    const tick = () => {
+      const ms = playbackClock.get();
+      if (miniRangeRef.current) {
+        miniRangeRef.current.value = String(Math.round(ms));
+      }
+      if (miniTimeRef.current) {
+        const totalSec = Math.floor(Math.max(0, ms) / 1000);
+        const m = Math.floor(totalSec / 60);
+        const s = totalSec % 60;
+        const f = Math.floor(((Math.max(0, ms) % 1000) / 1000) * fps);
+        const txt = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}.${String(f).padStart(2, '0')}`;
+        if (txt !== lastText) {
+          lastText = txt;
+          miniTimeRef.current.textContent = txt;
+        }
+      }
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [isMobileClassic, isPlaying, fps]);
+
+  // Toggle MO-8 mobile sheet peek height via root CSS var so the preview stage smoothly grows
+  useEffect(() => {
+    if (!isMobileClassic) return;
+    if (sheetPeek) {
+      document.documentElement.style.setProperty('--am-mobile-sheet-h', '132px');
+    } else {
+      document.documentElement.style.removeProperty('--am-mobile-sheet-h');
+    }
+    return () => {
+      if (sheetPeek) document.documentElement.style.removeProperty('--am-mobile-sheet-h');
+    };
+  }, [isMobileClassic, sheetPeek]);
 
   const handleReplaceMedia = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -167,17 +216,16 @@ export const LayerInspector: React.FC = () => {
   };
 
   const isRootMenu = !curveTarget && (inspectorTab === 'menu' || inspectorTab === 'none');
-  const isMobileClassic = layoutMode === 'classic';
   const activeScope = project ? resolveActiveGroup(project, groupStack) : null;
   const activeDurMs = activeScope?.durationMs ?? project?.durationMs ?? 5000;
   const frameMs = 1000 / Math.max(1, project?.fps ?? 30);
 
   const fmtMiniTime = (ms: number) => {
-    const fps = Math.max(1, project?.fps ?? 30);
-    const totalSec = Math.floor(ms / 1000);
+    const safe = Math.max(0, ms);
+    const totalSec = Math.floor(safe / 1000);
     const m = Math.floor(totalSec / 60);
     const s = totalSec % 60;
-    const f = Math.floor(((ms % 1000) / 1000) * fps);
+    const f = Math.floor(((safe % 1000) / 1000) * fps);
     return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}.${String(f).padStart(2, '0')}`;
   };
 
@@ -186,21 +234,27 @@ export const LayerInspector: React.FC = () => {
     const startY = e.clientY;
     const sheetEl = e.currentTarget.parentElement;
     const startH = sheetEl ? sheetEl.getBoundingClientRect().height : window.innerHeight * 0.46;
-    const minH = Math.round(window.innerHeight * 0.28);
+    const minH = 132;
     const maxH = Math.round(window.innerHeight * 0.72);
+    let moved = false;
+    let lastH = startH;
     try {
       e.currentTarget.setPointerCapture(e.pointerId);
     } catch {
       // ignore
     }
     const onMove = (ev: PointerEvent) => {
-      const nextH = Math.max(minH, Math.min(maxH, Math.round(startH - (ev.clientY - startY))));
-      document.documentElement.style.setProperty('--am-mobile-sheet-h', `${nextH}px`);
+      if (Math.abs(ev.clientY - startY) > 4) moved = true;
+      lastH = Math.max(minH, Math.min(maxH, Math.round(startH - (ev.clientY - startY))));
+      document.documentElement.style.setProperty('--am-mobile-sheet-h', `${lastH}px`);
     };
     const onUp = () => {
       window.removeEventListener('pointermove', onMove);
       window.removeEventListener('pointerup', onUp);
       window.removeEventListener('pointercancel', onUp);
+      if (moved) {
+        setSheetPeek(lastH <= 165);
+      }
     };
     window.addEventListener('pointermove', onMove);
     window.addEventListener('pointerup', onUp);
@@ -208,7 +262,7 @@ export const LayerInspector: React.FC = () => {
   };
 
   const mobileQuickTabs: { id: InspectorTab; label: string; action?: () => void }[] = [
-    { id: 'moveTransform', label: 'Move' },
+    ...(layer.type !== 'audio' ? [{ id: 'moveTransform' as InspectorTab, label: 'Move' }] : []),
     { id: 'effects', label: layer.effects.length > 0 ? `FX (${layer.effects.length})` : 'Effects' },
     ...(layer.type !== 'audio' && layer.type !== 'null' && layer.type !== 'camera'
       ? [{ id: 'blending' as InspectorTab, label: 'Blend' }]
@@ -221,21 +275,24 @@ export const LayerInspector: React.FC = () => {
       : []),
     ...(layer.type === 'text' ? [{ id: 'editText' as InspectorTab, label: 'Text' }] : []),
     ...(layer.type === 'shape' ? [{ id: 'editShape' as InspectorTab, label: 'Shape' }] : []),
+    ...(layer.type === 'audio' || layer.type === 'video' ? [{ id: 'volume' as InspectorTab, label: 'Vol' }] : []),
+    { id: 'speed', label: 'Speed' },
     ...(layer.type === 'group'
       ? [{ id: 'menu' as InspectorTab, label: 'Edit Group', action: () => enterGroup(layer.id) }]
       : []),
   ];
 
   return (
-    <aside className="am-inspector-dock">
+    <aside className={`am-inspector-dock${isMobileClassic && sheetPeek ? ' peek' : ''}`}>
       {isMobileClassic && (
         <div
           className="am-mobile-sheet-handle"
           onPointerDown={handleMobileSheetDrag}
-          onDoubleClick={() => document.documentElement.style.removeProperty('--am-mobile-sheet-h')}
-          title="Drag to resize panel (double-tap to reset)"
+          onClick={() => setSheetPeek((p) => !p)}
+          title={sheetPeek ? 'Tap or drag up to expand inspector' : 'Tap or drag down to peek preview'}
         >
           <span className="am-mobile-sheet-grip" />
+          <span className="am-mobile-sheet-peek-label">{sheetPeek ? 'Expand ▲' : 'Peek ▼'}</span>
         </div>
       )}
 
@@ -433,7 +490,15 @@ export const LayerInspector: React.FC = () => {
             <button
               type="button"
               className="am-mobile-mini-btn play"
-              onClick={togglePlay}
+              onPointerDown={() => {
+                audioEngine.unlockFromGesture();
+                (window as unknown as { __rendererRef?: React.RefObject<AlightRenderer | null> }).__rendererRef?.current?.primeElementAudio(true);
+              }}
+              onClick={() => {
+                audioEngine.unlockFromGesture();
+                (window as unknown as { __rendererRef?: React.RefObject<AlightRenderer | null> }).__rendererRef?.current?.primeElementAudio(true);
+                togglePlay();
+              }}
               title={isPlaying ? 'Pause' : 'Play'}
             >
               <AmIcon name={isPlaying ? 'ic_edit_pause' : 'ic_edit_play'} fallback={isPlaying ? 'pause' : 'play'} size={16} color="#00FFA8" />
@@ -442,8 +507,9 @@ export const LayerInspector: React.FC = () => {
               type="button"
               className="am-mobile-mini-btn"
               onClick={() => {
+                const base = isPlaying ? playbackClock.get() : currentTimeMs;
                 setIsPlaying(false);
-                setCurrentTimeMs(currentTimeMs - frameMs);
+                setCurrentTimeMs(base - frameMs);
               }}
               title="Previous Frame"
             >
@@ -453,14 +519,16 @@ export const LayerInspector: React.FC = () => {
               type="button"
               className="am-mobile-mini-btn"
               onClick={() => {
+                const base = isPlaying ? playbackClock.get() : currentTimeMs;
                 setIsPlaying(false);
-                setCurrentTimeMs(currentTimeMs + frameMs);
+                setCurrentTimeMs(base + frameMs);
               }}
               title="Next Frame"
             >
               <AmIcon name="ic_edit_nextframe" fallback="nextFrame" size={14} />
             </button>
             <input
+              ref={miniRangeRef}
               type="range"
               className="am-mobile-scrub-range"
               aria-label="Scrub timeline while editing"
@@ -473,7 +541,9 @@ export const LayerInspector: React.FC = () => {
                 setCurrentTimeMs(Number(e.target.value));
               }}
             />
-            <span className="am-mobile-mini-time">{fmtMiniTime(currentTimeMs)}</span>
+            <span ref={miniTimeRef} className="am-mobile-mini-time">
+              {fmtMiniTime(currentTimeMs)}
+            </span>
             <button
               type="button"
               className="am-mobile-mini-btn"
@@ -506,6 +576,7 @@ export const LayerInspector: React.FC = () => {
                     type="button"
                     className={`am-mobile-tab-pill ${active ? 'active' : ''}`}
                     onClick={() => {
+                      setSheetPeek(false);
                       if (t.action) {
                         t.action();
                       } else {
@@ -518,16 +589,25 @@ export const LayerInspector: React.FC = () => {
                   </button>
                 );
               })}
+              <button
+                type="button"
+                className="am-mobile-tab-pill split-pill"
+                onClick={splitSelectedAtPlayhead}
+                title="Split Layer at Playhead"
+              >
+                Split
+              </button>
             </div>
             <button
               type="button"
               className="am-mobile-tab-pill timeline-exit"
               onClick={() => {
+                setSheetPeek(false);
                 setCurveTarget(null);
                 setInspectorTab('none');
               }}
             >
-              Timeline
+              Done
             </button>
           </div>
         </>
