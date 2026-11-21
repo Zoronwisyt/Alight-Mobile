@@ -431,3 +431,34 @@ Carry forward: the stage drag is the only hot path in the app that has none of t
 inspector's scrubber has — coalescing, capture, cancel — and it additionally pays a full project clone per
 event and a 1.5×-DPR render per frame. Fix the write path (MO-2) and the commit rate (MO-1) together;
 everything else on this list is secondary.
+
+---
+
+## 12. Playback cost on a phone: the drawing buffer was the bill (shipped in `45e2fa4`)
+
+MO-6 and MO-10 above describe *interaction* and *playback* quality. The playback complaint that came
+back from a phone was simpler and had nothing to do with the project: **one video, no effects, and it
+still crawled.** The cost was in three context flags and one compositor interaction, none of which
+scale with project complexity.
+
+| # | Was | Now | Why it matters |
+| --- | --- | --- | --- |
+| **MP-1** | `preserveDrawingBuffer: true` (`renderer.ts:549`) | `false` | The flag forces a full-size colour-buffer copy every frame so the pixels survive compositing. At 1.5x DPR on a 1080-wide project that is a 2.6 MP copy, 60 times a second. |
+| **MP-2** | `antialias: true` (`renderer.ts:550`) | `false` | MSAA here samples a framebuffer whose only draw is a fullscreen quad. There are no geometric edges in GL at all - shapes, text and vectors are rasterised on a 2D canvas and uploaded as textures - so this cost 4x colour-buffer memory for **zero** visual change. |
+| **MP-3** | no `powerPreference` (`renderer.ts:553`) | `'high-performance'` | Asks for the discrete/fast GPU path where the device offers one. |
+| **MP-4** | DPR capped at 2 on every device (`renderer.ts:1555`) | 1.5 on phones/tablets, 2 on desktop | The preview backing store is `project * previewQuality * DPR`. On a phone the canvas is displayed at a fraction of that, so the extra device pixels were pure oversampling. Desktop is untouched. |
+| **MP-5** | `.am-stage-quality-pill` kept `backdrop-filter: blur(6px)` above the live canvas | dropped on `(pointer: coarse)` (`app.css:2413`) | A backdrop filter above a 60 fps canvas forces the compositor to re-blur the changing canvas every frame - the most expensive thing a phone does after the buffer copy. |
+
+Two contracts moved with MP-1:
+
+1. **PNG export reads through `renderer.captureFrameBlob()`** (`renderer.ts:1245`), which runs
+   `gl.finish()` and then `canvas.toBlob` synchronously. With the buffer no longer preserved, the pixels
+   are only valid until the browser composites, so every export call site must snapshot in the same task
+   as its render. `ExportDialog.tsx:105` and `:122` do.
+2. **Nothing else may read the canvas outside its render task.** Today only the two PNG paths do.
+
+⚠️ predicted, not measured on hardware: MP-1 and MP-2 are the two flags a mobile GL driver cannot
+optimise around, so the frame-time win should be large on any device that was fill-rate bound. ❌ open:
+a device trace (`chrome://inspect` frame timeline) to put a number on it, and whether the adaptive
+`pbScale` floor of 0.25 (`renderer.ts:1267`) wants company in the form of a playback-time degrade.
+
