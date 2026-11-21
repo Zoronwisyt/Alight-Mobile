@@ -542,6 +542,21 @@ Sequenced so every fix is **verifiable before the next** one lands, and so nothi
 
 ## Changelog
 
+**v1.5 (2026-11-21)** — O1 and O2 closed by reading the serializer.
+- **O1 closed — no spelling exists.** `TextElementTypeImpl.serialize` writes `size`, `font`, `wrapWidth`,
+  `align` and `<content>`; `StyledText` has no spacing field. AM's text spacing is the `text-spacing`
+  effect (`letterspacing` / `linespacing`). The codec's `1.2` / `0` defaults are therefore correct
+  behaviour, not a gap, and no attribute was invented.
+- **O2 closed — stroke is an edge decoration.** `EdgeDecorationKt.serialize` writes
+  `<path-stroke direction cap join start end end-size>`; `<stroke>` is the freehand drawing stroke
+  (`color width type points`, where `type` is the pen/eraser tool). The exporter now emits the real
+  element, with `cap`/`join` only when they differ from AM's defaults, and still reads the old
+  `<stroke endType>` form. `<shadow>` alpha is `<opacity>`, offset is a keyable child.
+  **No dash attribute exists** — the model's dash fields are web-only.
+- Vocabulary from `<clinit>`: `StrokeCap` = `butt|round|square`, `StrokeJoin` = `miter|round|bevel`,
+  `StrokeEnd` = 13 ids, `EdgeDecorationDirection` = `INSIDE|OUTSIDE|CENTERED`.
+- Gate extended with PS-08…PS-10 in `PARITY_SWEEP_5.0.280.md`; `check_xml_roundtrip.ts` asserts all three.
+
 **v1.4 (2026-11-21)** — parity sweep against the APK, codec focus.
 - **P0-08 added and fixed:** XML export dropped fill colour, gradients, paths, shape ids/params, strokes,
   shadows, freehand strokes, media references, audio gain, camera fog/focus and visibility. The writer now

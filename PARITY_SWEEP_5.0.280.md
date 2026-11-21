@@ -27,7 +27,8 @@ no shape geometry, no stroke, no shadow, no gradient, no media reference, no aud
 visibility flag. A project made in the web build and exported as AM XML came back as coloured
 rectangles at default size — the renderer was fine, the writer was half a document.
 
-This pass rewrites the writer, adds a round-trip gate, and fixes four smaller defects found on the way.
+This pass rewrites the writer, adds a round-trip gate, and fixes five smaller defects found on the way.
+A second pass the same day read the serializers and closed **O1** and **O2** — see §8.
 
 | # | Defect | Where | Status |
 | --- | --- | --- | --- |
@@ -36,6 +37,7 @@ This pass rewrites the writer, adds a round-trip gate, and fixes four smaller de
 | F3 | `modifiedTime` was regenerated on import, so every export→import→export pass differed | `amXmlCodec.ts:1108` | ✅ fixed |
 | F4 | A group with `fillType="none"` lost its `<fillColor>` (AM keeps one — see `beta_anim.xml:62`) | `amXmlCodec.ts:238` | ✅ fixed |
 | F5 | Freehand layers were written as `<shape>`, discarding every stroke; AM's tag is `<drawing>` | `amXmlCodec.ts:130` | ✅ fixed |
+| F6 | `<stroke endType="…">` was an **invented** element; AM writes stroke as `<path-stroke direction cap join …>` and shadow alpha as `opacity` | `amXmlCodec.ts:293`, `:305` | ✅ fixed (second pass) |
 
 ---
 
@@ -53,8 +55,8 @@ This pass rewrites the writer, adds a round-trip gate, and fixes four smaller de
 | Font archives | — (APK bundles none) | `fontZipImport.ts` + `check_font_zip.ts` | ✅ gate PASS |
 | Easing | 10 easing classes | `EasingType` — same 10 | ✅ (unchanged; `GRAPH_EASING_AUDIT.md`) |
 | Text metrics | stored size = 1/3 painted em (`textMetrics.ts` anchors) | `AM_TEXT_UNIT_PX = 3` | ✅ export/import round-trips at 1e-4 |
-| Text line height / letter spacing | dex has `lineSpacing`, `letterSpacing` **property names** but no confirmed XML spelling | `textData.lineHeight` / `.letterSpacing` exist and render, but the codec hardcodes `1.2` / `0` | ❌ **O1** |
-| Stroke cap / join / dash | dex has the concepts; XML spelling unconfirmed | model has them; codec drops them | ❌ **O2** |
+| Text line height / letter spacing | **No XML spelling exists.** `TextElementTypeImpl.serialize` writes exactly `size font wrapWidth align` plus `<content>`, and `StyledText` has only `align font fontSize text wrapWidth` — no spacing fields | `textData.lineHeight` / `.letterSpacing` render, and are **web-only state**; AM expresses spacing through the `text-spacing` effect's `letterspacing` / `linespacing` params | ✅ **O1 closed** |
+| Stroke cap / join / dash | `<path-stroke direction cap join start end end-size>` (`EdgeDecorationKt.serialize`); ids `butt/round/square` and `miter/round/bevel`; **no dash attribute exists** | model has them; exporter now emits the real element | ✅ **O2 closed** |
 | Nested scenes (elements) | `NestedSceneElementTypeImpl`, `PrecomposeType` | group copy, not a scene reference | ❌ known **A1** (`FEATURE_GAPS…`) |
 | Re-timing | `ReTimingMethod` (5 modes) | `retime.method` round-trips; source window not modelled | ⚠️ partial — **A2** |
 | Media transport | `.amproj` zip (project.xml + media) | XML export carries references only; no `.amproj` writer | ❌ **O3** |
@@ -75,8 +77,8 @@ covers all ten layer types in one project.
 | `fillType`, `fillColor`, `<fillColor value/kf>` | `:132`, `:238` | `:711` |
 | `<gradient type startColor midColor endColor start end>` | `:243` | `:703` |
 | `<path d>` for vector layers (mirrors `renderer.buildVectorPath`) | `:83`, `:285` | `:806` |
-| `<stroke endType><color/><size/></stroke>` | `:306` | `:841` |
-| `<shadow><color/><alpha/><size/><offset/></shadow>` | `:315` | `:856` |
+| `<path-stroke direction cap join end-size><color/><size/></path-stroke>` | `:293` | `:674` |
+| `<shadow direction><color/><opacity/><size/><hardness/><offset/></shadow>` | `:305` | `:713` |
 | `<drawing><stroke points color width opacity>` | `:131`, `:326` | `:518` |
 | media `src`, `speed`, `inTime`, `gain`, `muted`, `fillImage` | `:206`–`:233` | `:893`–`:948` |
 | `<gain>` for audio volume keyframes | `:340` | `:947` |
@@ -112,8 +114,8 @@ The two intentional normalisations:
 
 | ID | Open question | What settles it |
 | --- | --- | --- |
-| **O1** | XML spelling for `lineSpacing` / `letterSpacing` / vertical alignment | One AM export of a text layer with non-default line spacing, or a dump of the text-element writer |
-| **O2** | XML spelling for stroke cap / join / dash | One AM export of a dashed or bevel-joined stroke |
+| **O1** | ~~XML spelling for `lineSpacing` / `letterSpacing` / vertical alignment~~ **CLOSED — no spelling exists** | `TextElementTypeImpl.serialize` writes `size font wrapWidth align` + `<content>` only; `StyledText` has `align font fontSize text wrapWidth` and nothing else. Text spacing is the `text-spacing` effect (`letterspacing`, `linespacing` in `assets/effects/text-spacing.xml:6-7`). Nothing to invent; `textData.lineHeight` / `.letterSpacing` are web-only state |
+| **O2** | ~~XML spelling for stroke cap / join / dash~~ **CLOSED** | `EdgeDecorationKt.serialize` (jadx, classes7): tag is `path-stroke` (or `border` / `shadow` / `glow`), attributes `direction cap join start end end-size`, and `cap` / `join` / `start` / `end` are written **only** when they differ from the caller's default (butt / miter / none). Ids from `<clinit>`: `StrokeCap` = `butt round square`, `StrokeJoin` = `miter round bevel`, `StrokeEnd` = 13 ids from `none` to `teardrop-filled`. **There is no dash attribute** — the APK's edge decorations carry no dash, so the model's `dash` fields are web-only |
 | **O3** | `.amproj` export (project.xml **and** media bytes) | A scope decision — the writer half exists, the zip half does not |
 | **O4** | Nested-scene reference (`<embedScene>` as a *reference*, not a copy) | The A1 ticket in `FEATURE_GAPS_APK_VS_WEB.md` |
 | **O5** | Which layer a `clippingMask` binds to | Two-shape probe captured from AM at three frames |
@@ -163,6 +165,9 @@ Expected: `PASS` from all three `check_*` gates, `EFFECTS {"xml":315,"json":315}
 | PS-05 | Keframed effect params and their easing survive | ✅ |
 | PS-06 | Effect and preset corpora show zero drift | ✅ |
 | PS-07 | `tsc --noEmit` and `vite build` exit 0 | ✅ |
+| PS-08 | Stroke exports as `<path-stroke>` with AM's direction/cap/join ids, never as an invented `<stroke endType>` | ✅ |
+| PS-09 | Shadow alpha exports as `<opacity>`, offset as a keyable child | ✅ |
+| PS-10 | The text element writes only AM's five fields — no invented line-height or letter-spacing attribute | ✅ |
 
 ---
 
@@ -178,3 +183,29 @@ Expected: `PASS` from all three `check_*` gates, `EFFECTS {"xml":315,"json":315}
 Carry forward: the engine surfaces (effects, presets, blend, fonts, easing) hold. The **codec** was the
 weak seam and is now gated. The remaining real gaps are the ones already named in
 `FEATURE_GAPS_APK_VS_WEB.md` — nested scenes, re-timing, and a `.amproj` writer so media can travel.
+
+---
+
+## 8. O1 and O2, closed from the APK (second pass, same day)
+
+Both open items were closed by reading the **serializer**, not by finding a sample. The method to look
+for is `serialize(SceneElement, String, XmlSerializer)`, which dispatches per element type:
+
+| Question | APK anchor | Answer |
+| --- | --- | --- |
+| Where are text line spacing and letter spacing written? | `TextElementTypeImpl.serialize` (jadx) | **Nowhere.** It writes `size`, `font`, `wrapWidth`, `align` and a `<content>` child — five things. `StyledText` declares `align font fontSize text wrapWidth` and no spacing field at all. AM expresses spacing as the `text-spacing` effect, whose params are literally `letterspacing` / `linespacing` (`assets/effects/text-spacing.xml:6-7`). |
+| Where are stroke cap / join / dash written? | `EdgeDecorationKt.serialize` (jadx, classes7) | On `<path-stroke>`, as `cap` / `join` / `start` / `end`. **Not** on `<stroke>` — that tag is the freehand drawing stroke (`color width type points`, where `type` is the pen/eraser tool). **There is no dash attribute.** |
+| What are the legal ids? | `StrokeCap.<clinit>`, `StrokeJoin.<clinit>`, `StrokeEnd.<clinit>` | `butt \| round \| square`; `miter \| round \| bevel`; and 13 end styles from `none` to `teardrop-filled`. `EdgeDecorationDirection.<clinit>` gives `INSIDE \| OUTSIDE \| CENTERED`, lowercased on write. |
+
+Two consequences the exporter now honours:
+
+1. **`<stroke endType="…">` was an invented element.** It is replaced by AM's real
+   `<path-stroke direction="…">`, with `cap` and `join` emitted only when they differ from the
+   defaults (`butt`, `miter`) because that is exactly what `EdgeDecorationKt.serialize` does.
+   The old form is still **read** on import, so projects saved by the previous build do not break.
+2. **A shadow's alpha is `opacity`,** and its offset is a keyable child element, never an attribute.
+   Both spellings are now written the AM way and both are read back.
+
+A keyable value in AM is `<tag value="…"/>` when unkeyed and `<tag><kf t v e s/></tag>` when keyed —
+already the shape this writer used. One small gap noted and left alone: AM can also write a `s`
+(smoothing) attribute on `<kf>`; the codec does not emit it because the model has no smoothing field.

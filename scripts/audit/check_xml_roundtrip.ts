@@ -537,12 +537,24 @@ check('shape id is written short-form', xml1.includes('s=".roundrect"'), xml1.ma
 check('shape params are written as properties', xml1.includes('<property name="radius" type="float" value="12.000000"/>'));
 check('gradient keeps type and stop colours', xml1.includes('<gradient type="radial" startColor="#FFFF0000" midColor="#FF00FF00" endColor="#FF0000FF"'));
 check('gradient handles stay inside 0..1 page space', xml1.includes('start="0.300000,0.600000"'), xml1.match(/<gradient[^>]*start="[^"]*"/)?.[0]);
-check('stroke keeps endType and animatable size', xml1.includes('<stroke endType="outside">') && xml1.includes('<size value="6.000000"/>'));
-check('shadow keeps offset pair', xml1.includes('<offset value="5.000000,-7.000000"/>'));
+check('stroke exports as AM path-stroke with direction, cap and join', xml1.includes('<path-stroke direction="outside" cap="round" join="round" end-size="0">'), xml1.match(/<path-stroke[^>]*>/)?.[0]);
+check('stroke children stay keyable', xml1.includes('<size value="6.000000"/>'));
+check('shadow exports its alpha as opacity', xml1.includes('<opacity value="0.450000"/>'), xml1.match(/<shadow[^>]*>[\s\S]{0,200}/)?.[0]);
+check('shadow offset is a keyable child, never an attribute', xml1.includes('<offset value="5.000000,-7.000000"/>'));
 check('mask exports as clippingMask, never blending="mask"', xml1.includes('clippingMask="true"') && !xml1.includes('blending="mask"'));
 check('exclude exports as clippingMask plus blending="exclude"', /clippingMask="true"[^>]*blending="exclude"/.test(xml1));
 check('blend id is hyphenated XML, not the effect id', xml1.includes('blending="multiply"'), xml1.match(/blending="[^"]*"/g)?.slice(0, 4));
 check('hidden layer keeps hidden="true"', xml1.includes('hidden="true"'));
+// TextElementTypeImpl.serialize writes exactly size, font, wrapWidth, align and <content>.
+// StyledText has no lineSpacing/letterSpacing field at all, so the exporter must not invent
+// one; text spacing in AM is the text-spacing effect's letterspacing/linespacing params.
+check(
+  'text element writes only AM\'s five fields',
+  xml1.includes('<text ') &&
+    !/lineHeight|letterSpacing|lineSpacing/.test(xml1) &&
+    xml1.includes('<content>') &&
+    /<text [^>]*size="/.test(xml1)
+);
 check('retime method survives', xml1.includes('retime="loop"'));
 check('crop mode survives', xml1.includes('cropMode="fit"'));
 check('3D flag survives', xml1.includes('is3D="true"'));

@@ -283,21 +283,34 @@ function layerToXml(layer: Layer, fps = 30, indent = '  '): string {
     }
   }
 
+  // AM's stroke is an edge decoration, not a `<stroke>` element: EdgeDecorationKt.serialize
+  // writes `<path-stroke direction cap join start end end-size>` for STROKE, and only emits
+  // `cap`/`join`/`start`/`end` when they differ from the caller's default (butt/miter/none).
+  // The direction ids are the lowercased EdgeDecorationDirection enum: inside|outside|centered.
+  // Everything else in the decoration is a keyable child element.
   if (layer.stroke.enabled && layer.type !== 'freehand') {
-    const endType =
+    const direction =
       layer.stroke.position === 'inside' ? 'inside' : layer.stroke.position === 'outside' ? 'outside' : 'centered';
-    parts.push(`${indent}  <stroke endType="${endType}">`);
+    const capAttr = layer.stroke.cap && layer.stroke.cap !== 'butt' ? ` cap="${layer.stroke.cap}"` : '';
+    const joinAttr = layer.stroke.join && layer.stroke.join !== 'miter' ? ` join="${layer.stroke.join}"` : '';
+    parts.push(`${indent}  <path-stroke direction="${direction}"${capAttr}${joinAttr} end-size="0">`);
     parts.push(`${indent}    ${emitAnimProp('color', layer.stroke.color)}`);
     parts.push(`${indent}    ${emitAnimProp('size', layer.stroke.width)}`);
-    parts.push(`${indent}  </stroke>`);
+    parts.push(`${indent}  </path-stroke>`);
   }
 
+  // `<shadow>` is the SHADOW edge decoration: direction, then keyable color/opacity/size/
+  // hardness/offset. AM spells the alpha `opacity`, and the offset is a keyable child, never
+  // an attribute.
   if (layer.shadow.enabled) {
-    parts.push(`${indent}  <shadow>`);
+    parts.push(`${indent}  <shadow direction="outside">`);
     parts.push(`${indent}    ${emitAnimProp('color', layer.shadow.color)}`);
-    parts.push(`${indent}    ${emitAnimProp('alpha', layer.shadow.alpha)}`);
+    parts.push(`${indent}    ${emitAnimProp('opacity', layer.shadow.alpha)}`);
     parts.push(`${indent}    ${emitAnimProp('size', layer.shadow.size)}`);
-    parts.push(`${indent}    <offset value="${formatVal([layer.shadow.offsetX.value, layer.shadow.offsetY.value])}"/>`);
+    parts.push(`${indent}    ${emitAnimProp('hardness', animatable(0))}`);
+    parts.push(
+      `${indent}    ${emitAnimProp('offset', animatable([layer.shadow.offsetX.value, layer.shadow.offsetY.value]))}`
+    );
     parts.push(`${indent}  </shadow>`);
   }
 
@@ -654,7 +667,8 @@ function parseXmlLayer(
     }
   }
 
-  // Parse <stroke> on shapes (distinct from <drawing><stroke points="..."/>)
+  // Freehand strokes live in `<drawing><stroke points="..."/>` — a different element from the
+  // path-stroke edge decoration below, which is why this one is parsed by tag.
   const freehandStrokes = tag === 'drawing' ? parseDrawingStrokes(el) : undefined;
   let stroke: Layer['stroke'] = {
     enabled: false,
@@ -668,12 +682,18 @@ function parseXmlLayer(
     dashGap: 10,
     dashOffset: 0,
   };
+
+  // Stroke is an edge decoration in AM's dialect: `<path-stroke direction cap join start end
+  // end-size>` with keyable children. The older `<stroke endType>` form is still read because
+  // projects exported by this build before the fix exist in the wild.
   if (tag !== 'drawing') {
-    const stEl = el.querySelector(':scope > stroke');
+    const stEl = el.querySelector(':scope > path-stroke') ?? el.querySelector(':scope > stroke');
     if (stEl && stEl.getAttribute('enabled') !== 'false') {
       const stColorEl = stEl.querySelector(':scope > color');
       const stSizeEl = stEl.querySelector(':scope > size');
-      const endType = (stEl.getAttribute('endType') || 'centered').toLowerCase();
+      const direction = (stEl.getAttribute('direction') || stEl.getAttribute('endType') || 'centered').toLowerCase();
+      const capAttr = (stEl.getAttribute('cap') || 'butt').toLowerCase();
+      const joinAttr = (stEl.getAttribute('join') || 'miter').toLowerCase();
       stroke = {
         ...stroke,
         enabled: true,
@@ -683,7 +703,9 @@ function parseXmlLayer(
         width: stSizeEl
           ? parsePropElement(stSizeEl, parseNum, 4)
           : animatable(parseFloat(stEl.getAttribute('size') || '4') || 4),
-        position: endType === 'inside' ? 'inside' : endType === 'outside' ? 'outside' : 'center',
+        position: direction === 'inside' ? 'inside' : direction === 'outside' ? 'outside' : 'center',
+        cap: capAttr === 'round' || capAttr === 'square' ? capAttr : 'butt',
+        join: joinAttr === 'round' || joinAttr === 'bevel' ? joinAttr : 'miter',
       };
     }
   }
@@ -702,7 +724,9 @@ function parseXmlLayer(
     const shColorEl = shEl.querySelector(':scope > color');
     const shSizeEl = shEl.querySelector(':scope > size');
     const shOffEl = shEl.querySelector(':scope > offset');
-    const shAlphaEl = shEl.querySelector(':scope > alpha');
+    // AM spells the shadow's alpha `opacity` (EdgeDecorationKt.serialize → SHADOW); `<alpha>`
+    // is the old form this build used to write and still reads.
+    const shAlphaEl = shEl.querySelector(':scope > opacity') ?? shEl.querySelector(':scope > alpha');
     const offVec = shOffEl ? parseVec2(shOffEl.getAttribute('value') || '0,0') : [0, 0];
     shadow = {
       enabled: shEl.getAttribute('enabled') !== 'false',
