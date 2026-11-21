@@ -91,6 +91,8 @@ function transpileShaderCode(
   code = code.replace(/\bnormalize\s*\(\s*st\s*\)/g, '(length(st) > 0.00001 ? normalize(st) : vec2(0.0))');
   code = code.replace(/\bvec3\s+m\s*=\s*1\.0\s*\/\s*rdd\s*;/g, 'vec3 m = 1.0 / mix(rdd, vec3(1e-5), lessThan(abs(rdd), vec3(1e-5)));');
   code = code.replace(/max\(0\.00001,thickness\/10\.0\)\s*:\s*0\.00001/g, 'max(0.0005, thickness/10.0) : 0.0005');
+  // 5) Prevent smoothstep(edge, edge, x) UB/NaN in ribbon when smoothing == 0 on ANGLE/D3D11
+  code = code.replace(/\bfloat\s+b\s*=\s*smoothing\s*\/\s*20\.\s*;/g, 'float b = max(smoothing / 20.0, 0.0002);');
 
   return code;
 }

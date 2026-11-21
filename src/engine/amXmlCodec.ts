@@ -708,8 +708,17 @@ function parseXmlLayer(
             const hasExplicitWrap = Number.isFinite(rawWrap) && rawWrap > 0;
             const parsedFont = parseAmFontToken(textAttr('font'));
             const rawSize = parseFloat(textAttr('size') || '');
-            const amSize = Number.isFinite(rawSize) && rawSize > 0 ? rawSize : 72;
+            // AM's default StyledText fontSize is 18.0 (= 54px at 3px/unit), not 72.
+            const amSize = Number.isFinite(rawSize) && rawSize > 0 ? rawSize : 18;
             const rawAlign = (textAttr('align') || '').trim().toLowerCase();
+            // APK TextElementTypeImpl.getHasFillColor = true: AM stores text color in
+            // <fillColor value="..."/> (often omitting a `color` attribute on <text>).
+            const textColor =
+              textAttr('color') ||
+              fillColorEl?.getAttribute('value') ||
+              (fillColorAnim.keyframes.length > 0 ? fillColorAnim.keyframes[0].v : null) ||
+              el.getAttribute('fillColor') ||
+              '#FFFFFFFF';
             return {
               content: contentEl?.textContent || 'Text',
               fontFamily: parsedFont.family,
@@ -717,7 +726,7 @@ function parseXmlLayer(
               italic: parsedFont.style === 'italic',
               // AM paints at 3× the stored size; the renderer works in pixels.
               fontSize: Math.max(1, amTextSizeToPx(amSize)),
-              color: textAttr('color') || '#FFFFFFFF',
+              color: textColor,
               align: (rawAlign === 'left' || rawAlign === 'right' || rawAlign === 'center' ? rawAlign : 'center') as
                 | 'left'
                 | 'center'

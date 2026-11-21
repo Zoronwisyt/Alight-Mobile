@@ -3139,7 +3139,11 @@ export class AlightRenderer {
     ctx.textBaseline = 'middle';
     ctx.textAlign = 'center';
 
-    const [r, g, b, a] = parseColorArgb(td.color || '#FFFFFFFF');
+    const effectiveColor =
+      layer.fill.type === 'solid' && layer.fill.color.keyframes.length > 0
+        ? String(evalAnimatable(layer.fill.color, normT, td.color || '#FFFFFFFF'))
+        : td.color || '#FFFFFFFF';
+    const [r, g, b, a] = parseColorArgb(effectiveColor);
     const baseFill = `rgba(${Math.round(r * 255)}, ${Math.round(g * 255)}, ${Math.round(b * 255)}, ${a.toFixed(3)})`;
     const letterSp = (td.letterSpacing || 0) + extraLetterSpace;
     const wrapMax = td.wrapWidth > 40 ? td.wrapWidth : Infinity;
@@ -3203,7 +3207,7 @@ export class AlightRenderer {
     layout.lines.forEach((lineObj, li) => {
       const y = yStart + li * lineH;
       const { chars, widths, lineW } = lineObj;
-      let cursorX = td.align === 'left' ? -td.wrapWidth * 0.45 : td.align === 'right' ? td.wrapWidth * 0.45 - lineW : -lineW * 0.5;
+      let cursorX = td.align === 'left' ? -td.wrapWidth * 0.5 : td.align === 'right' ? td.wrapWidth * 0.5 - lineW : -lineW * 0.5;
 
       chars.forEach((ch, ci) => {
         const cw = widths[ci];
