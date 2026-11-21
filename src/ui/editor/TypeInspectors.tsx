@@ -450,28 +450,91 @@ export const SpeedRemapPanel: React.FC = () => {
 };
 
 export const VolumePanel: React.FC = () => {
-  const { layer, normT, updateLayer, setAnimValue, readAnim } = useSelectedLayer();
-  if (!layer || layer.type !== 'audio' || !layer.audioData) return null;
+  const { layer, updateLayer, setAnimValue, readAnim } = useSelectedLayer();
+  if (!layer) return null;
+
+  if (layer.type === 'video' && layer.mediaData) {
+    const isMuted = Boolean(layer.mediaData.muted) || (layer.mediaData.volume ?? 1) <= 0.001;
+    const vol = isMuted ? 0 : (layer.mediaData.volume ?? 1);
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+        <SpinnerControl
+          label="Video Volume"
+          value={vol}
+          min={0}
+          max={2}
+          step={0.05}
+          multiplier={100}
+          decimals={0}
+          unit="%"
+          onChange={(v) =>
+            updateLayer((l) => {
+              if (!l.mediaData) return;
+              l.mediaData.volume = v;
+              l.mediaData.muted = v <= 0.001;
+            })
+          }
+        />
+        <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: 10, background: 'var(--am-a1)', borderRadius: 10 }}>
+          <span>Mute Video Audio</span>
+          <input
+            type="checkbox"
+            checked={isMuted}
+            onChange={(e) =>
+              updateLayer((l) => {
+                if (!l.mediaData) return;
+                const nextMuted = e.target.checked;
+                l.mediaData.muted = nextMuted;
+                if (!nextMuted && (l.mediaData.volume ?? 0) <= 0.001) {
+                  l.mediaData.volume = 1;
+                }
+              })
+            }
+            style={{ width: 18, height: 18, accentColor: 'var(--am-accent)' }}
+          />
+        </label>
+      </div>
+    );
+  }
+
+  if (layer.type !== 'audio' || !layer.audioData) return null;
   const vol = readAnim(layer.audioData.volume, 1);
+  const isMuted = Boolean(layer.audioData.muted) || (vol <= 0.001 && layer.audioData.volume.keyframes.length === 0);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
       <SpinnerControl
         label="Track Volume"
-        value={vol}
+        value={isMuted ? 0 : vol}
         min={0}
         max={2}
         step={0.05}
         multiplier={100}
+        decimals={0}
         unit="%"
-        onChange={(v) => updateLayer((l) => { if (l.audioData) setAnimValue(l.audioData.volume, v); })}
+        onChange={(v) =>
+          updateLayer((l) => {
+            if (!l.audioData) return;
+            setAnimValue(l.audioData.volume, v);
+            l.audioData.muted = v <= 0.001 && l.audioData.volume.keyframes.length === 0;
+          })
+        }
       />
       <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: 10, background: 'var(--am-a1)', borderRadius: 10 }}>
         <span>Mute Audio Track</span>
         <input
           type="checkbox"
-          checked={layer.audioData.muted}
-          onChange={(e) => updateLayer((l) => { if (l.audioData) l.audioData.muted = e.target.checked; })}
+          checked={isMuted}
+          onChange={(e) =>
+            updateLayer((l) => {
+              if (!l.audioData) return;
+              const nextMuted = e.target.checked;
+              l.audioData.muted = nextMuted;
+              if (!nextMuted && l.audioData.volume.value <= 0.001 && l.audioData.volume.keyframes.length === 0) {
+                setAnimValue(l.audioData.volume, 1);
+              }
+            })
+          }
           style={{ width: 18, height: 18, accentColor: 'var(--am-accent)' }}
         />
       </label>

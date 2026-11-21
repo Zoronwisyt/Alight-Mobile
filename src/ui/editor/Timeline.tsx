@@ -254,6 +254,25 @@ const TimelineTrackRow = React.memo<TimelineTrackRowProps>(
               <span className="am-track-fx-pill">{layer.effects.length} fx</span>
             )}
 
+            {((layer.type === 'video' &&
+              (layer.mediaData?.muted || (layer.mediaData?.volume ?? 1) <= 0.001)) ||
+              (layer.type === 'audio' &&
+                (layer.audioData?.muted ||
+                  ((layer.audioData?.volume.value ?? 1) <= 0.001 &&
+                    (layer.audioData?.volume.keyframes.length ?? 0) === 0)))) && (
+              <span
+                className="am-track-fx-pill"
+                style={{
+                  background: 'rgba(10, 14, 24, 0.72)',
+                  color: '#FF7B7B',
+                  border: '1px solid rgba(255, 123, 123, 0.45)',
+                }}
+                title="Muted (0% volume)"
+              >
+                0%
+              </span>
+            )}
+
             {isSelected && (
               <span className="am-track-z-btns">
                 <button

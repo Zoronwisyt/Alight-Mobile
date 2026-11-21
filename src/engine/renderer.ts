@@ -1151,8 +1151,10 @@ export class AlightRenderer {
         // audio. The exception is a track Web Audio cannot carry — iOS behind the ring switch, or a
         // container decodeAudioData refuses — where the element keeps its own audio instead.
         if (audioEngine.isElementAudioOwned(md.src, md.mediaId)) {
-          v.muted = md.muted === true;
-          v.volume = Math.max(0, Math.min(1, md.volume ?? 1));
+          const vol = Math.max(0, Math.min(1, md.volume ?? 1));
+          const shouldMute = md.muted === true || vol <= 0.001;
+          v.muted = shouldMute;
+          v.volume = shouldMute ? 0 : vol;
         } else {
           v.muted = true;
         }
@@ -1276,10 +1278,9 @@ export class AlightRenderer {
       if (entry.audioUnlocked && !forceAll) continue;
       if (!isElOwned && !forceAll && !this.isIos) continue;
       const v = entry.video;
+      // Keep muted while priming so 0%-volume / muted video layers never burst audio on Play tap;
+      // syncVideosForPlayback unmutes only active layers with volume > 0 and muted !== true.
       const prevMuted = v.muted;
-      if (isElOwned) {
-        v.muted = false;
-      }
       const started = v.play();
       if (!started || typeof started.then !== 'function') continue;
       void started
@@ -1288,11 +1289,11 @@ export class AlightRenderer {
           // Park it again unless playback actually started while the promise was in flight.
           if (!this.isPlaybackActive && !v.paused) {
             v.pause();
-            if (!isElOwned) v.muted = prevMuted;
+            v.muted = prevMuted;
           }
         })
         .catch(() => {
-          if (!isElOwned) v.muted = prevMuted;
+          v.muted = prevMuted;
         });
     }
   }

@@ -523,6 +523,12 @@ class AudioEngine {
       ? (layer.mediaData?.volume ?? 1)
       : evalAnimatable(layer.audioData!.volume, remappedNormT, 1);
 
+    if (vol <= 0.001) {
+      el.muted = true;
+      el.volume = 0;
+      return;
+    }
+    el.muted = false;
     el.volume = Math.max(0, Math.min(1, vol));
     el.playbackRate = speed;
     const delayMs = Math.max(0, absStart - sceneMs);

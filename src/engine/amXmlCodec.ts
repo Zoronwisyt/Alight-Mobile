@@ -763,18 +763,34 @@ function parseXmlLayer(
   const cropMode: 'fill' | 'fit' | 'stretch' | undefined =
     rawCrop === 'fit' || rawCrop === 'stretch' || rawCrop === 'fill' ? rawCrop : undefined;
 
+  const findDirectChild = (parent: Element, names: string[]): Element | null => {
+    for (const child of Array.from(parent.children)) {
+      const t = child.tagName.toLowerCase();
+      if (names.includes(t)) return child;
+    }
+    return null;
+  };
+
   if (matchedVideo) {
     type = 'video';
     const rawSpeed = parseFloat(el.getAttribute('speed') || '');
     const parsedSpeed = Number.isFinite(rawSpeed) && rawSpeed > 0 ? Math.max(0.1, Math.min(4, rawSpeed)) : 1;
-    const volEl = el.querySelector(':scope > gain') ?? el.querySelector(':scope > volume');
+    const volEl = findDirectChild(el, ['gain', 'volume']);
     const rawVolAttr = el.getAttribute('gain') ?? el.getAttribute('volume');
-    const parsedVol = volEl
-      ? parsePropElement(volEl, parseNum, 1).value
-      : rawVolAttr != null
-        ? parseFloat(rawVolAttr) || 0
-        : 1;
-    const isMuted = el.getAttribute('muted') === 'true' || el.getAttribute('mute') === 'true' || parsedVol <= 0.001;
+    const volAnim = volEl
+      ? parsePropElement(volEl, parseNum, 1)
+      : directProps.gain ?? directProps.volume ?? (rawVolAttr != null ? animatable(parseFloat(rawVolAttr) || 0) : animatable(1));
+    const maxGain =
+      volAnim.keyframes.length > 0
+        ? Math.max(...volAnim.keyframes.map((k) => Number(k.v) || 0))
+        : Number(volAnim.value) || 0;
+    const parsedVol = Math.max(0, maxGain);
+    const isMuted =
+      el.getAttribute('muted') === 'true' ||
+      el.getAttribute('mute') === 'true' ||
+      el.getAttribute('audioMuted') === 'true' ||
+      el.getAttribute('hasAudio') === 'false' ||
+      maxGain <= 0.001;
     mediaData = {
       mediaId: matchedVideo.mediaId,
       src: matchedVideo.src,
@@ -786,7 +802,7 @@ function parseXmlLayer(
       durationMs: matchedVideo.durationMs || 4000,
       trimStartMs: parseFloat(el.getAttribute('inTime') || '0') || 0,
       playbackSpeed: parsedSpeed,
-      volume: parsedVol,
+      volume: isMuted ? 0 : parsedVol,
       muted: isMuted,
     };
   } else if (matchedImage) {
@@ -802,12 +818,20 @@ function parseXmlLayer(
     };
   } else if (matchedAudio) {
     type = 'audio';
-    const volEl = el.querySelector(':scope > gain') ?? el.querySelector(':scope > volume');
+    const volEl = findDirectChild(el, ['gain', 'volume']);
     const rawVolAttr = el.getAttribute('gain') ?? el.getAttribute('volume');
     const volAnim = volEl
       ? parsePropElement(volEl, parseNum, 1)
-      : animatable(rawVolAttr != null ? parseFloat(rawVolAttr) || 0 : 1);
-    const isMuted = el.getAttribute('muted') === 'true' || el.getAttribute('mute') === 'true';
+      : directProps.gain ?? directProps.volume ?? animatable(rawVolAttr != null ? parseFloat(rawVolAttr) || 0 : 1);
+    const maxGain =
+      volAnim.keyframes.length > 0
+        ? Math.max(...volAnim.keyframes.map((k) => Number(k.v) || 0))
+        : Number(volAnim.value) || 0;
+    const isMuted =
+      el.getAttribute('muted') === 'true' ||
+      el.getAttribute('mute') === 'true' ||
+      el.getAttribute('audioMuted') === 'true' ||
+      maxGain <= 0.001;
     audioData = {
       mediaId: matchedAudio.mediaId,
       src: matchedAudio.src,
