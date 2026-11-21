@@ -505,6 +505,7 @@ export class AlightRenderer {
   private dummyBlackTex: WebGLTexture;
   private maxTextureSize = 4096;
   private isPlaybackActive = false;
+  private activePlaybackVideoKeys = new Set<string>();
   private disposed = false;
   /** Phones/tablets: capped DPR, and the element — not Web Audio — may own video sound. */
   private mobileRender = false;
@@ -1152,7 +1153,11 @@ export class AlightRenderer {
         // container decodeAudioData refuses — where the element keeps its own audio instead.
         if (audioEngine.isElementAudioOwned(md.src, md.mediaId)) {
           const vol = Math.max(0, Math.min(1, md.volume ?? 1));
-          const shouldMute = md.muted === true || vol <= 0.001;
+          const isVfxOverlay =
+            Math.abs(vol - 1) < 1e-4 &&
+            (layer.blendMode === 'screen' ||
+              layer.effects.some((e) => e.enabled && (e.effectId.includes('chromakey') || e.effectId.includes('lumakey'))));
+          const shouldMute = md.muted === true || vol <= 0.001 || isVfxOverlay;
           v.muted = shouldMute;
           v.volume = shouldMute ? 0 : vol;
         } else {
@@ -1185,6 +1190,7 @@ export class AlightRenderer {
           }
         }
       } else {
+        v.muted = true;
         if (!v.paused) v.pause();
         // Pre-park video at trimStart up to 1.5s before its in-point (including upcoming groups) so entry has zero hitch
         if (isUpcoming && v.readyState >= 1 && !v.seeking) {
@@ -1200,9 +1206,13 @@ export class AlightRenderer {
       }
     }
 
+    this.activePlaybackVideoKeys = isPlaying ? activeKeys : new Set<string>();
     for (const [key, entry] of this.mediaVideos.entries()) {
-      if (!activeKeys.has(key) && !entry.video.paused) {
-        entry.video.pause();
+      if (!activeKeys.has(key)) {
+        entry.video.muted = true;
+        if (!entry.video.paused) {
+          entry.video.pause();
+        }
       }
     }
 
@@ -1273,27 +1283,29 @@ export class AlightRenderer {
    */
   public primeElementAudio(forceAll = false): void {
     if (this.disposed) return;
-    for (const entry of this.mediaVideos.values()) {
+    for (const [key, entry] of this.mediaVideos.entries()) {
       const isElOwned = audioEngine.isElementAudioOwned(entry.src, entry.mediaId);
       if (entry.audioUnlocked && !forceAll) continue;
       if (!isElOwned && !forceAll && !this.isIos) continue;
+      // Never start an inactive/hidden/muted video while already playing
+      if (this.isPlaybackActive && !this.activePlaybackVideoKeys.has(key)) continue;
       const v = entry.video;
-      // Keep muted while priming so 0%-volume / muted video layers never burst audio on Play tap;
-      // syncVideosForPlayback unmutes only active layers with volume > 0 and muted !== true.
-      const prevMuted = v.muted;
+      // Always prime muted so hidden/muted/out-of-range videos never play sound on Play tap;
+      // syncVideosForPlayback unmutes only active in-range layers with volume > 0 and muted !== true.
+      v.muted = true;
       const started = v.play();
       if (!started || typeof started.then !== 'function') continue;
       void started
         .then(() => {
           entry.audioUnlocked = true;
-          // Park it again unless playback actually started while the promise was in flight.
-          if (!this.isPlaybackActive && !v.paused) {
+          // Park any element that is not actively in-range for live playback
+          if ((!this.isPlaybackActive || !this.activePlaybackVideoKeys.has(key)) && !v.paused) {
             v.pause();
-            v.muted = prevMuted;
+            v.muted = true;
           }
         })
         .catch(() => {
-          v.muted = prevMuted;
+          v.muted = true;
         });
     }
   }

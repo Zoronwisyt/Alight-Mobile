@@ -460,6 +460,44 @@ export const EditorScreen: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isPlaying, visibilityPaused, currentProject?.id]);
 
+  // Live audio sync: if the user mutes, hides, deletes, or edits an audio/video layer while playing,
+  // immediately restart audioEngine from the live playhead so turned-off layers stop instantly.
+  const audioLayerFingerprint = React.useMemo(() => {
+    if (!currentProject) return '';
+    const scope = resolveActiveGroup(currentProject, groupStack);
+    const parts: string[] = [];
+    const walk = (list: typeof scope.layers) => {
+      for (const l of list) {
+        if (l.type === 'group' && l.groupLayers?.length) {
+          parts.push(`g:${l.id}:${l.visible ? 1 : 0}:${l.startTime}:${l.endTime}`);
+          walk(l.groupLayers);
+        } else if (l.type === 'audio' && l.audioData) {
+          parts.push(
+            `a:${l.id}:${l.visible ? 1 : 0}:${l.audioData.muted ? 1 : 0}:${l.audioData.volume.value}:${l.startTime}:${l.endTime}:${l.audioData.trimStartMs ?? 0}`
+          );
+        } else if (l.type === 'video' && l.mediaData) {
+          parts.push(
+            `v:${l.id}:${l.visible ? 1 : 0}:${l.mediaData.muted ? 1 : 0}:${l.mediaData.volume ?? 1}:${l.startTime}:${l.endTime}:${l.mediaData.trimStartMs ?? 0}:${l.mediaData.playbackSpeed ?? 1}`
+          );
+        }
+      }
+    };
+    walk(scope.layers);
+    return parts.join('|');
+  }, [currentProject, groupStack]);
+
+  const prevAudioFingerprintRef = useRef(audioLayerFingerprint);
+  useEffect(() => {
+    const prev = prevAudioFingerprintRef.current;
+    prevAudioFingerprintRef.current = audioLayerFingerprint;
+    if (!isPlaying || !currentProject || visibilityPaused || prev === audioLayerFingerprint) return;
+    const renderer = rendererRef.current;
+    const scope = resolveActiveGroup(currentProject, groupStack);
+    const tMs = livePlayheadRef.current;
+    renderer?.syncVideosForPlayback(currentProject, tMs, true, groupStack);
+    audioEngine.startPlayback(currentProject, tMs, scope.layers);
+  }, [audioLayerFingerprint, isPlaying, visibilityPaused, currentProject, groupStack]);
+
   // iOS grants media playback and unmuting per element, per gesture (especially touchend/click on Home Screen WKWebView).
   useEffect(() => {
     const prime = () => {

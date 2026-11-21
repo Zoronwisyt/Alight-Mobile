@@ -98,6 +98,7 @@ class AudioEngine {
   private activeSources: AudioBufferSourceNode[] = [];
   private fallbackAudioEls = new Map<string, HTMLAudioElement>();
   private activeFallbackEls: HTMLAudioElement[] = [];
+  private fallbackTimers: number[] = [];
   private loading = new Map<string, Promise<AudioBuffer>>();
   private playbackStartCtxTime = 0;
   private playbackStartSceneMs = 0;
@@ -228,17 +229,24 @@ class AudioEngine {
       // ignore
     }
 
-    // Prime any fallback HTMLAudioElements already registered
-    for (const el of this.fallbackAudioEls.values()) {
-      if ((el as HTMLAudioElement & { _unlocked?: boolean })._unlocked) continue;
-      const p = el.play();
-      if (p && typeof p.then === 'function') {
-        void p
-          .then(() => {
-            (el as HTMLAudioElement & { _unlocked?: boolean })._unlocked = true;
-            if (!this.playbackActive && !el.paused) el.pause();
-          })
-          .catch(() => {});
+    // Prime any fallback HTMLAudioElements already registered (always muted + immediately paused so
+    // tapping during playback never launches muted, hidden, or out-of-range fallback audio tracks).
+    if (!this.playbackActive) {
+      for (const el of this.fallbackAudioEls.values()) {
+        if ((el as HTMLAudioElement & { _unlocked?: boolean })._unlocked) continue;
+        el.muted = true;
+        const p = el.play();
+        if (p && typeof p.then === 'function') {
+          void p
+            .then(() => {
+              (el as HTMLAudioElement & { _unlocked?: boolean })._unlocked = true;
+              if (!el.paused) el.pause();
+              el.muted = true;
+            })
+            .catch(() => {
+              el.muted = true;
+            });
+        }
       }
     }
   }
@@ -544,16 +552,26 @@ class AudioEngine {
       } catch {
         // ignore seek before metadata
       }
+      el.muted = false;
       this.activeFallbackEls.push(el);
       void el.play().catch(() => {});
+      const stopDelayMs = Math.max(0, absEnd - Math.max(sceneMs, absStart));
+      if (Number.isFinite(stopDelayMs) && stopDelayMs > 0) {
+        const stopId = window.setTimeout(() => {
+          if (sessionId !== this.playbackSessionId || !el) return;
+          if (!el.paused) el.pause();
+          el.muted = true;
+        }, stopDelayMs);
+        this.fallbackTimers.push(stopId);
+      }
     };
 
     if (delayMs <= 16) {
       trigger();
     } else {
-      window.setTimeout(trigger, delayMs);
+      const startId = window.setTimeout(trigger, delayMs);
+      this.fallbackTimers.push(startId);
     }
-    void absEnd;
   }
 
   private async startLayerAudio(
@@ -633,14 +651,27 @@ class AudioEngine {
       }
     }
     this.activeSources = [];
+    for (const tid of this.fallbackTimers) {
+      window.clearTimeout(tid);
+    }
+    this.fallbackTimers = [];
     for (const el of this.activeFallbackEls) {
       try {
         if (!el.paused) el.pause();
+        el.muted = true;
       } catch {
         // ignore
       }
     }
     this.activeFallbackEls = [];
+    for (const el of this.fallbackAudioEls.values()) {
+      try {
+        if (!el.paused) el.pause();
+        el.muted = true;
+      } catch {
+        // ignore
+      }
+    }
     if (this.silentAudioEl && !this.silentAudioEl.paused && this.iosRouteUnlocked) {
       try {
         this.silentAudioEl.pause();
