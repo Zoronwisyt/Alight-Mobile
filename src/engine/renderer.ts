@@ -847,18 +847,34 @@ export class AlightRenderer {
   private collectActiveMediaLayers(
     layers: Layer[],
     parentTimeMs: number,
-    out: { layer: Layer; localTimeMs: number; parentTimeMs: number }[]
+    out: { layer: Layer; localTimeMs: number; parentTimeMs: number; isLookahead?: boolean }[],
+    lookaheadMs = 0,
+    parentIsLookahead = false
   ): void {
     for (const layer of layers) {
       if (!layer.visible) continue;
       if (layer.type === 'group' && layer.groupLayers?.length) {
-        if (parentTimeMs >= layer.startTime && parentTimeMs <= layer.endTime) {
+        if (!parentIsLookahead && parentTimeMs >= layer.startTime && parentTimeMs <= layer.endTime) {
           const { localTimeMs } = evalRemappedTime(layer, parentTimeMs);
-          this.collectActiveMediaLayers(layer.groupLayers, localTimeMs, out);
+          this.collectActiveMediaLayers(layer.groupLayers, localTimeMs, out, lookaheadMs, false);
+        } else if (
+          lookaheadMs > 0 &&
+          parentTimeMs < layer.startTime &&
+          layer.startTime - parentTimeMs <= lookaheadMs
+        ) {
+          // Pre-warm child media inside upcoming groups (e.g. rapid 250ms group cuts)
+          this.collectActiveMediaLayers(layer.groupLayers, 0, out, 0, true);
         }
       } else if ((layer.type === 'video' || layer.type === 'image') && layer.mediaData?.src) {
-        const { localTimeMs } = evalRemappedTime(layer, parentTimeMs);
-        out.push({ layer, localTimeMs, parentTimeMs });
+        if (parentIsLookahead) {
+          // Only pre-warm child layers that start near the beginning of the upcoming group
+          if (layer.startTime <= 500) {
+            out.push({ layer, localTimeMs: 0, parentTimeMs: layer.startTime, isLookahead: true });
+          }
+        } else {
+          const { localTimeMs } = evalRemappedTime(layer, parentTimeMs);
+          out.push({ layer, localTimeMs, parentTimeMs, isLookahead: false });
+        }
       }
     }
   }
@@ -871,7 +887,7 @@ export class AlightRenderer {
   ): void {
     this.isPlaybackActive = isPlaying;
     const activeKeys = new Set<string>();
-    const items: { layer: Layer; localTimeMs: number; parentTimeMs: number }[] = [];
+    const items: { layer: Layer; localTimeMs: number; parentTimeMs: number; isLookahead?: boolean }[] = [];
     let rootLayers = project.layers;
     if (activeGroupStack && activeGroupStack.length > 0) {
       for (const gid of activeGroupStack) {
@@ -880,17 +896,31 @@ export class AlightRenderer {
         rootLayers = grp.groupLayers ?? [];
       }
     }
-    this.collectActiveMediaLayers(rootLayers, sceneTimeMs, items);
+    this.collectActiveMediaLayers(rootLayers, sceneTimeMs, items, isPlaying ? 1500 : 0, false);
 
-    for (const { layer, localTimeMs, parentTimeMs } of items) {
+    for (const { layer, localTimeMs, parentTimeMs, isLookahead } of items) {
       if (layer.type !== 'video' || !layer.mediaData?.src) continue;
       const md = layer.mediaData;
       const videoKey = `${layer.id}::${md.src}`;
+      const inRange = !isLookahead && parentTimeMs >= layer.startTime && parentTimeMs <= layer.endTime;
+      const isUpcoming =
+        Boolean(isLookahead) ||
+        (isPlaying && parentTimeMs < layer.startTime && layer.startTime - parentTimeMs <= 1500);
+
+      // Don't allocate cold decoders for distant out-of-range layers (prevents exhausting Chrome's HW decoder limit)
+      if (!inRange && !isUpcoming) {
+        const existing = this.mediaVideos.get(videoKey);
+        if (existing && !existing.video.paused) existing.video.pause();
+        continue;
+      }
+
       const entry = this.getOrCreateVideoEntry(md.src, md.mediaId, layer.id);
       const v = entry.video;
       activeKeys.add(videoKey);
+      // Touch LRU order
+      this.mediaVideos.delete(videoKey);
+      this.mediaVideos.set(videoKey, entry);
 
-      const inRange = parentTimeMs >= layer.startTime && parentTimeMs <= layer.endTime;
       const speed = Math.max(0.1, Math.min(4, md.playbackSpeed || 1));
       const rawSec = Math.max(0, ((localTimeMs * speed) + (md.trimStartMs ?? 0)) / 1000);
       const maxSec = Number.isFinite(v.duration) && v.duration > 0 ? Math.max(0, v.duration - 0.02) : rawSec;
@@ -930,8 +960,8 @@ export class AlightRenderer {
         }
       } else {
         if (!v.paused) v.pause();
-        // Pre-park video at trimStart up to 1s before its in-point so entry has zero hitch
-        if (isPlaying && parentTimeMs < layer.startTime && layer.startTime - parentTimeMs < 1000 && v.readyState >= 1 && !v.seeking) {
+        // Pre-park video at trimStart up to 1.5s before its in-point (including upcoming groups) so entry has zero hitch
+        if (isUpcoming && v.readyState >= 1 && !v.seeking) {
           const startSec = Math.max(0, (md.trimStartMs ?? 0) / 1000);
           if (Math.abs(v.currentTime - startSec) > 0.05) {
             try {
@@ -947,6 +977,25 @@ export class AlightRenderer {
     for (const [key, entry] of this.mediaVideos.entries()) {
       if (!activeKeys.has(key) && !entry.video.paused) {
         entry.video.pause();
+      }
+    }
+
+    // Cap live HTMLVideoElement pool to 14 decoders (LRU) so multi-group projects never exhaust
+    // Chrome's hardware video decoder limit and drop/flicker frames.
+    const MAX_LIVE_VIDEOS = 14;
+    if (this.mediaVideos.size > MAX_LIVE_VIDEOS) {
+      for (const [key, entry] of Array.from(this.mediaVideos.entries())) {
+        if (this.mediaVideos.size <= MAX_LIVE_VIDEOS) break;
+        if (activeKeys.has(key)) continue;
+        entry.video.pause();
+        entry.video.removeAttribute('src');
+        try {
+          entry.video.load();
+        } catch {
+          // ignore
+        }
+        this.gl.deleteTexture(entry.tex);
+        this.mediaVideos.delete(key);
       }
     }
   }
@@ -1104,6 +1153,14 @@ export class AlightRenderer {
 
       if (entry.hasFrame) {
         return { tex: entry.tex, w: entry.w || 512, h: entry.h || 512 };
+      }
+      // Fallback: if another layer/group already decoded a frame for the exact same video src,
+      // reuse its GPU texture while this layer's decoder warms up so rapid cuts never flash black.
+      const suffix = `::${src}`;
+      for (const [k, other] of this.mediaVideos.entries()) {
+        if (other !== entry && other.hasFrame && (k === src || k.endsWith(suffix))) {
+          return { tex: other.tex, w: other.w || 512, h: other.h || 512 };
+        }
       }
       return null;
     } else {
