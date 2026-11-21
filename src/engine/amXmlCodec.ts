@@ -58,7 +58,64 @@ function emitAnimProp(tag: string, prop: Animatable<any>, isAttr = false, attrNa
   return `<${tag}>\n        ${kfs}\n      </${tag}>`;
 }
 
-function layerToXml(layer: Layer, indent = '  '): string {
+const SHAPE_NS = 'com.alightcreative.shapes.';
+
+/** AM writes gradient handles in 0..1 page space; the model keeps them in -1..1 layer space. */
+function formatGradientChannel(v: number): string {
+  return Math.max(0, Math.min(1, (v + 1) / 2)).toFixed(6);
+}
+
+/**
+ * A media reference has to survive export. AM resolves it against the package, so the media id is
+ * authoritative; projects created before ids existed fall back to the source basename.
+ */
+function mediaReference(mediaId: string | undefined, src: string | undefined): string | null {
+  const id = (mediaId || '').trim();
+  if (id) return id;
+  const raw = (src || '').trim();
+  if (!raw) return null;
+  const noQuery = raw.split(/[?#]/)[0];
+  const base = noQuery.split('/').pop();
+  return base || noQuery || null;
+}
+
+/** Mirrors renderer.buildVectorPath so an exported <path d> draws the same curve it replaced. */
+function vectorPathToSvgD(points: { x: number; y: number; inX: number; inY: number; outX: number; outY: number }[], closed: boolean): string {
+  if (points.length === 0) return '';
+  const n = (v: number) => Number(v.toFixed(4)).toString();
+  let d = `M ${n(points[0].x)} ${n(points[0].y)}`;
+  for (let i = 1; i < points.length; i++) {
+    const a = points[i - 1];
+    const b = points[i];
+    d += ` C ${n(a.x + a.outX)} ${n(a.y + a.outY)} ${n(b.x + b.inX)} ${n(b.y + b.inY)} ${n(b.x)} ${n(b.y)}`;
+  }
+  if (closed && points.length > 1) {
+    const a = points[points.length - 1];
+    const b = points[0];
+    d += ` C ${n(a.x + a.outX)} ${n(a.y + a.outY)} ${n(b.x + b.inX)} ${n(b.y + b.inY)} ${n(b.x)} ${n(b.y)} Z`;
+  }
+  return d;
+}
+
+function inferShapePropType(v: unknown): string {
+  if (Array.isArray(v)) return v.length === 2 ? 'vec2' : v.length === 4 ? 'quat' : 'vec3';
+  if (typeof v === 'boolean') return 'bool';
+  if (typeof v === 'string') return v.startsWith('#') ? 'color' : 'string';
+  return 'float';
+}
+
+function emitPropertyEl(name: string, prop: Animatable<any>, indent: string): string {
+  const type = inferShapePropType(prop.value);
+  if (!prop.keyframes || prop.keyframes.length === 0) {
+    return `${indent}<property name="${escapeXml(name)}" type="${type}" value="${escapeXml(formatVal(prop.value))}"/>`;
+  }
+  const kfs = prop.keyframes
+    .map((k) => `${indent}  <kf t="${k.t.toFixed(6)}" v="${escapeXml(formatVal(k.v))}"${formatEasingAttr(k.easing)}/>`)
+    .join('\n');
+  return `${indent}<property name="${escapeXml(name)}" type="${type}">\n${kfs}\n${indent}</property>`;
+}
+
+function layerToXml(layer: Layer, fps = 30, indent = '  '): string {
   const tagMap: Record<string, string> = {
     shape: 'shape',
     text: 'text',
@@ -69,7 +126,8 @@ function layerToXml(layer: Layer, indent = '  '): string {
     camera: 'camera',
     group: 'embedScene',
     vector: 'shape',
-    freehand: 'shape',
+    // AM's own tag for a freehand drawing is <drawing>; writing <shape> dropped every stroke.
+    freehand: 'drawing',
   };
   const tag = tagMap[layer.type] ?? 'shape';
   const fillAttr =
@@ -98,6 +156,45 @@ function layerToXml(layer: Layer, indent = '  '): string {
       ? ` cropMode="${escapeXml(layer.mediaData.cropMode)}"`
       : '';
   const is3DAttr = layer.is3D ? ' is3D="true"' : '';
+  const hiddenAttr = layer.visible ? '' : ' hidden="true"';
+  const shapeIdAttr =
+    layer.type === 'shape' && layer.shapeId
+      ? ` s="${escapeXml(
+          layer.shapeId.startsWith(SHAPE_NS) ? `.${layer.shapeId.slice(SHAPE_NS.length)}` : layer.shapeId
+        )}"`
+      : '';
+  const fogAttr = layer.cameraData?.fogEnabled ? ' fogEnabled="true"' : '';
+
+  // Media references and playback state live on the layer tag in AM's dialect. Without these the
+  // layer re-imports with no source at all, which is what the earlier writer did.
+  const mediaRef = mediaReference(layer.mediaData?.mediaId, layer.mediaData?.src);
+  const audioRef = mediaReference(layer.audioData?.mediaId, layer.audioData?.src);
+  const mediaAttrs: string[] = [];
+  if ((layer.type === 'video' || layer.type === 'image') && mediaRef) {
+    mediaAttrs.push(` src="${escapeXml(mediaRef)}"`);
+  }
+  if (layer.type === 'audio' && audioRef) {
+    mediaAttrs.push(` src="${escapeXml(audioRef)}"`);
+  }
+  if (layer.fill.type === 'media') {
+    const fillRef = mediaReference(layer.fill.mediaId, layer.fill.mediaSrc) ?? mediaRef;
+    if (fillRef) mediaAttrs.push(` fillImage="${escapeXml(fillRef)}"`);
+  }
+  const playbackSpeed = layer.mediaData?.playbackSpeed;
+  if (playbackSpeed != null && Math.abs(playbackSpeed - 1) > 1e-6) {
+    mediaAttrs.push(` speed="${playbackSpeed}"`);
+  }
+  const trimStart = layer.mediaData?.trimStartMs ?? layer.audioData?.trimStartMs;
+  if (trimStart != null && trimStart > 0) {
+    mediaAttrs.push(` inTime="${Math.round(trimStart)}"`);
+  }
+  const gainValue = layer.mediaData?.volume;
+  if (gainValue != null && Math.abs(gainValue - 1) > 1e-6) {
+    mediaAttrs.push(` gain="${gainValue}"`);
+  }
+  if (layer.mediaData?.muted || layer.audioData?.muted) {
+    mediaAttrs.push(' muted="true"');
+  }
 
   const parts: string[] = [];
   // Text attributes belong on the <text> element in AM's own dialect — its loader reads
@@ -114,7 +211,7 @@ function layerToXml(layer: Layer, indent = '  '): string {
       ` align="${escapeXml(td.align || 'center')}" color="${escapeXml(td.color || '#FFFFFFFF')}"`;
   }
   parts.push(
-    `${indent}<${tag} id="${escapeXml(layer.id)}" label="${escapeXml(layer.label)}" startTime="${Math.round(layer.startTime)}" endTime="${Math.round(layer.endTime)}"${fillAttr}${textAttrs}${parentAttr}${clipAttr}${blendAttr}${retimeAttr}${cropAttr}${is3DAttr}>`
+    `${indent}<${tag} id="${escapeXml(layer.id)}" label="${escapeXml(layer.label)}" startTime="${Math.round(layer.startTime)}" endTime="${Math.round(layer.endTime)}"${fillAttr}${textAttrs}${parentAttr}${hiddenAttr}${clipAttr}${blendAttr}${retimeAttr}${cropAttr}${is3DAttr}${shapeIdAttr}${fogAttr}${mediaAttrs.join('')}>`
   );
 
   parts.push(`${indent}  <transform>`);
@@ -135,11 +232,102 @@ function layerToXml(layer: Layer, indent = '  '): string {
     parts.push(`${indent}  <content>${escapeXml(layer.textData.content)}</content>`);
   }
 
+  // AM writes a fill colour on elements whose fillType is `none` too (the beta_anim sample keeps
+  // <fillColor value="#ff000000"/> on a group). Emitting it unconditionally is what keeps a
+  // colour from being replaced by the importer's fallback on the next load.
+  if (layer.fill.color.value) {
+    parts.push(`${indent}  ${emitAnimProp('fillColor', layer.fill.color)}`);
+  }
+
+  if (layer.fill.type === 'gradient') {
+    const stops =
+      layer.fill.gradientStops.length >= 2
+        ? layer.fill.gradientStops
+        : [
+            { offset: 0, color: '#FFFFFFFF' },
+            { offset: 1, color: '#FF000000' },
+          ];
+    const startColor = stops[0].color;
+    const endColor = stops[stops.length - 1].color;
+    const midColor = stops.length >= 3 ? stops[Math.floor(stops.length / 2)].color : null;
+    parts.push(
+      `${indent}  <gradient type="${layer.fill.gradientType}" startColor="${escapeXml(startColor)}"${
+        midColor ? ` midColor="${escapeXml(midColor)}"` : ''
+      } endColor="${escapeXml(endColor)}" start="${formatGradientChannel(layer.fill.gradientStart[0])},${formatGradientChannel(
+        layer.fill.gradientStart[1]
+      )}" end="${formatGradientChannel(layer.fill.gradientEnd[0])},${formatGradientChannel(layer.fill.gradientEnd[1])}"/>`
+    );
+  }
+
+  if (layer.svgPathD) {
+    parts.push(`${indent}  <path d="${escapeXml(layer.svgPathD)}"/>`);
+  } else if (layer.type === 'vector' && layer.vectorPath && layer.vectorPath.points.length > 0) {
+    const d = vectorPathToSvgD(layer.vectorPath.points, layer.vectorPath.closed);
+    if (d) parts.push(`${indent}  <path d="${escapeXml(d)}"/>`);
+  }
+
+  // Media display size is stored as the half-extent pair on <property name="size">, which is how
+  // the importer reads it back for image and video layers.
+  if ((layer.type === 'image' || layer.type === 'video') && layer.mediaData?.displayWidth && layer.mediaData.displayHeight) {
+    parts.push(
+      `${indent}  <property name="size" type="vec2" value="${formatVal([
+        layer.mediaData.displayWidth / 2,
+        layer.mediaData.displayHeight / 2,
+      ])}"/>`
+    );
+  }
+
+  if (layer.type === 'shape' && layer.shapeParams) {
+    for (const [pname, pval] of Object.entries(layer.shapeParams)) {
+      parts.push(emitPropertyEl(pname, pval, `${indent}  `));
+    }
+  }
+
+  if (layer.stroke.enabled && layer.type !== 'freehand') {
+    const endType =
+      layer.stroke.position === 'inside' ? 'inside' : layer.stroke.position === 'outside' ? 'outside' : 'centered';
+    parts.push(`${indent}  <stroke endType="${endType}">`);
+    parts.push(`${indent}    ${emitAnimProp('color', layer.stroke.color)}`);
+    parts.push(`${indent}    ${emitAnimProp('size', layer.stroke.width)}`);
+    parts.push(`${indent}  </stroke>`);
+  }
+
+  if (layer.shadow.enabled) {
+    parts.push(`${indent}  <shadow>`);
+    parts.push(`${indent}    ${emitAnimProp('color', layer.shadow.color)}`);
+    parts.push(`${indent}    ${emitAnimProp('alpha', layer.shadow.alpha)}`);
+    parts.push(`${indent}    ${emitAnimProp('size', layer.shadow.size)}`);
+    parts.push(`${indent}    <offset value="${formatVal([layer.shadow.offsetX.value, layer.shadow.offsetY.value])}"/>`);
+    parts.push(`${indent}  </shadow>`);
+  }
+
+  if (layer.type === 'freehand' && layer.freehandStrokes) {
+    for (const st of layer.freehandStrokes) {
+      const pts = st.points
+        .map((p) => `${p.x.toFixed(4)},${p.y.toFixed(4)},${p.pressure.toFixed(4)}`)
+        .join(';');
+      parts.push(
+        `${indent}  <stroke points="${escapeXml(pts)}" color="${escapeXml(st.color)}" width="${st.width}" opacity="${st.opacity}"/>`
+      );
+    }
+  }
+
+  if (layer.audioData) {
+    parts.push(`${indent}  ${emitAnimProp('gain', layer.audioData.volume)}`);
+  }
+
   if (layer.type === 'camera' && layer.cameraData) {
     parts.push(`${indent}  ${emitAnimProp('fov', layer.cameraData.fov)}`);
     if (layer.cameraData.type === 'orthographic') {
       parts.push(`${indent}  <property name="cameraType" type="string" value="orthographic"/>`);
     }
+    if (layer.cameraData.fogEnabled) {
+      parts.push(`${indent}  <fogColor value="${escapeXml(layer.cameraData.fogColor)}"/>`);
+      parts.push(`${indent}  <fogNearZ value="${layer.cameraData.fogNear}"/>`);
+      parts.push(`${indent}  <fogFarZ value="${layer.cameraData.fogFar}"/>`);
+    }
+    parts.push(`${indent}  ${emitAnimProp('focusDistance', layer.cameraData.focusDistance)}`);
+    parts.push(`${indent}  ${emitAnimProp('focusBlurStrength', layer.cameraData.blurStrength)}`);
   }
 
   for (const eff of layer.effects) {
@@ -173,9 +361,13 @@ function layerToXml(layer: Layer, indent = '  '): string {
   if (layer.type === 'group' && layer.groupLayers) {
     const gw = Math.round(layer.groupWidth || 1080);
     const gh = Math.round(layer.groupHeight || 1080);
-    parts.push(`${indent}  <scene width="${gw}" height="${gh}" fps="30" totalTime="${Math.round(layer.endTime - layer.startTime)}">`);
+    parts.push(
+      `${indent}  <scene title="" width="${gw}" height="${gh}" bgcolor="#00000000" fps="${Math.round(fps) || 30}" totalTime="${Math.round(
+        layer.endTime - layer.startTime
+      )}">`
+    );
     for (const sub of layer.groupLayers) {
-      parts.push(layerToXml(sub, indent + '    '));
+      parts.push(layerToXml(sub, fps, indent + '    '));
     }
     parts.push(`${indent}  </scene>`);
   }
@@ -191,7 +383,7 @@ export function exportProjectToAmXml(project: Project): string {
     `<scene title="${escapeXml(project.title)}" width="${project.width}" height="${project.height}" exportWidth="${project.width}" exportHeight="${project.height}" bgcolor="${escapeXml(project.bgColor === 'transparent' ? '#00000000' : project.bgColor)}" totalTime="${Math.round(project.durationMs)}" fps="${project.fps}" modifiedTime="${project.modifiedTime}" amver="280" am="com.alightcreative.motion/5.0.280">`,
   ];
   for (const layer of project.layers) {
-    lines.push(layerToXml(layer, '  '));
+    lines.push(layerToXml(layer, project.fps, '  '));
   }
   for (const bm of project.bookmarks) {
     lines.push(`  <bookmark t="${Math.round(bm)}"/>`);
@@ -292,6 +484,9 @@ function parseDirectProperties(el: Element): Record<string, Animatable<any>> {
       if (ptype === 'int') return parseInt(raw, 10) || 0;
       if (ptype === 'bool') return raw === 'true' || raw === '1';
       if (ptype === 'color') return raw;
+      // `type="string"` is how AM writes enum-valued properties such as cameraType; parsing it as
+      // a float silently reset an orthographic camera to perspective on every round trip.
+      if (ptype === 'string') return raw;
       return parseFloat(raw) || 0;
     };
     const fallback = ptype === 'quat' ? [0, 0, 0, 1] : parser('0');
@@ -908,6 +1103,8 @@ export function importProjectFromAmXml(xmlText: string, mediaMap?: AmPackageMedi
       textWrapDefaults,
     },
     cameraEnabled: layers.some((l) => l.type === 'camera'),
-    modifiedTime: Date.now(),
+    // Keep the document's own timestamp when it has one: regenerating it made every
+    // export→import→export pass differ by milliseconds.
+    modifiedTime: parseInt(scene.getAttribute('modifiedTime') || '', 10) || Date.now(),
   };
 }

@@ -7,6 +7,7 @@
     "dev": "vite --port 5173",
     "build": "tsc && vite build",
     "preview": "vite preview --port 4173",
+    "audit:xml": "esbuild scripts/audit/check_xml_roundtrip.ts --bundle --platform=node --format=esm --packages=external --outfile=scripts/audit/out/check_xml_roundtrip.mjs && node scripts/audit/out/check_xml_roundtrip.mjs",
     "extract": "python scripts/extract_apk.py"
   },
   "dependencies": {
@@ -22,6 +23,7 @@
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
     "@vitejs/plugin-react": "^4.3.4",
+    "jsdom": "^29.1.1",
     "typescript": "^5.7.3",
     "vite": "^6.2.0"
   }

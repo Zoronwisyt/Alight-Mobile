@@ -9,3 +9,6 @@ __pycache__/
 
 # esbuild bundles produced by scripts/audit/check_*.ts — regenerated on demand, not source
 scripts/audit/out/*.mjs
+
+# graphify knowledge graph — regenerable with `graphify update`, and the HTML is >1 MB
+graphify-out/

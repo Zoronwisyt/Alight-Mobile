@@ -200,6 +200,28 @@ dispute, or sign off.
 > deprecated effects are hidden behind "Show Legacy & Experimental" and badged **Compatibility**
 > (`EffectBrowserDialog.tsx:29–30, 176–178`; `EffectsPanel.tsx:88–89`).
 
+### P0-08 · XML export was lossy — the writer emitted half a document
+*(added v1.4, 2026-11-21 — fixed in the same pass)*
+
+- **Where (web):** `src/engine/amXmlCodec.ts`, `layerToXml`. Before this pass it wrote only the layer
+  tag basics, `<transform>`, `<content>`, `<fov>`, effects and a nested `<scene>`. It never wrote
+  `fillColor` for animated/gradient/media fills, `<gradient>`, `<path d>`, the shape id (`s`) or shape
+  params, `<stroke>`, `<shadow>`, freehand `<drawing>` strokes, media `src` / `speed` / `inTime` / `gain` /
+  `muted`, audio `<gain>`, camera fog/focus, or `hidden`.
+- **Where (APK):** `assets/hometab/beta_anim.xml` shows the real dialect and the attributes the APK
+  writes: `<fillColor value>`, `<gradient type startColor endColor start end>`, `<path d>`,
+  `<embedScene><scene>`, `<content>`.
+- **Consequence:** the renderer was correct and the save path was not. A shape saved as XML re-imported
+  as a default rectangle; a stroke, shadow, gradient, image, video or audio layer re-imported without its
+  defining data. This was the only defect in the sweep that *lost* a user's work on save.
+- **Fix:** the writer now emits every field the model holds, plus four defects found alongside it:
+  `type="string"` properties parsed as floats (orthographic camera → perspective), `modifiedTime`
+  regenerated on import (no byte stability), group `<fillColor>` dropped when `fillType="none"`, and
+  freehand exported as `<shape>` instead of `<drawing>`.
+- **Acceptance:** `scripts/audit/check_xml_roundtrip.ts` — fixture across all ten layer types must survive
+  `import(export(x))`, `export₂ == export₃`, and the APK's own `beta_anim.xml` must survive
+  export→import→export byte-stable. ✅ passing.
+
 ## 3. P1 — capability gaps that change what the app can do
 
 ### P1-01 · `env.editMode` is hardcoded; selection state is wired in one of two script call sites
@@ -519,6 +541,22 @@ Sequenced so every fix is **verifiable before the next** one lands, and so nothi
 ---
 
 ## Changelog
+
+**v1.4 (2026-11-21)** — parity sweep against the APK, codec focus.
+- **P0-08 added and fixed:** XML export dropped fill colour, gradients, paths, shape ids/params, strokes,
+  shadows, freehand strokes, media references, audio gain, camera fog/focus and visibility. The writer now
+  covers the whole model; `scripts/audit/check_xml_roundtrip.ts` gates it, including the APK's own
+  `assets/hometab/beta_anim.xml`.
+- **Three codec defects fixed alongside:** `type="string"` parsed as float (orthographic camera reset),
+  `modifiedTime` regenerated on import (unstable exports), group `<fillColor>` dropped when
+  `fillType="none"`.
+- **New:** `PARITY_SWEEP_5.0.280.md` — the full surface matrix with per-row evidence and the open list.
+- Audited and left alone: 6 `shake2` presets carry an undeclared `speed` prop (AM's own XML has no such
+  param either); `fastMath` is carried but never compiled; `transform.skew` has no UI; `groupMaskMode` is
+  written by the store and read by nobody.
+
+**v1.3 (2026-11-20)** — blend mode reverse (`P1-09b`): 29 `BlendingMode` constants, 24 catalogue effect
+ids, 5 native composites; `screen` corrected from catalogue id to native composite.
 
 **v1.2 (2026-11-19)** — compatibility / legacy effect audit.
 - **P0-07 added:** the `compat` root attribute is dropped by the extractor (`"compat" in effect` is false

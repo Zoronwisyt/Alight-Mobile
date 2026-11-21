@@ -478,3 +478,28 @@ already implemented.
 >    / `softoverlay` pair. `src/engine/blendModes.ts` is the single source of truth for both.
 >
 > Nothing else in this document is affected; B6's round-trip conclusion still stands, and its fix shipped.
+
+---
+
+## Correction log — XML export fidelity (append-only)
+
+> [!warning] CORRECTION — 2026-11-21 — §5's "Export: … XML" row measured *format availability*, not fidelity
+> Row 374 (`Export: video, GIF, current-frame PNG, PNG sequence, XML, project archive`) is correct that the
+> six formats exist and is **wrong if read as "XML export is faithful"**. Until this pass the writer emitted
+> only the layer tag basics, `<transform>`, `<content>`, camera fov, effects and a nested `<scene>`:
+>
+> 1. No `<fillColor>` for animated, gradient or media fills; no `<gradient>`; no `<path d>`; no shape id
+>    (`s`) and no shape params. A saved shape re-imported as a default rectangle.
+> 2. No `<stroke>`, no `<shadow>`, no `<drawing>` strokes. Styled elements re-imported bare.
+> 3. No media `src` / `speed` / `inTime` / `gain` / `muted`, and no audio `<gain>`. Media layers
+>    re-imported with no source.
+> 4. No `hidden`, no camera fog/focus.
+>
+> Fixed in the same pass; the full surface matrix, the five defects and the reproduction commands live in
+> **`PARITY_SWEEP_5.0.280.md`**. The gate is `scripts/audit/check_xml_roundtrip.ts`, which round-trips a
+> ten-layer fixture and the APK's own `assets/hometab/beta_anim.xml` byte-stably.
+>
+> Two codec gaps remain **open** and are recorded there as O1/O2: the XML spelling for
+> `lineSpacing`/`letterSpacing` (the model renders them, the codec hardcodes `1.2`/`0`) and for stroke
+> cap/join/dash (the model has them, the codec drops them). Neither has a confirmed APK spelling yet, so
+> nothing was invented.
