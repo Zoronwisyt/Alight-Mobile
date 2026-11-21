@@ -537,7 +537,7 @@ function parseXmlLayer(
   let mediaData: Layer['mediaData'];
   let audioData: Layer['audioData'];
 
-  const rawCrop = (el.getAttribute('cropMode') || '').toLowerCase();
+  const rawCrop = (el.getAttribute('cropMode') || el.getAttribute('mediaFillMode') || '').toLowerCase();
   const cropMode: 'fill' | 'fit' | 'stretch' | undefined =
     rawCrop === 'fit' || rawCrop === 'stretch' || rawCrop === 'fill' ? rawCrop : undefined;
 
@@ -545,6 +545,14 @@ function parseXmlLayer(
     type = 'video';
     const rawSpeed = parseFloat(el.getAttribute('speed') || '');
     const parsedSpeed = Number.isFinite(rawSpeed) && rawSpeed > 0 ? Math.max(0.1, Math.min(4, rawSpeed)) : 1;
+    const volEl = el.querySelector(':scope > gain') ?? el.querySelector(':scope > volume');
+    const rawVolAttr = el.getAttribute('gain') ?? el.getAttribute('volume');
+    const parsedVol = volEl
+      ? parsePropElement(volEl, parseNum, 1).value
+      : rawVolAttr != null
+        ? parseFloat(rawVolAttr) || 0
+        : 1;
+    const isMuted = el.getAttribute('muted') === 'true' || el.getAttribute('mute') === 'true' || parsedVol <= 0.001;
     mediaData = {
       mediaId: matchedVideo.mediaId,
       src: matchedVideo.src,
@@ -556,8 +564,8 @@ function parseXmlLayer(
       durationMs: matchedVideo.durationMs || 4000,
       trimStartMs: parseFloat(el.getAttribute('inTime') || '0') || 0,
       playbackSpeed: parsedSpeed,
-      volume: 1,
-      muted: false,
+      volume: parsedVol,
+      muted: isMuted,
     };
   } else if (matchedImage) {
     type = 'image';
@@ -572,14 +580,20 @@ function parseXmlLayer(
     };
   } else if (matchedAudio) {
     type = 'audio';
+    const volEl = el.querySelector(':scope > gain') ?? el.querySelector(':scope > volume');
+    const rawVolAttr = el.getAttribute('gain') ?? el.getAttribute('volume');
+    const volAnim = volEl
+      ? parsePropElement(volEl, parseNum, 1)
+      : animatable(rawVolAttr != null ? parseFloat(rawVolAttr) || 0 : 1);
+    const isMuted = el.getAttribute('muted') === 'true' || el.getAttribute('mute') === 'true';
     audioData = {
       mediaId: matchedAudio.mediaId,
       src: matchedAudio.src,
       name: matchedAudio.name,
       durationMs: matchedAudio.durationMs || 4000,
       trimStartMs: parseFloat(el.getAttribute('inTime') || '0') || 0,
-      volume: animatable(1),
-      muted: false,
+      volume: volAnim,
+      muted: isMuted,
     };
   }
 
