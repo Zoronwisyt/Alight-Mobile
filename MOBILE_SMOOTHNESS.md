@@ -462,3 +462,30 @@ optimise around, so the frame-time win should be large on any device that was fi
 a device trace (`chrome://inspect` frame timeline) to put a number on it, and whether the adaptive
 `pbScale` floor of 0.25 (`renderer.ts:1267`) wants company in the form of a playback-time degrade.
 
+## 13. The per-frame cost that was not GL at all (MP-6…MP-9)
+
+§12 fixed the GPU bill. The next report was still "really bad, even with one video and no effects",
+which is the sentence that says the bill is **per frame and fixed** - so it was worth asking what
+else runs once per animation frame. Two things did, and neither of them touches a shader.
+
+| # | Was | Now | Why it matters |
+| --- | --- | --- | --- |
+| **MP-6** | Every 4th rAF, `setCurrentTimeMs` went into the zustand store | The live playhead lives in `src/store/playbackClock.ts`; the store gets a 6 Hz commit | `currentTimeMs` is subscribed by the timeline **and** every layer row inside it, the playbar, the inspector, the preview gizmo and `useSelectedLayer`. A commit at 15 Hz reconciled all of that 15 times a second on a device with one spare core. |
+| **MP-7** | The timeline's `translate3d(contentOffset)` was recomputed by React on each commit | `Timeline.tsx` writes `style.transform` on the ruler and track containers from its own 60 fps loop while playing | The slide under the fixed centre playhead is the one thing that must be smooth. Driving it through React meant a full timeline reconcile to move two divs. Now it is two string writes. |
+| **MP-8** | The selection gizmo was rebuilt every commit, so at 6 Hz it visibly trailed the picture | Gizmo is not built while `isPlaying` (`PreviewCanvas.tsx`) | Matches the APK, which shows no transform handles during playback. Also removes `resolveLayerWorldTransformSimple` plus the shape-handle walk from every playing frame. |
+| **MP-9** | The audio meter committed a store update whenever its 0-1 sample changed, ~15 Hz | Quantised to 1/12 and sampled on the same 6 Hz tick | A continuously-varying float is a commit per frame; twelve steps are all the meter can show. |
+
+The correctness contract for MP-6/MP-7: the committed value always equals the live value **at the
+moment of commit**, so when React paints, its `translate3d` is already current and the rAF writer
+takes over on the next frame. Pausing commits the last live playhead from the effect's teardown, so
+the timeline never snaps back to the last 6 Hz tick.
+
+### 13.1 The missing number ✅ (tooling)
+
+Everything above is still a prediction until it is read off the phone that was slow. `?perf=1` mounts
+`src/ui/editor/PerfHud.tsx`, which reports `fps`, `p50`, `p95`, `dropped` (intervals over 1.5x p50),
+Chromium `longtask` count and milliseconds, the canvas backing-store size and `devicePixelRatio`.
+p95 is the number that matters: a 60 fps average with a 200 ms tail still feels broken. Cost when the
+parameter is absent is zero - no listener, no rAF, no state.
+
+

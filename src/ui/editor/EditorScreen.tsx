@@ -7,6 +7,7 @@ import {
   type MissingFontEntry,
 } from '../../engine/fontRegistry';
 import { AlightRenderer } from '../../engine/renderer';
+import { playbackClock } from '../../store/playbackClock';
 import { resolveActiveGroup, useEditorStore } from '../../store/useEditorStore';
 import { AddLayerPopup } from './AddLayerPopup';
 import { EditorActionBar } from './EditorActionBar';
@@ -14,6 +15,7 @@ import { EffectBrowserDialog } from './EffectBrowserDialog';
 import { ExportDialog } from './ExportDialog';
 import { LayerInspector } from './LayerInspector';
 import { MissingFontsDialog } from './MissingFontsDialog';
+import { PerfHud } from './PerfHud';
 import { Playbar } from './Playbar';
 import { PreviewCanvas } from './PreviewCanvas';
 import { ProjectSettingsDialog } from './ProjectSettingsDialog';
@@ -72,6 +74,8 @@ export const EditorScreen: React.FC = () => {
   const rendererRef = useRef<AlightRenderer | null>(null);
   const isExportingRef = useRef(false);
   const mediaRedrawRafRef = useRef(0);
+  /** Latest playhead the rAF loop reached, committed to the store when playback stops. */
+  const livePlayheadRef = useRef(0);
   const [visibilityPaused, setVisibilityPaused] = useState(false);
   const [viewModeOpen, setViewModeOpen] = useState(() => typeof window !== 'undefined' && window.innerWidth > 860);
   const [cacheVersion, setCacheVersion] = useState(0);
@@ -330,9 +334,10 @@ export const EditorScreen: React.FC = () => {
     let startSceneMs = playheadMs;
     let startWallMs = performance.now();
     let lastTs = startWallMs;
-    let commitTick = 0;
+    let lastCommitMs = 0;
     let consecutiveHits = 0;
     let rafId = 0;
+    let ended = false;
 
     const tick = (now: number) => {
       const store = useEditorStore.getState();
@@ -374,6 +379,7 @@ export const EditorScreen: React.FC = () => {
           });
           store.setCurrentTimeMs(activeDur);
           store.setIsPlaying(false);
+          ended = true;
           return;
         }
       }
@@ -398,11 +404,18 @@ export const EditorScreen: React.FC = () => {
         useCache: true,
       });
 
-      // Throttle React store playhead commits to every 4th frame (~15 Hz) while playing
-      commitTick++;
-      if (commitTick % 4 === 0) {
+      // The live clock never enters the store per frame. The timeline's `translate3d` is written
+      // straight to the DOM from `playbackClock` at display rate; React gets a 6 Hz commit instead of
+      // the old 15 Hz one, so the timeline, playbar and inspector re-render 2.5x less often while the
+      // playhead still moves at the display's full refresh.
+      livePlayheadRef.current = playheadMs;
+      playbackClock.set(playheadMs);
+      if (now - lastCommitMs >= 166) {
+        lastCommitMs = now;
         store.setCurrentTimeMs(playheadMs);
-        const lvl = audioEngine.sampleLevel();
+        // Quantised to 1/12: the meter does not need 60 distinguishable heights, and every distinct
+        // value used to be its own store commit and therefore its own React pass.
+        const lvl = Math.round(audioEngine.sampleLevel() * 12) / 12;
         if (lvl !== store.audioLevel) {
           store.setAudioLevel(lvl);
         }
@@ -415,10 +428,40 @@ export const EditorScreen: React.FC = () => {
       cancelAnimationFrame(rafId);
       renderer.pauseAllVideos();
       audioEngine.stopPlayback();
+      // Pausing must not snap back to the last 6 Hz commit; hand the store the frame the user saw.
+      const s = useEditorStore.getState();
+      if (!ended && s.currentProject?.id === currentProject.id && livePlayheadRef.current > 0) {
+        s.setCurrentTimeMs(livePlayheadRef.current);
+      }
     };
     // Intentionally start/stop only on isPlaying / visibilityPaused / currentProject?.id
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isPlaying, visibilityPaused, currentProject?.id]);
+
+  // iOS grants media playback and unmuting per element, per gesture. Every tap or keypress while
+  // paused is therefore a chance to unlock the element-owned tracks before the play button is even
+  // pressed; printing on a tap that is not about playback costs one no-op play/pause.
+  useEffect(() => {
+    const prime = () => {
+      const s = useEditorStore.getState();
+      if (!s.currentProject || s.isPlaying) return;
+      // Resume the audio graph from inside the gesture as well: `startPlayback` runs from the rAF
+      // loop, which iOS does not count as a gesture, and a context that never resumed leaves the
+      // playhead on the wall clock and the output silent.
+      try {
+        audioEngine.ensureContext();
+      } catch {
+        // No Web Audio on this browser; the element-owned path carries the sound.
+      }
+      rendererRef.current?.primeElementAudio();
+    };
+    window.addEventListener('pointerdown', prime, true);
+    window.addEventListener('keydown', prime, true);
+    return () => {
+      window.removeEventListener('pointerdown', prime, true);
+      window.removeEventListener('keydown', prime, true);
+    };
+  }, []);
 
   // Track C: Capture-phase global keyboard handler (suspends in inputs and open dialogs except Escape)
   useEffect(() => {
@@ -619,6 +662,7 @@ export const EditorScreen: React.FC = () => {
       <EditorActionBar />
 
       <div className={`am-editor-body ${layoutMode}${mobileSheetOpen ? ' sheet-open' : ''}`}>
+        <PerfHud />
         <PreviewCanvas
           canvasRef={canvasRef}
           onVisibilityPauseChange={setVisibilityPaused}

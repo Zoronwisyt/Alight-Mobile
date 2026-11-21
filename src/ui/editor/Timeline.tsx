@@ -4,6 +4,7 @@ import { canonicalizeBlendMode } from '../../engine/blendModes';
 import { replaceMediaOnLayers } from '../../engine/mediaReplace';
 import { snapTimelineMs } from '../../engine/snapping';
 import type { AlightRenderer } from '../../engine/renderer';
+import { playbackClock } from '../../store/playbackClock';
 import { resolveActiveGroup, useEditorStore } from '../../store/useEditorStore';
 import type { Layer } from '../../types/project';
 import { AmIcon } from '../components/AmIcon';
@@ -81,6 +82,7 @@ export const Timeline: React.FC<TimelineProps> = ({
     currentProject,
     currentTimeMs,
     timelinePxPerSec,
+    isPlaying,
     selectedLayerIds,
     groupStack,
     loop,
@@ -102,6 +104,7 @@ export const Timeline: React.FC<TimelineProps> = ({
       currentProject: s.currentProject,
       currentTimeMs: s.currentTimeMs,
       timelinePxPerSec: s.timelinePxPerSec,
+      isPlaying: s.isPlaying,
       selectedLayerIds: s.selectedLayerIds,
       groupStack: s.groupStack,
       loop: s.loop,
@@ -124,6 +127,9 @@ export const Timeline: React.FC<TimelineProps> = ({
   const scrollerRef = useRef<HTMLDivElement>(null);
   const rulerRef = useRef<HTMLDivElement>(null);
   const headersRef = useRef<HTMLDivElement>(null);
+  /** The two elements that slide under the fixed centre playhead; written directly at 60 fps. */
+  const rulerContentRef = useRef<HTMLDivElement>(null);
+  const tracksContentRef = useRef<HTMLDivElement>(null);
   const replaceInputRef = useRef<HTMLInputElement>(null);
   const [showOverflowMenu, setShowOverflowMenu] = useState(false);
   const [showCacheMenu, setShowCacheMenu] = useState(false);
@@ -210,8 +216,30 @@ export const Timeline: React.FC<TimelineProps> = ({
     };
   }, [currentProject?.id]);
 
-  if (!currentProject) return null;
-  const activeGroup = resolveActiveGroup(currentProject, groupStack);
+  // During playback the ruler and the track rows slide under the fixed centre playhead 60 times a
+  // second. Driving that through `translate3d` from React means a full timeline reconcile per frame
+  // on a device that cannot afford one, so while playing the transform is written straight to the
+  // DOM from the playback clock and React only re-renders at the store's ~6 Hz commit. The committed
+  // value always equals the live one at the moment of commit, so there is no jump when it lands.
+  useEffect(() => {
+    if (!isPlaying) return;
+    const apply = (ms: number) => {
+      const x = trackViewportW * 0.5 - (ms / 1000) * timelinePxPerSec;
+      const t = `translate3d(${x}px, 0, 0)`;
+      if (rulerContentRef.current) rulerContentRef.current.style.transform = t;
+      if (tracksContentRef.current) tracksContentRef.current.style.transform = t;
+    };
+    let raf = 0;
+    const loop = () => {
+      apply(playbackClock.get());
+      raf = requestAnimationFrame(loop);
+    };
+    apply(playbackClock.get());
+    raf = requestAnimationFrame(loop);
+    return () => cancelAnimationFrame(raf);
+  }, [isPlaying, trackViewportW, timelinePxPerSec]);
+
+  if (!currentProject) return null;  const activeGroup = resolveActiveGroup(currentProject, groupStack);
   const activeDurationMs = activeGroup.durationMs;
   const layers = getActiveLayers();
   const totalSec = Math.max(1, activeDurationMs / 1000 + 0.5);
@@ -443,6 +471,7 @@ export const Timeline: React.FC<TimelineProps> = ({
           onPointerDown={handleRulerDown}
         >
           <div
+            ref={rulerContentRef}
             style={{
               width: trackWidth,
               height: '100%',
@@ -680,6 +709,7 @@ export const Timeline: React.FC<TimelineProps> = ({
           }}
         >
           <div
+            ref={tracksContentRef}
             style={{
               width: trackWidth,
               minHeight: '100%',

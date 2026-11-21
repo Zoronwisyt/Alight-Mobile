@@ -29,6 +29,7 @@ export const PreviewCanvas: React.FC<PreviewCanvasProps> = ({
   const {
     currentProject,
     currentTimeMs,
+    isPlaying,
     selectedLayerIds,
     groupStack,
     getActiveLayers,
@@ -56,6 +57,7 @@ export const PreviewCanvas: React.FC<PreviewCanvasProps> = ({
     useShallow((s) => ({
       currentProject: s.currentProject,
       currentTimeMs: s.currentTimeMs,
+      isPlaying: s.isPlaying,
       selectedLayerIds: s.selectedLayerIds,
       groupStack: s.groupStack,
       getActiveLayers: s.getActiveLayers,
@@ -389,7 +391,7 @@ export const PreviewCanvas: React.FC<PreviewCanvasProps> = ({
     shapeHandles: Record<string, [number, number]>;
   } | null = null;
 
-  if (singleLayer && singleLayer.visible && currentTimeMs >= singleLayer.startTime && currentTimeMs <= singleLayer.endTime) {
+  if (!isPlaying && singleLayer && singleLayer.visible && currentTimeMs >= singleLayer.startTime && currentTimeMs <= singleLayer.endTime) {
     const { remappedNormT } = evalRemappedTime(singleLayer, currentTimeMs);
     const layersMap = new Map(layers.map((l) => [l.id, l]));
     const wt = resolveLayerWorldTransformSimple(singleLayer, layersMap, currentTimeMs);

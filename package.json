@@ -8,6 +8,7 @@
     "build": "tsc && vite build",
     "preview": "vite preview --port 4173",
     "audit:xml": "esbuild scripts/audit/check_xml_roundtrip.ts --bundle --platform=node --format=esm --packages=external --outfile=scripts/audit/out/check_xml_roundtrip.mjs && node scripts/audit/out/check_xml_roundtrip.mjs",
+    "audit:mp4": "esbuild scripts/audit/check_mp4_audio.ts --bundle --platform=node --format=esm --packages=external --outfile=scripts/audit/out/check_mp4_audio.mjs && node scripts/audit/out/check_mp4_audio.mjs",
     "extract": "python scripts/extract_apk.py"
   },
   "dependencies": {

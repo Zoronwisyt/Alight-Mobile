@@ -74,6 +74,8 @@ interface ImageMediaEntry {
 
 interface VideoMediaEntry {
   video: HTMLVideoElement;
+  /** The src this element was created for, so a gesture handler can match it to the audio engine. */
+  src: string;
   tex: WebGLTexture;
   w: number;
   h: number;
@@ -83,6 +85,8 @@ interface VideoMediaEntry {
   pendingSeekTarget: number | null;
   mediaId?: string;
   rehydrated?: boolean;
+  /** iOS grants playback per element; once a gesture has started it there is no need to re-prime. */
+  audioUnlocked?: boolean;
 }
 
 // Static scan to detect transform-mutating effect scripts (fixes Scale Assist where autoTransform=false)
@@ -767,6 +771,7 @@ export class AlightRenderer {
       const tex = this.createEmptyTex();
       entry = {
         video,
+        src,
         tex,
         w: 0,
         h: 0,
@@ -1059,6 +1064,35 @@ export class AlightRenderer {
       if (!entry.video.paused) {
         entry.video.pause();
       }
+    }
+  }
+
+  /**
+   * iOS will not let a `<video>` start from a `requestAnimationFrame` callback, and it will not let
+   * one unmute outside a gesture either. Both are per-element grants, so the way through is to
+   * start the element *inside* the gesture that begins playback and immediately park it again: after
+   * that the element is unlocked for the whole session and the playback loop can drive it.
+   *
+   * Only element-owned tracks are primed - Web Audio owns everything else, and starting those would
+   * be a wasted decode. Call this from a real pointerdown/keydown handler, never from a timer.
+   */
+  public primeElementAudio(): void {
+    if (this.disposed) return;
+    for (const entry of this.mediaVideos.values()) {
+      if (entry.audioUnlocked || !audioEngine.isElementAudioOwned(entry.src)) continue;
+      const v = entry.video;
+      v.muted = false;
+      const started = v.play();
+      if (!started || typeof started.then !== 'function') continue;
+      void started
+        .then(() => {
+          entry.audioUnlocked = true;
+          // Park it again unless playback actually started while the promise was in flight.
+          if (!this.isPlaybackActive && !v.paused) v.pause();
+        })
+        .catch(() => {
+          // Still locked; the next gesture tries again.
+        });
     }
   }
 

@@ -97,24 +97,68 @@ the clip's own sound while the preview had both. Video and media-fill layers now
 with `playbackSpeed`, `trimStartMs` and `volume` applied (`videoExporter.ts:112`, `:130`).
 
 ❌ Still open for export: a source whose decode fails (MA-3) cannot be mixed offline, because
-`OfflineAudioContext` has no media-element source. The preview is covered by the element; the file is
-not.
+`OfflineAudioContext` has no media-element source, so a source that cannot be decoded at all was
+audible in the preview (through its element) and silent in the exported file. **Closed in §4.1** for
+AAC: the mix now has a buffer to schedule, because the track is recovered from the container.
+
+### 4.1 AAC track rescue — the export gap, closed ✅
+
+`decodeAudioData` refusing a container does not mean the audio is gone. `src/engine/mp4Audio.ts`
+walks the ISO-BMFF boxes the file already carries — `moov` → `trak` → `mdia/hdlr == 'soun'` →
+`minf/stbl` — reads `stsd`/`stsz`/`stsc`/`stco`, pulls the `esds` AudioSpecificConfig for the profile,
+frequency index and channel count, and re-wraps every access unit behind a 7-byte ADTS header:
+
+```ts
+// audioEngine.ts - decodeViaAdts, called only when the first decode throws
+const track = extractAacAdts(bytes);          // null when the file has no AAC track
+return await ctx.decodeAudioData(track.adts.slice().buffer);
+```
+
+ADTS is the framing every browser's decoder accepts, so this turns "the container is refused" into
+"the audio decodes", in the preview and in the offline mix at the same time. `decodeAudioData`
+detaches the buffer it is given, which is why the recovery re-fetches instead of holding a second
+copy of a whole video file in memory.
+
+Verified by `scripts/audit/check_mp4_audio.ts` (`npm run audit:mp4`): it builds an MP4 in memory with
+one `soun` trak and two access units, then asserts the syncword, `0xF1` (MPEG-4, no CRC), the
+profile/frequency/channel byte, the 13-bit `frame_length` split across bytes 3-5, and that both
+access units come back byte-for-byte. It also asserts that a non-sound trak, garbage, an empty buffer
+and a truncated file all yield `null` rather than a fabricated frame.
+
+⚠️ predicted, not device-verified: whether a given iOS build needs this path at all. It only runs when
+the primary decode throws, so it cannot regress a file that already decodes.
+❌ Still open: ALAC, AC-3 and Opus-in-MP4 have no ADTS equivalent and fall back to the element, which
+the offline mix cannot use.
+
+## 5. The gesture hook was spending its grant on nothing ✅
+
+`MA-2`'s first version installed the resume listener from inside `ensureContext`'s context-creation
+branch, and removed it the first time it fired. On iOS that is backwards: a tap on the home screen
+before a project is loaded creates nothing and consumes the listener, after which the context is
+created by a preload - not a gesture - and `resume()` is rejected forever. The listener is now
+installed on every `ensureContext` path and only removed once the context is actually observed
+`running`; the play gesture also resumes the graph itself and calls `renderer.primeElementAudio()`,
+which starts each element-owned `<video>` inside the gesture and parks it again. iOS grants playback
+and unmuting per element, and it does not count a `requestAnimationFrame` callback as a gesture.
+
 
 ## 5. Verify on hardware
 
 | Check | Expected |
 | --- | --- |
 | iOS with the silent switch ON | video audio audible (MA-1) |
+| Tap the home screen once, then open a project and play | audio plays — the unlock listener survived (MA-2, §5) |
 | Background the app mid-playback, return, press play | audio returns without a reload (MA-2) |
 | Enter a group, press play | that group's audio plays (MA-4) |
 | Shared link project whose video plays silently on desktop too | audio present from the element path (MA-3) |
-| Export MP4 | audio track present (MA-5) |
+| Export MP4 | audio track present, including a clip that only played via its element (MA-5, §4.1) |
 
 ## Memory log
 
 | Field | Value |
 | --- | --- |
 | Vault note | `[[MOBILE_AUDIO]]` |
-| Shipped in | `45e2fa4` |
+| Shipped in | `45e2fa4` (MA-1…MA-5), this revision adds §4.1 and §5 |
+| Gate | `npm run audit:mp4` |
 | Related | `[[MOBILE_SMOOTHNESS]]`, `[[PLAYBACK_PREVIEW_DECOMPILED]]` |
 | Status | shipped, device verification open |

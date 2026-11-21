@@ -1,5 +1,6 @@
 import type { Layer, Project } from '../types/project';
 import { evalAnimatable, evalRemappedTime } from './animation';
+import { extractAacAdts } from './mp4Audio';
 
 /**
  * Mobile audio is governed by two platform rules the desktop build never had to care about:
@@ -83,16 +84,30 @@ class AudioEngine {
   }
 
   /**
-   * iOS only lets an AudioContext leave `suspended` inside a user gesture. Import, project load and
-   * preload all happen without one, so the context is primed by the first touch/keypress anywhere in
-   * the app rather than by the play button alone.
+   * iOS only lets an AudioContext leave `suspended` inside a user gesture, and it hands that grant
+   * per gesture - a call, a background/foreground cycle or a locked screen drops the context back to
+   * `interrupted`. The listener therefore stays installed until the context is actually observed
+   * `running`; removing it after the first tap was wrong, because a tap that happened before the
+   * context existed spent the grant on nothing.
    */
   private installUnlock(): void {
     if (this.unlockInstalled || typeof window === 'undefined') return;
     this.unlockInstalled = true;
     const unlock = () => {
-      this.ensureContext();
-      this.removeUnlock();
+      let ctx: AudioContext;
+      try {
+        ctx = this.ensureContext();
+      } catch {
+        return;
+      }
+      void ctx
+        .resume()
+        .then(() => {
+          if (ctx.state === 'running') this.removeUnlock();
+        })
+        .catch(() => {
+          // Still locked; the next gesture tries again.
+        });
     };
     this.unlockHandler = unlock;
     window.addEventListener('pointerdown', unlock, { passive: true });
@@ -124,8 +139,10 @@ class AudioEngine {
       this.analyser.fftSize = 256;
       this.analyser.connect(this.ctx.destination);
       this.dataArr = new Uint8Array(new ArrayBuffer(this.analyser.frequencyBinCount));
-      this.installUnlock();
     }
+    // Registered outside the creation guard: the listener must exist even when the context was made
+    // during a preload (no gesture), which is the normal path on a cold project load.
+    this.installUnlock();
     if (this.ctx.state !== 'running') {
       this.ctx.resume().catch(() => {});
     }
@@ -171,12 +188,23 @@ class AudioEngine {
       try {
         const res = await fetch(src);
         const arr = await res.arrayBuffer();
-        const buf = await ctx.decodeAudioData(arr);
-        this.buffers.set(key, buf);
-        return buf;
+        try {
+          const buf = await ctx.decodeAudioData(arr);
+          this.buffers.set(key, buf);
+          return buf;
+        } catch (firstErr) {
+          // `decodeAudioData` detaches the ArrayBuffer it is handed, so the recovery path re-fetches
+          // rather than keeping a second full copy of a video file alive in memory.
+          const recovered = await this.decodeViaAdts(src, ctx);
+          if (recovered) {
+            this.buffers.set(key, recovered);
+            return recovered;
+          }
+          throw firstErr;
+        }
       } catch (err) {
         this.failedAudioSrcs.add(key);
-        // A video container that will not decode still has a usable audio track inside its element.
+        // A container that will not decode at all still has a usable track inside its element.
         this.elementAudioSrcs.add(key);
         throw err;
       } finally {
@@ -185,6 +213,26 @@ class AudioEngine {
     })();
     this.loading.set(key, promise);
     return promise;
+  }
+
+  /**
+   * Second chance for a container the browser's decoder refuses as a whole: pull the AAC track out
+   * of the ISO-BMFF boxes, re-wrap it as ADTS, and let the same decoder read that. This is what makes
+   * an exported MP4 carry sound on a device where the preview only survived because the `<video>`
+   * element owned the track - `OfflineAudioContext` has no element source, but it does have buffers.
+   */
+  private async decodeViaAdts(src: string, ctx: AudioContext): Promise<AudioBuffer | null> {
+    try {
+      const res = await fetch(src);
+      const bytes = await res.arrayBuffer();
+      const track = extractAacAdts(bytes);
+      if (!track) return null;
+      // decodeAudioData wants an ArrayBuffer it owns; pass a fresh one over the ADTS window.
+      const copy = track.adts.slice().buffer;
+      return await ctx.decodeAudioData(copy);
+    } catch {
+      return null;
+    }
   }
 
   public extractPeaks(buf: AudioBuffer, bars = 96): number[] {
