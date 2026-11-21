@@ -79,9 +79,14 @@ interface VideoMediaEntry {
   tex: WebGLTexture;
   w: number;
   h: number;
+  texW: number;
+  texH: number;
   hasFrame: boolean;
   lastUploadedTime: number;
   lastUploadGen: number;
+  hasRvfc: boolean;
+  presentedFrames: number;
+  lastUploadedPresentedFrames: number;
   pendingSeekTarget: number | null;
   mediaId?: string;
   rehydrated?: boolean;
@@ -506,6 +511,10 @@ export class AlightRenderer {
   private interactiveUntilMs = 0;
   private interactiveSettleTimer = 0;
   private mobilePlaybackOverloaded = false;
+  private currentMaxVideoUploadDim = Infinity;
+  private videoHostEl: HTMLDivElement | null = null;
+  private videoProxyCanvas: HTMLCanvasElement | null = null;
+  private videoProxyCtx: CanvasRenderingContext2D | null = null;
   public onMediaReady?: () => void;
   public onCacheChange?: () => void;
 
@@ -739,6 +748,21 @@ export class AlightRenderer {
     gl.disable(gl.BLEND);
   }
 
+  private ensureVideoHost(): HTMLDivElement | null {
+    if (typeof document === 'undefined' || !document.body) return null;
+    if (!this.videoHostEl) {
+      const host = document.createElement('div');
+      host.setAttribute('aria-hidden', 'true');
+      // Rendered-but-invisible 1px container keeps iOS WebKit AVPlayer on the full 60fps
+      // hardware decode pipeline (detached or display:none <video> elements get throttled to ~10fps).
+      host.style.cssText =
+        'position:fixed;left:0;top:0;width:1px;height:1px;opacity:0.001;pointer-events:none;overflow:hidden;z-index:-1;';
+      document.body.appendChild(host);
+      this.videoHostEl = host;
+    }
+    return this.videoHostEl;
+  }
+
   private uploadVideoTex(entry: VideoMediaEntry): boolean {
     if (this.disposed) return false;
     const v = entry.video;
@@ -749,26 +773,72 @@ export class AlightRenderer {
     if (v.readyState < 2 || v.seeking || v.videoWidth === 0 || v.videoHeight === 0) {
       return false;
     }
-    // Skip redundant upload when video frame time hasn't advanced (paused scrubs / stills)
-    if (entry.hasFrame && entry.w === v.videoWidth && entry.h === v.videoHeight && Math.abs(entry.lastUploadedTime - v.currentTime) < 0.0005) {
-      entry.lastUploadGen = this.frameUploadGen;
-      return true;
+
+    // Compute target GPU texture upload size (on mobile preview, downscale 4K/hi-res video frames
+    // proportionally to Preview Quality to cut 33MB/frame uploads down to ~0.5-2MB/frame).
+    const maxDim = this.currentMaxVideoUploadDim;
+    const srcMax = Math.max(v.videoWidth, v.videoHeight);
+    let targetW = v.videoWidth;
+    let targetH = v.videoHeight;
+    let useProxy = false;
+    if (this.mobileRender && Number.isFinite(maxDim) && srcMax > maxDim) {
+      const ratio = maxDim / srcMax;
+      targetW = Math.max(16, Math.round(v.videoWidth * ratio));
+      targetH = Math.max(16, Math.round(v.videoHeight * ratio));
+      useProxy = true;
     }
+
+    const sizeMatches = entry.texW === targetW && entry.texH === targetH;
+    // Skip redundant GPU uploads when decoder has not presented a new frame since last upload
+    if (entry.hasFrame && sizeMatches) {
+      if (entry.hasRvfc && this.isPlaybackActive) {
+        if (entry.presentedFrames === entry.lastUploadedPresentedFrames) {
+          entry.lastUploadGen = this.frameUploadGen;
+          return true;
+        }
+      } else if (Math.abs(entry.lastUploadedTime - v.currentTime) < 0.0005) {
+        entry.lastUploadGen = this.frameUploadGen;
+        return true;
+      }
+    }
+
+    let uploadSource: HTMLVideoElement | HTMLCanvasElement = v;
+    if (useProxy) {
+      if (!this.videoProxyCanvas) {
+        this.videoProxyCanvas = document.createElement('canvas');
+        this.videoProxyCtx = this.videoProxyCanvas.getContext('2d', { alpha: false });
+      }
+      if (this.videoProxyCanvas && this.videoProxyCtx) {
+        if (this.videoProxyCanvas.width !== targetW || this.videoProxyCanvas.height !== targetH) {
+          this.videoProxyCanvas.width = targetW;
+          this.videoProxyCanvas.height = targetH;
+        }
+        this.videoProxyCtx.drawImage(v, 0, 0, targetW, targetH);
+        uploadSource = this.videoProxyCanvas;
+      } else {
+        targetW = v.videoWidth;
+        targetH = v.videoHeight;
+      }
+    }
+
     const gl = this.gl;
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, entry.tex);
-    // Zero-copy ANGLE/D3D11 video upload fast path (no CPU flipY/premultiply readback; flipped in shader)
+    // Zero-copy video upload fast path (no CPU flipY/premultiply readback; flipped in shader)
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 0);
     gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, 0);
-    if (entry.hasFrame && entry.w === v.videoWidth && entry.h === v.videoHeight) {
-      gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, gl.RGBA, gl.UNSIGNED_BYTE, v);
+    if (entry.hasFrame && entry.texW === targetW && entry.texH === targetH) {
+      gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, gl.RGBA, gl.UNSIGNED_BYTE, uploadSource);
     } else {
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, v);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, uploadSource);
+      entry.texW = targetW;
+      entry.texH = targetH;
     }
     entry.w = v.videoWidth;
     entry.h = v.videoHeight;
     entry.hasFrame = true;
     entry.lastUploadedTime = v.currentTime;
+    entry.lastUploadedPresentedFrames = entry.presentedFrames;
     entry.lastUploadGen = this.frameUploadGen;
     return true;
   }
@@ -787,7 +857,16 @@ export class AlightRenderer {
       video.crossOrigin = 'anonymous';
       video.muted = true;
       video.playsInline = true;
+      video.setAttribute('playsinline', '');
+      video.setAttribute('webkit-playsinline', '');
       video.preload = 'auto';
+      if (!offscreen) {
+        const host = this.ensureVideoHost();
+        if (host) {
+          video.style.cssText = 'position:absolute;left:0;top:0;width:1px;height:1px;';
+          host.appendChild(video);
+        }
+      }
       const tex = this.createEmptyTex();
       entry = {
         video,
@@ -795,14 +874,47 @@ export class AlightRenderer {
         tex,
         w: 0,
         h: 0,
+        texW: 0,
+        texH: 0,
         hasFrame: false,
         lastUploadedTime: -1,
         lastUploadGen: -1,
+        hasRvfc: false,
+        presentedFrames: 0,
+        lastUploadedPresentedFrames: -1,
         pendingSeekTarget: null,
         mediaId,
         rehydrated: false,
       };
       const cur = entry;
+
+      // Track hardware-decoded video frames via requestVideoFrameCallback so we upload
+      // exactly once per real decoded frame (zero duplicate 4K uploads on 60/120Hz displays).
+      if (!offscreen) {
+        const rVfc = (
+          video as HTMLVideoElement & {
+            requestVideoFrameCallback?: (cb: (now: number, meta: { presentedFrames?: number }) => void) => number;
+          }
+        ).requestVideoFrameCallback;
+        if (typeof rVfc === 'function') {
+          const onVideoFrame = (_now: number, meta: { presentedFrames?: number }) => {
+            if (this.disposed || !this.mediaVideos.has(key)) return;
+            cur.hasRvfc = true;
+            cur.presentedFrames =
+              typeof meta?.presentedFrames === 'number' ? meta.presentedFrames : cur.presentedFrames + 1;
+            try {
+              rVfc.call(video, onVideoFrame);
+            } catch {
+              // ignore
+            }
+          };
+          try {
+            rVfc.call(video, onVideoFrame);
+          } catch {
+            // ignore
+          }
+        }
+      }
 
       // Only live video entries trigger onMediaReady redraws (offscreen precache entries never touch the parked canvas)
       if (!offscreen) {
@@ -957,6 +1069,11 @@ export class AlightRenderer {
     activeGroupStack?: string[]
   ): void {
     this.isPlaybackActive = isPlaying;
+    // On mobile, release idle-precache offscreen decoders as soon as live playback starts
+    // so they never compete with live 4K hardware video decoding.
+    if (isPlaying && this.mobileRender && this.offscreenVideos.size > 0) {
+      this.clearOffscreenVideos();
+    }
     const activeKeys = new Set<string>();
     const items: { layer: Layer; localTimeMs: number; parentTimeMs: number; isLookahead?: boolean }[] = [];
     let rootLayers = project.layers;
@@ -1071,6 +1188,7 @@ export class AlightRenderer {
         } catch {
           // ignore
         }
+        entry.video.remove();
         this.gl.deleteTexture(entry.tex);
         this.mediaVideos.delete(key);
       }
@@ -1281,9 +1399,7 @@ export class AlightRenderer {
 
       // Upload new GPU texture only when decoder holds a fresh decoded frame (never blank during seek)
       if (v.readyState >= 2 && !v.seeking && v.videoWidth > 0) {
-        if (!entry.hasFrame || Math.abs(v.currentTime - entry.lastUploadedTime) > 0.0005) {
-          this.uploadVideoTex(entry);
-        }
+        this.uploadVideoTex(entry);
       }
 
       // FL-2: Frame-relative stale tolerance (half a frame) so cached frames never bake >0.5 frame video error
@@ -1710,6 +1826,10 @@ export class AlightRenderer {
           : pbScale;
       const rw = Math.max(16, Math.round(project.width * activeScale));
       const rh = Math.max(16, Math.round(project.height * activeScale));
+      // Scale mobile video texture upload ceiling with Preview Quality (cuts 4K 33MB uploads down to ~0.5-2MB)
+      this.currentMaxVideoUploadDim = this.mobileRender
+        ? Math.min(1280, Math.max(320, Math.round(Math.max(rw, rh) * 1.25)))
+        : Infinity;
 
       const sceneFbo = this.acquireFbo(rw, rh);
       const [br, bg, bb, ba] =
@@ -1732,6 +1852,9 @@ export class AlightRenderer {
       return;
     }
 
+    this.currentMaxVideoUploadDim = isExport || !this.mobileRender
+      ? Infinity
+      : Math.min(1280, Math.max(320, Math.round(Math.max(renderW, renderH) * 1.25)));
     const sceneFbo = this.acquireFbo(renderW, renderH);
     const [br, bg, bb, ba] =
       project.bgColor === 'transparent' ? [0, 0, 0, 0] : parseColorArgb(project.bgColor);
@@ -4022,9 +4145,16 @@ void main() {
     const gl = this.gl;
     for (const entry of this.mediaVideos.values()) {
       entry.video.src = '';
+      entry.video.remove();
       gl.deleteTexture(entry.tex);
     }
     this.mediaVideos.clear();
+    if (this.videoHostEl) {
+      this.videoHostEl.remove();
+      this.videoHostEl = null;
+    }
+    this.videoProxyCanvas = null;
+    this.videoProxyCtx = null;
     for (const entry of this.offscreenVideos.values()) {
       entry.video.src = '';
       gl.deleteTexture(entry.tex);
