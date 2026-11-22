@@ -40,12 +40,15 @@ export async function ensureCatalogLoaded(): Promise<void> {
   if (!loadPromise) {
     loadPromise = (async () => {
       const base = import.meta.env.BASE_URL;
-      const [effRes, preRes, shpRes] = await Promise.all([
+      const [effRes, preRes, shpRes, vsRes] = await Promise.all([
         fetch(`${base}am/effects.json`),
         fetch(`${base}am/presets.json`),
         fetch(`${base}am/shapes.json`),
+        fetch(`${base}am/videostar_effects.json`).catch(() => null),
       ]);
-      cachedBuiltInEffects = (await effRes.json()) as EffectDef[];
+      const baseEffects = (await effRes.json()) as EffectDef[];
+      const vsEffects = vsRes && vsRes.ok ? ((await vsRes.json()) as EffectDef[]) : [];
+      cachedBuiltInEffects = [...baseEffects, ...vsEffects];
       cachedPresets = (await preRes.json()) as Record<string, EffectPreset[]>;
       cachedShapes = (await shpRes.json()) as ShapeDef[];
 
