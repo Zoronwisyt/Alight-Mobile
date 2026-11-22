@@ -227,25 +227,54 @@ async function renderProjectAudioMix(
   return offline.startRendering();
 }
 
+/**
+ * Bitrate ladders per codec, best first. Re-encoding material that is already lossy (most music)
+ * at 192 kb/s was audibly noisier than the preview, which plays the *original* bitstream — export
+ * must sit at or above the source's quality generation, not below it.
+ */
+function audioEncoderCandidates(container: VideoContainer, numberOfChannels: number, sampleRate: number): AudioEncoderConfig[] {
+  if (container === 'mp4') {
+    const rates = numberOfChannels > 1 ? [256_000, 192_000, 128_000] : [128_000, 96_000];
+    return rates.map((bitrate) => ({
+      codec: 'mp4a.40.2',
+      numberOfChannels,
+      sampleRate,
+      bitrate,
+    }));
+  }
+  const rates = numberOfChannels > 1 ? [192_000, 128_000] : [96_000, 64_000];
+  return rates.map((bitrate) => ({
+    codec: 'opus',
+    numberOfChannels,
+    sampleRate,
+    bitrate,
+  }));
+}
+
+/** The best encoder config this browser supports for the mix, or null when audio cannot be encoded. */
+export async function resolveAudioEncoderConfig(
+  container: VideoContainer,
+  numberOfChannels: number,
+  sampleRate: number
+): Promise<AudioEncoderConfig | null> {
+  if (typeof AudioEncoder === 'undefined' || typeof AudioData === 'undefined') return null;
+  for (const cfg of audioEncoderCandidates(container, numberOfChannels, sampleRate)) {
+    try {
+      const sup = await AudioEncoder.isConfigSupported(cfg);
+      if (sup.supported) return cfg;
+    } catch {
+      // try next bitrate tier
+    }
+  }
+  return null;
+}
+
 async function encodeAudioBuffer(
   audioBuf: AudioBuffer,
-  container: VideoContainer,
+  cfg: AudioEncoderConfig,
   onChunk: (chunk: EncodedAudioChunk, meta?: EncodedAudioChunkMetadata) => void
 ): Promise<boolean> {
   if (typeof AudioEncoder === 'undefined' || typeof AudioData === 'undefined') return false;
-  const codec = container === 'mp4' ? 'mp4a.40.2' : 'opus';
-  const cfg: AudioEncoderConfig = {
-    codec,
-    numberOfChannels: audioBuf.numberOfChannels,
-    sampleRate: audioBuf.sampleRate,
-    bitrate: 192_000,
-  };
-  try {
-    const sup = await AudioEncoder.isConfigSupported(cfg);
-    if (!sup.supported) return false;
-  } catch {
-    return false;
-  }
 
   let encError: Error | null = null;
   const encoder = new AudioEncoder({
@@ -256,7 +285,10 @@ async function encodeAudioBuffer(
   });
   encoder.configure(cfg);
 
-  const chunkFrames = 1024;
+  // AAC consumes exactly 1024 samples per access unit. Opus frames are 2.5-60 ms (120-2880 samples
+  // at 48 kHz); a 1024-sample packet is not a legal Opus frame and the encoder's per-packet
+  // padding/trim showed up as a regular buzz at every chunk boundary. 960 = 20 ms is always valid.
+  const chunkFrames = cfg.codec.startsWith('mp4a') ? 1024 : 960;
   const numCh = audioBuf.numberOfChannels;
   const totalFrames = audioBuf.length;
 
@@ -264,8 +296,17 @@ async function encodeAudioBuffer(
     if (encError) throw encError;
     const frames = Math.min(chunkFrames, totalFrames - offset);
     const planar = new Float32Array(frames * numCh);
+    // The preview's output device hard-clips the summed mix at +/-1.0, but OfflineAudioContext
+    // renders without clamping and fixed-point audio encoders *wrap* out-of-range samples instead
+    // of clipping them — that wrap was the "extra noise" export had and the preview never showed.
+    // Clamp (and de-NaN) here so the file matches the preview's behaviour exactly.
     for (let ch = 0; ch < numCh; ch++) {
-      planar.set(audioBuf.getChannelData(ch).subarray(offset, offset + frames), ch * frames);
+      const srcData = audioBuf.getChannelData(ch);
+      const dstOff = ch * frames;
+      for (let i = 0; i < frames; i++) {
+        const x = srcData[offset + i];
+        planar[dstOff + i] = x !== x ? 0 : x > 1 ? 1 : x < -1 ? -1 : x;
+      }
     }
     const audioData = new AudioData({
       format: 'f32-planar',
@@ -320,22 +361,14 @@ export async function exportProjectVideo(
 
   // Prepare optional offline audio mix
   let audioBuf: AudioBuffer | null = null;
+  let audioCfg: AudioEncoderConfig | null = null;
   let audioSupported = false;
   if (options.includeAudio !== false && typeof AudioEncoder !== 'undefined') {
     options.onProgress?.(0, 'Mixing audio tracks...');
     audioBuf = await renderProjectAudioMix(project, durationSec, options.includeVideoAudio !== false);
     if (audioBuf) {
-      try {
-        const check = await AudioEncoder.isConfigSupported({
-          codec: container === 'mp4' ? 'mp4a.40.2' : 'opus',
-          numberOfChannels: audioBuf.numberOfChannels,
-          sampleRate: audioBuf.sampleRate,
-          bitrate: 192_000,
-        });
-        audioSupported = Boolean(check.supported);
-      } catch {
-        audioSupported = false;
-      }
+      audioCfg = await resolveAudioEncoderConfig(container, audioBuf.numberOfChannels, audioBuf.sampleRate);
+      audioSupported = Boolean(audioCfg);
     }
   }
 
@@ -458,9 +491,9 @@ export async function exportProjectVideo(
     videoEncoder.close();
 
     let hasAudio = false;
-    if (audioBuf && audioSupported) {
+    if (audioBuf && audioSupported && audioCfg) {
       options.onProgress?.(0.98, 'Encoding audio track...');
-      hasAudio = await encodeAudioBuffer(audioBuf, container, (chunk, meta) => {
+      hasAudio = await encodeAudioBuffer(audioBuf, audioCfg, (chunk, meta) => {
         if (mp4Muxer) mp4Muxer.addAudioChunk(chunk, meta);
         else if (webmMuxer) webmMuxer.addAudioChunk(chunk, meta);
       });

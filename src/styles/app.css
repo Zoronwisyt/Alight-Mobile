@@ -2596,3 +2596,247 @@ button:active {
   border: 2.5px solid var(--am-accent);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
 }
+
+/* ============================================================================
+   MOBILE UI REFRESH — bottom-sheet editor polish (classic layout)
+   Aesthetics + workflow pass over the existing controls. Same features, same
+   grid contract (preview never covered); appended last so it wins the cascade.
+   ============================================================================ */
+
+/* Sheet height now animates between detents — except while a finger is dragging */
+.am-editor-body.classic,
+.am-editor-body.classic.sheet-open {
+  transition: grid-template-rows var(--am-dur-base) var(--am-ease-sheet);
+}
+.am-editor-body.sheet-dragging,
+.am-editor-body.sheet-dragging .am-inspector-dock {
+  transition: none !important;
+}
+
+/* Stage: soft radial falloff so the canvas reads as a lit "screen" */
+.am-editor-body.classic .am-stage-wrap {
+  background:
+    radial-gradient(120% 90% at 50% 12%, rgba(46, 52, 82, 0.55) 0%, rgba(16, 18, 32, 0) 60%),
+    #101220;
+}
+
+/* ---- Inspector sheet shell ---- */
+.am-editor-body.classic .am-inspector-dock {
+  border-radius: 22px 22px 0 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.16);
+  background:
+    linear-gradient(180deg, rgba(105, 252, 151, 0.05) 0%, rgba(0, 0, 0, 0) 22%),
+    linear-gradient(180deg, #232740 0%, #1A1D2C 46%, #171926 100%);
+  box-shadow:
+    0 -14px 44px rgba(0, 0, 0, 0.62),
+    0 -2px 0 rgba(0, 255, 168, 0.10),
+    inset 0 1px 0 rgba(255, 255, 255, 0.10);
+}
+
+/* ---- Sheet handle (grab / peek / dismiss target) ---- */
+.am-mobile-sheet-handle {
+  height: 34px;
+  background: transparent;
+  border-bottom: none;
+}
+.am-mobile-sheet-handle:active .am-mobile-sheet-grip {
+  background: var(--am-accent);
+  width: 52px;
+}
+.am-mobile-sheet-grip {
+  width: 44px;
+  height: 5px;
+  background: linear-gradient(90deg, rgba(105, 252, 151, 0.55), rgba(92, 229, 255, 0.55));
+  box-shadow: 0 0 12px rgba(0, 255, 168, 0.18);
+  transition: width var(--am-dur-fast) var(--am-ease-standard), background-color var(--am-dur-fast) linear;
+}
+.am-mobile-sheet-title {
+  position: absolute;
+  left: 14px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: rgba(255, 255, 255, 0.66);
+  max-width: 40%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  pointer-events: none;
+}
+.am-mobile-sheet-peek-label {
+  right: 14px;
+  color: rgba(0, 255, 168, 0.62);
+}
+
+/* ---- Mini transport ---- */
+.am-mobile-mini-transport {
+  gap: 6px;
+  padding: 6px 10px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(0, 0, 0, 0.12));
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+.am-mobile-mini-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07);
+}
+.am-mobile-mini-btn.play {
+  width: 42px;
+  height: 42px;
+  background: var(--am-accent-grad);
+  border: none;
+  color: #052018;
+  box-shadow:
+    0 4px 16px rgba(0, 255, 168, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.45);
+}
+.am-mobile-mini-btn.play:active:not(:disabled) {
+  transform: scale(0.92);
+  box-shadow: 0 2px 8px rgba(0, 255, 168, 0.3);
+}
+
+/* Scrub bar: hairline track with accent progress fill + glowing thumb */
+.am-mobile-scrub-range {
+  --scrub-pct: 0%;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 30px;
+  background: transparent;
+  accent-color: var(--am-accent);
+}
+.am-mobile-scrub-range::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--am-accent-grad-start) 0%, var(--am-accent) var(--scrub-pct), rgba(255, 255, 255, 0.14) var(--scrub-pct));
+}
+.am-mobile-scrub-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  margin-top: -5px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: none;
+  box-shadow: 0 0 0 3px rgba(0, 255, 168, 0.30), 0 2px 6px rgba(0, 0, 0, 0.5);
+}
+.am-mobile-scrub-range::-moz-range-track {
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.14);
+}
+.am-mobile-scrub-range::-moz-range-progress {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--am-accent);
+}
+.am-mobile-scrub-range::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: none;
+  box-shadow: 0 0 0 3px rgba(0, 255, 168, 0.30), 0 2px 6px rgba(0, 0, 0, 0.5);
+}
+.am-mobile-mini-time {
+  padding: 5px 8px;
+  border-radius: 9px;
+  background: rgba(0, 255, 168, 0.07);
+  border: 1px solid rgba(0, 255, 168, 0.20);
+}
+
+/* ---- Quick tab strip ---- */
+.am-mobile-tab-bar {
+  padding: 7px 10px;
+  background: rgba(255, 255, 255, 0.025);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+.am-mobile-tab-strip {
+  scroll-behavior: smooth;
+}
+.am-mobile-tab-pill {
+  height: 32px;
+  padding: 0 12px;
+  font-size: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  color: #C7CDDE;
+}
+.am-mobile-tab-pill.active {
+  background: linear-gradient(135deg, rgba(105, 252, 151, 0.22) 0%, rgba(92, 229, 255, 0.20) 100%);
+  border-color: rgba(0, 255, 168, 0.65);
+  color: var(--am-accent);
+  box-shadow:
+    0 0 14px rgba(0, 255, 168, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+.am-mobile-tab-pill.timeline-exit {
+  background: linear-gradient(180deg, #343950, #272B3D);
+  border-color: rgba(255, 255, 255, 0.28);
+}
+
+/* ---- Inspector head + body inside the sheet ---- */
+.am-editor-body.classic .am-insp-head {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(0, 0, 0, 0.06));
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+.am-editor-body.classic .am-insp-head.sub-bar {
+  background: linear-gradient(180deg, rgba(105, 252, 151, 0.07), rgba(0, 0, 0, 0.05));
+}
+.am-editor-body.classic .am-insp-scroll {
+  background: transparent;
+}
+.am-nav-icon-btn {
+  border-radius: 11px;
+  transition: background-color var(--am-dur-fast) linear, transform var(--am-dur-instant) var(--am-ease-standard);
+}
+.am-nav-icon-btn:active {
+  background: rgba(255, 255, 255, 0.12);
+  transform: scale(0.92);
+}
+.am-nav-icon-btn.active {
+  background: rgba(0, 255, 168, 0.10);
+}
+
+/* ---- Top action bar ---- */
+.am-actionbar {
+  background: linear-gradient(180deg, #232740 0%, #191C2A 100%);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06), 0 6px 18px rgba(0, 0, 0, 0.35);
+}
+.am-nav-time {
+  padding: 4px 9px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.28);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #C4C5CB;
+}
+.am-layout-chip {
+  border-radius: 8px;
+}
+
+/* ---- Timeline (visible when the sheet is closed) ---- */
+.am-editor-body.classic .am-timeline-wrap {
+  background: linear-gradient(180deg, #1B1E2D 0%, #161826 100%);
+}
+.am-editor-body.classic .am-track-bar {
+  border-radius: 8px;
+}
+.am-editor-body.classic .am-track-bar.selected {
+  box-shadow:
+    0 0 0 1.5px var(--am-accent),
+    0 4px 14px rgba(0, 255, 168, 0.22);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .am-editor-body.classic,
+  .am-editor-body.classic.sheet-open {
+    transition: none;
+  }
+  .am-mobile-tab-strip {
+    scroll-behavior: auto;
+  }
+}

@@ -376,7 +376,10 @@ export const EditorScreen: React.FC = () => {
         playheadMs = startSceneMs + (now - startWallMs);
       }
 
-      const activeDur = resolveActiveGroup(proj, store.groupStack).durationMs;
+      const activeScope = resolveActiveGroup(proj, store.groupStack);
+      const activeDur = activeScope.durationMs;
+      // Follow volume automation / live volume edits on the running graph (no restart, no dropout).
+      if (hasAudioTrack) audioEngine.updateLiveVolumes(activeScope.layers);
       if (playheadMs >= activeDur) {
         if (store.loop) {
           playheadMs = 0;
@@ -472,12 +475,15 @@ export const EditorScreen: React.FC = () => {
           parts.push(`g:${l.id}:${l.visible ? 1 : 0}:${l.startTime}:${l.endTime}`);
           walk(l.groupLayers);
         } else if (l.type === 'audio' && l.audioData) {
+          // Volume is NOT part of this fingerprint on purpose: it is applied live through
+          // audioEngine.updateLiveVolumes(). Restarting startPlayback on every slider tick cut the
+          // whole mix mid-frame (preview audio "bugging out" while editing).
           parts.push(
-            `a:${l.id}:${l.visible ? 1 : 0}:${l.audioData.muted ? 1 : 0}:${l.audioData.volume.value}:${l.startTime}:${l.endTime}:${l.audioData.trimStartMs ?? 0}`
+            `a:${l.id}:${l.visible ? 1 : 0}:${l.audioData.muted ? 1 : 0}:${l.startTime}:${l.endTime}:${l.audioData.trimStartMs ?? 0}`
           );
         } else if (l.type === 'video' && l.mediaData) {
           parts.push(
-            `v:${l.id}:${l.visible ? 1 : 0}:${l.mediaData.muted ? 1 : 0}:${l.mediaData.volume ?? 1}:${l.startTime}:${l.endTime}:${l.mediaData.trimStartMs ?? 0}:${l.mediaData.playbackSpeed ?? 1}`
+            `v:${l.id}:${l.visible ? 1 : 0}:${l.mediaData.muted ? 1 : 0}:${l.startTime}:${l.endTime}:${l.mediaData.trimStartMs ?? 0}:${l.mediaData.playbackSpeed ?? 1}`
           );
         }
       }

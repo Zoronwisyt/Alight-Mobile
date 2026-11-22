@@ -104,6 +104,29 @@ class AudioEngine {
   private playbackStartSceneMs = 0;
   private playbackActive = false;
   private playbackSessionId = 0;
+  /**
+   * Every running Web-Audio layer (buffer source or fallback element), keyed by layer id, so a
+   * volume edit can ramp the live gain instead of restarting playback. A full `startPlayback()`
+   * restart on every slider tick was cutting every other track out mid-frame — the preview audio
+   * "bugging out" while editing volume.
+   */
+  private liveMix = new Map<
+    string,
+    {
+      isVideo: boolean;
+      localOffsetMs: number;
+      absStart: number;
+      absEnd: number;
+      gain: GainNode | null;
+      el: HTMLAudioElement | null;
+      /** Fallback elements started muted keep their trigger params so a live volume-up can start them. */
+      trimSec?: number;
+      speed?: number;
+      started?: boolean;
+      sessionId?: number;
+    }
+  >();
+  private lastMixVolumes = new Map<string, number>();
   private unlockInstalled = false;
   private iosRouteUnlocked = false;
   private silentAudioEl: HTMLAudioElement | null = null;
@@ -534,6 +557,20 @@ class AudioEngine {
     if (vol <= 0.001) {
       el.muted = true;
       el.volume = 0;
+      // Registered unstarted: raising the volume during playback starts it in place (updateLiveVolumes)
+      // instead of restarting the whole graph.
+      this.liveMix.set(layer.id, {
+        isVideo,
+        localOffsetMs,
+        absStart,
+        absEnd,
+        gain: null,
+        el,
+        trimSec,
+        speed,
+        started: false,
+        sessionId,
+      });
       return;
     }
     el.muted = false;
@@ -554,6 +591,9 @@ class AudioEngine {
       }
       el.muted = false;
       this.activeFallbackEls.push(el);
+      const live = this.liveMix.get(layer.id);
+      if (live) live.started = true;
+      else this.liveMix.set(layer.id, { isVideo, localOffsetMs, absStart, absEnd, gain: null, el, trimSec, speed, started: true, sessionId });
       void el.play().catch(() => {});
       const stopDelayMs = Math.max(0, absEnd - Math.max(sceneMs, absStart));
       if (Number.isFinite(stopDelayMs) && stopDelayMs > 0) {
@@ -631,6 +671,7 @@ class AudioEngine {
       const remainingBufSec = Math.max(0.02, (buf.duration - offsetSec) / speed);
       src.start(ctx.currentTime + delaySec, offsetSec, Math.min(remainingClipSec, remainingBufSec));
       this.activeSources.push(src);
+      this.liveMix.set(layer.id, { isVideo, localOffsetMs, absStart, absEnd, gain, el: null });
     } catch {
       // Decode failed: for standalone <audio> layers, play via HTMLAudioElement fallback
       if (!isVideo && (mediaSrc || mediaId)) {
@@ -639,9 +680,70 @@ class AudioEngine {
     }
   }
 
+  /**
+   * Re-evaluate the live mix against the (possibly edited) layer list and ramp any gain that moved.
+   * Called from the playback loop, so volume keyframes actually animate in the preview — previously
+   * the gain was set once at play and the exported file (which bakes the automation) sounded
+   * different from the preview. Cheap: it early-returns while nothing is running or nothing changed.
+   */
+  public updateLiveVolumes(layers: Layer[]): void {
+    if (!this.playbackActive || this.liveMix.size === 0 || !this.ctx) return;
+    const fresh: { layer: Layer; absStart: number; absEnd: number; localOffsetMs: number }[] = [];
+    this.collectAudioLayers(layers, 0, Infinity, fresh);
+    const byId = new Map(fresh.map((f) => [f.layer.id, f]));
+    const sceneMs = this.getPlaybackPositionMs() ?? this.playbackStartSceneMs;
+    const now = this.ctx.currentTime;
+    for (const [id, entry] of this.liveMix) {
+      const item = byId.get(id);
+      let vol = 0;
+      if (item) {
+        const layer = item.layer;
+        if (entry.isVideo) {
+          vol = Math.max(0, Math.min(2, layer.mediaData?.volume ?? 1));
+        } else if (layer.audioData) {
+          const { remappedNormT } = evalRemappedTime(layer, Math.max(layer.startTime, sceneMs - entry.localOffsetMs));
+          vol = Math.max(0, Math.min(2, evalAnimatable(layer.audioData.volume, remappedNormT, 1)));
+        }
+      }
+      const prev = this.lastMixVolumes.get(id);
+      if (prev !== undefined && Math.abs(prev - vol) < 0.0015) continue;
+      this.lastMixVolumes.set(id, vol);
+      if (entry.gain) {
+        // setTargetAtTime keeps drags and per-tick keyframe steps click-free.
+        entry.gain.gain.setTargetAtTime(vol, now, 0.015);
+      }
+      if (entry.el) {
+        entry.el.volume = Math.max(0, Math.min(1, vol));
+        entry.el.muted = vol <= 0.001;
+        if (!entry.started && vol > 0.001 && entry.sessionId === this.playbackSessionId && sceneMs >= entry.absStart && sceneMs < entry.absEnd) {
+          entry.started = true;
+          try {
+            entry.el.currentTime = (entry.trimSec ?? 0) + ((sceneMs - entry.absStart) / 1000) * (entry.speed || 1);
+          } catch {
+            // seek before metadata
+          }
+          this.activeFallbackEls.push(entry.el);
+          void entry.el.play().catch(() => {});
+          const stopDelayMs = Math.max(0, entry.absEnd - sceneMs);
+          if (Number.isFinite(stopDelayMs) && stopDelayMs > 0) {
+            const sid = this.playbackSessionId;
+            const stopId = window.setTimeout(() => {
+              if (sid !== this.playbackSessionId || !entry.el) return;
+              if (!entry.el.paused) entry.el.pause();
+              entry.el.muted = true;
+            }, stopDelayMs);
+            this.fallbackTimers.push(stopId);
+          }
+        }
+      }
+    }
+  }
+
   public stopPlayback(): void {
     this.playbackActive = false;
     this.playbackSessionId++;
+    this.liveMix.clear();
+    this.lastMixVolumes.clear();
     for (const s of this.activeSources) {
       try {
         s.stop();

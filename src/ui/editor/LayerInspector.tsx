@@ -99,6 +99,9 @@ export const LayerInspector: React.FC = () => {
   const [showParentMenu, setShowParentMenu] = useState(false);
   const [showMoreMenu, setShowMoreMenu] = useState(false);
   const [sheetPeek, setSheetPeek] = useState(false);
+  const [sheetSnapH, setSheetSnapH] = useState<number | null>(null);
+  const sheetDragMovedRef = useRef(false);
+  const tabStripRef = useRef<HTMLDivElement>(null);
 
   const isMobileClassic = layoutMode === 'classic';
   const fps = Math.max(1, project?.fps ?? 30);
@@ -112,6 +115,11 @@ export const LayerInspector: React.FC = () => {
       const ms = playbackClock.get();
       if (miniRangeRef.current) {
         miniRangeRef.current.value = String(Math.round(ms));
+        const maxMs = Number(miniRangeRef.current.max) || 1;
+        miniRangeRef.current.style.setProperty(
+          '--scrub-pct',
+          `${Math.max(0, Math.min(100, (ms / maxMs) * 100))}%`
+        );
       }
       if (miniTimeRef.current) {
         const totalSec = Math.floor(Math.max(0, ms) / 1000);
@@ -130,18 +138,36 @@ export const LayerInspector: React.FC = () => {
     return () => cancelAnimationFrame(raf);
   }, [isMobileClassic, isPlaying, fps]);
 
+  // Paused/scrubbing: keep the scrub fill in step with the playhead (the rAF loop owns it while playing)
+  useEffect(() => {
+    if (!isMobileClassic || isPlaying) return;
+    const el = miniRangeRef.current;
+    if (!el) return;
+    const maxMs = Math.max(100, Number(el.max) || 100);
+    el.style.setProperty('--scrub-pct', `${Math.max(0, Math.min(100, (currentTimeMs / maxMs) * 100))}%`);
+  }, [isMobileClassic, isPlaying, currentTimeMs]);
+
+  // Workflow: the active tab pill always scrolls itself into view, so deep property lists stay oriented
+  useEffect(() => {
+    if (!isMobileClassic) return;
+    const active = tabStripRef.current?.querySelector('.am-mobile-tab-pill.active');
+    active?.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' });
+  }, [isMobileClassic, inspectorTab, curveTarget, layer?.id]);
+
   // Toggle MO-8 mobile sheet peek height via root CSS var so the preview stage smoothly grows
   useEffect(() => {
     if (!isMobileClassic) return;
     if (sheetPeek) {
       document.documentElement.style.setProperty('--am-mobile-sheet-h', '132px');
+    } else if (sheetSnapH) {
+      document.documentElement.style.setProperty('--am-mobile-sheet-h', `${sheetSnapH}px`);
     } else {
       document.documentElement.style.removeProperty('--am-mobile-sheet-h');
     }
     return () => {
-      if (sheetPeek) document.documentElement.style.removeProperty('--am-mobile-sheet-h');
+      if (sheetPeek || sheetSnapH) document.documentElement.style.removeProperty('--am-mobile-sheet-h');
     };
-  }, [isMobileClassic, sheetPeek]);
+  }, [isMobileClassic, sheetPeek, sheetSnapH]);
 
   const handleReplaceMedia = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -233,9 +259,11 @@ export const LayerInspector: React.FC = () => {
     e.stopPropagation();
     const startY = e.clientY;
     const sheetEl = e.currentTarget.parentElement;
+    const bodyEl = sheetEl?.parentElement ?? null;
     const startH = sheetEl ? sheetEl.getBoundingClientRect().height : window.innerHeight * 0.46;
     const minH = 132;
     const maxH = Math.round(window.innerHeight * 0.72);
+    const defaultH = Math.round(window.innerHeight * 0.46);
     let moved = false;
     let lastH = startH;
     try {
@@ -244,17 +272,45 @@ export const LayerInspector: React.FC = () => {
       // ignore
     }
     const onMove = (ev: PointerEvent) => {
-      if (Math.abs(ev.clientY - startY) > 4) moved = true;
-      lastH = Math.max(minH, Math.min(maxH, Math.round(startH - (ev.clientY - startY))));
+      if (Math.abs(ev.clientY - startY) > 4) {
+        moved = true;
+        sheetDragMovedRef.current = true;
+        // Kill the snap transition while a finger is literally driving the height
+        bodyEl?.classList.add('sheet-dragging');
+      }
+      lastH = Math.max(80, Math.min(maxH, Math.round(startH - (ev.clientY - startY))));
       document.documentElement.style.setProperty('--am-mobile-sheet-h', `${lastH}px`);
     };
     const onUp = () => {
       window.removeEventListener('pointermove', onMove);
       window.removeEventListener('pointerup', onUp);
       window.removeEventListener('pointercancel', onUp);
-      if (moved) {
-        setSheetPeek(lastH <= 165);
+      bodyEl?.classList.remove('sheet-dragging');
+      if (!moved) return;
+      // Swipe well past the peek line = dismiss the sheet back to the timeline (native sheet behavior)
+      if (lastH < 104) {
+        setSheetPeek(false);
+        setSheetSnapH(null);
+        document.documentElement.style.removeProperty('--am-mobile-sheet-h');
+        setInspectorTab('none');
+        window.setTimeout(() => {
+          sheetDragMovedRef.current = false;
+        }, 120);
+        return;
       }
+      // Snap to the nearest detent: peek (132) / default (46%) / tall (72%)
+      const detents = [minH, defaultH, maxH];
+      const snapped = detents.reduce((best, h) =>
+        Math.abs(h - lastH) < Math.abs(best - lastH) ? h : best
+      );
+      setSheetPeek(snapped === minH);
+      setSheetSnapH(snapped === minH || Math.abs(snapped - defaultH) < 10 ? null : snapped);
+      if (snapped === minH) document.documentElement.style.setProperty('--am-mobile-sheet-h', '132px');
+      else if (snapped === defaultH) document.documentElement.style.removeProperty('--am-mobile-sheet-h');
+      else document.documentElement.style.setProperty('--am-mobile-sheet-h', `${snapped}px`);
+      window.setTimeout(() => {
+        sheetDragMovedRef.current = false;
+      }, 120);
     };
     window.addEventListener('pointermove', onMove);
     window.addEventListener('pointerup', onUp);
@@ -288,9 +344,13 @@ export const LayerInspector: React.FC = () => {
         <div
           className="am-mobile-sheet-handle"
           onPointerDown={handleMobileSheetDrag}
-          onClick={() => setSheetPeek((p) => !p)}
-          title={sheetPeek ? 'Tap or drag up to expand inspector' : 'Tap or drag down to peek preview'}
+          onClick={() => {
+            if (sheetDragMovedRef.current) return;
+            setSheetPeek((p) => !p);
+          }}
+          title={sheetPeek ? 'Tap or drag up to expand inspector' : 'Tap or drag down to peek · swipe away to close'}
         >
+          <span className="am-mobile-sheet-title">{layer.label}</span>
           <span className="am-mobile-sheet-grip" />
           <span className="am-mobile-sheet-peek-label">{sheetPeek ? 'Expand ▲' : 'Peek ▼'}</span>
         </div>
@@ -501,7 +561,7 @@ export const LayerInspector: React.FC = () => {
               }}
               title={isPlaying ? 'Pause' : 'Play'}
             >
-              <AmIcon name={isPlaying ? 'ic_edit_pause' : 'ic_edit_play'} fallback={isPlaying ? 'pause' : 'play'} size={16} color="#00FFA8" />
+              <AmIcon name={isPlaying ? 'ic_edit_pause' : 'ic_edit_play'} fallback={isPlaying ? 'pause' : 'play'} size={17} color="#052018" />
             </button>
             <button
               type="button"
@@ -565,7 +625,7 @@ export const LayerInspector: React.FC = () => {
           </div>
 
           <div className="am-mobile-tab-bar">
-            <div className="am-mobile-tab-strip">
+            <div className="am-mobile-tab-strip" ref={tabStripRef}>
               {mobileQuickTabs.map((t) => {
                 const active =
                   !curveTarget &&
